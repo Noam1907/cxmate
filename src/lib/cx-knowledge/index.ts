@@ -1,0 +1,117 @@
+// ============================================
+// Journey Templates & Meaningful Moments (existing)
+// ============================================
+export {
+  SALES_STAGES,
+  CUSTOMER_STAGES,
+  FULL_LIFECYCLE_STAGES,
+  getDefaultStages,
+  type StageTemplate,
+} from "./journey-templates";
+
+export {
+  SALES_MOMENTS,
+  CUSTOMER_MOMENTS,
+  getDefaultMoments,
+  type MomentTemplate,
+} from "./meaningful-moments";
+
+export { VERTICALS, getVertical, type VerticalConfig } from "./verticals";
+
+// ============================================
+// CX Theory Engine (Layer 3)
+// ============================================
+export {
+  DECISION_CYCLE,
+  DECISION_DIAGNOSES,
+  getDecisionStage,
+  getPriceRelevance,
+  diagnoseSalesProblem,
+  type DecisionStage,
+  type DecisionStageProfile,
+  type DecisionDiagnosis,
+} from "./buyer-decision-cycle";
+
+export {
+  LIFECYCLE_PHASES,
+  LIFECYCLE_ANTI_PATTERNS,
+  getLifecyclePhase,
+  getAntiPatternsForPhase,
+  assessSignal,
+  type LifecyclePhase,
+  type LifecyclePhaseProfile,
+  type LifecycleAntiPattern,
+} from "./customer-lifecycle-science";
+
+export {
+  ALL_FAILURE_PATTERNS,
+  getFailurePatternsByPhase,
+  getFailurePatternsByStage,
+  getCriticalPatterns,
+  getFailurePattern,
+  type FailurePattern,
+} from "./failure-patterns";
+
+export {
+  ALL_SUCCESS_PATTERNS,
+  getSuccessPatternsByPhase,
+  getSuccessPatternsByStage,
+  getQuickWins,
+  getHighImpactPatterns,
+  getSuccessPattern,
+  type SuccessPattern,
+} from "./success-patterns";
+
+// ============================================
+// CX Tools (Layer 5)
+// ============================================
+export {
+  MEASUREMENT_TOOLS,
+  getToolsForStage,
+  getMeasurementTool,
+  getToolsByEase,
+  type MeasurementTool,
+  type MeasurementToolType,
+  type ToolRecommendation,
+} from "./cx-tools/measurement-tools";
+
+// ============================================
+// Impact Models (Layer 6)
+// ============================================
+export {
+  VERTICAL_BENCHMARKS,
+  SIZE_BENCHMARKS,
+  getVerticalBenchmark,
+  getSizeBenchmark,
+  getBlendedBenchmark,
+  type VerticalBenchmark,
+  type SizeBenchmark,
+  type BenchmarkMetrics,
+} from "./impact-models/benchmarks";
+
+export {
+  calculateChurnReductionImpact,
+  calculateOnboardingImpact,
+  calculateConversionImpact,
+  calculateExpansionImpact,
+  generateQuickImpactEstimates,
+  formatCurrency,
+  formatImpactRange,
+  type CompanyProfile,
+  type ImpactEstimate,
+} from "./impact-models/impact-calculator";
+
+// ============================================
+// Best Practice Foundations (Mode A)
+// ============================================
+export {
+  CX_FOUNDATIONS,
+  STAGE_GUIDANCE,
+  getFoundationsByPriority,
+  getFoundationsForStage,
+  getStageGuidance,
+  getMistakesForStage,
+  type FoundationElement,
+  type StageGuidance,
+  type MaturityStage,
+} from "./best-practice-foundations";

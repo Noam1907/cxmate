@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx create-next-app:*)",
+      "Bash(npm install:*)",
+      "Bash(npx:*)",
+      "Bash(pbcopy:*)",
+      "Bash(npm run dev:*)",
+      "Bash(pkill:*)",
+      "Bash(curl:*)",
+      "mcp__filesystem__read_text_file",
+      "mcp__filesystem__list_directory",
+      "mcp__filesystem__directory_tree",
+      "mcp__filesystem__read_multiple_files",
+      "Bash(git init:*)",
+      "Bash(git -C /Users/anat/Documents/Anat-workspace/cx-mate add -A)",
+      "Bash(git -C /Users/anat/Documents/Anat-workspace/cx-mate status)"
+    ]
+  }
+}
