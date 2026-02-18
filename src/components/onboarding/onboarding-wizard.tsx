@@ -94,8 +94,8 @@ export function OnboardingWizard() {
       const result = await response.json();
       // Store result for the journey page to pick up
       sessionStorage.setItem("cx-mate-journey", JSON.stringify(result));
-      // Redirect to journey map with the new template ID
-      router.push(`/journey?id=${result.templateId}`);
+      // Redirect to confrontation screen (the "aha moment"), then they proceed to full journey
+      router.push(`/confrontation?id=${result.templateId}`);
     } catch (error) {
       console.error("Onboarding error:", error);
       // TODO: Show error toast
