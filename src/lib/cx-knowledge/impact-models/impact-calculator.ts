@@ -297,6 +297,112 @@ function calculatePriorityScore(
 }
 
 // ============================================
+// Build Profile from Onboarding Data
+// ============================================
+
+export interface OnboardingProfile {
+  profile: CompanyProfile;
+  dataSource: "user_provided" | "benchmark_estimated";
+  calculations: {
+    customerCount: { value: number; source: string };
+    averageACV: { value: number; source: string };
+    churnRate: { value: number; source: string };
+    annualRevenue: { value: number; source: string };
+  };
+}
+
+/**
+ * Maps onboarding string values to a CompanyProfile with numeric data.
+ * Returns dataSource to indicate whether we used user data or benchmarks.
+ */
+export function buildProfileFromOnboarding(input: {
+  hasExistingCustomers: boolean;
+  customerCount: string;
+  roughRevenue: string;
+  averageDealSize: string;
+  companySize: string;
+  vertical: string;
+}): OnboardingProfile {
+  const hasData = input.hasExistingCustomers;
+
+  // Customer count
+  const customerCountMap: Record<string, number> = {
+    "1-10": 5,
+    "11-50": 30,
+    "51-200": 100,
+    "200+": 350,
+  };
+  const customerCount = hasData && input.customerCount
+    ? customerCountMap[input.customerCount] || estimateCustomerCount(input.companySize)
+    : estimateCustomerCount(input.companySize);
+
+  // Average ACV
+  const dealSizeMap: Record<string, number> = {
+    under_1k: 500,
+    "1k_5k": 3000,
+    "5k_20k": 12000,
+    "20k_50k": 35000,
+    "50k_plus": 75000,
+  };
+  const averageACV = hasData && input.averageDealSize
+    ? dealSizeMap[input.averageDealSize] || estimateACV(input.vertical)
+    : estimateACV(input.vertical);
+
+  // Revenue
+  const revenueMap: Record<string, number> = {
+    pre_revenue: 0,
+    under_100k: 50000,
+    "100k_500k": 300000,
+    "500k_1m": 750000,
+    "1m_plus": 1500000,
+  };
+  const annualRevenue = hasData && input.roughRevenue
+    ? revenueMap[input.roughRevenue] || customerCount * averageACV
+    : customerCount * averageACV;
+
+  // Churn rate — always benchmarked (we don't ask for it yet)
+  const churnRate = estimateChurnRate(input.companySize);
+
+  const dataSource = hasData && input.customerCount && input.averageDealSize
+    ? "user_provided" as const
+    : "benchmark_estimated" as const;
+
+  return {
+    profile: {
+      customerCount,
+      averageACV: averageACV,
+      monthlyChurnRate: churnRate,
+      annualRevenue,
+    },
+    dataSource,
+    calculations: {
+      customerCount: {
+        value: customerCount,
+        source: hasData && input.customerCount
+          ? `User selected: ${input.customerCount}`
+          : `Benchmark for ${input.companySize} company`,
+      },
+      averageACV: {
+        value: averageACV,
+        source: hasData && input.averageDealSize
+          ? `User selected: ${input.averageDealSize} range`
+          : `Industry benchmark for ${input.vertical}`,
+      },
+      churnRate: {
+        value: churnRate,
+        source: `Industry benchmark for ${input.companySize} company`,
+      },
+      annualRevenue: {
+        value: annualRevenue,
+        source: hasData && input.roughRevenue
+          ? `User selected: ${input.roughRevenue} range`
+          : `Estimated: ${customerCount} customers × $${averageACV.toLocaleString()} ACV`,
+      },
+    },
+  };
+}
+
+// ============================================
 // Format helpers for display
 // ============================================
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -29,7 +29,8 @@ function useRecommendationStatus() {
   const [statuses, setStatuses] = useState<Record<string, RecStatus>>({});
 
   useEffect(() => {
-    const stored = sessionStorage.getItem("cx-mate-rec-status");
+    // Use localStorage so progress survives browser refresh
+    const stored = localStorage.getItem("cx-mate-rec-status");
     if (stored) {
       try {
         setStatuses(JSON.parse(stored));
@@ -42,7 +43,7 @@ function useRecommendationStatus() {
   const setStatus = (key: string, status: RecStatus) => {
     setStatuses((prev) => {
       const next = { ...prev, [key]: status };
-      sessionStorage.setItem("cx-mate-rec-status", JSON.stringify(next));
+      localStorage.setItem("cx-mate-rec-status", JSON.stringify(next));
       return next;
     });
   };
@@ -153,6 +154,30 @@ function statusStyle(status: RecStatus) {
 // Recommendation Card
 // ============================================
 
+function CopyButton({ text }: { text: string }) {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation();
+      navigator.clipboard.writeText(text).then(() => {
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      });
+    },
+    [text]
+  );
+
+  return (
+    <button
+      onClick={handleCopy}
+      className="text-xs px-2 py-1 rounded border border-slate-200 bg-white hover:bg-slate-50 text-slate-600 transition-colors shrink-0"
+    >
+      {copied ? "Copied!" : "Copy"}
+    </button>
+  );
+}
+
 function RecommendationCard({
   rec,
   status,
@@ -225,7 +250,10 @@ function RecommendationCard({
               {/* Template */}
               {rec.template && (
                 <div className="rounded-md bg-slate-50 border p-3">
-                  <div className="text-xs font-semibold mb-1.5">Template</div>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <div className="text-xs font-semibold">Template</div>
+                    <CopyButton text={rec.template} />
+                  </div>
                   <div className="text-sm whitespace-pre-line leading-relaxed text-slate-700">
                     {rec.template}
                   </div>

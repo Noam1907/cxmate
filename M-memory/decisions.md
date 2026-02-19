@@ -45,6 +45,9 @@ Track key technical and product decisions and why they were made.
 | 2026-02-18 | **Knowledge base wired into journey prompt** | All 8 knowledge modules injected into Claude prompt context. Prompt includes decision science, lifecycle science, failure/success patterns, CX tools, benchmarks, foundations — all filtered by company maturity stage. | Active |
 | 2026-02-18 | **Output interfaces enriched (backward-compatible)** | New fields (diagnosis, actionTemplate, cxToolRecommendation, etc.) added as optional to GeneratedMoment/Stage/Journey. New journey-level arrays: confrontationInsights, cxToolRoadmap, impactProjections. Old UI components still work. | Active |
 | 2026-02-18 | **Max tokens increased to 8192** | Richer theory-backed output requires more tokens. Doubled from 4096 to 8192. | Active |
+| 2026-02-19 | **localStorage for status tracking (not Supabase yet)** | Full DB persistence requires auth → org → journey → moments → recommendations chain. That's Sprint 3 scope. localStorage survives refresh, good enough for preview mode. | Active |
+| 2026-02-19 | **Confrontation mode detection by companySize** | 1-50 = early_stage (Mode A), 51-300 = growing (Mode B), 300+ = established (Mode C). Each mode gets distinct headline, subtitle, section headings. Detection is client-side from onboarding data. | Active |
+| 2026-02-19 | **Deferred research pipeline + curated templates to Sprint 3** | Research pipeline (Claude tool_use) and curated template library are valuable but not blocking. Ship Sprint 2 with AI-generated templates and best-practice confrontation first. | Active |
 
 ---
 

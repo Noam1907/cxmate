@@ -1,16 +1,14 @@
 /**
- * AI Engineer: Journey Generation Prompt (v2 — Theory-Backed)
+ * AI Engineer: Journey Generation Prompt (v3 — CX Mate Companion)
  *
- * This module builds the prompt sent to Claude to generate a
- * customized journey map based on onboarding data.
- *
- * v2 enhancements:
- * - Injects CX theory engine (buyer decision cycle, lifecycle science)
- * - Includes failure/success patterns relevant to company stage
- * - Recommends CX measurement tools per stage
- * - Provides benchmark context for the company's vertical and size
- * - Includes best-practice foundations for early-stage companies
- * - Outputs actionable diagnoses, not just observations
+ * v3 enhancements:
+ * - CX Mate persona: peer advisor, not judge. "Companies like yours typically..." not "Here's the truth..."
+ * - Two-path analysis: COMPARISON mode (has customers) vs PRESCRIPTIVE mode (pre-customer)
+ * - CX maturity context: NPS/CSAT/CES usage, response counts, journey maps, data vs gut
+ * - Business data context: real revenue, ACV, pricing model → grounded math
+ * - Transparent impact projections: show the formula, cite the data source
+ * - companionAdvice field on ConfrontationInsight
+ * - calculation + dataSource fields on ImpactProjection
  */
 
 import {
@@ -35,10 +33,11 @@ import {
   getStageGuidance,
   type MaturityStage,
 } from "@/lib/cx-knowledge";
+import { buildProfileFromOnboarding } from "@/lib/cx-knowledge/impact-models/impact-calculator";
 import type { OnboardingInput } from "@/lib/validations/onboarding";
 
 // ============================================
-// Output Interfaces (v2 — enriched)
+// Output Interfaces (v3 — enriched)
 // ============================================
 
 export interface GeneratedMoment {
@@ -48,12 +47,11 @@ export interface GeneratedMoment {
   severity: "low" | "medium" | "high" | "critical";
   triggers: string[];
   recommendations: string[];
-  // v2: Theory-backed enrichments
-  diagnosis?: string; // What's likely going wrong and why (from CX theory)
-  actionTemplate?: string; // Specific thing to do/write/send
-  cxToolRecommendation?: string; // Which measurement tool to deploy here
-  decisionScienceInsight?: string; // What the buyer/customer is thinking at this stage
-  impactIfIgnored?: string; // Business impact of not addressing this
+  diagnosis?: string;
+  actionTemplate?: string;
+  cxToolRecommendation?: string;
+  decisionScienceInsight?: string;
+  impactIfIgnored?: string;
 }
 
 export interface GeneratedStage {
@@ -62,19 +60,19 @@ export interface GeneratedStage {
   description: string;
   emotionalState: string;
   meaningfulMoments: GeneratedMoment[];
-  // v2: Stage-level enrichments
-  topFailureRisk?: string; // The most likely CX failure at this stage
-  successPattern?: string; // The highest-impact success pattern for this stage
-  benchmarkContext?: string; // How similar companies perform at this stage
+  topFailureRisk?: string;
+  successPattern?: string;
+  benchmarkContext?: string;
 }
 
 export interface ConfrontationInsight {
-  pattern: string; // e.g., "Premature Price Reveal"
+  pattern: string;
   likelihood: "high" | "medium" | "low";
   description: string;
   businessImpact: string;
   immediateAction: string;
   measureWith: string;
+  companionAdvice?: string; // v3: CX Mate's peer one-liner
 }
 
 export interface CxToolRecommendation {
@@ -86,19 +84,20 @@ export interface CxToolRecommendation {
 
 export interface ImpactProjection {
   area: string;
-  potentialImpact: string; // e.g., "$50K-120K annual revenue impact"
+  potentialImpact: string;
   timeToRealize: string;
   effort: string;
+  calculation?: string; // v3: show the math formula
+  dataSource?: "user_provided" | "benchmark_estimated"; // v3: transparency
 }
 
 export interface GeneratedJourney {
   name: string;
   stages: GeneratedStage[];
-  // v2: Journey-level intelligence (optional for backward compatibility with v1 journeys)
   confrontationInsights?: ConfrontationInsight[];
   cxToolRoadmap?: CxToolRecommendation[];
   impactProjections?: ImpactProjection[];
-  maturityAssessment?: string; // Where they are and what to focus on
+  maturityAssessment?: string;
 }
 
 // ============================================
@@ -106,10 +105,9 @@ export interface GeneratedJourney {
 // ============================================
 
 function detectMaturityStage(companySize: string): MaturityStage {
-  // Map company size to maturity stage for knowledge base routing
   switch (companySize) {
     case "1-10":
-      return "pre_revenue"; // Or first_customers — small team
+      return "pre_revenue";
     case "11-50":
       return "first_customers";
     case "51-150":
@@ -123,7 +121,6 @@ function detectMaturityStage(companySize: string): MaturityStage {
 function detectCompanyStage(companySize: string): "early" | "growing" | "established" {
   switch (companySize) {
     case "1-10":
-      return "early";
     case "11-50":
       return "early";
     case "51-150":
@@ -189,7 +186,7 @@ function buildFailurePatternContext(companyStage: "early" | "growing" | "establi
   ).join("\n");
 
   return `## Common CX Failure Patterns for ${companyStage}-stage companies
-These are the mistakes companies at this stage typically make. Use these to diagnose and confront:
+These are the mistakes companies at this stage typically make:
 
 ${formatted}`;
 }
@@ -284,6 +281,148 @@ ${foundations.map((f) => `- **${f.name}** (priority ${f.priority}): ${f.descript
 }
 
 // ============================================
+// v3: CX Maturity Context Builder
+// ============================================
+
+function buildCxMaturityContext(input: OnboardingInput): string {
+  const sections: string[] = [];
+
+  // What they measure
+  const metrics: string[] = [];
+  if (input.measuresNps) metrics.push("NPS");
+  if (input.measuresCsat) metrics.push("CSAT");
+  if (input.measuresCes) metrics.push("CES");
+
+  if (metrics.length > 0) {
+    sections.push(`CX metrics in use: ${metrics.join(", ")}`);
+
+    // NPS callout
+    if (input.measuresNps && input.npsResponseCount) {
+      if (input.npsResponseCount === "under_50") {
+        sections.push(
+          "⚠️ NPS with under 50 responses is NOT statistically reliable. " +
+          "Suggest they weight CSAT more heavily until response volume grows. " +
+          "Don't cite their NPS score as meaningful — use it as directional only."
+        );
+      } else if (input.npsResponseCount === "50_100") {
+        sections.push(
+          "NPS with 50-100 responses is borderline reliable. " +
+          "Recommend increasing sample size. Treat as directional."
+        );
+      } else {
+        sections.push(
+          "NPS with 100+ responses — statistically meaningful. Can be used with confidence."
+        );
+      }
+    }
+  } else {
+    sections.push(
+      "Not tracking any CX metrics yet. " +
+      "This is common at their stage. Recommend starting with one simple metric."
+    );
+  }
+
+  // Journey map
+  sections.push(
+    input.hasJourneyMap
+      ? "Has an existing journey map — build on what they have, don't start from scratch."
+      : "No existing journey map — this will be their first. Keep it simple and actionable."
+  );
+
+  // Data vs gut
+  const dataLabels: Record<string, string> = {
+    all_gut: "Makes CX decisions entirely on instinct — no data infrastructure yet",
+    mostly_gut: "Mostly instinct-driven with some data — early stage of measurement maturity",
+    mix: "Balanced data and instinct — has some measurement but gaps remain",
+    mostly_data: "Primarily data-driven — good measurement foundation, optimize from here",
+    data_driven: "Fully data-driven CX decisions — mature measurement stack",
+  };
+  sections.push(dataLabels[input.dataVsGut] || "CX decision style unknown");
+
+  return `## CX Maturity Assessment
+${sections.join("\n")}
+
+Use this to calibrate your recommendations:
+- If they're gut-driven, don't recommend complex analytics — start with basic measurement
+- If they already measure well, focus on acting on data rather than collecting more
+- Match CX tool recommendations to their actual measurement maturity`;
+}
+
+// ============================================
+// v3: Business Data Context Builder
+// ============================================
+
+function buildBusinessDataContext(input: OnboardingInput): string {
+  const onboardingProfile = buildProfileFromOnboarding({
+    hasExistingCustomers: input.hasExistingCustomers,
+    customerCount: input.customerCount,
+    roughRevenue: input.roughRevenue,
+    averageDealSize: input.averageDealSize,
+    companySize: input.companySize,
+    vertical: input.vertical,
+  });
+
+  const { calculations, dataSource } = onboardingProfile;
+  const p = onboardingProfile.profile;
+
+  let context = `## Business Data (${dataSource === "user_provided" ? "User-provided numbers" : "Benchmark estimates"})\n`;
+
+  context += `
+- Customers: ~${p.customerCount} (${calculations.customerCount.source})
+- Average ACV: $${p.averageACV.toLocaleString()} (${calculations.averageACV.source})
+- Est. monthly churn: ${p.monthlyChurnRate}% (${calculations.churnRate.source})
+- Est. annual revenue: $${p.annualRevenue?.toLocaleString()} (${calculations.annualRevenue.source})`;
+
+  if (dataSource === "user_provided") {
+    context += `
+
+IMPORTANT: Since the user provided real business data, you MUST:
+1. Show your math in impact projections — e.g., "50 customers × $12K ACV × 25% churn reduction = $150K saved"
+2. Set dataSource to "user_provided" on all impactProjections
+3. Use their actual numbers, not benchmarks
+4. Include the calculation formula in the "calculation" field`;
+  } else {
+    context += `
+
+IMPORTANT: These are benchmark estimates (user didn't provide real numbers). You MUST:
+1. Label all projections clearly — "Based on industry benchmarks for [vertical] companies at your stage"
+2. Set dataSource to "benchmark_estimated" on all impactProjections
+3. Use percentage-based language when possible ("typically reduces churn by 20-30%")
+4. Include the benchmark source in the "calculation" field`;
+  }
+
+  return context;
+}
+
+// ============================================
+// v3: Two-Path Analysis Mode
+// ============================================
+
+function buildAnalysisModeContext(input: OnboardingInput): string {
+  if (input.hasExistingCustomers) {
+    return `## Analysis Mode: COMPARISON
+This company has existing customers. Your job is to:
+1. VALIDATE what they're doing right — acknowledge their progress
+2. COMPARE their current state against best practices for ${input.vertical} companies at their stage
+3. Identify GAPS between where they are and where they should be
+4. Show the REVENUE IMPACT of closing each gap (with transparent math)
+5. Frame insights as "Companies like yours typically..." not "You're doing this wrong"
+
+Tone: You're a knowledgeable peer who's seen this movie before. You're validating their experience while showing them what the best companies at their stage do differently.`;
+  }
+
+  return `## Analysis Mode: PRESCRIPTIVE
+This company is pre-customer or very early. Your job is to:
+1. PRESCRIBE the optimal journey from day one — they have a blank canvas
+2. Show them what "great" looks like at their stage (not aspirational enterprise practices)
+3. Highlight the TOP 3 things to get right from the start (not 20 things)
+4. Use PERCENTAGE-based projections since we don't have real revenue data
+5. Frame insights as "The companies that nail this early..." and "Here's what you want to avoid..."
+
+Tone: You're a mentor who's helped dozens of companies launch. You're excited about their potential while being practical about priorities.`;
+}
+
+// ============================================
 // Main Prompt Builder
 // ============================================
 
@@ -292,7 +431,6 @@ export function buildJourneyPrompt(input: OnboardingInput): string {
   const defaultStages = getDefaultStages(input.journeyType);
   const defaultMoments = getDefaultMoments(input.journeyType);
 
-  // Detect maturity for knowledge routing
   const maturityStage = detectMaturityStage(input.companySize);
   const companyStage = detectCompanyStage(input.companySize);
 
@@ -307,7 +445,7 @@ Key moments for this vertical: ${vertical.keyMoments.join(", ") || "varies"}`
   const stageNames = defaultStages.map((s) => s.name).join(", ");
   const momentNames = defaultMoments.map((m) => m.name).join(", ");
 
-  // Build knowledge context sections
+  // Build all context sections
   const decisionCycleContext = buildDecisionCycleContext();
   const lifecycleContext = buildLifecycleContext();
   const failureContext = buildFailurePatternContext(companyStage);
@@ -316,12 +454,26 @@ Key moments for this vertical: ${vertical.keyMoments.join(", ") || "varies"}`
   const benchmarkContext = buildBenchmarkContext(input.vertical, input.companySize);
   const foundationsContext = buildFoundationsContext(maturityStage);
 
-  return `You are a world-class CX architect with deep expertise in B2B customer experience, buyer psychology, and decision science. You don't just map journeys — you diagnose problems, prescribe actions, and quantify impact.
+  // v3: New context sections
+  const cxMaturityContext = buildCxMaturityContext(input);
+  const businessDataContext = buildBusinessDataContext(input);
+  const analysisModeContext = buildAnalysisModeContext(input);
+
+  return `You are CX Mate — a knowledgeable CX companion for B2B startups. Think of yourself as a trusted peer advisor who's been in the trenches, seen what works and what doesn't, and is now whispering smart advice in the founder's ear.
+
+## Your Persona
+- **Peer advisor, not judge.** You validate what they're doing right before showing gaps. Frame insights as "Companies like yours typically..." not "Here's the truth about your business..."
+- **Assertive and direct** — you don't hedge or give wishy-washy advice. You have opinions backed by data.
+- **Touch of humor** — professional but not corporate. You're the kind of advisor people actually enjoy talking to.
+- **Never condescending.** Even if they're early stage with no CX in place, you respect where they are and meet them there.
+- **Transparent about data quality.** When using their real numbers, say "Based on your numbers..." When using benchmarks, say "Based on what we see with similar companies..."
 
 ## Company Context
 - Company: ${input.companyName}
 - Size: ${input.companySize} employees
 - Maturity stage: ${maturityStage} (${companyStage})
+- Has existing customers: ${input.hasExistingCustomers ? "Yes" : "No (pre-customer)"}
+${input.hasExistingCustomers && input.customerCount ? `- Customer count: ${input.customerCount}` : ""}
 ${verticalContext}
 - Journey type requested: ${input.journeyType}
 - Their customers: ${input.customerDescription}
@@ -340,6 +492,18 @@ ${input.additionalContext ? `- Additional context: ${input.additionalContext}` :
 ## Default Template
 The standard stages for a ${input.journeyType} journey are: ${stageNames}
 Standard meaningful moments include: ${momentNames}
+
+---
+
+${analysisModeContext}
+
+---
+
+${cxMaturityContext}
+
+---
+
+${businessDataContext}
 
 ---
 
@@ -362,26 +526,35 @@ ${foundationsContext}
 ---
 
 ## Your Task
-Generate a customized, theory-backed journey map that goes beyond generic advice:
+Generate a customized, theory-backed journey map with the CX Mate companion voice:
 
 1. **Stages**: Use the standard stages as a foundation but customize names, descriptions, and emotional states to match this specific company. For each stage, identify the top failure risk and recommend the highest-impact success pattern.
 
 2. **Meaningful Moments (2-4 per stage)**: Tailored to their industry and challenges. For each moment:
-   - Provide a theory-backed **diagnosis** (what's likely going wrong and the root cause, based on the failure patterns and decision science above)
-   - Give a specific **actionTemplate** (exactly what to do, write, or send — not vague advice)
-   - Recommend a specific **cxToolRecommendation** (which measurement tool to deploy at this moment)
-   - Include a **decisionScienceInsight** (what the buyer/customer is psychologically experiencing here)
-   - State the **impactIfIgnored** (the business cost of not addressing this)
+   - Provide a theory-backed **diagnosis** (what's likely going wrong and the root cause)
+   - Give a specific **actionTemplate** (exactly what to do, write, or send)
+   - Recommend a specific **cxToolRecommendation** (which measurement tool to deploy)
+   - Include a **decisionScienceInsight** (what the buyer/customer is psychologically experiencing)
+   - State the **impactIfIgnored** (the business cost — use their numbers or benchmarks)
 
-3. **Confrontation Insights (3-5)**: The most important "here's what companies like you get wrong" findings. Be specific and direct. Each includes the pattern name, likelihood for this company, business impact, immediate action, and what to measure.
+3. **Confrontation Insights (3-5)**: Use the companion voice. Frame as "What typically trips up companies at your stage" not "What you're getting wrong." Each includes:
+   - The pattern name
+   - Likelihood for this company
+   - Business impact (with math if user provided data)
+   - Immediate action
+   - What to measure
+   - **companionAdvice**: A single-sentence CX Mate comment in first person, like a smart friend saying what they'd do. Examples: "If I were you, I'd fix this before hiring a CS team." or "This is the #1 thing I see killing retention at your stage."
 
-4. **CX Tool Roadmap (3-5 tools)**: Which CX measurement tools to deploy, in what order, and why. Match to the company's maturity stage.
+4. **CX Tool Roadmap (3-5 tools)**: Matched to their CX maturity. Don't recommend NPS if they have under 50 responses — suggest CSAT instead.
 
-5. **Impact Projections (2-3)**: Estimated business impact if they address the top CX issues. Use the benchmarks above to ground estimates.
+5. **Impact Projections (2-3)**: Each MUST include:
+   - **calculation**: The math formula (e.g., "50 customers × $12K ACV × 25% churn reduction = $150K")
+   - **dataSource**: "user_provided" or "benchmark_estimated"
+   - Show ranges (conservative to optimistic)
 
-6. **Maturity Assessment**: A 2-3 sentence assessment of where this company is, what they should focus on first, and what to avoid doing too early.
+6. **Maturity Assessment**: A 2-3 sentence CX Mate-style assessment. Validate where they are, name what to focus on, say what to avoid doing too early.
 
-Prioritize moments related to their stated pain points. Use plain language — no CX jargon. Be direct and confrontational when needed.
+Prioritize moments related to their stated pain points. Use plain language. Be the advisor they'd actually want to talk to.
 
 ## Output Format
 Return a JSON object with this exact structure:
@@ -393,9 +566,9 @@ Return a JSON object with this exact structure:
       "stageType": "sales" | "customer",
       "description": "What happens at this stage for this specific company",
       "emotionalState": "how the customer feels",
-      "topFailureRisk": "The most likely CX failure pattern at this stage (from the failure patterns above)",
+      "topFailureRisk": "The most likely CX failure pattern at this stage",
       "successPattern": "The highest-impact success intervention for this stage",
-      "benchmarkContext": "How similar companies perform at this stage (from benchmarks)",
+      "benchmarkContext": "How similar companies perform at this stage",
       "meaningfulMoments": [
         {
           "name": "Moment Name",
@@ -405,41 +578,44 @@ Return a JSON object with this exact structure:
           "triggers": ["signal 1", "signal 2"],
           "recommendations": ["specific action 1", "specific action 2"],
           "diagnosis": "What's likely going wrong and the root cause",
-          "actionTemplate": "Specific thing to do/write/send (be concrete — include email text, survey questions, or process steps)",
+          "actionTemplate": "Specific thing to do/write/send",
           "cxToolRecommendation": "Which CX measurement tool to deploy here and why",
           "decisionScienceInsight": "What the buyer/customer is psychologically experiencing",
-          "impactIfIgnored": "Business cost of not addressing this (use benchmarks to quantify)"
+          "impactIfIgnored": "Business cost of not addressing this"
         }
       ]
     }
   ],
   "confrontationInsights": [
     {
-      "pattern": "Pattern Name (from the failure patterns knowledge)",
+      "pattern": "Pattern Name",
       "likelihood": "high" | "medium" | "low",
-      "description": "Why this pattern is likely affecting this company",
-      "businessImpact": "Quantified impact (use benchmarks)",
-      "immediateAction": "What to do right now (be specific)",
-      "measureWith": "Which CX tool to track this"
+      "description": "Why this pattern is likely affecting this company (companion voice)",
+      "businessImpact": "Quantified impact",
+      "immediateAction": "What to do right now",
+      "measureWith": "Which CX tool to track this",
+      "companionAdvice": "CX Mate's one-liner in first person"
     }
   ],
   "cxToolRoadmap": [
     {
       "tool": "Tool name",
-      "whenToDeploy": "When to start using this (e.g., 'Week 1', 'After 30 customers')",
+      "whenToDeploy": "When to start using this",
       "whyThisTool": "Why this tool at this stage",
-      "expectedOutcome": "What you'll learn from deploying this"
+      "expectedOutcome": "What you'll learn"
     }
   ],
   "impactProjections": [
     {
       "area": "Area of improvement",
       "potentialImpact": "Estimated annual revenue impact range",
-      "timeToRealize": "How long until you see results",
-      "effort": "low | medium | high"
+      "timeToRealize": "How long until results",
+      "effort": "low | medium | high",
+      "calculation": "The math formula showing how you got this number",
+      "dataSource": "user_provided" | "benchmark_estimated"
     }
   ],
-  "maturityAssessment": "2-3 sentence assessment of where this company is and what to focus on"
+  "maturityAssessment": "2-3 sentence CX Mate assessment in companion voice"
 }
 
 Return ONLY the JSON object, no markdown fences, no explanation.`;

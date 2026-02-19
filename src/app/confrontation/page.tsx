@@ -1,7 +1,7 @@
 "use client";
 
 import { Suspense, useEffect, useState } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -16,6 +16,84 @@ import type {
   ConfrontationInsight,
   ImpactProjection,
 } from "@/lib/ai/journey-prompt";
+
+// ============================================
+// Confrontation Modes (A/B/C)
+// ============================================
+
+type ConfrontationMode = "early_stage" | "growing" | "established";
+
+function detectMode(companySize: string): ConfrontationMode {
+  switch (companySize) {
+    case "1-10":
+    case "11-50":
+      return "early_stage";
+    case "51-150":
+    case "151-300":
+      return "growing";
+    case "300+":
+      return "established";
+    default:
+      return "early_stage";
+  }
+}
+
+const MODE_CONFIG: Record<
+  ConfrontationMode,
+  {
+    label: string;
+    headline: (company: string) => string;
+    subtitle: string;
+    insightsHeading: (hasCustomers: boolean) => string;
+    impactHeading: (hasCustomers: boolean) => string;
+    maturityHeading: (hasCustomers: boolean) => string;
+    criticalLabel: (hasCustomers: boolean) => string;
+    badgeColor: string;
+  }
+> = {
+  early_stage: {
+    label: "Foundation Analysis",
+    headline: (company) => `${company}, let\u2019s build this right.`,
+    subtitle:
+      "We analyzed your setup against what works best for companies at your stage. Here\u2019s what the top performers get right early \u2014 and where you have the biggest opportunities.",
+    insightsHeading: (hasCustomers) =>
+      hasCustomers
+        ? "What typically trips up companies at your stage"
+        : "What to get right from day one",
+    impactHeading: (hasCustomers) =>
+      hasCustomers
+        ? "Revenue impact if you act"
+        : "The opportunity ahead",
+    maturityHeading: (hasCustomers) =>
+      hasCustomers
+        ? "Your CX maturity snapshot"
+        : "Your starting position",
+    criticalLabel: () => "Priority areas",
+    badgeColor: "bg-blue-100 text-blue-800 border-blue-200",
+  },
+  growing: {
+    label: "Growth Intelligence",
+    headline: (company) => `${company}, growth changes everything.`,
+    subtitle:
+      "We analyzed your business against CX patterns from companies scaling past your stage. Here\u2019s where the biggest opportunities are hiding.",
+    insightsHeading: () => "What typically trips up companies at your stage",
+    impactHeading: () => "Revenue impact if you act",
+    maturityHeading: () => "Your CX maturity snapshot",
+    criticalLabel: () => "Priority areas",
+    badgeColor: "bg-amber-100 text-amber-800 border-amber-200",
+  },
+  established: {
+    label: "Optimization Report",
+    headline: (company) => `${company}, time to compound.`,
+    subtitle:
+      "At your scale, small CX improvements compound into major revenue impact. We benchmarked you against industry leaders and found these optimization opportunities.",
+    insightsHeading: () => "Optimization opportunities",
+    impactHeading: () => "Projected impact at scale",
+    maturityHeading: () => "Your CX maturity snapshot",
+    criticalLabel: () => "Priority areas",
+    badgeColor: "bg-purple-100 text-purple-800 border-purple-200",
+  },
+};
 
 // ============================================
 // Animated number counter
@@ -70,7 +148,7 @@ function FadeIn({
 }
 
 // ============================================
-// Insight Row
+// Insight Row (with companionAdvice)
 // ============================================
 
 function InsightRow({
@@ -118,12 +196,23 @@ function InsightRow({
             </p>
           </div>
           <div className="text-muted-foreground text-sm shrink-0">
-            {expanded ? "−" : "+"}
+            {expanded ? "\u2212" : "+"}
           </div>
         </div>
 
         {expanded && (
           <div className="mt-4 pt-4 border-t border-current/10 grid gap-3">
+            {/* CX Mate companion advice */}
+            {insight.companionAdvice && (
+              <div className="rounded-lg bg-slate-800 text-white p-3">
+                <div className="text-xs font-semibold text-slate-300 mb-1">
+                  CX Mate says
+                </div>
+                <div className="text-sm italic">
+                  &ldquo;{insight.companionAdvice}&rdquo;
+                </div>
+              </div>
+            )}
             <div className="rounded-lg bg-white/80 border p-3">
               <div className="text-xs font-semibold text-red-800 mb-1">
                 Business impact
@@ -152,7 +241,7 @@ function InsightRow({
 }
 
 // ============================================
-// Impact Card
+// Impact Card (with calculation + dataSource)
 // ============================================
 
 function ImpactCard({
@@ -167,6 +256,11 @@ function ImpactCard({
     medium: "bg-yellow-100 text-yellow-800",
     high: "bg-red-100 text-red-800",
   };
+
+  const dataSourceLabel =
+    projection.dataSource === "user_provided"
+      ? "Based on your numbers"
+      : "Based on industry benchmarks";
 
   return (
     <FadeIn delay={1600 + index * 150}>
@@ -188,6 +282,30 @@ function ImpactCard({
         <div className="text-xs text-muted-foreground">
           {projection.timeToRealize}
         </div>
+
+        {/* Transparent calculation */}
+        {projection.calculation && (
+          <div className="mt-2 pt-2 border-t">
+            <div className="text-xs text-muted-foreground font-mono bg-slate-50 rounded px-2 py-1.5">
+              {projection.calculation}
+            </div>
+          </div>
+        )}
+
+        {/* Data source badge */}
+        {projection.dataSource && (
+          <div className="flex items-center gap-1">
+            <span
+              className={`text-xs px-2 py-0.5 rounded-full border font-medium ${
+                projection.dataSource === "user_provided"
+                  ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                  : "bg-slate-50 text-slate-600 border-slate-200"
+              }`}
+            >
+              {dataSourceLabel}
+            </span>
+          </div>
+        )}
       </div>
     </FadeIn>
   );
@@ -199,10 +317,11 @@ function ImpactCard({
 
 function ConfrontationContent() {
   const searchParams = useSearchParams();
-  const router = useRouter();
   const templateId = searchParams.get("id");
   const [journey, setJourney] = useState<GeneratedJourney | null>(null);
   const [companyName, setCompanyName] = useState<string>("");
+  const [mode, setMode] = useState<ConfrontationMode>("early_stage");
+  const [hasExistingCustomers, setHasExistingCustomers] = useState(false);
   const [loading, setLoading] = useState(true);
   const [headerVisible, setHeaderVisible] = useState(false);
 
@@ -214,6 +333,10 @@ function ConfrontationContent() {
           const data = JSON.parse(stored);
           setJourney(data.journey);
           setCompanyName(data.onboardingData?.companyName || "your company");
+          setMode(detectMode(data.onboardingData?.companySize || ""));
+          setHasExistingCustomers(
+            data.onboardingData?.hasExistingCustomers || false
+          );
         } catch {
           console.error("Failed to parse stored journey");
         }
@@ -248,7 +371,7 @@ function ConfrontationContent() {
         <div className="text-center space-y-4">
           <h1 className="text-2xl font-bold">No analysis available</h1>
           <p className="text-muted-foreground">
-            Complete the onboarding to get your CX confrontation.
+            Complete the onboarding to get your CX intelligence report.
           </p>
           <Link href="/onboarding">
             <Button>Start Onboarding</Button>
@@ -272,6 +395,8 @@ function ConfrontationContent() {
     0
   );
 
+  const config = MODE_CONFIG[mode];
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
       <div className="max-w-2xl mx-auto px-4 py-12">
@@ -283,15 +408,21 @@ function ConfrontationContent() {
               : "opacity-0 translate-y-6"
           }`}
         >
-          <div className="text-sm font-medium text-muted-foreground uppercase tracking-widest">
-            CX Intelligence Report
+          <div className="flex items-center justify-center gap-2">
+            <div className="text-sm font-medium text-muted-foreground uppercase tracking-widest">
+              CX Intelligence Report
+            </div>
+            <span
+              className={`text-xs px-2 py-0.5 rounded-full border font-medium ${config.badgeColor}`}
+            >
+              {config.label}
+            </span>
           </div>
           <h1 className="text-4xl font-bold tracking-tight">
-            {companyName}, here&apos;s the truth.
+            {config.headline(companyName)}
           </h1>
           <p className="text-lg text-muted-foreground max-w-lg mx-auto">
-            We analyzed your business against CX theory, industry benchmarks,
-            and patterns from companies at your stage. Here&apos;s what we found.
+            {config.subtitle}
           </p>
         </div>
 
@@ -321,7 +452,9 @@ function ConfrontationContent() {
               <div className="text-3xl font-bold text-red-700">
                 <AnimatedValue value={String(criticalMoments)} delay={800} />
               </div>
-              <div className="text-xs text-red-600 mt-1">Critical risks</div>
+              <div className="text-xs text-red-600 mt-1">
+                {config.criticalLabel(hasExistingCustomers)}
+              </div>
             </div>
           </div>
         </FadeIn>
@@ -332,7 +465,7 @@ function ConfrontationContent() {
             <Card className="border-slate-200 bg-gradient-to-br from-slate-50 to-white">
               <CardHeader>
                 <CardTitle className="text-base">
-                  Where you are right now
+                  {config.maturityHeading(hasExistingCustomers)}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -350,11 +483,11 @@ function ConfrontationContent() {
             <FadeIn delay={700}>
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-xl font-bold">
-                  What you&apos;re probably getting wrong
+                  {config.insightsHeading(hasExistingCustomers)}
                 </h2>
                 {highRiskCount > 0 && (
                   <Badge variant="destructive">
-                    {highRiskCount} high risk
+                    {highRiskCount} high priority
                   </Badge>
                 )}
               </div>
@@ -373,7 +506,7 @@ function ConfrontationContent() {
           <div className="mb-12">
             <FadeIn delay={1500}>
               <h2 className="text-xl font-bold mb-4">
-                The upside if you act
+                {config.impactHeading(hasExistingCustomers)}
               </h2>
             </FadeIn>
 

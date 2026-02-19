@@ -53,16 +53,23 @@ export async function generateJourney(
     throw new Error("No text response from Claude");
   }
 
-  // Parse the JSON response
+  // Parse the JSON response — Claude sometimes returns malformed JSON
+  const raw = textBlock.text
+    .replace(/```json\n?/g, "")
+    .replace(/```\n?/g, "")
+    .trim();
+
   try {
-    const journey = JSON.parse(textBlock.text) as GeneratedJourney;
-    return journey;
+    return JSON.parse(raw) as GeneratedJourney;
   } catch {
-    // If Claude wrapped it in markdown fences, strip them
-    const cleaned = textBlock.text
-      .replace(/```json\n?/g, "")
-      .replace(/```\n?/g, "")
-      .trim();
-    return JSON.parse(cleaned) as GeneratedJourney;
+    // Attempt to repair common Claude JSON issues:
+    // - trailing commas before } or ]
+    // - unescaped control characters in strings
+    const repaired = raw
+      .replace(/,\s*([}\]])/g, "$1")
+      .replace(/[\x00-\x1f]/g, (ch: string) =>
+        ch === "\n" ? "\\n" : ch === "\t" ? "\\t" : ""
+      );
+    return JSON.parse(repaired) as GeneratedJourney;
   }
 }

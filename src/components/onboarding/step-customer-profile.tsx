@@ -5,6 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
   CUSTOMER_SIZES,
+  CUSTOMER_COUNT_OPTIONS,
   MAIN_CHANNELS,
   type OnboardingData,
 } from "@/types/onboarding";
@@ -28,14 +29,83 @@ export function StepCustomerProfile({
         </p>
       </div>
 
+      {/* Has Existing Customers Toggle */}
+      <div className="space-y-3">
+        <Label>Do you have paying customers?</Label>
+        <div className="grid grid-cols-2 gap-2">
+          <button
+            type="button"
+            onClick={() => onChange({ hasExistingCustomers: true })}
+            className={`rounded-lg border px-4 py-3 text-sm font-medium transition-colors cursor-pointer ${
+              data.hasExistingCustomers
+                ? "border-primary bg-primary/5 text-primary"
+                : "border-border text-muted-foreground hover:bg-accent/50"
+            }`}
+          >
+            Yes, we do
+          </button>
+          <button
+            type="button"
+            onClick={() =>
+              onChange({
+                hasExistingCustomers: false,
+                customerCount: "",
+                pricingModel: "",
+                roughRevenue: "",
+                averageDealSize: "",
+              })
+            }
+            className={`rounded-lg border px-4 py-3 text-sm font-medium transition-colors cursor-pointer ${
+              !data.hasExistingCustomers
+                ? "border-primary bg-primary/5 text-primary"
+                : "border-border text-muted-foreground hover:bg-accent/50"
+            }`}
+          >
+            Not yet
+          </button>
+        </div>
+      </div>
+
+      {/* Customer Count — shown when hasExistingCustomers */}
+      {data.hasExistingCustomers && (
+        <div className="space-y-3">
+          <Label>How many paying customers do you have?</Label>
+          <RadioGroup
+            value={data.customerCount}
+            onValueChange={(value) => onChange({ customerCount: value })}
+            className="grid grid-cols-2 gap-2"
+          >
+            {CUSTOMER_COUNT_OPTIONS.map((opt) => (
+              <label
+                key={opt.value}
+                className={`flex items-center gap-2 rounded-lg border px-4 py-3 cursor-pointer transition-colors hover:bg-accent/50 ${
+                  data.customerCount === opt.value
+                    ? "border-primary bg-primary/5"
+                    : "border-border"
+                }`}
+              >
+                <RadioGroupItem value={opt.value} />
+                <span className="text-sm">{opt.label}</span>
+              </label>
+            ))}
+          </RadioGroup>
+        </div>
+      )}
+
       {/* Customer Description */}
       <div className="space-y-2">
         <Label htmlFor="customerDescription">
-          Describe your typical customer in one sentence
+          {data.hasExistingCustomers
+            ? "Describe your typical customer in one sentence"
+            : "Describe your target customer in one sentence"}
         </Label>
         <Textarea
           id="customerDescription"
-          placeholder="e.g. Mid-market SaaS companies with 50-200 employees looking to improve their customer onboarding"
+          placeholder={
+            data.hasExistingCustomers
+              ? "e.g. Mid-market SaaS companies with 50-200 employees looking to improve their customer onboarding"
+              : "e.g. B2B SaaS companies that need better customer onboarding processes"
+          }
           value={data.customerDescription}
           onChange={(e) => onChange({ customerDescription: e.target.value })}
           rows={3}
@@ -44,7 +114,11 @@ export function StepCustomerProfile({
 
       {/* Customer Size */}
       <div className="space-y-3">
-        <Label>What size are most of your customers?</Label>
+        <Label>
+          {data.hasExistingCustomers
+            ? "What size are most of your customers?"
+            : "What size companies are you targeting?"}
+        </Label>
         <RadioGroup
           value={data.customerSize}
           onValueChange={(value) => onChange({ customerSize: value })}
@@ -68,7 +142,11 @@ export function StepCustomerProfile({
 
       {/* Main Channel */}
       <div className="space-y-3">
-        <Label>How do customers typically find and buy from you?</Label>
+        <Label>
+          {data.hasExistingCustomers
+            ? "How do customers typically find and buy from you?"
+            : "How will customers find and buy from you?"}
+        </Label>
         <RadioGroup
           value={data.mainChannel}
           onValueChange={(value) => onChange({ mainChannel: value })}
