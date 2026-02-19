@@ -45,6 +45,15 @@ This is the team's collective memory. Every agent reads this before working.
 - Fixed all issues: error display, AbortController timeout, JSON repair, nav header
 - Key insight: always do a full flow walkthrough before building new features
 
+### 2026-02-19 — Auth + DB Persistence Pipeline
+- **Supabase v2 Database type needs `Relationships` + `Views/Functions/Enums/CompositeTypes`**: Without these, `.from("table").insert()` resolves to `never` type. Add `Relationships: []` to each table and empty mapped types for Views/Functions/Enums/CompositeTypes.
+- **Admin client uses `@supabase/supabase-js` directly** (not `@supabase/ssr`): The service role client doesn't need cookie handling — it bypasses RLS entirely. Use `createClient<Database>()` from the base package.
+- **Org creation must happen server-side with service role**: RLS policies check `org_id` in JWT claims, but during signup the user has no org_id yet. Use admin client to create org and set `app_metadata.org_id`.
+- **Dual-mode pattern**: Keep sessionStorage as the "always works" path. API fetch is the "persistent" path. Pages check templateId: `"preview"` → sessionStorage, real UUID → `GET /api/journey/[id]`. Always fall back to sessionStorage if API fails.
+- **`useSearchParams()` requires Suspense boundary**: Next.js 16 enforces this during static generation. Wrap components using `useSearchParams()` in a Suspense boundary.
+- **Route protection with preview mode**: Middleware can't check sessionStorage (server-side). Instead, check for `?id=preview` query param to allow unauthenticated access. Dashboard and playbook pages always allowed through — they handle their own empty states.
+- **JSONB backup + normalized tables**: Store the full `GeneratedJourney` in `journey_templates.stages` as JSONB for easy reconstruction. Also insert into normalized `journey_stages` + `meaningful_moments` for queryability. `loadJourney()` tries JSONB first, falls back to table reconstruction.
+
 ---
 
 ## Version History

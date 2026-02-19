@@ -14,23 +14,33 @@ function JourneyContent() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (templateId === "preview") {
-      const stored = sessionStorage.getItem("cx-mate-journey");
-      if (stored) {
-        try {
-          const data = JSON.parse(stored);
-          setJourney(data.journey);
-        } catch {
-          console.error("Failed to parse stored journey");
+    async function load() {
+      if (templateId === "preview" || !templateId) {
+        const stored = sessionStorage.getItem("cx-mate-journey");
+        if (stored) {
+          try {
+            const data = JSON.parse(stored);
+            setJourney(data.journey);
+          } catch {
+            console.error("Failed to parse stored journey");
+          }
         }
+        setLoading(false);
+      } else {
+        // Persisted mode — fetch from API
+        try {
+          const response = await fetch(`/api/journey/${templateId}`);
+          if (response.ok) {
+            const data = await response.json();
+            setJourney(data.journey || null);
+          }
+        } catch (err) {
+          console.error("Failed to load journey:", err);
+        }
+        setLoading(false);
       }
-      setLoading(false);
-    } else if (templateId) {
-      // TODO: Fetch from Supabase by template ID
-      setLoading(false);
-    } else {
-      setLoading(false);
     }
+    load();
   }, [templateId]);
 
   if (loading) {

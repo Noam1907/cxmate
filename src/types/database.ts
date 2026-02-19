@@ -45,6 +45,7 @@ export interface Database {
           plan_tier?: string;
           updated_at?: string;
         };
+        Relationships: [];
       };
       journey_templates: {
         Row: {
@@ -82,6 +83,15 @@ export interface Database {
           source?: string;
           updated_at?: string;
         };
+        Relationships: [
+          {
+            foreignKeyName: "journey_templates_org_id_fkey";
+            columns: ["org_id"];
+            isOneToOne: false;
+            referencedRelation: "organizations";
+            referencedColumns: ["id"];
+          },
+        ];
       };
       journey_stages: {
         Row: {
@@ -116,6 +126,15 @@ export interface Database {
           emotional_state?: string;
           meaningful_moments?: Json;
         };
+        Relationships: [
+          {
+            foreignKeyName: "journey_stages_template_id_fkey";
+            columns: ["template_id"];
+            isOneToOne: false;
+            referencedRelation: "journey_templates";
+            referencedColumns: ["id"];
+          },
+        ];
       };
       meaningful_moments: {
         Row: {
@@ -150,6 +169,15 @@ export interface Database {
           triggers?: Json;
           recommendations?: Json;
         };
+        Relationships: [
+          {
+            foreignKeyName: "meaningful_moments_stage_id_fkey";
+            columns: ["stage_id"];
+            isOneToOne: false;
+            referencedRelation: "journey_stages";
+            referencedColumns: ["id"];
+          },
+        ];
       };
       recommendations: {
         Row: {
@@ -187,7 +215,28 @@ export interface Database {
           measure_metric?: string;
           status?: string;
         };
+        Relationships: [
+          {
+            foreignKeyName: "recommendations_moment_id_fkey";
+            columns: ["moment_id"];
+            isOneToOne: false;
+            referencedRelation: "meaningful_moments";
+            referencedColumns: ["id"];
+          },
+        ];
       };
+    };
+    Views: {
+      [_ in never]: never;
+    };
+    Functions: {
+      [_ in never]: never;
+    };
+    Enums: {
+      [_ in never]: never;
+    };
+    CompositeTypes: {
+      [_ in never]: never;
     };
   };
 }

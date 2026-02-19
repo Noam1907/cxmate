@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { onboardingSchema } from "@/lib/validations/onboarding";
 import { generateJourney } from "@/lib/ai/generate-journey";
+import { createClient } from "@/lib/supabase/server";
+import { persistJourney } from "@/lib/services/journey-persistence";
 
 export async function POST(request: Request) {
   try {
@@ -20,17 +22,35 @@ export async function POST(request: Request) {
     // Generate journey using Claude
     const journey = await generateJourney(input);
 
-    // TODO: Once Supabase is connected, persist to database:
-    // 1. Create or update organization
-    // 2. Create journey template
-    // 3. Create journey stages
-    // 4. Create meaningful moments
-    // 5. Create recommendations
+    // Check if user is authenticated
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
-    // For now, return the generated journey directly
+    let templateId = "preview";
+
+    if (user) {
+      const orgId = user.app_metadata?.org_id as string | undefined;
+
+      if (orgId) {
+        try {
+          templateId = await persistJourney(supabase, orgId, {
+            companyName: input.companyName,
+            vertical: input.vertical,
+            journeyType: input.journeyType,
+          }, journey);
+        } catch (err) {
+          console.error("Failed to persist journey:", err);
+          // Fall back to preview mode — don't block the user
+          templateId = "preview";
+        }
+      }
+    }
+
     return NextResponse.json({
       success: true,
-      templateId: "preview", // Will be a real UUID once DB is connected
+      templateId,
       journey,
       onboardingData: input,
     });

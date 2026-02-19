@@ -361,14 +361,21 @@ export default function PlaybookPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [hasJourney, setHasJourney] = useState(false);
+  const [templateId, setTemplateId] = useState("preview");
   const [filter, setFilter] = useState<FilterMode>("all");
   const { statuses, setStatus } = useRecommendationStatus();
 
   useEffect(() => {
-    // Check if we have journey data
+    // Check if we have journey data (sessionStorage for both modes)
     const stored = sessionStorage.getItem("cx-mate-journey");
     if (stored) {
       setHasJourney(true);
+      try {
+        const parsed = JSON.parse(stored);
+        setTemplateId(parsed.templateId || "preview");
+      } catch {
+        // ignore
+      }
 
       // Check if we already generated a playbook
       const storedPlaybook = sessionStorage.getItem("cx-mate-playbook");
@@ -615,10 +622,10 @@ export default function PlaybookPage() {
 
         {/* Footer navigation */}
         <div className="flex items-center justify-between mt-10 pt-6 border-t">
-          <Link href="/confrontation?id=preview">
+          <Link href={`/confrontation?id=${templateId}`}>
             <Button variant="ghost">Back to CX Report</Button>
           </Link>
-          <Link href="/journey?id=preview">
+          <Link href={`/journey?id=${templateId}`}>
             <Button variant="outline">View Journey Map</Button>
           </Link>
         </div>

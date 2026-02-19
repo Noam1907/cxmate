@@ -326,23 +326,46 @@ function ConfrontationContent() {
   const [headerVisible, setHeaderVisible] = useState(false);
 
   useEffect(() => {
-    if (templateId === "preview") {
-      const stored = sessionStorage.getItem("cx-mate-journey");
-      if (stored) {
+    async function load() {
+      if (templateId === "preview" || !templateId) {
+        // Preview mode — load from sessionStorage
+        const stored = sessionStorage.getItem("cx-mate-journey");
+        if (stored) {
+          try {
+            const data = JSON.parse(stored);
+            setJourney(data.journey);
+            setCompanyName(data.onboardingData?.companyName || "your company");
+            setMode(detectMode(data.onboardingData?.companySize || ""));
+            setHasExistingCustomers(
+              data.onboardingData?.hasExistingCustomers || false
+            );
+          } catch {
+            console.error("Failed to parse stored journey");
+          }
+        }
+      } else {
+        // Persisted mode — fetch from API
         try {
-          const data = JSON.parse(stored);
-          setJourney(data.journey);
-          setCompanyName(data.onboardingData?.companyName || "your company");
-          setMode(detectMode(data.onboardingData?.companySize || ""));
-          setHasExistingCustomers(
-            data.onboardingData?.hasExistingCustomers || false
-          );
-        } catch {
-          console.error("Failed to parse stored journey");
+          const response = await fetch(`/api/journey/${templateId}`);
+          if (response.ok) {
+            const data = await response.json();
+            setJourney(data.journey || null);
+            // For persisted journeys, try to get onboarding data from sessionStorage as fallback
+            const stored = sessionStorage.getItem("cx-mate-journey");
+            if (stored) {
+              const parsed = JSON.parse(stored);
+              setCompanyName(parsed.onboardingData?.companyName || "your company");
+              setMode(detectMode(parsed.onboardingData?.companySize || ""));
+              setHasExistingCustomers(parsed.onboardingData?.hasExistingCustomers || false);
+            }
+          }
+        } catch (err) {
+          console.error("Failed to load journey:", err);
         }
       }
+      setLoading(false);
     }
-    setLoading(false);
+    load();
   }, [templateId]);
 
   useEffect(() => {

@@ -24,14 +24,16 @@ interface DashboardData {
   playbook: GeneratedPlaybook | null;
   onboarding: OnboardingInput | null;
   recStatuses: Record<string, string>;
+  templateId: string;
 }
 
-function loadDashboardData(): DashboardData {
+function loadLocalDashboardData(): DashboardData {
   const data: DashboardData = {
     journey: null,
     playbook: null,
     onboarding: null,
     recStatuses: {},
+    templateId: "preview",
   };
 
   try {
@@ -40,6 +42,7 @@ function loadDashboardData(): DashboardData {
       const parsed = JSON.parse(journeyRaw);
       data.journey = parsed.journey || null;
       data.onboarding = parsed.onboardingData || null;
+      data.templateId = parsed.templateId || "preview";
     }
   } catch {
     // ignore
@@ -152,7 +155,7 @@ export default function DashboardPage() {
   const [data, setData] = useState<DashboardData | null>(null);
 
   useEffect(() => {
-    setData(loadDashboardData());
+    setData(loadLocalDashboardData());
   }, []);
 
   // Still loading from storage
@@ -195,6 +198,7 @@ export default function DashboardPage() {
     : null;
 
   const companyName = data.onboarding?.companyName || "Your Company";
+  const tid = data.templateId || "preview";
   const topInsights = (data.journey!.confrontationInsights || [])
     .filter((i) => i.likelihood === "high")
     .slice(0, 3);
@@ -330,7 +334,7 @@ export default function DashboardPage() {
                   </p>
                 </div>
               ))}
-              <Link href="/confrontation?id=preview">
+              <Link href={`/confrontation?id=${tid}`}>
                 <Button variant="ghost" size="sm" className="mt-1">
                   See full report
                 </Button>
@@ -341,7 +345,7 @@ export default function DashboardPage() {
 
         {/* Quick Navigation */}
         <div className="grid sm:grid-cols-3 gap-3">
-          <Link href="/confrontation?id=preview">
+          <Link href={`/confrontation?id=${tid}`}>
             <Card className="hover:shadow-md transition-shadow cursor-pointer h-full">
               <CardHeader>
                 <CardTitle className="text-base">CX Report</CardTitle>
@@ -351,7 +355,7 @@ export default function DashboardPage() {
               </CardHeader>
             </Card>
           </Link>
-          <Link href="/journey?id=preview">
+          <Link href={`/journey?id=${tid}`}>
             <Card className="hover:shadow-md transition-shadow cursor-pointer h-full">
               <CardHeader>
                 <CardTitle className="text-base">Journey Map</CardTitle>

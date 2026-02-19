@@ -48,6 +48,10 @@ Track key technical and product decisions and why they were made.
 | 2026-02-19 | **localStorage for status tracking (not Supabase yet)** | Full DB persistence requires auth → org → journey → moments → recommendations chain. That's Sprint 3 scope. localStorage survives refresh, good enough for preview mode. | Active |
 | 2026-02-19 | **Confrontation mode detection by companySize** | 1-50 = early_stage (Mode A), 51-300 = growing (Mode B), 300+ = established (Mode C). Each mode gets distinct headline, subtitle, section headings. Detection is client-side from onboarding data. | Active |
 | 2026-02-19 | **Deferred research pipeline + curated templates to Sprint 3** | Research pipeline (Claude tool_use) and curated template library are valuable but not blocking. Ship Sprint 2 with AI-generated templates and best-practice confrontation first. | Active |
+| 2026-02-19 | **Dual-mode architecture (preview + persisted)** | Anonymous users can complete onboarding and see results via sessionStorage (try-before-you-buy). Authenticated users get data persisted to Supabase. Auth happens AFTER value is shown, maximizing conversion. | Active |
+| 2026-02-19 | **JSONB backup + normalized tables for journey storage** | Store full GeneratedJourney as JSONB in journey_templates.stages for easy reconstruction. Also insert normalized rows in journey_stages + meaningful_moments for queryability. loadJourney() tries JSONB first, falls back to table reconstruction. | Active |
+| 2026-02-19 | **Admin client with service role for org creation** | During signup, user has no org_id yet so RLS would block. Use service role client (bypasses RLS) to create org + set user app_metadata.org_id. Admin client is server-only, never exposed to browser. | Active |
+| 2026-02-19 | **Middleware route protection with preview bypass** | Public routes (/, /onboarding, /auth) always accessible. App routes (/dashboard, /confrontation, /journey, /playbook) allow authenticated users or users with ?id=preview. Dashboard/playbook always allowed through — they handle empty state. | Active |
 
 ---
 

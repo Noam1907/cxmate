@@ -1,22 +1,41 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-const NAV_ITEMS = [
-  { href: "/dashboard", label: "Dashboard" },
-  { href: "/confrontation?id=preview", label: "CX Report" },
-  { href: "/journey?id=preview", label: "Journey" },
-  { href: "/playbook", label: "Playbook" },
-];
+function getTemplateId(): string {
+  try {
+    const stored = sessionStorage.getItem("cx-mate-journey");
+    if (stored) {
+      const data = JSON.parse(stored);
+      return data.templateId || "preview";
+    }
+  } catch {
+    // ignore
+  }
+  return "preview";
+}
 
 export function NavHeader() {
   const pathname = usePathname();
+  const [templateId, setTemplateId] = useState("preview");
 
-  // Hide nav on home page and during onboarding
-  if (pathname === "/" || pathname === "/onboarding") {
+  useEffect(() => {
+    setTemplateId(getTemplateId());
+  }, []);
+
+  // Hide nav on home page, onboarding, and auth
+  if (pathname === "/" || pathname === "/onboarding" || pathname.startsWith("/auth")) {
     return null;
   }
+
+  const navItems = [
+    { href: "/dashboard", label: "Dashboard" },
+    { href: `/confrontation?id=${templateId}`, label: "CX Report" },
+    { href: `/journey?id=${templateId}`, label: "Journey" },
+    { href: "/playbook", label: "Playbook" },
+  ];
 
   return (
     <header className="border-b bg-white/80 backdrop-blur-sm sticky top-0 z-50">
@@ -25,7 +44,7 @@ export function NavHeader() {
           CX Mate
         </Link>
         <nav className="flex items-center gap-1">
-          {NAV_ITEMS.map((item) => {
+          {navItems.map((item) => {
             const isActive = pathname === item.href.split("?")[0];
             return (
               <Link
