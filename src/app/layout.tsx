@@ -11,7 +11,7 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "CX Mate - AI-Powered Customer Experience",
   description:
-    "Transform your customer journey with AI-powered CX orchestration for B2B startups",
+    "Transform your customer journey with AI-powered CX orchestration",
 };
 
 export default function RootLayout({

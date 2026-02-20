@@ -14,7 +14,28 @@
       "mcp__filesystem__read_multiple_files",
       "Bash(git init:*)",
       "Bash(git -C /Users/anat/Documents/Anat-workspace/cx-mate add -A)",
-      "Bash(git -C /Users/anat/Documents/Anat-workspace/cx-mate status)"
+      "Bash(git -C /Users/anat/Documents/Anat-workspace/cx-mate status)",
+      "Bash(git commit:*)",
+      "Bash(git -C /Users/anat/Documents/Anat-workspace/cx-mate diff --stat)",
+      "Bash(git -C /Users/anat/Documents/Anat-workspace/cx-mate log --oneline -5)",
+      "Bash(git -C /Users/anat/Documents/Anat-workspace/cx-mate add:*)",
+      "Bash(git -C /Users/anat/Documents/Anat-workspace/cx-mate commit -m \"$\\(cat <<''EOF''\nSprint 2: Confrontation screen, recommendation engine, and Playbook UI\n\n- Add /confrontation page — dedicated \"aha moment\" screen with staggered\n  animations, maturity assessment, confrontation insights, and impact\n  projections. This is the key value reveal after onboarding.\n- Build recommendation engine \\(prompt + service + API endpoint\\) that turns\n  journey moments into specific playbook actions with templates, owners,\n  timing, and effort estimates. Powered by CX knowledge base.\n- Build full /playbook page with status tracking \\(not_started/in_progress/done\\),\n  filter tabs \\(All/Must Do/Quick Wins\\), week-one checklist, progress bar,\n  and expandable recommendation cards with templates.\n- Update onboarding flow: redirect to /confrontation instead of /journey.\n- Add \"Get Your Playbook\" CTA to confrontation page.\n\nNew flow: Onboarding → Confrontation → Journey Map / Playbook\n\nCo-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(npm run build:*)",
+      "Bash(lsof:*)",
+      "Bash(kill:*)",
+      "Bash(git -C /Users/anat/Documents/Anat-workspace/cx-mate status --short)",
+      "Bash(git -C /Users/anat/Documents/Anat-workspace/cx-mate commit -m \"$\\(cat <<''EOF''\nSprint 3: Dashboard, nav, UX fixes, product evolution \\(two paths + CX Mate persona\\)\n\n- Dashboard page with stats grid, playbook progress, top risks, quick nav\n- Global nav header \\(CX Mate brand, 4-tab nav, hidden on home/onboarding\\)\n- Fixed stuck Generate button \\(error display + AbortController 180s timeout\\)\n- JSON parsing repair for Claude output \\(trailing commas + control chars\\)\n- Product evolution: extended onboarding with hasExistingCustomers branching,\n  business data step, CX maturity step, dynamic wizard steps \\(6 or 7 steps\\)\n- Journey prompt v3: CX Mate companion persona, two-path analysis\n  \\(COMPARISON vs PRESCRIPTIVE\\), CX maturity + business data context,\n  transparent impact projections with calculation formulas\n- CX Intelligence Report: companion tone, \"CX Mate says\" advice blocks,\n  data source badges, transparent math display\n- Impact calculator: buildProfileFromOnboarding maps onboarding to numbers\n\nCo-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(node -e:*)",
+      "Bash(git add:*)",
+      "Bash(wait:*)",
+      "Bash(echo:*)",
+      "WebFetch(domain:resources.anthropic.com)",
+      "WebFetch(domain:claude.com)",
+      "Skill(cx-expert)",
+      "Skill(cx-expert:*)",
+      "Skill(prd)",
+      "Skill(prd:*)",
+      "Bash(source:*)"
     ]
   }
 }

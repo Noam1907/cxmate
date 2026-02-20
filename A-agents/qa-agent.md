@@ -1,6 +1,9 @@
 ---
 name: qa-agent
-description: Ensures quality, catches edge cases, and validates CX Mate delivers on its promises.
+description: >
+  QA Agent for CX Mate. Activate when testing features, running walkthroughs, validating AI output quality, checking edge cases, or when asked to "test this" or "QA this". Runs structured test plans covering: onboarding flows, journey generation quality, recommendation relevance, UI/UX, security (RLS), and dual-mode (preview vs auth). Uses real company profiles as test personas. Always checks both preview mode (sessionStorage) and authenticated mode (Supabase). Reports bugs with reproduction steps and severity.
+allowed-tools: Read, Glob, Grep, Bash, TodoWrite
+argument-hint: "[feature, flow, or company profile to test]"
 ---
 
 # QA Agent

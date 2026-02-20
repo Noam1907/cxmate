@@ -91,13 +91,23 @@ export interface ImpactProjection {
   dataSource?: "user_provided" | "benchmark_estimated"; // v3: transparency
 }
 
+export interface TechStackRecommendation {
+  category: "crm" | "marketing" | "support" | "analytics" | "cs_platform" | "communication";
+  categoryLabel: string;
+  tools: string[];
+  whyNow: string;
+  connectWith: string;
+}
+
 export interface GeneratedJourney {
   name: string;
   stages: GeneratedStage[];
   confrontationInsights?: ConfrontationInsight[];
   cxToolRoadmap?: CxToolRecommendation[];
   impactProjections?: ImpactProjection[];
+  techStackRecommendations?: TechStackRecommendation[];
   maturityAssessment?: string;
+  assumptions?: string[];
 }
 
 // ============================================
@@ -428,8 +438,13 @@ Tone: You're a mentor who's helped dozens of companies launch. You're excited ab
 
 export function buildJourneyPrompt(input: OnboardingInput): string {
   const vertical = getVertical(input.vertical);
-  const defaultStages = getDefaultStages(input.journeyType);
-  const defaultMoments = getDefaultMoments(input.journeyType);
+
+  // Pre-customer companies can only have a sales journey — no customers yet means
+  // no customer lifecycle stages. Override to "sales" regardless of what was selected.
+  const effectiveJourneyType = !input.hasExistingCustomers ? "sales" : input.journeyType;
+
+  const defaultStages = getDefaultStages(effectiveJourneyType);
+  const defaultMoments = getDefaultMoments(effectiveJourneyType);
 
   const maturityStage = detectMaturityStage(input.companySize);
   const companyStage = detectCompanyStage(input.companySize);
@@ -444,6 +459,11 @@ Key moments for this vertical: ${vertical.keyMoments.join(", ") || "varies"}`
 
   const stageNames = defaultStages.map((s) => s.name).join(", ");
   const momentNames = defaultMoments.map((m) => m.name).join(", ");
+
+  // Build note for pre-customer companies
+  const preCustomerNote = !input.hasExistingCustomers
+    ? `\n⚠️ IMPORTANT: This company has NO existing customers yet. Generate ONLY sales-stage content (pre-sale journey). Do NOT generate any post-sale or customer success stages (onboarding, activation, retention, expansion, renewal). Those stages don't apply — there are no customers yet. Focus 100% on the journey from awareness through to winning the first customers.\n`
+    : "";
 
   // Build all context sections
   const decisionCycleContext = buildDecisionCycleContext();
@@ -480,6 +500,10 @@ ${verticalContext}
 - Customer size: ${input.customerSize}
 - Main acquisition channel: ${input.mainChannel}
 
+## Competitive Landscape
+${input.competitors ? `- Known competitors/alternatives: ${input.competitors}` : "- No competitors specified — use industry knowledge to identify likely alternatives"}
+${input.companyWebsite ? `- Company website: ${input.companyWebsite}` : ""}
+
 ## Their Challenges
 - Biggest challenge: ${input.biggestChallenge}
 - Pain points: ${input.painPoints.join(", ")}${input.customPainPoint ? `, ${input.customPainPoint}` : ""}
@@ -490,9 +514,9 @@ ${verticalContext}
 ${input.additionalContext ? `- Additional context: ${input.additionalContext}` : ""}
 
 ## Default Template
-The standard stages for a ${input.journeyType} journey are: ${stageNames}
+The standard stages for a ${effectiveJourneyType} journey are: ${stageNames}
 Standard meaningful moments include: ${momentNames}
-
+${preCustomerNote}
 ---
 
 ${analysisModeContext}
@@ -528,7 +552,7 @@ ${foundationsContext}
 ## Your Task
 Generate a customized, theory-backed journey map with the CX Mate companion voice:
 
-1. **Stages**: Use the standard stages as a foundation but customize names, descriptions, and emotional states to match this specific company. For each stage, identify the top failure risk and recommend the highest-impact success pattern.
+1. **Stages**: Use the standard stages as a foundation but customize names, descriptions, and emotional states to match this specific company. For each stage, identify the top failure risk and recommend the highest-impact success pattern.${!input.hasExistingCustomers ? ' IMPORTANT: ALL stages MUST have stageType: "sales". Do not generate any stages with stageType: "customer". There are no customers yet.' : ""}
 
 2. **Meaningful Moments (2-4 per stage)**: Tailored to their industry and challenges. For each moment:
    - Provide a theory-backed **diagnosis** (what's likely going wrong and the root cause)
@@ -553,6 +577,27 @@ Generate a customized, theory-backed journey map with the CX Mate companion voic
    - Show ranges (conservative to optimistic)
 
 6. **Maturity Assessment**: A 2-3 sentence CX Mate-style assessment. Validate where they are, name what to focus on, say what to avoid doing too early.
+
+7. **Tech Stack Recommendations (3-5)**: Based on their maturity, recommend which tools to connect for CRM, marketing automation, support, analytics, and CS platforms. For each:
+   - Category (crm, marketing, support, analytics, cs_platform, communication)
+   - 2-3 specific tool names (appropriate for their stage — don't recommend Salesforce to a 5-person startup)
+   - Why this category matters now
+   - What to integrate it with
+
+8. **Assumptions (3-5)**: List the key assumptions behind your analysis. Be transparent about what you inferred vs what the user told you. Examples: "Assumed 4% monthly churn rate (industry benchmark for early-stage B2B SaaS)", "Based on mid-market ACV range of $5K-$20K from your input."
+
+9. **Impact Projections — ALWAYS include both dollar amounts AND percentage improvements.** Example: "$36K - $72K annual impact (20-40% churn reduction)". The percentage context helps users gauge if the improvement is realistic.
+
+10. **AI-First Lens**: For EVERY recommendation and action template, consider whether AI can automate it. Flag actions as:
+   - "🤖 AI can do this" — fully automatable (e.g., personalized welcome email, health scoring, sentiment analysis)
+   - "🤖+👤 AI assists" — AI drafts/suggests, human reviews (e.g., QBR deck, renewal strategy, churn outreach)
+   - "👤 Human touch" — requires genuine human connection (e.g., executive sponsor relationship, crisis management)
+   The goal: maximize CX impact while minimizing manual effort. These are small teams — help them do more with less.
+
+11. **Survey Recommendations**: For growing/scaling companies, recommend specific survey tools and timing:
+   - Which survey type (NPS/CSAT/CES) at which journey moment
+   - Specific tool suggestions appropriate for their stage (e.g., Delighted for SMB, Qualtrics for enterprise)
+   - Include this in the CX Tool Roadmap section
 
 Prioritize moments related to their stated pain points. Use plain language. Be the advisor they'd actually want to talk to.
 
@@ -614,6 +659,19 @@ Return a JSON object with this exact structure:
       "calculation": "The math formula showing how you got this number",
       "dataSource": "user_provided" | "benchmark_estimated"
     }
+  ],
+  "techStackRecommendations": [
+    {
+      "category": "crm" | "marketing" | "support" | "analytics" | "cs_platform" | "communication",
+      "categoryLabel": "Human-readable category name (e.g. CRM, Marketing Automation)",
+      "tools": ["Tool 1", "Tool 2"],
+      "whyNow": "Why this category matters at their stage",
+      "connectWith": "What to integrate it with for maximum CX impact"
+    }
+  ],
+  "assumptions": [
+    "Key assumption 1 with source (e.g. 'Assumed 4% monthly churn based on industry benchmark for early-stage B2B SaaS')",
+    "Key assumption 2..."
   ],
   "maturityAssessment": "2-3 sentence CX Mate assessment in companion voice"
 }

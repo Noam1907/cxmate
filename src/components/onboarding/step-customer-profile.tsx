@@ -9,65 +9,31 @@ import {
   MAIN_CHANNELS,
   type OnboardingData,
 } from "@/types/onboarding";
+import { ChatBubble } from "./chat-bubble";
 
 interface StepCustomerProfileProps {
   data: OnboardingData;
   onChange: (updates: Partial<OnboardingData>) => void;
 }
 
-export function StepCustomerProfile({
-  data,
-  onChange,
-}: StepCustomerProfileProps) {
+export function StepCustomerProfile({ data, onChange }: StepCustomerProfileProps) {
+  const isPreLaunch = data.companyMaturity === "pre_launch";
+
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold">Who are your customers?</h2>
-        <p className="text-muted-foreground mt-1">
-          Help us understand who you serve so we can make the journey specific to
-          them.
-        </p>
-      </div>
+      <ChatBubble>
+        {isPreLaunch ? (
+          <>
+            <p>Since you&apos;re building your go-to-market, let me understand <strong>who you&apos;re going after</strong>.</p>
+            <p>Even without customers yet, knowing your target helps me map the right sales journey.</p>
+          </>
+        ) : (
+          <p>Tell me about <strong>your customers</strong> — this helps me make the journey specific to them.</p>
+        )}
+      </ChatBubble>
 
-      {/* Has Existing Customers Toggle */}
-      <div className="space-y-3">
-        <Label>Do you have paying customers?</Label>
-        <div className="grid grid-cols-2 gap-2">
-          <button
-            type="button"
-            onClick={() => onChange({ hasExistingCustomers: true })}
-            className={`rounded-lg border px-4 py-3 text-sm font-medium transition-colors cursor-pointer ${
-              data.hasExistingCustomers
-                ? "border-primary bg-primary/5 text-primary"
-                : "border-border text-muted-foreground hover:bg-accent/50"
-            }`}
-          >
-            Yes, we do
-          </button>
-          <button
-            type="button"
-            onClick={() =>
-              onChange({
-                hasExistingCustomers: false,
-                customerCount: "",
-                pricingModel: "",
-                roughRevenue: "",
-                averageDealSize: "",
-              })
-            }
-            className={`rounded-lg border px-4 py-3 text-sm font-medium transition-colors cursor-pointer ${
-              !data.hasExistingCustomers
-                ? "border-primary bg-primary/5 text-primary"
-                : "border-border text-muted-foreground hover:bg-accent/50"
-            }`}
-          >
-            Not yet
-          </button>
-        </div>
-      </div>
-
-      {/* Customer Count — shown when hasExistingCustomers */}
-      {data.hasExistingCustomers && (
+      {/* Customer Count — only for companies with customers */}
+      {!isPreLaunch && (
         <div className="space-y-3">
           <Label>How many paying customers do you have?</Label>
           <RadioGroup
@@ -95,16 +61,16 @@ export function StepCustomerProfile({
       {/* Customer Description */}
       <div className="space-y-2">
         <Label htmlFor="customerDescription">
-          {data.hasExistingCustomers
-            ? "Describe your typical customer in one sentence"
-            : "Describe your target customer in one sentence"}
+          {isPreLaunch
+            ? "Describe your target customer in one sentence"
+            : "Describe your typical customer in one sentence"}
         </Label>
         <Textarea
           id="customerDescription"
           placeholder={
-            data.hasExistingCustomers
-              ? "e.g. Mid-market SaaS companies with 50-200 employees looking to improve their customer onboarding"
-              : "e.g. B2B SaaS companies that need better customer onboarding processes"
+            isPreLaunch
+              ? "e.g. B2B SaaS companies that need better customer onboarding processes"
+              : "e.g. Mid-market SaaS companies with 50-200 employees looking to improve retention"
           }
           value={data.customerDescription}
           onChange={(e) => onChange({ customerDescription: e.target.value })}
@@ -115,9 +81,9 @@ export function StepCustomerProfile({
       {/* Customer Size */}
       <div className="space-y-3">
         <Label>
-          {data.hasExistingCustomers
-            ? "What size are most of your customers?"
-            : "What size companies are you targeting?"}
+          {isPreLaunch
+            ? "What size companies are you targeting?"
+            : "What size are most of your customers?"}
         </Label>
         <RadioGroup
           value={data.customerSize}
@@ -143,9 +109,9 @@ export function StepCustomerProfile({
       {/* Main Channel */}
       <div className="space-y-3">
         <Label>
-          {data.hasExistingCustomers
-            ? "How do customers typically find and buy from you?"
-            : "How will customers find and buy from you?"}
+          {isPreLaunch
+            ? "How will customers find and buy from you?"
+            : "How do customers find and buy from you?"}
         </Label>
         <RadioGroup
           value={data.mainChannel}

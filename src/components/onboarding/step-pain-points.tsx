@@ -3,7 +3,8 @@
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
-import { PAIN_POINT_OPTIONS, type OnboardingData } from "@/types/onboarding";
+import { getPainPointsForMaturity, type OnboardingData } from "@/types/onboarding";
+import { ChatBubble } from "./chat-bubble";
 
 interface StepPainPointsProps {
   data: OnboardingData;
@@ -11,6 +12,8 @@ interface StepPainPointsProps {
 }
 
 export function StepPainPoints({ data, onChange }: StepPainPointsProps) {
+  const painOptions = getPainPointsForMaturity(data.companyMaturity);
+
   const togglePainPoint = (value: string) => {
     const current = data.painPoints || [];
     const updated = current.includes(value)
@@ -21,13 +24,10 @@ export function StepPainPoints({ data, onChange }: StepPainPointsProps) {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold">Where does it hurt?</h2>
-        <p className="text-muted-foreground mt-1">
-          Understanding your pain points helps us prioritize which moments
-          matter most in your journey.
-        </p>
-      </div>
+      <ChatBubble>
+        <p>Now — <strong>what&apos;s keeping you up at night?</strong></p>
+        <p>Understanding your pain points helps me prioritize which moments matter most in your journey.</p>
+      </ChatBubble>
 
       {/* Biggest Challenge */}
       <div className="space-y-2">
@@ -36,18 +36,22 @@ export function StepPainPoints({ data, onChange }: StepPainPointsProps) {
         </Label>
         <Textarea
           id="biggestChallenge"
-          placeholder="e.g. We're losing 15% of customers in the first 90 days and we don't know why"
+          placeholder={
+            data.companyMaturity === "pre_launch"
+              ? "e.g. We don't know how to structure our sales process to close our first deal"
+              : "e.g. We're losing 15% of customers in the first 90 days and we don't know why"
+          }
           value={data.biggestChallenge}
           onChange={(e) => onChange({ biggestChallenge: e.target.value })}
           rows={3}
         />
       </div>
 
-      {/* Pain Points Checkboxes */}
+      {/* Pain Points — Maturity-Adaptive */}
       <div className="space-y-3">
         <Label>Which of these resonate? (pick all that apply)</Label>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-          {PAIN_POINT_OPTIONS.map((option) => (
+          {painOptions.map((option) => (
             <label
               key={option.value}
               className={`flex items-center gap-3 rounded-lg border px-4 py-3 cursor-pointer transition-colors hover:bg-accent/50 ${
@@ -70,9 +74,7 @@ export function StepPainPoints({ data, onChange }: StepPainPointsProps) {
 
       {/* Custom Pain Point */}
       <div className="space-y-2">
-        <Label htmlFor="customPainPoint">
-          Anything else? (optional)
-        </Label>
+        <Label htmlFor="customPainPoint">Anything else? (optional)</Label>
         <Input
           id="customPainPoint"
           placeholder="Describe another challenge..."

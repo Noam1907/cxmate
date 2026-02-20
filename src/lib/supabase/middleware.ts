@@ -2,7 +2,7 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
 // Routes that don't require authentication
-const PUBLIC_ROUTES = ["/", "/onboarding", "/auth", "/auth/callback"];
+const PUBLIC_ROUTES = ["/", "/onboarding", "/auth", "/auth/callback", "/reset"];
 
 // Routes that require auth OR preview data
 const APP_ROUTES = ["/dashboard", "/confrontation", "/journey", "/playbook"];

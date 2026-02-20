@@ -220,6 +220,7 @@ Rules:
 5. **Assign owners.** Use roles like "Founder," "Sales Rep," "CS Manager," "Product Team" — not names.
 6. **Make effort realistic.** Use these effort levels: "15_min", "1_hour", "half_day", "multi_day".
 7. **Connect to measurement.** Every recommendation should say how to know it worked.
+${!input.hasExistingCustomers ? '8. **PRE-CUSTOMER CONSTRAINT (CRITICAL):** This company has NO customers yet. Every recommendation MUST be sales-focused (winning first customers). Do NOT generate any recommendations about customer onboarding, customer success, retention, renewal, or expansion. Those do not apply. The weekOneChecklist and quickWins must also be 100% sales-focused.' : ""}
 
 ## Output Format
 

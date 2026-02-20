@@ -3,15 +3,19 @@
 import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { JourneyMap } from "@/components/journey/journey-map";
+import { JourneyVisual } from "@/components/journey/journey-visual";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import type { GeneratedJourney } from "@/lib/ai/journey-prompt";
+
+type ViewMode = "cards" | "visual";
 
 function JourneyContent() {
   const searchParams = useSearchParams();
   const templateId = searchParams.get("id");
   const [journey, setJourney] = useState<GeneratedJourney | null>(null);
   const [loading, setLoading] = useState(true);
+  const [viewMode, setViewMode] = useState<ViewMode>("cards");
 
   useEffect(() => {
     async function load() {
@@ -27,7 +31,6 @@ function JourneyContent() {
         }
         setLoading(false);
       } else {
-        // Persisted mode — fetch from API
         try {
           const response = await fetch(`/api/journey/${templateId}`);
           if (response.ok) {
@@ -68,15 +71,51 @@ function JourneyContent() {
     );
   }
 
-  return <JourneyMap journey={journey} />;
+  return (
+    <div className="w-full">
+      {/* Header + View toggle */}
+      <div className="text-center mb-6 space-y-4">
+        <h1 className="text-3xl font-bold">{journey.name}</h1>
+        <div className="inline-flex items-center rounded-lg border bg-muted p-1 text-muted-foreground">
+          <button
+            onClick={() => setViewMode("cards")}
+            className={`inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition-all ${
+              viewMode === "cards"
+                ? "bg-background text-foreground shadow-sm"
+                : "hover:text-foreground"
+            }`}
+          >
+            <span className="text-xs">☰</span> Detail View
+          </button>
+          <button
+            onClick={() => setViewMode("visual")}
+            className={`inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition-all ${
+              viewMode === "visual"
+                ? "bg-background text-foreground shadow-sm"
+                : "hover:text-foreground"
+            }`}
+          >
+            <span className="text-xs">🗺</span> Journey Map
+          </button>
+        </div>
+      </div>
+
+      {/* Content based on view mode */}
+      {viewMode === "cards" ? (
+        <JourneyMap journey={journey} />
+      ) : (
+        <JourneyVisual journey={journey} />
+      )}
+    </div>
+  );
 }
 
 export default function JourneyPage() {
   return (
-    <main className="min-h-screen flex items-center justify-center py-12 px-4">
+    <main className="min-h-screen py-12 px-4">
       <Suspense
         fallback={
-          <div className="text-center space-y-2">
+          <div className="text-center space-y-2 pt-24">
             <div className="text-2xl font-bold">Loading...</div>
           </div>
         }

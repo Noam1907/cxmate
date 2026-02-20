@@ -541,8 +541,72 @@ function ConfrontationContent() {
           </div>
         )}
 
+        {/* Tech Stack Recommendations */}
+        {journey.techStackRecommendations && journey.techStackRecommendations.length > 0 && (
+          <div className="mb-12">
+            <FadeIn delay={1900}>
+              <h2 className="text-xl font-bold mb-4">
+                Recommended tech stack
+              </h2>
+              <p className="text-sm text-muted-foreground mb-4">
+                Tools to connect for maximum CX impact at your stage
+              </p>
+            </FadeIn>
+            <div className="grid gap-3">
+              {journey.techStackRecommendations.map((rec, i) => (
+                <FadeIn key={i} delay={2000 + i * 100}>
+                  <div className="rounded-xl border bg-white p-4 space-y-2">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs px-2 py-0.5 rounded-full bg-blue-100 text-blue-800 border border-blue-200 font-medium">
+                        {rec.categoryLabel}
+                      </span>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {rec.tools.map((tool, j) => (
+                        <span key={j} className="text-sm font-medium bg-slate-100 px-2 py-1 rounded">
+                          {tool}
+                        </span>
+                      ))}
+                    </div>
+                    <p className="text-sm text-muted-foreground">{rec.whyNow}</p>
+                    <p className="text-xs text-muted-foreground">
+                      <span className="font-medium">Connect with:</span> {rec.connectWith}
+                    </p>
+                  </div>
+                </FadeIn>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Assumptions & Methodology */}
+        {journey.assumptions && journey.assumptions.length > 0 && (
+          <FadeIn delay={2100} className="mb-10">
+            <details className="group">
+              <summary className="cursor-pointer text-sm font-medium text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1">
+                <span className="text-xs group-open:rotate-90 transition-transform">▶</span>
+                Assumptions &amp; methodology
+              </summary>
+              <div className="mt-3 rounded-xl border bg-slate-50 p-4 space-y-2">
+                <ul className="space-y-1.5">
+                  {journey.assumptions.map((assumption, i) => (
+                    <li key={i} className="text-xs text-muted-foreground flex items-start gap-2">
+                      <span className="mt-1 text-slate-400">•</span>
+                      <span>{assumption}</span>
+                    </li>
+                  ))}
+                </ul>
+                <p className="text-xs text-muted-foreground italic pt-2 border-t">
+                  Projections are directional estimates, not predictions.
+                  Actual results depend on execution and market conditions.
+                </p>
+              </div>
+            </details>
+          </FadeIn>
+        )}
+
         {/* CTA — proceed to full journey */}
-        <FadeIn delay={2000} className="text-center space-y-4">
+        <FadeIn delay={2200} className="text-center space-y-4">
           <div className="border-t pt-8">
             <h3 className="text-lg font-semibold mb-2">
               Ready to see the full picture?

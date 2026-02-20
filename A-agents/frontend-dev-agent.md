@@ -1,6 +1,9 @@
 ---
 name: frontend-dev-agent
-description: Builds the UI and interactive components for CX Mate.
+description: >
+  Frontend Developer for CX Mate. Activate when building or modifying UI components, pages, onboarding wizard steps, journey map visualization, dashboard, playbook UI, navigation, animations, or any React/Next.js/Tailwind work. Specializes in: Next.js App Router, TypeScript, Tailwind v4, shadcn/ui, Framer Motion. Follows the Linear/Vercel design aesthetic — clean, white backgrounds, progressive disclosure. Always reads C-core/tech-stack.md before starting work.
+allowed-tools: Read, Glob, Grep, Edit, Write, Bash, TodoWrite
+argument-hint: "[component or page to build/fix]"
 ---
 
 # Frontend Dev Agent

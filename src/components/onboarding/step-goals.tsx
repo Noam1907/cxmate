@@ -4,10 +4,11 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
-  GOAL_OPTIONS,
+  getGoalsForMaturity,
   TIMEFRAME_OPTIONS,
   type OnboardingData,
 } from "@/types/onboarding";
+import { ChatBubble } from "./chat-bubble";
 
 interface StepGoalsProps {
   data: OnboardingData;
@@ -15,25 +16,24 @@ interface StepGoalsProps {
 }
 
 export function StepGoals({ data, onChange }: StepGoalsProps) {
+  const goalOptions = getGoalsForMaturity(data.companyMaturity);
+
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold">What does success look like?</h2>
-        <p className="text-muted-foreground mt-1">
-          This helps us focus your journey map and recommendations on what
-          matters most.
-        </p>
-      </div>
+      <ChatBubble>
+        <p>Last thing — <strong>what does success look like for you?</strong></p>
+        <p>This helps me focus your journey map and recommendations on what matters most.</p>
+      </ChatBubble>
 
-      {/* Primary Goal */}
+      {/* Primary Goal — Maturity-Adaptive */}
       <div className="space-y-3">
         <Label>What&apos;s your #1 goal?</Label>
         <RadioGroup
           value={data.primaryGoal}
           onValueChange={(value) => onChange({ primaryGoal: value })}
-          className="grid grid-cols-1 sm:grid-cols-2 gap-2"
+          className="grid grid-cols-1 gap-2"
         >
-          {GOAL_OPTIONS.map((goal) => (
+          {goalOptions.map((goal) => (
             <label
               key={goal.value}
               className={`flex items-center gap-3 rounded-lg border px-4 py-3 cursor-pointer transition-colors hover:bg-accent/50 ${
@@ -76,7 +76,7 @@ export function StepGoals({ data, onChange }: StepGoalsProps) {
       {/* Additional Context */}
       <div className="space-y-2">
         <Label htmlFor="additionalContext">
-          Anything else we should know? (optional)
+          Anything else I should know? (optional)
         </Label>
         <Textarea
           id="additionalContext"

@@ -8,6 +8,7 @@ import {
   DEAL_SIZE_OPTIONS,
   type OnboardingData,
 } from "@/types/onboarding";
+import { ChatBubble } from "./chat-bubble";
 
 interface StepBusinessDataProps {
   data: OnboardingData;
@@ -17,12 +18,12 @@ interface StepBusinessDataProps {
 export function StepBusinessData({ data, onChange }: StepBusinessDataProps) {
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold">Help us ground the numbers</h2>
-        <p className="text-muted-foreground mt-1">
-          This lets us calculate real projections — not hand-wavy estimates.
+      <ChatBubble>
+        <p>
+          Let&apos;s ground this in <strong>real numbers</strong> so your playbook has
+          actual ROI projections — not hand-wavy estimates.
         </p>
-      </div>
+      </ChatBubble>
 
       {/* Pricing Model */}
       <div className="space-y-3">

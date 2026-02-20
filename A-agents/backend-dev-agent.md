@@ -1,6 +1,9 @@
 ---
 name: backend-dev-agent
-description: Builds the API layer, database, and integration engine for CX Mate.
+description: >
+  Backend Developer for CX Mate. Activate when building or modifying API routes, Supabase schema/RLS/auth, database migrations, server-side services, persistence pipelines, or integration connectors. Specializes in: Next.js API routes, Supabase (PostgreSQL + RLS + Auth + Realtime), Zod validation, service role admin operations, and the journey/playbook persistence pipeline. Always checks M-memory/decisions.md for architectural decisions before making changes.
+allowed-tools: Read, Glob, Grep, Edit, Write, Bash, TodoWrite
+argument-hint: "[API route, service, or database task]"
 ---
 
 # Backend Dev Agent

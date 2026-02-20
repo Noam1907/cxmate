@@ -34,6 +34,25 @@ Track sprint progress and status.
 - 2026-02-19: **Next session should start with:** UX walkthrough of the new onboarding flow (both paths), then Auth + DB persistence pipeline.
 - 2026-02-19: **Auth + DB Persistence Pipeline — Phases 1-3 COMPLETE.** Built full auth flow: login/signup page (email/password, mode toggle, Suspense-wrapped), auth callback route (code exchange + auto org creation + app_metadata update), admin client (service role, bypasses RLS), auth helpers (getSession/getUser/getOrgId). Built persistence pipeline: journey-persistence service (persistJourney + loadJourney with JSONB backup + normalized tables fallback), updated onboarding API route (auto-persists for authenticated users, falls back to preview), journey loading API route (GET /api/journey/[id] with RLS enforcement). Updated all frontend pages for dual-mode loading (preview=sessionStorage, real UUID=API fetch). Updated nav header for dynamic template IDs. Updated middleware for route protection (public vs app routes, preview mode bypass). Fixed Database types (added Relationships + Views/Functions/Enums/CompositeTypes for Supabase v2 compatibility). Build passes clean.
 - 2026-02-19: **Next session should start with:** Full UX walkthrough of both auth flow AND preview flow (verify nothing broke). Then playbook persistence (Phase 4) and "Save My Results" CTA (Phase 5). Then journey editing and health scoring.
+- 2026-02-19: **QA Walkthrough (Orca AI) + Bug Fix + Agent Skills Upgrade.** QA walkthrough with Orca AI profile (11-50 employees, B2B SaaS, Full Lifecycle journey, pre-customer): CX Report loaded correctly, journey map and playbook generated successfully. Bug found: pre-customer companies selecting "Full Lifecycle" journey type were getting customer-stage content (onboarding emails, CS handoffs) in both the journey and playbook — even though they have no customers. Fixed in journey-prompt.ts (override effectiveJourneyType to "sales" when !hasExistingCustomers, add ⚠️ CRITICAL constraint in prompt, constrain stageType to "sales" only) and recommendation-prompt.ts (Rule 8: PRE-CUSTOMER CONSTRAINT). Build passes clean. Agent skills upgraded: applied Anthropic's "Complete Guide to Building Skills for Claude" — all 12 agent SKILL.md files now have rich description (when to activate), allowed-tools (specific tools per role), argument-hint, and user-invocable: false for orchestrator. This enables Claude to auto-activate the right agent based on context.
+- 2026-02-19: **Next session should start with:** Continue QA with Mesh Payments profile (FinTech, existing customers) and Beam AI (early-stage pre-customer). Then playbook persistence (Phase 4). Then journey health scoring (P1).
+- 2026-02-19: **Onboarding Redesign v2 — Conversational Story Flow + Major Feature Additions.** Complete onboarding rewrite: maturity-based branching (pre_launch/first_customers/growing/scaling), ChatBubble persona, dynamic step building, maturity-adaptive pain points and goals, deriveFromMaturity() backward compatibility. QA walkthrough of full Growing path: all 9 steps → journey generation → CX Report → Journey Map → Playbook — all working end-to-end. Then user feedback round with 8 improvements:
+  1. ✅ Removed "B2B" from welcome (now "companies" not "B2B companies")
+  2. ✅ Created design brief for designer mockups (`P-prds/design-brief-onboarding.md`)
+  3. ✅ Added competitor question step (new `step-competitors.tsx`)
+  4. ✅ Added assumptions/methodology to CX Report (collapsible section with disclaimer)
+  5. ✅ Added tech stack recommendations (CRM, marketing, support, analytics) to prompt + CX Report UI
+  6. ✅ AI Engineer owns AI trends / stress-testing (documented in decisions.md)
+  7. ✅ Added company website field to Welcome step (future auto-enrichment)
+  8. ✅ Added percentages alongside dollar amounts in prompt instructions
+  Then additional feedback:
+  9. ✅ Added horizontal visual journey view (new `journey-visual.tsx` with toggle on journey page)
+  10. ✅ Updated CX Expert skill with Qualtrics/survey platform landscape + survey deployment strategy by maturity
+  11. ✅ Added AI-first lens to journey prompt (🤖/🤖+👤/👤 automation labels on recommendations)
+  12. ✅ Added AI-first principle to orchestrator agent (all agents must evaluate through AI-first lens)
+  13. ✅ AI Engineer agent updated with AI trends ownership + future vision
+  Build passes clean.
+- 2026-02-19: **Next session should start with:** Full QA re-run (all maturity paths with new competitor + website fields). Test visual journey view. Then playbook persistence (Phase 4). Consider: auto-enrichment from company website (scrape → LLM → pre-fill fields).
 
 ### Sprint 4: Beta Launch (Weeks 7-8)
 - Stripe integration

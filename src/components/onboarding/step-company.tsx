@@ -1,10 +1,11 @@
 "use client";
 
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { VERTICALS } from "@/lib/cx-knowledge";
 import { COMPANY_SIZES, type OnboardingData } from "@/types/onboarding";
+import { ChatBubble } from "./chat-bubble";
 
 interface StepCompanyProps {
   data: OnboardingData;
@@ -14,23 +15,10 @@ interface StepCompanyProps {
 export function StepCompany({ data, onChange }: StepCompanyProps) {
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold">Tell us about your company</h2>
-        <p className="text-muted-foreground mt-1">
-          This helps us tailor your journey map to your specific business.
-        </p>
-      </div>
-
-      {/* Company Name */}
-      <div className="space-y-2">
-        <Label htmlFor="companyName">Company name</Label>
-        <Input
-          id="companyName"
-          placeholder="e.g. Acme Corp"
-          value={data.companyName}
-          onChange={(e) => onChange({ companyName: e.target.value })}
-        />
-      </div>
+      <ChatBubble>
+        <p>Nice to meet you, <strong>{data.companyName || "there"}</strong>!</p>
+        <p>Tell me a bit about your company so I can tailor everything to your world.</p>
+      </ChatBubble>
 
       {/* Vertical */}
       <div className="space-y-3">
