@@ -5,7 +5,6 @@ import { usePathname } from "next/navigation";
 import type { OnboardingData } from "@/types/onboarding";
 import { MATURITY_OPTIONS } from "@/types/onboarding";
 import type { GeneratedJourney } from "@/lib/ai/journey-prompt";
-import { SidebarSection } from "./sidebar-section";
 
 interface SidebarCompleteViewProps {
   data: Partial<OnboardingData> | null;
@@ -23,7 +22,7 @@ export function SidebarCompleteView({
   if (!data && !journey) {
     return (
       <div className="text-center py-8">
-        <p className="text-xs text-sidebar-foreground/50">
+        <p className="text-xs text-sidebar-foreground/40">
           Complete onboarding to see your CX profile
         </p>
       </div>
@@ -56,17 +55,17 @@ export function SidebarCompleteView({
   const id = templateId || "preview";
 
   const quickLinks = [
-    { href: `/confrontation?id=${id}`, label: "CX Report", icon: "📊" },
-    { href: `/journey?id=${id}`, label: "Journey", icon: "🗺️" },
-    { href: "/playbook", label: "Playbook", icon: "📋" },
-    { href: "/dashboard", label: "Dashboard", icon: "📈" },
+    { href: `/confrontation?id=${id}`, label: "CX Report" },
+    { href: `/journey?id=${id}`, label: "Journey Map" },
+    { href: "/playbook", label: "Playbook" },
+    { href: "/dashboard", label: "Dashboard" },
   ];
 
   return (
     <div className="space-y-5">
       {/* Company Header */}
       <div className="space-y-2">
-        <h2 className="text-sm font-bold text-sidebar-foreground">
+        <h2 className="text-base font-bold text-sidebar-foreground">
           {data?.companyName || "Your Company"}
         </h2>
         <div className="flex flex-wrap gap-1.5">
@@ -76,13 +75,13 @@ export function SidebarCompleteView({
             </span>
           )}
           {maturityOption && (
-            <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-sidebar-primary/10 text-sidebar-primary">
-              {maturityOption.emoji} {maturityOption.label}
+            <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-primary/8 text-primary">
+              {maturityOption.label}
             </span>
           )}
           {data?.companySize && (
             <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-sidebar-accent text-sidebar-accent-foreground">
-              {data.companySize} emp.
+              {data.companySize}
             </span>
           )}
         </div>
@@ -90,73 +89,77 @@ export function SidebarCompleteView({
 
       {/* Journey Stats */}
       {journey && (
-        <SidebarSection label="Journey Overview">
+        <div className="space-y-2">
+          <p className="text-[10px] font-semibold uppercase tracking-wider text-sidebar-foreground/35">Journey</p>
           <div className="grid grid-cols-3 gap-2">
-            <div className="text-center p-2 rounded-lg bg-sidebar-accent/50">
+            <div className="text-center p-2 rounded-lg bg-sidebar-accent">
               <p className="text-lg font-bold text-sidebar-foreground">
                 {stageCount}
               </p>
-              <p className="text-[10px] text-sidebar-foreground/60">Stages</p>
+              <p className="text-[10px] text-sidebar-foreground/50">Stages</p>
             </div>
-            <div className="text-center p-2 rounded-lg bg-sidebar-accent/50">
+            <div className="text-center p-2 rounded-lg bg-sidebar-accent">
               <p className="text-lg font-bold text-sidebar-foreground">
                 {momentCount}
               </p>
-              <p className="text-[10px] text-sidebar-foreground/60">Moments</p>
+              <p className="text-[10px] text-sidebar-foreground/50">Moments</p>
             </div>
             <div className="text-center p-2 rounded-lg bg-red-50">
-              <p className="text-lg font-bold text-red-700">{criticalCount}</p>
-              <p className="text-[10px] text-red-600/70">Critical</p>
+              <p className="text-lg font-bold text-red-600">{criticalCount}</p>
+              <p className="text-[10px] text-red-500/70">Critical</p>
             </div>
           </div>
-        </SidebarSection>
+        </div>
       )}
 
       {/* Maturity Assessment */}
       {journey?.maturityAssessment && (
-        <SidebarSection label="CX Assessment">
-          <p className="text-xs text-sidebar-foreground/80 leading-relaxed line-clamp-4">
+        <div className="space-y-2">
+          <p className="text-[10px] font-semibold uppercase tracking-wider text-sidebar-foreground/35">Assessment</p>
+          <p className="text-xs text-sidebar-foreground/70 leading-relaxed line-clamp-4">
             {journey.maturityAssessment}
           </p>
-        </SidebarSection>
+        </div>
       )}
 
       {/* Top Risks */}
       {topRisks.length > 0 && (
-        <SidebarSection label="Top Risks" icon="⚠️">
+        <div className="space-y-2">
+          <p className="text-[10px] font-semibold uppercase tracking-wider text-sidebar-foreground/35">Top risks</p>
           <div className="space-y-1.5">
             {topRisks.map((risk, i) => (
               <Link
                 key={i}
                 href={`/confrontation?id=${id}`}
-                className="block text-xs text-sidebar-foreground/80 hover:text-sidebar-primary transition-colors p-1.5 rounded-md hover:bg-sidebar-accent/50"
+                className="block text-xs text-sidebar-foreground/70 hover:text-primary transition-colors p-1.5 rounded-md hover:bg-sidebar-accent"
               >
-                <span className="text-red-500 mr-1.5">&#9679;</span>
+                <span className="text-red-400 mr-1.5">&#9679;</span>
                 {risk.pattern}
               </Link>
             ))}
           </div>
-        </SidebarSection>
+        </div>
       )}
 
       {/* Goal */}
       {data?.primaryGoal && (
-        <SidebarSection label="Focus">
-          <div className="p-2 rounded-lg bg-sidebar-primary/5 border border-sidebar-primary/10">
+        <div className="space-y-2">
+          <p className="text-[10px] font-semibold uppercase tracking-wider text-sidebar-foreground/35">Focus</p>
+          <div className="p-2.5 rounded-lg bg-primary/5 border border-primary/10">
             <p className="text-xs font-medium text-sidebar-foreground">
               {data.primaryGoal.replace(/_/g, " ")}
             </p>
             {data.timeframe && (
-              <p className="text-[10px] text-sidebar-foreground/50 mt-0.5">
+              <p className="text-[10px] text-sidebar-foreground/45 mt-0.5">
                 {data.timeframe.replace(/_/g, " ")}
               </p>
             )}
           </div>
-        </SidebarSection>
+        </div>
       )}
 
       {/* Quick Links */}
-      <div className="pt-3 mt-1 border-t border-sidebar-border/50">
+      <div className="pt-3 mt-1 border-t border-sidebar-border">
         <div className="space-y-0.5">
           {quickLinks.map((link) => {
             const isActive = pathname === link.href.split("?")[0];
@@ -164,13 +167,12 @@ export function SidebarCompleteView({
               <Link
                 key={link.href}
                 href={link.href}
-                className={`flex items-center gap-2 px-2 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                className={`block px-3 py-2 rounded-lg text-xs font-medium transition-all ${
                   isActive
-                    ? "bg-sidebar-primary text-sidebar-primary-foreground"
-                    : "text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent/50"
+                    ? "bg-primary text-white"
+                    : "text-sidebar-foreground/60 hover:text-sidebar-foreground hover:bg-sidebar-accent"
                 }`}
               >
-                <span className="text-sm">{link.icon}</span>
                 {link.label}
               </Link>
             );

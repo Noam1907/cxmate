@@ -35,8 +35,8 @@ export async function generateRecommendations(
     },
     body: JSON.stringify({
       model: "claude-sonnet-4-20250514",
-      max_tokens: 8192,
-      system: "You are a CX expert API. You MUST respond with ONLY a valid JSON object. No preamble, no explanation, no markdown fences, no text before or after the JSON. The very first character of your response must be { and the very last must be }.",
+      max_tokens: 16384,
+      system: "You are a CX expert API. You MUST respond with ONLY a valid JSON object. No preamble, no explanation, no markdown fences, no text before or after the JSON. The very first character of your response must be { and the very last must be }. CRITICAL: Keep your response concise — aim for under 12000 tokens. Use short descriptions (1-2 sentences each). Do NOT write essays in JSON string values.",
       messages: [
         {
           role: "user",
@@ -53,6 +53,9 @@ export async function generateRecommendations(
 
   const message = await response.json();
 
+  // Check for truncation
+  const stopReason = message.stop_reason;
+
   const textBlock = message.content?.find(
     (block: { type: string }) => block.type === "text"
   );
@@ -60,19 +63,26 @@ export async function generateRecommendations(
     throw new Error("No text response from Claude");
   }
 
-  // Parse the JSON response — Claude sometimes returns malformed JSON
+  // Parse the JSON response
   let raw = textBlock.text.trim();
 
   // Strip markdown code fences
   raw = raw.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
 
-  // Extract the JSON object — find the outermost { ... }
+  // Extract the JSON object
   const jsonStart = raw.indexOf("{");
   const jsonEnd = raw.lastIndexOf("}");
-  if (jsonStart === -1 || jsonEnd === -1 || jsonEnd <= jsonStart) {
-    throw new Error(`Claude response did not contain valid JSON. First 200 chars: ${raw.slice(0, 200)}`);
+  if (jsonStart === -1) {
+    throw new Error(`Claude response did not contain JSON. First 200 chars: ${raw.slice(0, 200)}`);
   }
-  raw = raw.slice(jsonStart, jsonEnd + 1);
+
+  // If truncated (max_tokens), try to repair the incomplete JSON
+  if (stopReason === "max_tokens" || jsonEnd <= jsonStart) {
+    console.warn("[generate-recommendations] Response was truncated (stop_reason: max_tokens). Attempting repair...");
+    raw = repairTruncatedJson(raw.slice(jsonStart));
+  } else {
+    raw = raw.slice(jsonStart, jsonEnd + 1);
+  }
 
   // Attempt parsing with progressive repair
   const attempts = [
@@ -105,4 +115,49 @@ export async function generateRecommendations(
   }
 
   throw new Error(`Failed to parse recommendations JSON after all repair attempts. First 300 chars: ${raw.slice(0, 300)}`);
+}
+
+/**
+ * Attempt to repair truncated JSON by closing open brackets/braces.
+ * When Claude hits max_tokens, the JSON is cut mid-stream.
+ */
+function repairTruncatedJson(raw: string): string {
+  let cleaned = raw;
+
+  // If we're in the middle of a string value, close it
+  const quoteCount = (cleaned.match(/(?<!\\)"/g) || []).length;
+  if (quoteCount % 2 !== 0) {
+    cleaned += '"';
+  }
+
+  // Remove trailing comma if present
+  cleaned = cleaned.replace(/,\s*$/, "");
+
+  // Count open vs close brackets/braces
+  let openBraces = 0;
+  let openBrackets = 0;
+  let inString = false;
+  let prevChar = "";
+
+  for (const char of cleaned) {
+    if (char === '"' && prevChar !== "\\") {
+      inString = !inString;
+    } else if (!inString) {
+      if (char === "{") openBraces++;
+      else if (char === "}") openBraces--;
+      else if (char === "[") openBrackets++;
+      else if (char === "]") openBrackets--;
+    }
+    prevChar = char;
+  }
+
+  // Close any open brackets then braces
+  for (let i = 0; i < openBrackets; i++) {
+    cleaned += "]";
+  }
+  for (let i = 0; i < openBraces; i++) {
+    cleaned += "}";
+  }
+
+  return cleaned;
 }
