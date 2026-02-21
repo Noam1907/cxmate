@@ -102,6 +102,21 @@ export {
 } from "./impact-models/impact-calculator";
 
 // ============================================
+// Enterprise CX Maturity Benchmarks (Qualtrics 2025 + Gladly 2026)
+// ============================================
+export {
+  CX_MATURITY_STAGES,
+  CX_COMPETENCY_RATINGS,
+  CX_OBSTACLES,
+  CX_ROI_DATA,
+  CX_CAPABILITY_RATINGS,
+  AI_IN_CX,
+  CX_LEADERSHIP,
+  SMB_CX_STATS,
+  CX_MATE_THESIS,
+} from "./enterprise-cx-maturity";
+
+// ============================================
 // Best Practice Foundations (Mode A)
 // ============================================
 export {

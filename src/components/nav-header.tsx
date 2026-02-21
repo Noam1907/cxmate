@@ -38,10 +38,13 @@ export function NavHeader() {
   ];
 
   return (
-    <header className="border-b bg-white/80 backdrop-blur-sm sticky top-0 z-50">
-      <div className="max-w-5xl mx-auto px-4 flex items-center justify-between h-12">
-        <Link href="/dashboard" className="text-sm font-bold tracking-tight">
-          CX Mate
+    <header className="border-b border-border/50 bg-white/80 backdrop-blur-md sticky top-0 z-50">
+      <div className="max-w-full px-6 flex items-center justify-between h-14">
+        <Link href="/dashboard" className="flex items-center gap-2.5">
+          <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center">
+            <span className="text-xs font-bold text-primary">CX</span>
+          </div>
+          <span className="text-sm font-bold tracking-tight text-foreground">CX Mate</span>
         </Link>
         <nav className="flex items-center gap-1">
           {navItems.map((item) => {
@@ -50,10 +53,10 @@ export function NavHeader() {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`text-xs px-3 py-1.5 rounded-md transition-colors ${
+                className={`text-xs font-medium px-4 py-2 rounded-lg transition-all duration-200 ${
                   isActive
-                    ? "bg-slate-900 text-white"
-                    : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+                    ? "bg-primary text-primary-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground hover:bg-slate-100"
                 }`}
               >
                 {item.label}

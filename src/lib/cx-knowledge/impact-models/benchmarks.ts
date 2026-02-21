@@ -8,6 +8,10 @@
  * Sources: OpenView, Bessemer, SaaS Capital, Gainsight, Totango,
  * ProfitWell, ChartMogul — composite averages from public reports.
  *
+ * See also: ../enterprise-cx-maturity.ts for enterprise CX maturity
+ * benchmarks (Qualtrics XM Institute 2025 + Gladly 2026) that provide
+ * industry-wide context for how companies perform on CX.
+ *
  * All numbers are estimates/ranges and should be presented as such.
  */
 

@@ -57,6 +57,14 @@ Track key technical and product decisions and why they were made.
 | 2026-02-19 | **CX Report shows assumptions + methodology** | Transparency builds trust. Collapsible "Assumptions & methodology" section shows what was inferred vs user-provided. Impact projections include percentages alongside dollar amounts. | Active |
 | 2026-02-19 | **Tech stack recommendations in CX Report** | Recommending CRM, marketing, support, analytics tools at their maturity level (don't recommend Salesforce to a 5-person startup). Shown after impact projections, before CTAs. | Active |
 
+| 2026-02-21 | **Company auto-enrichment via Claude + website scraping** | When user enters company name + website, CX Mate fetches website HTML, sends to Claude for structured extraction (vertical, size, competitors, customer size, channel). Pre-fills onboarding steps with "AI-suggested" badges. User confirms or overrides. Enrichment data also passed to journey prompt for deeper personalization. | Active |
+| 2026-02-21 | **Enrichment uses same Claude model (sonnet), not lighter model** | Accuracy matters more than speed for this feature. Using the same model ensures high-quality extraction. The prompt is short (~300 tokens) so cost is negligible ($0.01/call). 12s timeout on Claude call, 8s on website fetch. | Active |
+| 2026-02-21 | **Competitor chips UI instead of textarea** | Competitors are now displayed as removable pills/chips with an "Add" input. Much better UX than a textarea — users can see each competitor distinctly, remove wrong AI suggestions with one click, and add their own. | Active |
+| 2026-02-21 | **Product vision refined: 3 value layers** | (1) Free first taste: simple credible journey map + CX report. (2) Next steps: actionable recommendations that earn trust. (3) Premium: playbook + integrations + ongoing intelligence. Monetization happens at layer 3. | Active |
+| 2026-02-21 | **Forward features roadmap: Evidence Wall → Competitive Intelligence → CX Pulse → Simulation → QBR → Health Scoring** | Six features that create ongoing value and moat. Pulse (monthly re-analysis) = retention loop. Competitive CX = offensive weapon. Health Scoring = anchors $499 tier. Evidence Wall uses Claude training data for social proof. | Active |
+| 2026-02-21 | **Pricing model: Free / $99 / $249 / $499** | Free = one-time journey+report. Starter $99 = monthly Pulse + Evidence Wall. Growth $249 = Competitive Intelligence + Simulations + QBR Deck. Scale $499 = Health Scoring + CRM integration. | Active |
+| 2026-02-21 | **Target audience is NOT headcount-based** | Not "5-300 employees". It's "companies that haven't hired a CX expert yet" — a 600-person company with no formal CX is a perfect customer. Stage-based positioning, not size-based. | Active |
+
 ---
 
 *Decisions age. Context helps them age well.*

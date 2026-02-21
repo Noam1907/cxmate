@@ -71,30 +71,33 @@ function AuthContent() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-background px-4">
       <div className="w-full max-w-sm">
         {/* Logo */}
         <div className="text-center mb-8">
-          <h1 className="text-2xl font-bold tracking-tight">CX Mate</h1>
+          <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-primary/10 mb-3">
+            <span className="text-lg font-bold text-primary">CX</span>
+          </div>
+          <h1 className="text-2xl font-bold tracking-tight text-foreground">CX Mate</h1>
           <p className="text-sm text-muted-foreground mt-1">
             Your AI CX co-pilot
           </p>
         </div>
 
         {/* Card */}
-        <div className="bg-white rounded-xl border shadow-sm p-6 space-y-6">
+        <div className="bg-card rounded-2xl border border-border shadow-sm p-6 space-y-6">
           {/* Mode Toggle */}
-          <div className="grid grid-cols-2 gap-1 bg-slate-100 rounded-lg p-1">
+          <div className="grid grid-cols-2 gap-1 bg-secondary rounded-xl p-1">
             <button
               onClick={() => {
                 setMode("login");
                 setError("");
                 setMessage("");
               }}
-              className={`text-sm py-2 rounded-md font-medium transition-colors ${
+              className={`text-sm py-2 rounded-lg font-medium transition-all duration-200 ${
                 mode === "login"
-                  ? "bg-white shadow-sm text-slate-900"
-                  : "text-slate-500 hover:text-slate-700"
+                  ? "bg-white shadow-sm text-foreground"
+                  : "text-muted-foreground hover:text-foreground"
               }`}
             >
               Log in
@@ -105,10 +108,10 @@ function AuthContent() {
                 setError("");
                 setMessage("");
               }}
-              className={`text-sm py-2 rounded-md font-medium transition-colors ${
+              className={`text-sm py-2 rounded-lg font-medium transition-all duration-200 ${
                 mode === "signup"
-                  ? "bg-white shadow-sm text-slate-900"
-                  : "text-slate-500 hover:text-slate-700"
+                  ? "bg-white shadow-sm text-foreground"
+                  : "text-muted-foreground hover:text-foreground"
               }`}
             >
               Sign up
@@ -129,6 +132,7 @@ function AuthContent() {
                   placeholder="Acme Inc."
                   value={companyName}
                   onChange={(e) => setCompanyName(e.target.value)}
+                  className="rounded-xl"
                 />
               </div>
             )}
@@ -142,6 +146,7 @@ function AuthContent() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
+                className="rounded-xl"
               />
             </div>
 
@@ -155,22 +160,23 @@ function AuthContent() {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 minLength={6}
+                className="rounded-xl"
               />
             </div>
 
             {error && (
-              <p className="text-sm text-red-600 bg-red-50 rounded-md px-3 py-2">
+              <p className="text-sm text-destructive bg-destructive/10 rounded-xl px-3 py-2">
                 {error}
               </p>
             )}
 
             {message && (
-              <p className="text-sm text-green-600 bg-green-50 rounded-md px-3 py-2">
+              <p className="text-sm text-emerald-600 bg-emerald-50 rounded-xl px-3 py-2">
                 {message}
               </p>
             )}
 
-            <Button type="submit" className="w-full" disabled={loading}>
+            <Button type="submit" className="w-full rounded-xl" disabled={loading}>
               {loading
                 ? "Loading..."
                 : mode === "login"
@@ -181,12 +187,12 @@ function AuthContent() {
         </div>
 
         {/* Skip link */}
-        <div className="text-center mt-4">
+        <div className="text-center mt-6">
           <Link
             href="/onboarding"
-            className="text-xs text-muted-foreground hover:text-slate-600 transition-colors"
+            className="text-xs text-muted-foreground hover:text-primary transition-colors"
           >
-            Continue without an account →
+            Continue without an account &rarr;
           </Link>
         </div>
       </div>
@@ -198,7 +204,7 @@ export default function AuthPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen flex items-center justify-center">
+        <div className="min-h-screen flex items-center justify-center bg-background">
           <div className="text-muted-foreground">Loading...</div>
         </div>
       }

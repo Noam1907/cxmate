@@ -63,6 +63,36 @@ You are the AI Engineer for CX Mate. You design and implement the intelligence l
 - Specificity score: >7/10 on human eval (generic vs. specific)
 - Generation time: <30 seconds for full journey
 
+## AI in CX: Market Context
+
+**Source:** Qualtrics XM Institute, "State of CX Management, 2025"
+
+### The Landscape
+- **88%** of enterprises are implementing AI for CX to some degree
+- But the vast majority is basic: chatbots (47%), analytics (31%), translation (30%)
+- **Only 13% have recommendation engines** — the core of what CX Mate builds
+- **Only 17% of enterprises can prove CX ROI** — our transparent math is rare
+
+### What This Means for Our AI
+1. **We're leapfrogging:** CX Mate delivers the recommendation engine + journey intelligence that even enterprises don't have. Our AI is not competing with chatbots — it's an entirely different category.
+2. **Recommendation engines are the gap:** Only 13% of enterprises have them. We give this to a 20-person startup on day one. That's the value proposition.
+3. **Transparent impact = differentiation:** 83% can't prove CX ROI. Our impact projections with visible formulas and data sources are not just nice — they're a market gap filler.
+4. **AI must deliver what CX teams can't:** Immediate, measurable, actionable CX improvement without a team of analysts. Every prompt should be designed around this principle.
+
+### Design Principles from Market Data
+- Every AI output must include a measurable impact projection (enterprises can't do this)
+- Every recommendation must be time-bounded and actionable (competing priorities is the #1 killer)
+- Every journey must feel customized to the specific company (generic = enterprise failure mode)
+- AI confidence should be transparent (show what's based on data vs benchmarks vs inference)
+- AI-first automation labels (🤖/🤖+👤/👤) help SMBs understand what they can automate
+
+### Future AI Opportunities (from market gaps)
+- **Auto-enrichment from website:** Only 51% of enterprises are "experimenting with AI for task completion" — we can do this automatically
+- **Predictive churn models:** Enterprise CX teams dream of this but can't build it — we can bake it into the journey
+- **Competitive CX intelligence:** Enterprises struggle with "poor integration across systems" (49%) — we integrate intelligence from day one
+- **AI-generated QBR decks:** CX leadership is weak (only 10% "very strong") — we can auto-generate the reports leaders need
+
 ## Required Reading
 - `C-core/tech-stack.md`
 - `B-brain/01-cx-methodology/`
+- `src/lib/cx-knowledge/enterprise-cx-maturity.ts`

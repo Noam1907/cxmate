@@ -54,6 +54,17 @@ This is the team's collective memory. Every agent reads this before working.
 - **Route protection with preview mode**: Middleware can't check sessionStorage (server-side). Instead, check for `?id=preview` query param to allow unauthenticated access. Dashboard and playbook pages always allowed through — they handle their own empty states.
 - **JSONB backup + normalized tables**: Store the full `GeneratedJourney` in `journey_templates.stages` as JSONB for easy reconstruction. Also insert into normalized `journey_stages` + `meaningful_moments` for queryability. `loadJourney()` tries JSONB first, falls back to table reconstruction.
 
+### 2026-02-21 — Company Auto-Enrichment + Product Vision
+
+- **Website fetching in Next.js API routes**: Use standard `fetch()` with a short timeout (8s) and abort controller. Strip HTML aggressively: remove `<script>`, `<style>`, `<nav>`, `<footer>`, `<svg>`, `<img>` tags, then all remaining HTML tags. Decode entities. Cap at ~3000 chars for prompt efficiency.
+- **Enrichment as "background async" pattern**: Trigger enrichment on step transition (not on every keystroke). Fire `enrich()` when user clicks Continue from welcome step. By the time they reach step 2, results are usually back (~3-5 seconds). If slow, step works normally — enrichment is purely additive.
+- **Pre-fill only empty fields**: When enrichment returns, only apply values to fields the user hasn't manually filled. Use a ref (`enrichmentApplied`) to prevent re-applying enrichment on re-renders. Never override user input with AI suggestions.
+- **"AI-suggested" badge pattern**: Small inline pill badge (`text-[10px] bg-primary/8 text-primary rounded-full`) next to labels. Show when the current field value matches the enrichment suggestion. Disappears naturally when user changes the value.
+- **Competitor chips > textarea**: Chips provide better UX than a textarea for lists of items. Each chip has an × button for removal. An input + "Add" button lets users add their own. Parse/serialize to comma-separated string for backward compatibility with the `competitors: string` field.
+- **Pass enrichment to journey prompt**: The enrichment data (description, reasoning, confidence) enriches the journey generation prompt with real company context. But always tell Claude to prefer user-provided data over enrichment data when they conflict.
+- **Enrichment API is cheap**: ~300 input tokens for the prompt, ~200 output tokens. Sub-$0.01 per call. No need for caching in MVP — direct Claude call every time. Add caching later if volume justifies it.
+- **Product insight: target audience is stage-based, not size-based**: "Companies that haven't hired a CX expert yet" is the real ICP, not "5-300 employees." A 600-person company with no formal CX is a perfect customer.
+
 ---
 
 ## Version History

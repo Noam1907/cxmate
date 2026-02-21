@@ -1,11 +1,14 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
-import { NavHeader } from "@/components/nav-header";
+import { CompanyProfileProvider } from "@/contexts/company-profile-context";
+import { AppShell } from "@/components/layout/app-shell";
 
-const inter = Inter({
+const plusJakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
-  variable: "--font-inter",
+  variable: "--font-plus-jakarta",
+  display: "swap",
+  weight: ["400", "500", "600", "700"],
 });
 
 export const metadata: Metadata = {
@@ -21,9 +24,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`${inter.variable} font-sans antialiased`}>
-        <NavHeader />
-        {children}
+      <body className={`${plusJakarta.variable} font-sans antialiased`}>
+        <CompanyProfileProvider>
+          <AppShell>{children}</AppShell>
+        </CompanyProfileProvider>
       </body>
     </html>
   );
