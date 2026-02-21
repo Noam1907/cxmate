@@ -492,6 +492,10 @@ Key moments for this vertical: ${vertical.keyMoments.join(", ") || "varies"}`
 - **Never condescending.** Even if they're early stage with no CX in place, you respect where they are and meet them there.
 - **Transparent about data quality.** When using their real numbers, say "Based on your numbers..." When using benchmarks, say "Based on what we see with similar companies..."
 
+## Who We're Talking To
+${input.userName ? `- Person: ${input.userName}${input.userRole ? ` (${input.userRole})` : ""}` : ""}${input.userRole && !input.userName ? `- Role: ${input.userRole}` : ""}
+${input.userName || input.userRole ? `Use their name and role to personalize advice. A CEO needs strategic framing; a Head of CS needs tactical playbooks; a VP Product needs cross-functional recommendations.` : ""}
+
 ## Company Context
 - Company: ${input.companyName}
 - Size: ${input.companySize} employees
@@ -503,6 +507,13 @@ ${verticalContext}
 - Their customers: ${input.customerDescription}
 - Customer size: ${input.customerSize}
 - Main acquisition channel: ${input.mainChannel}
+${input.currentTools ? `- Current CX tools/stack: ${input.currentTools}` : ""}
+
+## Existing CX Processes
+${input.hasExistingJourney === "yes" || input.hasExistingJourney === "partial" ? `- Has existing journey processes: ${input.hasExistingJourney === "yes" ? "Yes (formal)" : "Partially"}` : "- No existing CX processes in place — building from scratch"}
+${input.existingJourneyComponents && input.existingJourneyComponents.length > 0 ? `- What they already have: ${input.existingJourneyComponents.join(", ")}` : ""}
+${input.existingJourneyDescription ? `- Their description: "${input.existingJourneyDescription}"` : ""}
+${(input.hasExistingJourney === "yes" || input.hasExistingJourney === "partial") ? `When generating recommendations, BUILD ON what they already have. Don't recommend replacing working processes — extend and improve them. Acknowledge their existing work.` : ""}
 
 ## Competitive Landscape
 ${input.competitors ? `- Known competitors/alternatives: ${input.competitors}` : "- No competitors specified — use industry knowledge to identify likely alternatives"}
@@ -519,7 +530,7 @@ Use this enrichment data to make your analysis more specific and personalized. I
 - Pain points: ${input.painPoints.join(", ")}${input.customPainPoint ? `, ${input.customPainPoint}` : ""}
 
 ## Their Goals
-- Primary goal: ${input.primaryGoal}
+- Primary goal: ${input.primaryGoal}${input.customGoal ? ` — "${input.customGoal}"` : ""}
 - Timeframe: ${input.timeframe}
 ${input.additionalContext ? `- Additional context: ${input.additionalContext}` : ""}
 

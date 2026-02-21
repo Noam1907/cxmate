@@ -177,6 +177,10 @@ export function buildRecommendationPrompt(
 
 Your voice: Direct, confident, touch of humor. You're the friend who's built this before and is telling them exactly what to do. "Here's what to send on Day 3" not "Consider reaching out to the customer." Include ready-to-use templates they can copy-paste — not vague advice.
 
+## Who We're Building For
+${input.userName ? `- Person: ${input.userName}${input.userRole ? ` (${input.userRole})` : ""}` : ""}${input.userRole && !input.userName ? `- Role: ${input.userRole}` : ""}
+${input.userRole ? `Tailor owner assignments and language to their role. If they're a CEO, recommendations should be delegatable. If they're a Head of CS, make them tactical and hands-on.` : ""}
+
 ## Company Context
 - Company: ${input.companyName}
 - Size: ${input.companySize} employees (${companyStage} stage)
@@ -184,10 +188,18 @@ Your voice: Direct, confident, touch of humor. You're the friend who's built thi
 - Has existing customers: ${input.hasExistingCustomers ? "Yes" : "No (pre-customer)"}
 - Customers: ${input.customerDescription} (${input.customerSize})
 - Main channel: ${input.mainChannel}
+${input.currentTools ? `- Current tools/stack: ${input.currentTools}\nWhen recommending tools or automation, BUILD ON their existing stack. Recommend integrations, not replacements. If they use HubSpot, recommend HubSpot workflows — don't suggest switching to Salesforce.` : ""}
+${input.hasExistingJourney === "yes" || input.hasExistingJourney === "partial" ? `
+## Existing Processes (Don't Reinvent)
+- Status: ${input.hasExistingJourney === "yes" ? "Has formal processes" : "Has partial processes"}
+${input.existingJourneyComponents && input.existingJourneyComponents.length > 0 ? `- Already have: ${input.existingJourneyComponents.join(", ")}` : ""}
+${input.existingJourneyDescription ? `- Description: "${input.existingJourneyDescription}"` : ""}
+IMPORTANT: Acknowledge and build on their existing work. Recommendations for stages they already cover should be IMPROVEMENTS, not from-scratch rebuilds.` : ""}
 - Biggest challenge: ${input.biggestChallenge}
-- Pain points: ${input.painPoints.join(", ")}
-- Primary goal: ${input.primaryGoal}
+- Pain points: ${input.painPoints.join(", ")}${input.customPainPoint ? `, ${input.customPainPoint}` : ""}
+- Primary goal: ${input.primaryGoal}${input.customGoal ? ` (${input.customGoal})` : ""}
 - Timeframe: ${input.timeframe}
+${input.additionalContext ? `- Additional context: ${input.additionalContext}` : ""}
 
 ## Stage Guidance
 ${stageGuidance}
@@ -232,7 +244,7 @@ Rules:
    - AI workflow automation (Zapier AI, Make, n8n) for process automation
    - LLM-powered personalization for emails, onboarding flows, and customer communications
    When recommending AI tools, be specific: name the tool, explain HOW it applies to their specific moment, and note if it replaces manual work. The future of CX is AI-augmented — make sure every playbook reflects this.
-${!input.hasExistingCustomers ? '8. **PRE-CUSTOMER CONSTRAINT (CRITICAL):** This company has NO customers yet. Every recommendation MUST be sales-focused (winning first customers). Do NOT generate any recommendations about customer onboarding, customer success, retention, renewal, or expansion. Those do not apply. The weekOneChecklist and quickWins must also be 100% sales-focused.' : ""}
+${!input.hasExistingCustomers ? '9. **PRE-CUSTOMER CONSTRAINT (CRITICAL):** This company has NO customers yet. Every recommendation MUST be sales-focused (winning first customers). Do NOT generate any recommendations about customer onboarding, customer success, retention, renewal, or expansion. Those do not apply. The weekOneChecklist and quickWins must also be 100% sales-focused.' : ""}
 
 ## Output Format
 
