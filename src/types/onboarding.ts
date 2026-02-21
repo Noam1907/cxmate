@@ -8,8 +8,13 @@ export type CompanyMaturity = "pre_launch" | "first_customers" | "growing" | "sc
 
 export interface OnboardingData {
   // Step 1: Welcome
+  userName?: string;
+  userRole?: string;
   companyName: string;
   companyWebsite: string;
+
+  // Tech stack (asked after business data or customer profile)
+  currentTools?: string;
 
   // Step 2: Company Context
   vertical: string;
@@ -21,7 +26,9 @@ export interface OnboardingData {
 
   // Step 4: Journey Existence (growing/scaling only)
   hasExistingJourney: "yes" | "no" | "partial" | "";
+  existingJourneyComponents?: string[];
   existingJourneyDescription?: string;
+  existingJourneyFileName?: string;
 
   // Step 5: Customer Profile (adaptive)
   customerCount: string;
@@ -41,6 +48,7 @@ export interface OnboardingData {
 
   // Step 8: Goals (maturity-adaptive)
   primaryGoal: string;
+  customGoal?: string;
   timeframe: string;
   additionalContext?: string;
 
@@ -135,10 +143,10 @@ export const CUSTOMER_SIZES = [
 ] as const;
 
 export const MAIN_CHANNELS = [
-  { value: "self_serve", label: "Self-serve / product-led" },
-  { value: "sales_led", label: "Sales-led" },
-  { value: "partner", label: "Partner / referral" },
-  { value: "mixed", label: "Mix of channels" },
+  { value: "self_serve", label: "Self-serve / product-led", description: "Customers sign up, onboard, and get value on their own" },
+  { value: "sales_led", label: "Sales-led", description: "A salesperson guides evaluation and purchase" },
+  { value: "partner", label: "Partner / referral", description: "Customers come through resellers or word of mouth" },
+  { value: "mixed", label: "Mix of channels", description: "Some customers self-serve, others go through sales" },
 ] as const;
 
 export const CUSTOMER_COUNT_OPTIONS = [
@@ -160,7 +168,9 @@ export const REVENUE_RANGE_OPTIONS = [
   { value: "under_100k", label: "Under $100K ARR" },
   { value: "100k_500k", label: "$100K - $500K ARR" },
   { value: "500k_1m", label: "$500K - $1M ARR" },
-  { value: "1m_plus", label: "$1M+ ARR" },
+  { value: "1m_5m", label: "$1M - $5M ARR" },
+  { value: "5m_20m", label: "$5M - $20M ARR" },
+  { value: "20m_plus", label: "$20M+ ARR" },
 ] as const;
 
 export const DEAL_SIZE_OPTIONS = [
@@ -168,7 +178,9 @@ export const DEAL_SIZE_OPTIONS = [
   { value: "1k_5k", label: "$1K - $5K / year" },
   { value: "5k_20k", label: "$5K - $20K / year" },
   { value: "20k_50k", label: "$20K - $50K / year" },
-  { value: "50k_plus", label: "$50K+ / year" },
+  { value: "50k_100k", label: "$50K - $100K / year" },
+  { value: "100k_500k", label: "$100K - $500K / year" },
+  { value: "500k_plus", label: "$500K+ / year" },
 ] as const;
 
 export const TIMEFRAME_OPTIONS = [
@@ -178,6 +190,38 @@ export const TIMEFRAME_OPTIONS = [
   { value: "exploring", label: "Just exploring for now" },
 ] as const;
 
+/**
+ * Maps goals to realistic expected timeframes.
+ * CX Mate suggests the timeframe — user confirms or adjusts.
+ */
+export const GOAL_TIMEFRAME_MAP: Record<string, { timeframe: string; explanation: string }> = {
+  // Pre-launch
+  map_sales_process: { timeframe: "1_month", explanation: "Sales process mapping can show results within 2-4 weeks" },
+  understand_buyer: { timeframe: "1_month", explanation: "Buyer journey clarity is achievable within a few weeks" },
+  gtm_playbook: { timeframe: "3_months", explanation: "A solid GTM playbook needs 1-2 months to build and validate" },
+  differentiate: { timeframe: "3_months", explanation: "Differentiation takes research and market testing" },
+  // First customers
+  repeatable_onboarding: { timeframe: "3_months", explanation: "Building repeatable onboarding typically takes 6-10 weeks" },
+  early_success: { timeframe: "1_month", explanation: "Quick wins for early customer success are achievable fast" },
+  first_playbook: { timeframe: "3_months", explanation: "A first CX playbook takes 4-8 weeks to build right" },
+  reduce_support_load: { timeframe: "3_months", explanation: "Support optimization shows impact in 6-10 weeks" },
+  find_expansion: { timeframe: "6_months", explanation: "Expansion motions take time to identify and test" },
+  // Growing
+  reduce_churn: { timeframe: "3_months", explanation: "Churn reduction requires 2-3 months of changes + measurement" },
+  build_playbook: { timeframe: "3_months", explanation: "A team-wide playbook needs 6-10 weeks to build and roll out" },
+  proactive_cx: { timeframe: "6_months", explanation: "Moving to proactive CX is a 3-6 month transformation" },
+  fix_onboarding: { timeframe: "3_months", explanation: "Onboarding fixes typically show impact in 8-12 weeks" },
+  close_handoff_gaps: { timeframe: "3_months", explanation: "Sales-to-CS alignment takes 6-10 weeks to formalize" },
+  // Scaling
+  unify_journey: { timeframe: "6_months", explanation: "Unifying the journey is a 4-6 month initiative" },
+  health_scoring: { timeframe: "6_months", explanation: "Health scoring needs data collection + calibration time" },
+  scale_cx: { timeframe: "6_months", explanation: "Scaling CX without headcount is a 4-6 month project" },
+  fix_onboarding_scale: { timeframe: "3_months", explanation: "Onboarding automation typically takes 8-12 weeks" },
+  drive_expansion: { timeframe: "6_months", explanation: "Systematic expansion takes 3-6 months to build" },
+  // Default
+  something_else: { timeframe: "3_months", explanation: "Most CX improvements show meaningful results in 2-3 months" },
+};
+
 // ============================================
 // Maturity-Adaptive Pain Points
 // ============================================
@@ -186,31 +230,42 @@ export function getPainPointsForMaturity(maturity: CompanyMaturity) {
   switch (maturity) {
     case "pre_launch":
       return [
-        { value: "no_sales_process", label: "Don't know how to structure our sales process" },
-        { value: "unclear_value_prop", label: "Can't articulate our value prop clearly" },
-        { value: "unknown_buyer_journey", label: "No idea what the buying journey looks like" },
-        { value: "losing_deals", label: "Losing deals but don't know why" },
+        { value: "no_sales_process", label: "Don't know how to structure our sales process", category: "acquisition" as const },
+        { value: "unclear_value_prop", label: "Can't articulate our value prop clearly", category: "acquisition" as const },
+        { value: "unknown_buyer_journey", label: "No idea what the buying journey looks like", category: "acquisition" as const },
+        { value: "losing_deals", label: "Losing deals but don't know why", category: "acquisition" as const },
+        { value: "no_competitive_edge", label: "Don't know how to differentiate from competitors", category: "acquisition" as const },
+        { value: "pricing_uncertainty", label: "Not sure how to price or package our product", category: "operations" as const },
       ];
     case "first_customers":
       return [
-        { value: "messy_onboarding", label: "Onboarding is messy / manual" },
-        { value: "unclear_value", label: "Not sure if customers are getting value" },
-        { value: "inconsistent_process", label: "No consistent process — every customer is different" },
-        { value: "worried_about_losing", label: "Worried about losing early customers" },
+        { value: "messy_onboarding", label: "Onboarding is messy / manual", category: "retention" as const },
+        { value: "unclear_value", label: "Not sure if customers are getting value", category: "retention" as const },
+        { value: "inconsistent_process", label: "No consistent process — every customer is different", category: "operations" as const },
+        { value: "worried_about_losing", label: "Worried about losing early customers", category: "retention" as const },
+        { value: "no_feedback_loop", label: "No way to know if customers are happy or struggling", category: "operations" as const },
+        { value: "support_overwhelm", label: "Spending too much time on support / handholding", category: "operations" as const },
+        { value: "expansion_unknown", label: "Don't know when or how to upsell", category: "acquisition" as const },
       ];
     case "growing":
       return [
-        { value: "churn", label: "Customers leaving without warning" },
-        { value: "handoff_gaps", label: "Gaps between sales handoff and CS" },
-        { value: "no_visibility", label: "No visibility into customer health" },
-        { value: "no_playbook", label: "Team doesn't have a playbook to follow" },
+        { value: "churn", label: "Customers leaving without warning", category: "retention" as const },
+        { value: "handoff_gaps", label: "Gaps between sales handoff and CS", category: "operations" as const },
+        { value: "onboarding_too_long", label: "Onboarding takes too long — customers lose interest", category: "retention" as const },
+        { value: "implementation_fails", label: "Customers buy but never fully implement", category: "retention" as const },
+        { value: "no_visibility", label: "No visibility into customer health", category: "operations" as const },
+        { value: "no_playbook", label: "Team doesn't have a playbook to follow", category: "operations" as const },
+        { value: "reactive_support", label: "Always firefighting — can't get ahead of problems", category: "operations" as const },
       ];
     case "scaling":
       return [
-        { value: "inconsistent_cx", label: "CX is inconsistent across the team" },
-        { value: "late_risk_detection", label: "Can't identify at-risk accounts early enough" },
-        { value: "onboarding_scale", label: "Onboarding takes too long / doesn't scale" },
-        { value: "no_unified_view", label: "No unified view of the customer lifecycle" },
+        { value: "inconsistent_cx", label: "CX is inconsistent across the team", category: "operations" as const },
+        { value: "late_risk_detection", label: "Can't identify at-risk accounts early enough", category: "retention" as const },
+        { value: "onboarding_scale", label: "Onboarding doesn't scale — too many manual steps", category: "operations" as const },
+        { value: "implementation_fails", label: "Customers churn before fully adopting the product", category: "retention" as const },
+        { value: "no_unified_view", label: "No unified view of the customer lifecycle", category: "operations" as const },
+        { value: "expansion_missed", label: "Missing expansion revenue — no systematic upsell", category: "acquisition" as const },
+        { value: "data_silos", label: "Customer data is scattered across tools", category: "operations" as const },
       ];
   }
 }
@@ -226,26 +281,109 @@ export function getGoalsForMaturity(maturity: CompanyMaturity) {
         { value: "map_sales_process", label: "Map my sales process end-to-end" },
         { value: "understand_buyer", label: "Understand my buyer's decision journey" },
         { value: "gtm_playbook", label: "Get a clear go-to-market playbook" },
+        { value: "differentiate", label: "Stand out from competitors" },
+        { value: "something_else", label: "Something else" },
       ];
     case "first_customers":
       return [
         { value: "repeatable_onboarding", label: "Build a repeatable onboarding process" },
         { value: "early_success", label: "Make sure early customers succeed" },
         { value: "first_playbook", label: "Create my first CX playbook" },
+        { value: "reduce_support_load", label: "Reduce support burden on the team" },
+        { value: "find_expansion", label: "Find upsell / expansion opportunities" },
+        { value: "something_else", label: "Something else" },
       ];
     case "growing":
       return [
         { value: "reduce_churn", label: "Reduce churn" },
         { value: "build_playbook", label: "Build a playbook the whole team can follow" },
         { value: "proactive_cx", label: "Move from reactive to proactive CX" },
+        { value: "fix_onboarding", label: "Fix onboarding / implementation" },
+        { value: "close_handoff_gaps", label: "Close gaps between sales and CS" },
+        { value: "something_else", label: "Something else" },
       ];
     case "scaling":
       return [
         { value: "unify_journey", label: "Unify sales and CS into one journey" },
         { value: "health_scoring", label: "Implement health scoring and early warning" },
         { value: "scale_cx", label: "Scale CX without scaling headcount" },
+        { value: "fix_onboarding_scale", label: "Make onboarding scalable" },
+        { value: "drive_expansion", label: "Systematize expansion revenue" },
+        { value: "something_else", label: "Something else" },
       ];
   }
+}
+
+// ============================================
+// Pain → Goal Connection Map
+// ============================================
+
+const PAIN_TO_GOAL_MAP: Record<string, string[]> = {
+  // Pre-launch pains
+  no_sales_process: ["map_sales_process", "gtm_playbook"],
+  unclear_value_prop: ["differentiate", "understand_buyer"],
+  unknown_buyer_journey: ["understand_buyer", "map_sales_process"],
+  losing_deals: ["map_sales_process", "differentiate"],
+  no_competitive_edge: ["differentiate", "gtm_playbook"],
+  pricing_uncertainty: ["gtm_playbook"],
+  // First customers pains
+  messy_onboarding: ["repeatable_onboarding", "first_playbook"],
+  unclear_value: ["early_success", "first_playbook"],
+  inconsistent_process: ["first_playbook", "repeatable_onboarding"],
+  worried_about_losing: ["early_success", "repeatable_onboarding"],
+  no_feedback_loop: ["early_success", "first_playbook"],
+  support_overwhelm: ["reduce_support_load", "repeatable_onboarding"],
+  expansion_unknown: ["find_expansion"],
+  // Growing pains
+  churn: ["reduce_churn", "proactive_cx"],
+  handoff_gaps: ["close_handoff_gaps", "build_playbook"],
+  onboarding_too_long: ["fix_onboarding", "build_playbook"],
+  implementation_fails: ["fix_onboarding", "reduce_churn", "fix_onboarding_scale"],
+  no_visibility: ["proactive_cx", "reduce_churn"],
+  no_playbook: ["build_playbook"],
+  reactive_support: ["proactive_cx", "build_playbook"],
+  // Scaling pains
+  inconsistent_cx: ["unify_journey", "scale_cx"],
+  late_risk_detection: ["health_scoring", "scale_cx"],
+  onboarding_scale: ["fix_onboarding_scale", "scale_cx"],
+  no_unified_view: ["unify_journey", "health_scoring"],
+  expansion_missed: ["drive_expansion"],
+  data_silos: ["unify_journey", "health_scoring"],
+};
+
+/**
+ * Returns goals ordered by relevance to selected pains.
+ * Goals connected to pains appear first (tagged as related),
+ * followed by other maturity-appropriate goals.
+ */
+export function getGoalsForPainAndMaturity(
+  maturity: CompanyMaturity,
+  painPoints: string[],
+): Array<{ value: string; label: string; relatedToPain: boolean }> {
+  const allGoals = getGoalsForMaturity(maturity);
+
+  // Collect goal values connected to selected pains
+  const relatedGoalValues = new Set<string>();
+  for (const pain of painPoints) {
+    const goals = PAIN_TO_GOAL_MAP[pain];
+    if (goals) {
+      goals.forEach((g) => relatedGoalValues.add(g));
+    }
+  }
+
+  // Tag and sort: related goals first, then others, "something_else" always last
+  const tagged = allGoals.map((goal) => ({
+    ...goal,
+    relatedToPain: relatedGoalValues.has(goal.value),
+  }));
+
+  return tagged.sort((a, b) => {
+    if (a.value === "something_else") return 1;
+    if (b.value === "something_else") return -1;
+    if (a.relatedToPain && !b.relatedToPain) return -1;
+    if (!a.relatedToPain && b.relatedToPain) return 1;
+    return 0;
+  });
 }
 
 // ============================================
@@ -280,7 +418,7 @@ export const MATURITY_OPTIONS = [
 ] as const;
 
 export const JOURNEY_EXISTS_OPTIONS = [
-  { value: "yes" as const, label: "Yes, we have something", description: "We have a documented journey or CX process" },
-  { value: "no" as const, label: "Not really", description: "It's all in people's heads" },
-  { value: "partial" as const, label: "It's outdated / incomplete", description: "We've tried but it needs a refresh" },
+  { value: "yes" as const, label: "Yes — we have documented processes", description: "Onboarding flows, playbooks, training timelines, or other documented CX processes" },
+  { value: "partial" as const, label: "Partially — some things are documented", description: "We have bits and pieces, but it's incomplete or outdated" },
+  { value: "no" as const, label: "Not yet — it's all in people's heads", description: "We handle things case by case, no formal documentation" },
 ] as const;

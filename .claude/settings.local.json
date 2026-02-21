@@ -35,7 +35,15 @@
       "Skill(cx-expert:*)",
       "Skill(prd)",
       "Skill(prd:*)",
-      "Bash(source:*)"
+      "Bash(source:*)",
+      "Bash(brew list:*)",
+      "mcp__filesystem__read_media_file",
+      "Bash(brew install:*)",
+      "WebFetch(domain:www.qualtrics.com)",
+      "WebFetch(domain:community.qualtrics.com)",
+      "Bash(wc:*)",
+      "WebFetch(domain:www.gladly.ai)",
+      "WebFetch(domain:ramp.com)"
     ]
   }
 }

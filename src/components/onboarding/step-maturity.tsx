@@ -30,21 +30,21 @@ export function StepMaturity({ data, onChange }: StepMaturityProps) {
         <p>This drives everything I&apos;ll build for you, so pick what fits best.</p>
       </ChatBubble>
 
-      <div className="grid gap-3">
+      <div className="grid gap-4">
         {MATURITY_OPTIONS.map((option) => (
           <button
             key={option.value}
             type="button"
             onClick={() => handleSelect(option.value)}
-            className={`flex items-start gap-4 rounded-xl border p-5 cursor-pointer transition-all text-left hover:shadow-sm ${
+            className={`flex items-start gap-5 rounded-xl border p-6 cursor-pointer transition-all text-left hover:shadow-sm ${
               data.companyMaturity === option.value
                 ? "border-primary bg-primary/5 shadow-sm"
                 : "border-border hover:bg-accent/50"
             }`}
           >
-            <span className="text-2xl mt-0.5">{option.emoji}</span>
+            <span className="text-4xl mt-0.5">{option.emoji}</span>
             <div className="space-y-1">
-              <div className="font-semibold text-sm">{option.label}</div>
+              <div className="font-semibold text-base">{option.label}</div>
               <div className="text-sm text-muted-foreground">
                 {option.subtitle}
               </div>

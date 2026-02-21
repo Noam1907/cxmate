@@ -10,14 +10,30 @@ import {
   type OnboardingData,
 } from "@/types/onboarding";
 import { ChatBubble } from "./chat-bubble";
+import type { EnrichedCompanyData } from "@/types/enrichment";
 
 interface StepCustomerProfileProps {
   data: OnboardingData;
   onChange: (updates: Partial<OnboardingData>) => void;
+  enrichment?: EnrichedCompanyData | null;
 }
 
-export function StepCustomerProfile({ data, onChange }: StepCustomerProfileProps) {
+function AiSuggestedBadge() {
+  return (
+    <span className="inline-flex items-center gap-1 text-[10px] font-medium text-primary bg-primary/8 px-2 py-0.5 rounded-full">
+      <svg className="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 20 20">
+        <path fillRule="evenodd" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" clipRule="evenodd" />
+      </svg>
+      AI-suggested
+    </span>
+  );
+}
+
+export function StepCustomerProfile({ data, onChange, enrichment }: StepCustomerProfileProps) {
   const isPreLaunch = data.companyMaturity === "pre_launch";
+  const hasEnrichment = !!enrichment;
+  const customerSizeWasSuggested = hasEnrichment && data.customerSize === enrichment.suggestedCustomerSize;
+  const channelWasSuggested = hasEnrichment && data.mainChannel === enrichment.suggestedMainChannel;
 
   return (
     <div className="space-y-6">
@@ -31,6 +47,37 @@ export function StepCustomerProfile({ data, onChange }: StepCustomerProfileProps
           <p>Tell me about <strong>your customers</strong> — this helps me make the journey specific to them.</p>
         )}
       </ChatBubble>
+
+      {/* Customer Size — quick pick first */}
+      <div className="space-y-3">
+        <div className="flex items-center gap-2">
+          <Label>
+            {isPreLaunch
+              ? "What size companies are you targeting?"
+              : "What size are most of your customers?"}
+          </Label>
+          {customerSizeWasSuggested && <AiSuggestedBadge />}
+        </div>
+        <RadioGroup
+          value={data.customerSize}
+          onValueChange={(value) => onChange({ customerSize: value })}
+          className="grid grid-cols-2 gap-2"
+        >
+          {CUSTOMER_SIZES.map((size) => (
+            <label
+              key={size.value}
+              className={`flex items-center gap-2 rounded-lg border px-4 py-3 cursor-pointer transition-colors hover:bg-accent/50 ${
+                data.customerSize === size.value
+                  ? "border-primary bg-primary/5"
+                  : "border-border"
+              }`}
+            >
+              <RadioGroupItem value={size.value} />
+              <span className="text-sm">{size.label}</span>
+            </label>
+          ))}
+        </RadioGroup>
+      </div>
 
       {/* Customer Count — only for companies with customers */}
       {!isPreLaunch && (
@@ -78,41 +125,16 @@ export function StepCustomerProfile({ data, onChange }: StepCustomerProfileProps
         />
       </div>
 
-      {/* Customer Size */}
+      {/* Main Channel — with descriptions */}
       <div className="space-y-3">
-        <Label>
-          {isPreLaunch
-            ? "What size companies are you targeting?"
-            : "What size are most of your customers?"}
-        </Label>
-        <RadioGroup
-          value={data.customerSize}
-          onValueChange={(value) => onChange({ customerSize: value })}
-          className="grid grid-cols-2 gap-2"
-        >
-          {CUSTOMER_SIZES.map((size) => (
-            <label
-              key={size.value}
-              className={`flex items-center gap-2 rounded-lg border px-4 py-3 cursor-pointer transition-colors hover:bg-accent/50 ${
-                data.customerSize === size.value
-                  ? "border-primary bg-primary/5"
-                  : "border-border"
-              }`}
-            >
-              <RadioGroupItem value={size.value} />
-              <span className="text-sm">{size.label}</span>
-            </label>
-          ))}
-        </RadioGroup>
-      </div>
-
-      {/* Main Channel */}
-      <div className="space-y-3">
-        <Label>
-          {isPreLaunch
-            ? "How will customers find and buy from you?"
-            : "How do customers find and buy from you?"}
-        </Label>
+        <div className="flex items-center gap-2">
+          <Label>
+            {isPreLaunch
+              ? "How will customers find and buy from you?"
+              : "How do customers find and buy from you?"}
+          </Label>
+          {channelWasSuggested && <AiSuggestedBadge />}
+        </div>
         <RadioGroup
           value={data.mainChannel}
           onValueChange={(value) => onChange({ mainChannel: value })}
@@ -121,14 +143,21 @@ export function StepCustomerProfile({ data, onChange }: StepCustomerProfileProps
           {MAIN_CHANNELS.map((channel) => (
             <label
               key={channel.value}
-              className={`flex items-center gap-2 rounded-lg border px-4 py-3 cursor-pointer transition-colors hover:bg-accent/50 ${
+              className={`flex flex-col rounded-lg border px-4 py-3 cursor-pointer transition-colors hover:bg-accent/50 ${
                 data.mainChannel === channel.value
                   ? "border-primary bg-primary/5"
                   : "border-border"
               }`}
             >
-              <RadioGroupItem value={channel.value} />
-              <span className="text-sm">{channel.label}</span>
+              <div className="flex items-center gap-2">
+                <RadioGroupItem value={channel.value} />
+                <span className="text-sm font-medium">{channel.label}</span>
+              </div>
+              {channel.description && (
+                <span className="text-xs text-muted-foreground ml-6">
+                  {channel.description}
+                </span>
+              )}
             </label>
           ))}
         </RadioGroup>

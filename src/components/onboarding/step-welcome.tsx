@@ -13,16 +13,38 @@ interface StepWelcomeProps {
 
 /**
  * Guess a website domain from a company name.
- * "Acme Corp" → "acmecorp.com"
- * "My Cool App" → "mycoolapp.com"
+ * Handles common TLDs: .ai, .io, .co, .com
+ * "Orca AI" → "orca.ai"
+ * "Mesh Payments" → "meshpayments.com"
+ * "Acme Labs" → "acmelabs.io" (if "labs" → .io hint)
  */
 function guessWebsite(name: string): string {
-  const cleaned = name
-    .toLowerCase()
-    .replace(/[^a-z0-9\s]/g, "")    // strip special chars
-    .replace(/\b(inc|corp|ltd|llc|co|company|group|technologies|tech|software|labs|io)\b/g, "") // strip suffixes
+  const lower = name.toLowerCase().trim();
+  if (!lower) return "";
+
+  // Detect TLD hints in the name itself
+  const tldHints: Record<string, string> = {
+    ai: ".ai",
+    io: ".io",
+    co: ".co",
+  };
+
+  // Check if the last word is a known TLD hint
+  const words = lower.split(/\s+/);
+  const lastWord = words[words.length - 1];
+
+  if (tldHints[lastWord] && words.length > 1) {
+    // "Orca AI" → "orca.ai", "Beam AI" → "beam.ai"
+    const nameWithoutTld = words.slice(0, -1).join("").replace(/[^a-z0-9]/g, "");
+    return nameWithoutTld ? `${nameWithoutTld}${tldHints[lastWord]}` : "";
+  }
+
+  // Default: strip common suffixes, collapse, append .com
+  const cleaned = lower
+    .replace(/[^a-z0-9\s]/g, "")
+    .replace(/\b(inc|corp|ltd|llc|company|group|technologies|tech|software)\b/g, "")
     .trim()
-    .replace(/\s+/g, "");           // collapse spaces
+    .replace(/\s+/g, "");
   return cleaned ? `${cleaned}.com` : "";
 }
 
@@ -57,7 +79,7 @@ export function StepWelcome({ data, onChange }: StepWelcomeProps) {
   return (
     <div className="space-y-6">
       <ChatBubble>
-        <p className="font-medium">Hey! 👋 I&apos;m CX Mate — your AI-powered CX co-pilot.</p>
+        <p className="font-medium">Hey! 👋 I&apos;m CX Mate — your CCXP-certified AI customer experience expert.</p>
         <p>
           I help companies map their customer journey, find the moments that
           matter, and build playbooks their team can actually execute.
@@ -69,6 +91,33 @@ export function StepWelcome({ data, onChange }: StepWelcomeProps) {
       </ChatBubble>
 
       <div className="space-y-4 max-w-sm">
+        {/* Person's name */}
+        <div className="space-y-2">
+          <Label htmlFor="userName">What&apos;s your name?</Label>
+          <Input
+            id="userName"
+            placeholder="e.g. Sarah"
+            value={data.userName || ""}
+            onChange={(e) => onChange({ userName: e.target.value })}
+            autoFocus
+          />
+        </div>
+
+        {/* Person's role */}
+        <div className="space-y-2">
+          <Label htmlFor="userRole">Your role</Label>
+          <Input
+            id="userRole"
+            placeholder="e.g. Head of CS, CEO, VP Product"
+            value={data.userRole || ""}
+            onChange={(e) => onChange({ userRole: e.target.value })}
+          />
+          <p className="text-xs text-muted-foreground">
+            This helps me tailor recommendations to your perspective
+          </p>
+        </div>
+
+        {/* Company name */}
         <div className="space-y-2">
           <Label htmlFor="companyName">What&apos;s your company called?</Label>
           <Input
@@ -76,21 +125,22 @@ export function StepWelcome({ data, onChange }: StepWelcomeProps) {
             placeholder="e.g. Acme Corp"
             value={data.companyName}
             onChange={(e) => onChange({ companyName: e.target.value })}
-            autoFocus
           />
         </div>
+
+        {/* Company website */}
         <div className="space-y-2">
           <Label htmlFor="companyWebsite">Company website</Label>
           <Input
             id="companyWebsite"
-            placeholder="e.g. acmecorp.com"
+            placeholder="e.g. orca.ai"
             value={data.companyWebsite}
             onChange={(e) => handleWebsiteChange(e.target.value)}
           />
           <p className="text-xs text-muted-foreground">
             {websiteManuallyEdited
               ? "Great — I'll use this to learn about your business"
-              : "Auto-suggested from company name — feel free to edit"}
+              : "Auto-suggested — feel free to edit"}
           </p>
         </div>
       </div>

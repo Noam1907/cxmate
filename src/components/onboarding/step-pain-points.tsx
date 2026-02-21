@@ -26,13 +26,13 @@ export function StepPainPoints({ data, onChange }: StepPainPointsProps) {
     <div className="space-y-6">
       <ChatBubble>
         <p>Now — <strong>what&apos;s keeping you up at night?</strong></p>
-        <p>Understanding your pain points helps me prioritize which moments matter most in your journey.</p>
+        <p>This is where my CCXP expertise kicks in. Understanding your pains helps me prioritize the moments in your journey that will have the biggest impact.</p>
       </ChatBubble>
 
-      {/* Biggest Challenge */}
+      {/* Biggest Pain — plain language, no CX jargon */}
       <div className="space-y-2">
         <Label htmlFor="biggestChallenge">
-          What&apos;s your single biggest CX challenge right now?
+          In one sentence, what&apos;s the #1 thing you&apos;d fix about how customers experience your product?
         </Label>
         <Textarea
           id="biggestChallenge"
@@ -45,6 +45,9 @@ export function StepPainPoints({ data, onChange }: StepPainPointsProps) {
           onChange={(e) => onChange({ biggestChallenge: e.target.value })}
           rows={3}
         />
+        <p className="text-xs text-muted-foreground">
+          This becomes the focal point of your journey map and playbook
+        </p>
       </div>
 
       {/* Pain Points — Maturity-Adaptive */}
