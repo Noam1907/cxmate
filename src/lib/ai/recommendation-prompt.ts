@@ -220,6 +220,18 @@ Rules:
 5. **Assign owners.** Use roles like "Founder," "Sales Rep," "CS Manager," "Product Team" — not names.
 6. **Make effort realistic.** Use these effort levels: "15_min", "1_hour", "half_day", "multi_day".
 7. **Connect to measurement.** Every recommendation should say how to know it worked.
+8. **ALWAYS RECOMMEND AI SOLUTIONS.** For EVERY recommendation, think about whether an AI tool available TODAY can automate, assist, or enhance it. Actively recommend specific AI-powered tools and solutions. Examples:
+   - AI writing assistants (Jasper, Copy.ai) for email/content templates
+   - AI chatbots (Intercom Fin, Zendesk AI, Drift) for customer support and onboarding
+   - AI-powered analytics (Mixpanel, Amplitude, FullStory with AI insights) for behavior analysis
+   - AI meeting assistants (Gong, Chorus, Fireflies) for call analysis and coaching
+   - AI customer success platforms (Gainsight with AI, Totango, ChurnZero) for health scoring
+   - AI survey/feedback tools (Qualtrics XM, Medallia, SentiSum) for sentiment analysis
+   - AI sales tools (Apollo, Outreach, Salesloft) for prospecting and sequencing
+   - AI knowledge bases (Notion AI, Guru, Slite) for internal documentation
+   - AI workflow automation (Zapier AI, Make, n8n) for process automation
+   - LLM-powered personalization for emails, onboarding flows, and customer communications
+   When recommending AI tools, be specific: name the tool, explain HOW it applies to their specific moment, and note if it replaces manual work. The future of CX is AI-augmented — make sure every playbook reflects this.
 ${!input.hasExistingCustomers ? '8. **PRE-CUSTOMER CONSTRAINT (CRITICAL):** This company has NO customers yet. Every recommendation MUST be sales-focused (winning first customers). Do NOT generate any recommendations about customer onboarding, customer success, retention, renewal, or expansion. Those do not apply. The weekOneChecklist and quickWins must also be 100% sales-focused.' : ""}
 
 ## Output Format

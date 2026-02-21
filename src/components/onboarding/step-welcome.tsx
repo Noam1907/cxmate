@@ -77,7 +77,8 @@ export function StepWelcome({ data, onChange }: StepWelcomeProps) {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
+      <h2 className="text-2xl font-bold tracking-tight text-foreground">Let&apos;s get started</h2>
       <ChatBubble>
         <p className="font-medium">Hey! 👋 I&apos;m CX Mate — your CCXP-certified AI customer experience expert.</p>
         <p>
@@ -90,29 +91,29 @@ export function StepWelcome({ data, onChange }: StepWelcomeProps) {
         </p>
       </ChatBubble>
 
-      <div className="space-y-5 max-w-md">
+      <div className="rounded-2xl border border-border/60 bg-white p-6 space-y-5 shadow-sm">
         {/* Person's name */}
         <div className="space-y-2">
-          <Label htmlFor="userName" className="text-sm font-medium">What&apos;s your name?</Label>
+          <Label htmlFor="userName" className="text-sm font-semibold text-foreground">What&apos;s your name?</Label>
           <Input
             id="userName"
             placeholder="e.g. Sarah"
             value={data.userName || ""}
             onChange={(e) => onChange({ userName: e.target.value })}
             autoFocus
-            className="h-11"
+            className="h-12 rounded-xl border-border/60 text-sm"
           />
         </div>
 
         {/* Person's role */}
         <div className="space-y-2">
-          <Label htmlFor="userRole" className="text-sm font-medium">Your role</Label>
+          <Label htmlFor="userRole" className="text-sm font-semibold text-foreground">Your role</Label>
           <Input
             id="userRole"
             placeholder="e.g. Head of CS, CEO, VP Product"
             value={data.userRole || ""}
             onChange={(e) => onChange({ userRole: e.target.value })}
-            className="h-11"
+            className="h-12 rounded-xl border-border/60 text-sm"
           />
           <p className="text-xs text-muted-foreground">
             This helps me tailor recommendations to your perspective
@@ -121,25 +122,25 @@ export function StepWelcome({ data, onChange }: StepWelcomeProps) {
 
         {/* Company name */}
         <div className="space-y-2">
-          <Label htmlFor="companyName" className="text-sm font-medium">What&apos;s your company called?</Label>
+          <Label htmlFor="companyName" className="text-sm font-semibold text-foreground">What&apos;s your company called?</Label>
           <Input
             id="companyName"
             placeholder="e.g. Acme Corp"
             value={data.companyName}
             onChange={(e) => onChange({ companyName: e.target.value })}
-            className="h-11"
+            className="h-12 rounded-xl border-border/60 text-sm"
           />
         </div>
 
         {/* Company website */}
         <div className="space-y-2">
-          <Label htmlFor="companyWebsite" className="text-sm font-medium">Company website</Label>
+          <Label htmlFor="companyWebsite" className="text-sm font-semibold text-foreground">Company website</Label>
           <Input
             id="companyWebsite"
             placeholder="e.g. orca.ai"
             value={data.companyWebsite}
             onChange={(e) => handleWebsiteChange(e.target.value)}
-            className="h-11"
+            className="h-12 rounded-xl border-border/60 text-sm"
           />
           <p className="text-xs text-muted-foreground">
             {websiteManuallyEdited

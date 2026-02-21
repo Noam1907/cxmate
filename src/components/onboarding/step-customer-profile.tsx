@@ -36,7 +36,8 @@ export function StepCustomerProfile({ data, onChange, enrichment }: StepCustomer
   const channelWasSuggested = hasEnrichment && data.mainChannel === enrichment.suggestedMainChannel;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
+      <h2 className="text-2xl font-bold tracking-tight text-foreground">Who are your customers?</h2>
       <ChatBubble>
         {isPreLaunch ? (
           <>
@@ -49,9 +50,9 @@ export function StepCustomerProfile({ data, onChange, enrichment }: StepCustomer
       </ChatBubble>
 
       {/* Customer Size — quick pick first */}
-      <div className="space-y-3">
+      <div className="rounded-2xl border border-border/60 bg-white p-6 space-y-4 shadow-sm">
         <div className="flex items-center gap-2">
-          <Label>
+          <Label className="text-sm font-semibold text-foreground">
             {isPreLaunch
               ? "What size companies are you targeting?"
               : "What size are most of your customers?"}
@@ -61,19 +62,19 @@ export function StepCustomerProfile({ data, onChange, enrichment }: StepCustomer
         <RadioGroup
           value={data.customerSize}
           onValueChange={(value) => onChange({ customerSize: value })}
-          className="grid grid-cols-2 gap-2"
+          className="grid grid-cols-2 gap-2.5"
         >
           {CUSTOMER_SIZES.map((size) => (
             <label
               key={size.value}
-              className={`flex items-center gap-2 rounded-lg border px-4 py-3 cursor-pointer transition-colors hover:bg-accent/50 ${
+              className={`flex items-center gap-2 rounded-xl border-2 px-4 py-3 cursor-pointer transition-all hover:shadow-sm ${
                 data.customerSize === size.value
-                  ? "border-primary bg-primary/5"
-                  : "border-border"
+                  ? "border-primary bg-primary/5 shadow-sm"
+                  : "border-border/50 hover:border-border"
               }`}
             >
               <RadioGroupItem value={size.value} />
-              <span className="text-sm">{size.label}</span>
+              <span className="text-sm font-medium">{size.label}</span>
             </label>
           ))}
         </RadioGroup>
@@ -81,24 +82,24 @@ export function StepCustomerProfile({ data, onChange, enrichment }: StepCustomer
 
       {/* Customer Count — only for companies with customers */}
       {!isPreLaunch && (
-        <div className="space-y-3">
-          <Label>How many paying customers do you have?</Label>
+        <div className="rounded-2xl border border-border/60 bg-white p-6 space-y-4 shadow-sm">
+          <Label className="text-sm font-semibold text-foreground">How many paying customers do you have?</Label>
           <RadioGroup
             value={data.customerCount}
             onValueChange={(value) => onChange({ customerCount: value })}
-            className="grid grid-cols-2 gap-2"
+            className="grid grid-cols-2 gap-2.5"
           >
             {CUSTOMER_COUNT_OPTIONS.map((opt) => (
               <label
                 key={opt.value}
-                className={`flex items-center gap-2 rounded-lg border px-4 py-3 cursor-pointer transition-colors hover:bg-accent/50 ${
+                className={`flex items-center gap-2 rounded-xl border-2 px-4 py-3 cursor-pointer transition-all hover:shadow-sm ${
                   data.customerCount === opt.value
-                    ? "border-primary bg-primary/5"
-                    : "border-border"
+                    ? "border-primary bg-primary/5 shadow-sm"
+                    : "border-border/50 hover:border-border"
                 }`}
               >
                 <RadioGroupItem value={opt.value} />
-                <span className="text-sm">{opt.label}</span>
+                <span className="text-sm font-medium">{opt.label}</span>
               </label>
             ))}
           </RadioGroup>
@@ -106,8 +107,8 @@ export function StepCustomerProfile({ data, onChange, enrichment }: StepCustomer
       )}
 
       {/* Customer Description */}
-      <div className="space-y-2">
-        <Label htmlFor="customerDescription">
+      <div className="rounded-2xl border border-border/60 bg-white p-6 space-y-3 shadow-sm">
+        <Label htmlFor="customerDescription" className="text-sm font-semibold text-foreground">
           {isPreLaunch
             ? "Describe your target customer in one sentence"
             : "Describe your typical customer in one sentence"}
@@ -122,13 +123,14 @@ export function StepCustomerProfile({ data, onChange, enrichment }: StepCustomer
           value={data.customerDescription}
           onChange={(e) => onChange({ customerDescription: e.target.value })}
           rows={3}
+          className="rounded-xl border-border/60"
         />
       </div>
 
       {/* Main Channel — with descriptions */}
-      <div className="space-y-3">
+      <div className="rounded-2xl border border-border/60 bg-white p-6 space-y-4 shadow-sm">
         <div className="flex items-center gap-2">
-          <Label>
+          <Label className="text-sm font-semibold text-foreground">
             {isPreLaunch
               ? "How will customers find and buy from you?"
               : "How do customers find and buy from you?"}
@@ -138,23 +140,23 @@ export function StepCustomerProfile({ data, onChange, enrichment }: StepCustomer
         <RadioGroup
           value={data.mainChannel}
           onValueChange={(value) => onChange({ mainChannel: value })}
-          className="grid grid-cols-2 gap-2"
+          className="grid grid-cols-2 gap-2.5"
         >
           {MAIN_CHANNELS.map((channel) => (
             <label
               key={channel.value}
-              className={`flex flex-col rounded-lg border px-4 py-3 cursor-pointer transition-colors hover:bg-accent/50 ${
+              className={`flex flex-col rounded-xl border-2 px-4 py-3 cursor-pointer transition-all hover:shadow-sm ${
                 data.mainChannel === channel.value
-                  ? "border-primary bg-primary/5"
-                  : "border-border"
+                  ? "border-primary bg-primary/5 shadow-sm"
+                  : "border-border/50 hover:border-border"
               }`}
             >
               <div className="flex items-center gap-2">
                 <RadioGroupItem value={channel.value} />
-                <span className="text-sm font-medium">{channel.label}</span>
+                <span className="text-sm font-semibold">{channel.label}</span>
               </div>
               {channel.description && (
-                <span className="text-xs text-muted-foreground ml-6">
+                <span className="text-xs text-muted-foreground ml-6 mt-0.5">
                   {channel.description}
                 </span>
               )}

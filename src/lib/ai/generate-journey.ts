@@ -29,6 +29,7 @@ export async function generateJourney(
     body: JSON.stringify({
       model: "claude-sonnet-4-20250514",
       max_tokens: 8192, // v2: Increased for theory-backed output with confrontation insights, CX tool roadmap, and impact projections
+      system: "You are a CX expert API. You MUST respond with ONLY a valid JSON object. No preamble, no explanation, no markdown fences, no text before or after the JSON. The very first character of your response must be { and the very last must be }.",
       messages: [
         {
           role: "user",
@@ -54,22 +55,50 @@ export async function generateJourney(
   }
 
   // Parse the JSON response — Claude sometimes returns malformed JSON
-  const raw = textBlock.text
-    .replace(/```json\n?/g, "")
-    .replace(/```\n?/g, "")
-    .trim();
+  let raw = textBlock.text.trim();
 
-  try {
-    return JSON.parse(raw) as GeneratedJourney;
-  } catch {
-    // Attempt to repair common Claude JSON issues:
-    // - trailing commas before } or ]
-    // - unescaped control characters in strings
-    const repaired = raw
-      .replace(/,\s*([}\]])/g, "$1")
-      .replace(/[\x00-\x1f]/g, (ch: string) =>
-        ch === "\n" ? "\\n" : ch === "\t" ? "\\t" : ""
-      );
-    return JSON.parse(repaired) as GeneratedJourney;
+  // Strip markdown code fences
+  raw = raw.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
+
+  // Extract the JSON object — find the outermost { ... }
+  const jsonStart = raw.indexOf("{");
+  const jsonEnd = raw.lastIndexOf("}");
+  if (jsonStart === -1 || jsonEnd === -1 || jsonEnd <= jsonStart) {
+    throw new Error(`Claude response did not contain valid JSON. First 200 chars: ${raw.slice(0, 200)}`);
   }
+  raw = raw.slice(jsonStart, jsonEnd + 1);
+
+  // Attempt parsing with progressive repair
+  const attempts = [
+    () => JSON.parse(raw),
+    () => {
+      // Fix trailing commas and control chars
+      const repaired = raw
+        .replace(/,\s*([}\]])/g, "$1")
+        .replace(/[\x00-\x1f]/g, (ch: string) =>
+          ch === "\n" ? "\\n" : ch === "\t" ? "\\t" : ""
+        );
+      return JSON.parse(repaired);
+    },
+    () => {
+      // Nuclear option: also fix unescaped quotes inside string values
+      const repaired = raw
+        .replace(/,\s*([}\]])/g, "$1")
+        .replace(/[\x00-\x1f]/g, (ch: string) =>
+          ch === "\n" ? "\\n" : ch === "\t" ? "\\t" : ""
+        )
+        .replace(/:\s*"([^"]*?)(?<!\\)"([^"]*?)"/g, ': "$1\\"$2"');
+      return JSON.parse(repaired);
+    },
+  ];
+
+  for (const attempt of attempts) {
+    try {
+      return attempt() as GeneratedJourney;
+    } catch {
+      continue;
+    }
+  }
+
+  throw new Error(`Failed to parse journey JSON after all repair attempts. First 300 chars: ${raw.slice(0, 300)}`);
 }

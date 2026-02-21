@@ -70,14 +70,11 @@ export function StepJourneyExists({ data, onChange }: StepJourneyExistsProps) {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
+      <h2 className="text-2xl font-bold tracking-tight text-foreground">What do you already have?</h2>
       <ChatBubble>
         <p>
-          Before I build something new, I want to understand <strong>what you already have in place</strong>.
-        </p>
-        <p>
-          This could be anything — an onboarding checklist, a training timeline, a sales pipeline, a Notion doc.
-          {" "}Even informal processes count.
+          Before I build something new, I want to understand what you have in place — an onboarding checklist, a training timeline, a sales pipeline, a Notion doc. Even informal processes count.
         </p>
       </ChatBubble>
 
@@ -127,13 +124,13 @@ export function StepJourneyExists({ data, onChange }: StepJourneyExistsProps) {
                 existingJourneyFileName: "",
               } : {}),
             })}
-            className={`flex flex-col gap-1 rounded-xl border p-4 cursor-pointer transition-all text-left hover:shadow-sm ${
+            className={`flex flex-col gap-1 rounded-xl border-2 p-5 cursor-pointer transition-all text-left ${
               data.hasExistingJourney === option.value
-                ? "border-primary bg-primary/5 shadow-sm"
-                : "border-border hover:bg-accent/50"
+                ? "border-primary bg-primary/5 shadow-md ring-1 ring-primary/20"
+                : "border-border/50 hover:border-border hover:shadow-sm bg-white"
             }`}
           >
-            <div className="font-medium text-sm">{option.label}</div>
+            <div className="font-bold text-sm text-foreground">{option.label}</div>
             <div className="text-xs text-muted-foreground">{option.description}</div>
           </button>
         ))}
@@ -157,10 +154,10 @@ export function StepJourneyExists({ data, onChange }: StepJourneyExistsProps) {
               {JOURNEY_COMPONENTS.map((component) => (
                 <label
                   key={component.value}
-                  className={`flex items-center gap-3 rounded-lg border px-3 py-2.5 cursor-pointer transition-colors hover:bg-accent/50 ${
+                  className={`flex items-center gap-3 rounded-xl border-2 px-4 py-3 cursor-pointer transition-all hover:shadow-sm ${
                     existingComponents.includes(component.value)
-                      ? "border-primary bg-primary/5"
-                      : "border-border"
+                      ? "border-primary bg-primary/5 shadow-sm"
+                      : "border-border/50 hover:border-border"
                   }`}
                 >
                   <input

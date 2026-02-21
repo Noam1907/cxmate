@@ -36,6 +36,7 @@ export async function generateRecommendations(
     body: JSON.stringify({
       model: "claude-sonnet-4-20250514",
       max_tokens: 8192,
+      system: "You are a CX expert API. You MUST respond with ONLY a valid JSON object. No preamble, no explanation, no markdown fences, no text before or after the JSON. The very first character of your response must be { and the very last must be }.",
       messages: [
         {
           role: "user",
@@ -59,15 +60,49 @@ export async function generateRecommendations(
     throw new Error("No text response from Claude");
   }
 
-  try {
-    const playbook = JSON.parse(textBlock.text) as GeneratedPlaybook;
-    return playbook;
-  } catch {
-    // Strip markdown fences if present
-    const cleaned = textBlock.text
-      .replace(/```json\n?/g, "")
-      .replace(/```\n?/g, "")
-      .trim();
-    return JSON.parse(cleaned) as GeneratedPlaybook;
+  // Parse the JSON response — Claude sometimes returns malformed JSON
+  let raw = textBlock.text.trim();
+
+  // Strip markdown code fences
+  raw = raw.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
+
+  // Extract the JSON object — find the outermost { ... }
+  const jsonStart = raw.indexOf("{");
+  const jsonEnd = raw.lastIndexOf("}");
+  if (jsonStart === -1 || jsonEnd === -1 || jsonEnd <= jsonStart) {
+    throw new Error(`Claude response did not contain valid JSON. First 200 chars: ${raw.slice(0, 200)}`);
   }
+  raw = raw.slice(jsonStart, jsonEnd + 1);
+
+  // Attempt parsing with progressive repair
+  const attempts = [
+    () => JSON.parse(raw),
+    () => {
+      const repaired = raw
+        .replace(/,\s*([}\]])/g, "$1")
+        .replace(/[\x00-\x1f]/g, (ch: string) =>
+          ch === "\n" ? "\\n" : ch === "\t" ? "\\t" : ""
+        );
+      return JSON.parse(repaired);
+    },
+    () => {
+      const repaired = raw
+        .replace(/,\s*([}\]])/g, "$1")
+        .replace(/[\x00-\x1f]/g, (ch: string) =>
+          ch === "\n" ? "\\n" : ch === "\t" ? "\\t" : ""
+        )
+        .replace(/:\s*"([^"]*?)(?<!\\)"([^"]*?)"/g, ': "$1\\"$2"');
+      return JSON.parse(repaired);
+    },
+  ];
+
+  for (const attempt of attempts) {
+    try {
+      return attempt() as GeneratedPlaybook;
+    } catch {
+      continue;
+    }
+  }
+
+  throw new Error(`Failed to parse recommendations JSON after all repair attempts. First 300 chars: ${raw.slice(0, 300)}`);
 }

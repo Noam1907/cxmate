@@ -18,60 +18,60 @@ interface StepBusinessDataProps {
 
 export function StepBusinessData({ data, onChange }: StepBusinessDataProps) {
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
+      <h2 className="text-2xl font-bold tracking-tight text-foreground">Let&apos;s talk numbers</h2>
       <ChatBubble>
         <p>
-          Let&apos;s ground this in <strong>real numbers</strong> so your playbook has
-          actual ROI projections — not hand-wavy estimates.
+          This grounds your playbook in <strong>real ROI projections</strong> — not hand-wavy estimates.
         </p>
       </ChatBubble>
 
       {/* Average Deal Size — first (most concrete/easy to answer) */}
-      <div className="space-y-3">
-        <Label>Average deal size (annual contract value)</Label>
+      <div className="rounded-2xl border border-border/60 bg-white p-6 space-y-4 shadow-sm">
+        <Label className="text-sm font-semibold text-foreground">Average deal size (annual contract value)</Label>
         <RadioGroup
           value={data.averageDealSize}
           onValueChange={(value) => onChange({ averageDealSize: value })}
-          className="grid grid-cols-2 gap-2"
+          className="grid grid-cols-2 gap-2.5"
         >
           {DEAL_SIZE_OPTIONS.map((opt) => (
             <label
               key={opt.value}
-              className={`flex items-center gap-2 rounded-lg border px-4 py-3 cursor-pointer transition-colors hover:bg-accent/50 ${
+              className={`flex items-center gap-2 rounded-xl border-2 px-4 py-3 cursor-pointer transition-all hover:shadow-sm ${
                 data.averageDealSize === opt.value
-                  ? "border-primary bg-primary/5"
-                  : "border-border"
+                  ? "border-primary bg-primary/5 shadow-sm"
+                  : "border-border/50 hover:border-border"
               }`}
             >
               <RadioGroupItem value={opt.value} />
-              <span className="text-sm">{opt.label}</span>
+              <span className="text-sm font-medium">{opt.label}</span>
             </label>
           ))}
         </RadioGroup>
       </div>
 
       {/* Pricing Model */}
-      <div className="space-y-3">
-        <Label>How do you price your product?</Label>
+      <div className="rounded-2xl border border-border/60 bg-white p-6 space-y-4 shadow-sm">
+        <Label className="text-sm font-semibold text-foreground">How do you price your product?</Label>
         <RadioGroup
           value={data.pricingModel}
           onValueChange={(value) => onChange({ pricingModel: value })}
-          className="grid grid-cols-2 gap-2"
+          className="grid grid-cols-2 gap-2.5"
         >
           {PRICING_MODEL_OPTIONS.map((opt) => (
             <label
               key={opt.value}
-              className={`flex flex-col rounded-lg border px-4 py-3 cursor-pointer transition-colors hover:bg-accent/50 ${
+              className={`flex flex-col rounded-xl border-2 px-4 py-3.5 cursor-pointer transition-all hover:shadow-sm ${
                 data.pricingModel === opt.value
-                  ? "border-primary bg-primary/5"
-                  : "border-border"
+                  ? "border-primary bg-primary/5 shadow-sm"
+                  : "border-border/50 hover:border-border"
               }`}
             >
               <div className="flex items-center gap-2">
                 <RadioGroupItem value={opt.value} />
-                <span className="text-sm font-medium">{opt.label}</span>
+                <span className="text-sm font-semibold">{opt.label}</span>
               </div>
-              <span className="text-xs text-muted-foreground ml-6">
+              <span className="text-xs text-muted-foreground ml-6 mt-0.5">
                 {opt.description}
               </span>
             </label>
@@ -80,24 +80,24 @@ export function StepBusinessData({ data, onChange }: StepBusinessDataProps) {
       </div>
 
       {/* Rough Revenue */}
-      <div className="space-y-3">
-        <Label>Rough annual revenue range</Label>
+      <div className="rounded-2xl border border-border/60 bg-white p-6 space-y-4 shadow-sm">
+        <Label className="text-sm font-semibold text-foreground">Rough annual revenue range</Label>
         <RadioGroup
           value={data.roughRevenue}
           onValueChange={(value) => onChange({ roughRevenue: value })}
-          className="grid grid-cols-2 gap-2"
+          className="grid grid-cols-2 gap-2.5"
         >
           {REVENUE_RANGE_OPTIONS.map((opt) => (
             <label
               key={opt.value}
-              className={`flex items-center gap-2 rounded-lg border px-4 py-3 cursor-pointer transition-colors hover:bg-accent/50 ${
+              className={`flex items-center gap-2 rounded-xl border-2 px-4 py-3 cursor-pointer transition-all hover:shadow-sm ${
                 data.roughRevenue === opt.value
-                  ? "border-primary bg-primary/5"
-                  : "border-border"
+                  ? "border-primary bg-primary/5 shadow-sm"
+                  : "border-border/50 hover:border-border"
               }`}
             >
               <RadioGroupItem value={opt.value} />
-              <span className="text-sm">{opt.label}</span>
+              <span className="text-sm font-medium">{opt.label}</span>
             </label>
           ))}
         </RadioGroup>
@@ -105,15 +105,16 @@ export function StepBusinessData({ data, onChange }: StepBusinessDataProps) {
 
       {/* Tech Stack */}
       <div className="space-y-2">
-        <Label htmlFor="currentTools">What tools do you use for CX today? (optional)</Label>
+        <Label htmlFor="currentTools" className="text-sm font-semibold text-foreground">What tools do you use for CX today? (optional)</Label>
         <Input
           id="currentTools"
           placeholder="e.g. HubSpot, Intercom, Zendesk, Salesforce..."
           value={data.currentTools || ""}
           onChange={(e) => onChange({ currentTools: e.target.value })}
+          className="h-12 rounded-xl border-border/60"
         />
         <p className="text-xs text-muted-foreground">
-          This helps me recommend tools that integrate with your stack — and suggest what AI can replace today
+          This helps me recommend AI-powered tools that can replace or enhance your current stack
         </p>
       </div>
     </div>

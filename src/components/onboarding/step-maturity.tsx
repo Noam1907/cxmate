@@ -24,9 +24,9 @@ export function StepMaturity({ data, onChange }: StepMaturityProps) {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
+      <h2 className="text-2xl font-bold tracking-tight text-foreground">Where are you on your journey?</h2>
       <ChatBubble>
-        <p>Now the big question — <strong>where are you on your customer journey?</strong></p>
         <p>This drives everything I&apos;ll build for you, so pick what fits best.</p>
       </ChatBubble>
 
@@ -36,17 +36,21 @@ export function StepMaturity({ data, onChange }: StepMaturityProps) {
             key={option.value}
             type="button"
             onClick={() => handleSelect(option.value)}
-            className={`flex items-start gap-4 rounded-2xl border-2 p-5 cursor-pointer transition-all text-left hover:shadow-sm ${
+            className={`flex items-start gap-4 rounded-2xl border-2 p-5 cursor-pointer transition-all text-left ${
               data.companyMaturity === option.value
-                ? "border-primary bg-primary/5 shadow-sm"
-                : "border-border/60 hover:border-border hover:bg-accent/30"
+                ? "border-primary bg-primary/5 shadow-md ring-1 ring-primary/20"
+                : "border-border/50 hover:border-border hover:shadow-sm bg-white"
             }`}
           >
-            <div className="w-12 h-12 rounded-xl bg-primary/8 flex items-center justify-center shrink-0">
+            <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 transition-colors ${
+              data.companyMaturity === option.value
+                ? "bg-primary/15"
+                : "bg-primary/8"
+            }`}>
               <span className="text-2xl">{option.emoji}</span>
             </div>
             <div className="space-y-1">
-              <div className="font-semibold text-sm">{option.label}</div>
+              <div className="font-bold text-sm text-foreground">{option.label}</div>
               <div className="text-sm text-muted-foreground leading-relaxed">
                 {option.subtitle}
               </div>

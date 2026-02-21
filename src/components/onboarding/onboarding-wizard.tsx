@@ -167,7 +167,8 @@ function StepGenerate({
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
+      <h2 className="text-2xl font-bold tracking-tight text-foreground">Here&apos;s what I&apos;ll build for you</h2>
       <ChatBubble>
         <p>
           {data.userName ? `${data.userName}, ` : ""}I&apos;ve got everything I need.
@@ -175,45 +176,25 @@ function StepGenerate({
         </p>
       </ChatBubble>
 
-      <div className="rounded-2xl border border-primary/15 bg-gradient-to-br from-primary/5 to-transparent p-6 space-y-5">
-        <p className="text-[10px] font-semibold text-primary uppercase tracking-widest">What you&apos;ll get</p>
-        <div className="space-y-4">
-          <div className="flex items-start gap-3">
-            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
-              <span className="text-sm">🗺️</span>
+      <div className="rounded-2xl border-2 border-primary/20 bg-white p-8 space-y-6 shadow-md">
+        <p className="text-[10px] font-bold text-primary uppercase tracking-[0.15em]">What you&apos;ll get</p>
+        <div className="grid gap-4">
+          {[
+            { icon: "🗺️", bg: "from-teal-50 to-teal-100", title: `End-to-end ${journeyLabel} journey map`, desc: "Every stage your customer goes through — mapped to your specific business" },
+            { icon: "⚡", bg: "from-amber-50 to-amber-100", title: "Meaningful moments analysis", desc: "The make-or-break interactions that determine whether customers stay or leave" },
+            { icon: "🎯", bg: "from-rose-50 to-rose-100", title: "Priority focus areas", desc: "Where to invest your time first for maximum impact — based on your pains and goals" },
+            { icon: "📋", bg: "from-blue-50 to-blue-100", title: "AI-powered playbook with templates", desc: "Actionable recommendations including AI tools you can implement this week" },
+          ].map((item) => (
+            <div key={item.title} className="flex items-start gap-4 rounded-xl bg-background/60 p-4 border border-border/30">
+              <div className={`w-11 h-11 rounded-xl bg-gradient-to-br ${item.bg} flex items-center justify-center shrink-0`}>
+                <span className="text-xl">{item.icon}</span>
+              </div>
+              <div>
+                <div className="font-bold text-sm text-foreground">{item.title}</div>
+                <div className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{item.desc}</div>
+              </div>
             </div>
-            <div>
-              <div className="font-medium text-sm">End-to-end {journeyLabel} journey map</div>
-              <div className="text-xs text-muted-foreground">Every stage your customer goes through — mapped to your specific business</div>
-            </div>
-          </div>
-          <div className="flex items-start gap-3">
-            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
-              <span className="text-sm">⚡</span>
-            </div>
-            <div>
-              <div className="font-medium text-sm">Meaningful moments analysis</div>
-              <div className="text-xs text-muted-foreground">The make-or-break interactions that determine whether customers stay or leave</div>
-            </div>
-          </div>
-          <div className="flex items-start gap-3">
-            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
-              <span className="text-sm">🎯</span>
-            </div>
-            <div>
-              <div className="font-medium text-sm">Priority focus areas</div>
-              <div className="text-xs text-muted-foreground">Where to invest your time first for maximum impact — based on your pains and goals</div>
-            </div>
-          </div>
-          <div className="flex items-start gap-3">
-            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
-              <span className="text-sm">📋</span>
-            </div>
-            <div>
-              <div className="font-medium text-sm">Ready-to-use playbook with templates</div>
-              <div className="text-xs text-muted-foreground">Actionable recommendations your team can start executing this week</div>
-            </div>
-          </div>
+          ))}
         </div>
       </div>
 
@@ -224,13 +205,13 @@ function StepGenerate({
         </p>
       </ChatBubble>
 
-      <div className="flex justify-center">
+      <div className="flex justify-center pt-2">
         <Button
           size="lg"
           onClick={onSubmit}
-          className="rounded-xl shadow-md hover:shadow-lg transition-all px-8 py-3 text-base"
+          className="rounded-2xl shadow-lg hover:shadow-xl transition-all px-10 py-6 text-base font-semibold"
         >
-          Build My CX Playbook →
+          Build My CX Playbook &rarr;
         </Button>
       </div>
     </div>
@@ -300,68 +281,73 @@ function GeneratingExperience({ data }: { data: OnboardingData }) {
 
   return (
     <div className="space-y-8">
-      {/* Header */}
-      <div className="text-center space-y-3">
-        <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-2">
-          <span className="text-lg font-bold text-primary">CX</span>
+      {/* Hero header with bold progress */}
+      <div className="rounded-2xl border-2 border-primary/20 bg-white p-8 shadow-md text-center space-y-6">
+        <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/15 to-primary/5 flex items-center justify-center mx-auto shadow-sm">
+          <span className="text-xl font-bold text-primary">CX</span>
         </div>
-        <h2 className="text-2xl font-bold text-foreground tracking-tight">
-          Building your CX playbook
-        </h2>
-        <p className="text-sm text-muted-foreground">
-          This takes about 2 minutes — your CCXP expert is doing deep analysis
-        </p>
-      </div>
+        <div className="space-y-2">
+          <h2 className="text-2xl font-bold text-foreground tracking-tight">
+            Building your CX playbook
+          </h2>
+          <p className="text-sm text-muted-foreground">
+            Your CCXP expert is doing deep analysis
+          </p>
+        </div>
 
-      {/* Progress bar */}
-      <div className="space-y-2">
-        <div className="h-2 bg-primary/10 rounded-full overflow-hidden">
-          <div
-            className="h-full bg-gradient-to-r from-primary to-primary/70 rounded-full transition-all duration-1000 ease-out"
-            style={{ width: `${progress}%` }}
-          />
-        </div>
-        <div className="flex justify-between text-[10px] text-muted-foreground">
-          <span>{Math.floor(seconds / 60)}:{(seconds % 60).toString().padStart(2, "0")} elapsed</span>
-          <span>~2 min total</span>
+        {/* Bold progress display */}
+        <div className="space-y-3 max-w-sm mx-auto">
+          <div className="h-3 bg-primary/8 rounded-full overflow-hidden">
+            <div
+              className="h-full bg-gradient-to-r from-primary to-primary/60 rounded-full transition-all duration-1000 ease-out"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+          <div className="flex justify-between items-baseline">
+            <span className="text-2xl font-bold text-foreground tabular-nums">
+              {Math.floor(seconds / 60)}:{(seconds % 60).toString().padStart(2, "0")}
+            </span>
+            <span className="text-xs text-muted-foreground">~2 min total</span>
+          </div>
         </div>
       </div>
 
       {/* Current phase card */}
-      <div className="rounded-2xl border border-primary/15 bg-gradient-to-br from-primary/5 to-transparent p-5 space-y-3 transition-all duration-500">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-            <span className="text-lg">{currentPhase.icon}</span>
+      <div className="rounded-2xl border-2 border-primary/15 bg-white p-6 space-y-4 transition-all duration-500 shadow-sm">
+        <div className="flex items-center gap-4">
+          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary/12 to-primary/5 flex items-center justify-center shrink-0">
+            <span className="text-2xl">{currentPhase.icon}</span>
           </div>
           <div className="flex-1">
             <div className="flex items-center gap-2">
-              <span className="font-semibold text-sm text-foreground">{currentPhase.title}</span>
-              <span className="inline-block w-3 h-3 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+              <span className="font-bold text-base text-foreground">{currentPhase.title}</span>
+              <span className="inline-block w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
             </div>
-            <p className="text-xs text-muted-foreground mt-0.5">{currentPhase.detail}</p>
+            <p className="text-sm text-muted-foreground mt-1">{currentPhase.detail}</p>
           </div>
         </div>
-        <div className="border-t border-primary/10 pt-2">
-          <p className="text-xs text-primary/80 italic">&ldquo;{currentPhase.insight}&rdquo;</p>
+        <div className="border-t border-border/40 pt-3">
+          <p className="text-sm text-primary/80 italic leading-relaxed">&ldquo;{currentPhase.insight}&rdquo;</p>
         </div>
       </div>
 
       {/* Completed phases */}
       {phase > 0 && (
-        <div className="space-y-2">
+        <div className="rounded-2xl border border-border/40 bg-white p-5 space-y-3">
+          <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.15em]">Completed</p>
           {phases.slice(0, phase).map((p, i) => (
-            <div key={i} className="flex items-center gap-3 text-sm text-muted-foreground">
-              <span className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center text-xs text-primary shrink-0">✓</span>
-              <span>{p.title}</span>
+            <div key={i} className="flex items-center gap-3 text-sm">
+              <span className="w-6 h-6 rounded-full bg-emerald-100 flex items-center justify-center text-xs text-emerald-600 shrink-0 font-bold">✓</span>
+              <span className="text-foreground/70">{p.title}</span>
             </div>
           ))}
         </div>
       )}
 
       {/* Insight / what they'll get */}
-      <div className="rounded-xl border border-border/50 bg-slate-50/80 p-4 space-y-2">
-        <p className="text-xs font-semibold text-foreground uppercase tracking-wide">Did you know?</p>
-        <p className="text-sm text-muted-foreground leading-relaxed">
+      <div className="rounded-2xl border-2 border-amber-200/60 bg-amber-50/50 p-5 space-y-2">
+        <p className="text-[10px] font-bold text-amber-800 uppercase tracking-[0.15em]">Did you know?</p>
+        <p className="text-base font-medium text-amber-900/80 leading-relaxed">
           {data.companyMaturity === "pre_launch"
             ? "Companies that map their sales journey before launch close their first deals 2x faster on average."
             : data.companyMaturity === "first_customers"
@@ -380,9 +366,69 @@ function GeneratingExperience({ data }: { data: OnboardingData }) {
 // Main Wizard
 // ============================================
 
+// ============================================
+// Intro Hero — Value Pitch Before Any Form
+// ============================================
+
+function IntroHero({ onStart }: { onStart: () => void }) {
+  return (
+    <div className="w-full max-w-2xl mx-auto text-center space-y-12 py-8">
+      {/* Headline */}
+      <div className="space-y-5">
+        <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/15 to-primary/5 flex items-center justify-center mx-auto shadow-md">
+          <span className="text-xl font-bold text-primary">CX</span>
+        </div>
+        <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-foreground leading-tight">
+          Your AI CX expert is ready
+        </h1>
+        <p className="text-lg text-muted-foreground max-w-md mx-auto leading-relaxed">
+          CX Mate analyzes your business, maps your customer journey,
+          and builds a playbook your team can execute — in under 5 minutes.
+        </p>
+      </div>
+
+      {/* 3 Deliverable Preview Cards */}
+      <div className="grid gap-4 text-left max-w-lg mx-auto">
+        {[
+          { icon: "📊", bg: "from-rose-50 to-rose-100", title: "CX Intelligence Report", desc: "Honest assessment of your customer experience — risks, gaps, and opportunities backed by evidence" },
+          { icon: "🗺️", bg: "from-teal-50 to-teal-100", title: "Journey Map", desc: "Every stage your customers go through, with meaningful moments scored by severity" },
+          { icon: "📋", bg: "from-amber-50 to-amber-100", title: "Action Playbook", desc: "AI-powered recommendations with templates your team can start executing this week" },
+        ].map((card) => (
+          <div key={card.title} className="flex items-start gap-4 rounded-2xl border-2 border-border/40 bg-white p-6 shadow-sm hover:shadow-md transition-all">
+            <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${card.bg} flex items-center justify-center shrink-0`}>
+              <span className="text-2xl">{card.icon}</span>
+            </div>
+            <div>
+              <div className="font-bold text-base text-foreground">{card.title}</div>
+              <div className="text-sm text-muted-foreground mt-1 leading-relaxed">
+                {card.desc}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* CTA */}
+      <div className="space-y-4">
+        <Button
+          size="lg"
+          onClick={onStart}
+          className="rounded-2xl px-12 py-6 text-base font-bold shadow-lg hover:shadow-xl transition-all"
+        >
+          Let&apos;s build yours &rarr;
+        </Button>
+        <p className="text-sm text-muted-foreground">
+          Takes about 3 minutes. No account needed.
+        </p>
+      </div>
+    </div>
+  );
+}
+
 export function OnboardingWizard() {
   const router = useRouter();
   const profileContext = useCompanyProfile();
+  const [showIntro, setShowIntro] = useState(true);
   const [step, setStep] = useState(0);
   const [data, setData] = useState<OnboardingData>(initialData);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -407,6 +453,7 @@ export function OnboardingWizard() {
   const steps = useMemo(() => buildSteps(data), [data.companyMaturity]);
   const totalSteps = steps.length;
   const safeStep = Math.min(step, totalSteps - 1);
+  const wizardTopRef = useRef<HTMLDivElement>(null);
 
   // Clamp step to valid range — must be in useEffect, not during render
   useEffect(() => {
@@ -414,6 +461,11 @@ export function OnboardingWizard() {
       setStep(safeStep);
     }
   }, [safeStep, step]);
+
+  // Scroll to top when step changes
+  useEffect(() => {
+    wizardTopRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, [safeStep]);
 
   const currentStep = steps[safeStep];
 
@@ -549,8 +601,13 @@ export function OnboardingWizard() {
     ? validationMap[currentStep.key](data)
     : false;
 
+  // Show intro hero before any form
+  if (showIntro) {
+    return <IntroHero onStart={() => setShowIntro(false)} />;
+  }
+
   return (
-    <div className="w-full max-w-2xl mx-auto">
+    <div ref={wizardTopRef} className="w-full max-w-2xl mx-auto">
       {/* Progress bar with step labels */}
       {currentStep?.key !== "generate" && (
         <div className="mb-12">
@@ -570,8 +627,8 @@ export function OnboardingWizard() {
         </div>
       )}
 
-      {/* Step Content */}
-      <div className="min-h-[420px]">
+      {/* Step Content — key-based fade on step change */}
+      <div key={currentStep?.key} className="min-h-[420px] animate-in fade-in duration-300">
         {currentStep && renderStep(currentStep.key, data, handleChange, handleSubmit, isSubmitting, enrichment, isEnriching)}
       </div>
 

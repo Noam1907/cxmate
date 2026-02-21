@@ -53,15 +53,16 @@ export function StepCompetitors({ data, onChange, enrichment }: StepCompetitorsP
       : "Who are your main competitors? Understanding how your customers compare you helps me find CX moments where you can stand out.";
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
+      <h2 className="text-2xl font-bold tracking-tight text-foreground">Who are you up against?</h2>
       <ChatBubble>
         <p>{bubbleText}</p>
       </ChatBubble>
 
-      <div className="space-y-4">
+      <div className="rounded-2xl border border-border/60 bg-white p-6 space-y-4 shadow-sm">
         <div className="space-y-3">
           <div className="flex items-center gap-2">
-            <Label>Competitors or alternatives your customers consider</Label>
+            <Label className="text-sm font-semibold text-foreground">Competitors or alternatives your customers consider</Label>
             {hasEnrichment && (
               <span className="inline-flex items-center gap-1 text-[10px] font-medium text-primary bg-primary/8 px-2 py-0.5 rounded-full">
                 <svg className="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 20 20">
@@ -103,13 +104,13 @@ export function StepCompetitors({ data, onChange, enrichment }: StepCompetitorsP
               value={customCompetitor}
               onChange={(e) => setCustomCompetitor(e.target.value)}
               onKeyDown={handleKeyDown}
-              className="flex-1"
+              className="flex-1 h-12 rounded-xl border-border/60"
             />
             <button
               type="button"
               onClick={addCompetitor}
               disabled={!customCompetitor.trim()}
-              className="px-3 py-2 text-sm font-medium text-primary border border-primary/30 rounded-lg hover:bg-primary/5 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              className="px-4 py-2 text-sm font-semibold text-primary border-2 border-primary/30 rounded-xl hover:bg-primary/5 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
             >
               Add
             </button>
