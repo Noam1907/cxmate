@@ -175,33 +175,44 @@ function StepGenerate({
         </p>
       </ChatBubble>
 
-      <div className="rounded-xl border border-primary/20 bg-gradient-to-br from-primary/5 to-transparent p-5 space-y-4">
-        <div className="flex items-start gap-3">
-          <span className="text-lg mt-0.5">🗺️</span>
-          <div>
-            <div className="font-medium text-sm">End-to-end {journeyLabel} journey map</div>
-            <div className="text-xs text-muted-foreground">Every stage your customer goes through — mapped to your specific business</div>
+      <div className="rounded-2xl border border-primary/15 bg-gradient-to-br from-primary/5 to-transparent p-6 space-y-5">
+        <p className="text-[10px] font-semibold text-primary uppercase tracking-widest">What you&apos;ll get</p>
+        <div className="space-y-4">
+          <div className="flex items-start gap-3">
+            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
+              <span className="text-sm">🗺️</span>
+            </div>
+            <div>
+              <div className="font-medium text-sm">End-to-end {journeyLabel} journey map</div>
+              <div className="text-xs text-muted-foreground">Every stage your customer goes through — mapped to your specific business</div>
+            </div>
           </div>
-        </div>
-        <div className="flex items-start gap-3">
-          <span className="text-lg mt-0.5">⚡</span>
-          <div>
-            <div className="font-medium text-sm">Meaningful moments analysis</div>
-            <div className="text-xs text-muted-foreground">The make-or-break interactions that determine whether customers stay or leave</div>
+          <div className="flex items-start gap-3">
+            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
+              <span className="text-sm">⚡</span>
+            </div>
+            <div>
+              <div className="font-medium text-sm">Meaningful moments analysis</div>
+              <div className="text-xs text-muted-foreground">The make-or-break interactions that determine whether customers stay or leave</div>
+            </div>
           </div>
-        </div>
-        <div className="flex items-start gap-3">
-          <span className="text-lg mt-0.5">🎯</span>
-          <div>
-            <div className="font-medium text-sm">Priority focus areas</div>
-            <div className="text-xs text-muted-foreground">Where to invest your time first for maximum impact — based on your pains and goals</div>
+          <div className="flex items-start gap-3">
+            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
+              <span className="text-sm">🎯</span>
+            </div>
+            <div>
+              <div className="font-medium text-sm">Priority focus areas</div>
+              <div className="text-xs text-muted-foreground">Where to invest your time first for maximum impact — based on your pains and goals</div>
+            </div>
           </div>
-        </div>
-        <div className="flex items-start gap-3">
-          <span className="text-lg mt-0.5">📋</span>
-          <div>
-            <div className="font-medium text-sm">Ready-to-use playbook with templates</div>
-            <div className="text-xs text-muted-foreground">Actionable recommendations your team can start executing this week</div>
+          <div className="flex items-start gap-3">
+            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
+              <span className="text-sm">📋</span>
+            </div>
+            <div>
+              <div className="font-medium text-sm">Ready-to-use playbook with templates</div>
+              <div className="text-xs text-muted-foreground">Actionable recommendations your team can start executing this week</div>
+            </div>
           </div>
         </div>
       </div>
@@ -290,9 +301,11 @@ function GeneratingExperience({ data }: { data: OnboardingData }) {
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div className="text-center space-y-2">
-        <div className="text-4xl mb-3">✨</div>
-        <h2 className="text-xl font-bold text-foreground">
+      <div className="text-center space-y-3">
+        <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-2">
+          <span className="text-lg font-bold text-primary">CX</span>
+        </div>
+        <h2 className="text-2xl font-bold text-foreground tracking-tight">
           Building your CX playbook
         </h2>
         <p className="text-sm text-muted-foreground">
@@ -315,9 +328,11 @@ function GeneratingExperience({ data }: { data: OnboardingData }) {
       </div>
 
       {/* Current phase card */}
-      <div className="rounded-xl border border-primary/20 bg-gradient-to-br from-primary/5 to-primary/10 p-5 space-y-3 transition-all duration-500">
+      <div className="rounded-2xl border border-primary/15 bg-gradient-to-br from-primary/5 to-transparent p-5 space-y-3 transition-all duration-500">
         <div className="flex items-center gap-3">
-          <span className="text-2xl">{currentPhase.icon}</span>
+          <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+            <span className="text-lg">{currentPhase.icon}</span>
+          </div>
           <div className="flex-1">
             <div className="flex items-center gap-2">
               <span className="font-semibold text-sm text-foreground">{currentPhase.title}</span>
@@ -336,17 +351,17 @@ function GeneratingExperience({ data }: { data: OnboardingData }) {
         <div className="space-y-2">
           {phases.slice(0, phase).map((p, i) => (
             <div key={i} className="flex items-center gap-3 text-sm text-muted-foreground">
-              <span className="text-primary">✓</span>
+              <span className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center text-xs text-primary shrink-0">✓</span>
               <span>{p.title}</span>
             </div>
           ))}
         </div>
       )}
 
-      {/* Excitement / what they'll get */}
-      <div className="bg-muted/50 rounded-lg p-4 space-y-2">
-        <p className="text-xs font-medium text-foreground">💡 While you wait...</p>
-        <p className="text-xs text-muted-foreground">
+      {/* Insight / what they'll get */}
+      <div className="rounded-xl border border-border/50 bg-slate-50/80 p-4 space-y-2">
+        <p className="text-xs font-semibold text-foreground uppercase tracking-wide">Did you know?</p>
+        <p className="text-sm text-muted-foreground leading-relaxed">
           {data.companyMaturity === "pre_launch"
             ? "Companies that map their sales journey before launch close their first deals 2x faster on average."
             : data.companyMaturity === "first_customers"
@@ -537,32 +552,32 @@ export function OnboardingWizard() {
   return (
     <div className="w-full max-w-2xl mx-auto">
       {/* Progress bar with step labels */}
-      <div className="mb-10">
-        <div className="flex justify-center gap-1.5 mb-3">
-          {steps.map((s, i) => (
-            <div
-              key={s.key}
-              className={`h-1.5 rounded-full transition-all duration-300 ${
-                i < safeStep ? "bg-primary" : i === safeStep ? "bg-primary" : "bg-primary/15"
-              } ${i === safeStep ? "w-10" : "w-3"}`}
-            />
-          ))}
-        </div>
-        {currentStep && currentStep.key !== "generate" && (
+      {currentStep?.key !== "generate" && (
+        <div className="mb-12">
+          <div className="flex justify-center gap-1.5 mb-3">
+            {steps.map((s, i) => (
+              <div
+                key={s.key}
+                className={`h-1.5 rounded-full transition-all duration-500 ${
+                  i < safeStep ? "bg-primary" : i === safeStep ? "bg-primary" : "bg-primary/10"
+                } ${i === safeStep ? "w-12" : "w-4"}`}
+              />
+            ))}
+          </div>
           <p className="text-center text-xs text-muted-foreground font-medium">
-            Step {safeStep + 1} of {totalSteps} &middot; {currentStep.label}
+            Step {safeStep + 1} of {totalSteps} &middot; {currentStep?.label}
           </p>
-        )}
-      </div>
+        </div>
+      )}
 
       {/* Step Content */}
-      <div className="min-h-[400px]">
+      <div className="min-h-[420px]">
         {currentStep && renderStep(currentStep.key, data, handleChange, handleSubmit, isSubmitting, enrichment, isEnriching)}
       </div>
 
       {/* Error message with retry */}
       {submitError && (
-        <div className="mt-4 p-4 rounded-xl bg-red-50 border border-red-200 space-y-3">
+        <div className="mt-6 p-4 rounded-xl bg-red-50 border border-red-200 space-y-3">
           <p className="text-sm text-red-700">{submitError}</p>
           <Button
             size="sm"
@@ -574,9 +589,9 @@ export function OnboardingWizard() {
         </div>
       )}
 
-      {/* Navigation — subtle */}
+      {/* Navigation */}
       {currentStep?.key !== "generate" && (
-        <div className="flex justify-between mt-8 pt-6 border-t border-border/50">
+        <div className="flex justify-between mt-10 pt-6 border-t border-border/30">
           <Button
             variant="ghost"
             onClick={handleBack}
@@ -586,7 +601,7 @@ export function OnboardingWizard() {
             &larr; Back
           </Button>
 
-          <Button onClick={handleNext} disabled={!canContinue} className="rounded-xl px-6 shadow-sm">
+          <Button onClick={handleNext} disabled={!canContinue} className="rounded-xl px-8 shadow-sm">
             Continue &rarr;
           </Button>
         </div>
@@ -594,7 +609,7 @@ export function OnboardingWizard() {
 
       {/* Back button on generate step */}
       {currentStep?.key === "generate" && !isSubmitting && (
-        <div className="mt-8 pt-6 border-t border-border/50">
+        <div className="mt-10 pt-6 border-t border-border/30">
           <Button
             variant="ghost"
             onClick={handleBack}

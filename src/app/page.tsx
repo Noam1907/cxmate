@@ -137,25 +137,25 @@ function FeaturesSection() {
       title: "CX Intelligence Report",
       description: "Confrontation-style analysis that shows you what's actually happening in your customer experience — the risks, the gaps, and the opportunities.",
       badge: "Insights",
-      badgeColor: "bg-red-50 text-red-700 border-red-200",
+      badgeColor: "bg-primary/8 text-primary border-primary/15",
     },
     {
       title: "Journey Map",
       description: "A complete stage-by-stage journey with meaningful moments, emotional arcs, and severity ratings tailored to your business model.",
       badge: "Visual",
-      badgeColor: "bg-blue-50 text-blue-700 border-blue-200",
+      badgeColor: "bg-primary/8 text-primary border-primary/15",
     },
     {
       title: "Action Playbook",
       description: "Prioritized recommendations with copy-paste templates, effort estimates, and ownership assignments. Not theory — execution.",
       badge: "Actions",
-      badgeColor: "bg-emerald-50 text-emerald-700 border-emerald-200",
+      badgeColor: "bg-primary/8 text-primary border-primary/15",
     },
     {
       title: "Maturity Benchmarking",
       description: "See where you stand compared to companies at your stage. Know exactly what to invest in now vs. later.",
       badge: "Benchmark",
-      badgeColor: "bg-amber-50 text-amber-700 border-amber-200",
+      badgeColor: "bg-primary/8 text-primary border-primary/15",
     },
   ];
 
@@ -223,10 +223,10 @@ function Footer() {
     <footer className="border-t border-border/50 bg-background">
       <div className="max-w-5xl mx-auto px-6 py-8 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center">
-            <span className="text-xs font-bold text-primary">CX</span>
+          <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+            <span className="text-sm font-bold text-primary">CX</span>
           </div>
-          <span className="text-sm font-semibold text-foreground">CX Mate</span>
+          <span className="text-sm font-bold tracking-tight text-foreground">CX Mate</span>
         </div>
         <p className="text-xs text-muted-foreground">
           Like having a CX expert on your team — powered by AI

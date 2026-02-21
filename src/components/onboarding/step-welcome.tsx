@@ -90,27 +90,29 @@ export function StepWelcome({ data, onChange }: StepWelcomeProps) {
         </p>
       </ChatBubble>
 
-      <div className="space-y-4 max-w-sm">
+      <div className="space-y-5 max-w-md">
         {/* Person's name */}
         <div className="space-y-2">
-          <Label htmlFor="userName">What&apos;s your name?</Label>
+          <Label htmlFor="userName" className="text-sm font-medium">What&apos;s your name?</Label>
           <Input
             id="userName"
             placeholder="e.g. Sarah"
             value={data.userName || ""}
             onChange={(e) => onChange({ userName: e.target.value })}
             autoFocus
+            className="h-11"
           />
         </div>
 
         {/* Person's role */}
         <div className="space-y-2">
-          <Label htmlFor="userRole">Your role</Label>
+          <Label htmlFor="userRole" className="text-sm font-medium">Your role</Label>
           <Input
             id="userRole"
             placeholder="e.g. Head of CS, CEO, VP Product"
             value={data.userRole || ""}
             onChange={(e) => onChange({ userRole: e.target.value })}
+            className="h-11"
           />
           <p className="text-xs text-muted-foreground">
             This helps me tailor recommendations to your perspective
@@ -119,23 +121,25 @@ export function StepWelcome({ data, onChange }: StepWelcomeProps) {
 
         {/* Company name */}
         <div className="space-y-2">
-          <Label htmlFor="companyName">What&apos;s your company called?</Label>
+          <Label htmlFor="companyName" className="text-sm font-medium">What&apos;s your company called?</Label>
           <Input
             id="companyName"
             placeholder="e.g. Acme Corp"
             value={data.companyName}
             onChange={(e) => onChange({ companyName: e.target.value })}
+            className="h-11"
           />
         </div>
 
         {/* Company website */}
         <div className="space-y-2">
-          <Label htmlFor="companyWebsite">Company website</Label>
+          <Label htmlFor="companyWebsite" className="text-sm font-medium">Company website</Label>
           <Input
             id="companyWebsite"
             placeholder="e.g. orca.ai"
             value={data.companyWebsite}
             onChange={(e) => handleWebsiteChange(e.target.value)}
+            className="h-11"
           />
           <p className="text-xs text-muted-foreground">
             {websiteManuallyEdited

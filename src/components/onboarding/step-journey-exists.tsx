@@ -82,19 +82,19 @@ export function StepJourneyExists({ data, onChange }: StepJourneyExistsProps) {
       </ChatBubble>
 
       {/* Visual example — shows what "CX processes" means */}
-      <div className="rounded-xl border border-border/60 bg-muted/30 p-4 space-y-2">
-        <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-          💡 Example: what companies typically have
+      <div className="rounded-xl border border-border/50 bg-slate-50/80 p-4 space-y-2">
+        <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+          Example: what companies typically have
         </p>
         <div className="flex items-center gap-1 overflow-x-auto py-2">
           {[
-            { label: "Sales pipeline", color: "bg-blue-100 text-blue-700 border-blue-200" },
-            { label: "→", color: "text-muted-foreground text-lg" },
-            { label: "Onboarding flow", color: "bg-green-100 text-green-700 border-green-200" },
-            { label: "→", color: "text-muted-foreground text-lg" },
-            { label: "Training program", color: "bg-amber-100 text-amber-700 border-amber-200" },
-            { label: "→", color: "text-muted-foreground text-lg" },
-            { label: "Ongoing support", color: "bg-purple-100 text-purple-700 border-purple-200" },
+            { label: "Sales pipeline", color: "bg-primary/8 text-primary border-primary/15" },
+            { label: "→", color: "text-muted-foreground/50 text-lg" },
+            { label: "Onboarding flow", color: "bg-primary/8 text-primary border-primary/15" },
+            { label: "→", color: "text-muted-foreground/50 text-lg" },
+            { label: "Training program", color: "bg-primary/8 text-primary border-primary/15" },
+            { label: "→", color: "text-muted-foreground/50 text-lg" },
+            { label: "Ongoing support", color: "bg-primary/8 text-primary border-primary/15" },
           ].map((item, i) =>
             item.label === "→" ? (
               <span key={i} className={item.color}>→</span>
