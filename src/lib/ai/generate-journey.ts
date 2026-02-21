@@ -27,9 +27,9 @@ export async function generateJourney(
       "anthropic-version": "2023-06-01",
     },
     body: JSON.stringify({
-      model: "claude-sonnet-4-20250514",
-      max_tokens: 16384,
-      system: "You are a CX expert API. You MUST respond with ONLY a valid JSON object. No preamble, no explanation, no markdown fences, no text before or after the JSON. The very first character of your response must be { and the very last must be }. CRITICAL: Keep your response concise — aim for under 12000 tokens. Use short descriptions (1-2 sentences each). Do NOT write essays in JSON string values.",
+      model: "claude-sonnet-4-5-20251001",
+      max_tokens: 16000,
+      system: "You are a CX expert API. You MUST respond with ONLY a valid JSON object. No preamble, no explanation, no markdown fences, no text before or after the JSON. The very first character of your response must be { and the very last must be }. CRITICAL: Be concise — max 8000 tokens total. Every string field: 1 sentence only. No elaboration. No lists inside strings. Short and punchy.",
       messages: [
         {
           role: "user",
