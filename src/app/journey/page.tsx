@@ -7,6 +7,8 @@ import { JourneyVisual } from "@/components/journey/journey-visual";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import type { GeneratedJourney } from "@/lib/ai/journey-prompt";
+import type { OnboardingData } from "@/types/onboarding";
+import { buildEvidenceMap, type EvidenceMap } from "@/lib/evidence-matching";
 
 type ViewMode = "cards" | "visual";
 
@@ -14,16 +16,22 @@ function JourneyContent() {
   const searchParams = useSearchParams();
   const templateId = searchParams.get("id");
   const [journey, setJourney] = useState<GeneratedJourney | null>(null);
+  const [evidenceMap, setEvidenceMap] = useState<EvidenceMap | null>(null);
   const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState<ViewMode>("cards");
 
   useEffect(() => {
     async function load() {
+      let loadedJourney: GeneratedJourney | null = null;
+      let loadedOnboarding: Partial<OnboardingData> | null = null;
+
       if (templateId === "preview" || !templateId) {
         const stored = sessionStorage.getItem("cx-mate-journey");
         if (stored) {
           try {
             const data = JSON.parse(stored);
+            loadedJourney = data.journey;
+            loadedOnboarding = data.onboardingData || null;
             setJourney(data.journey);
           } catch {
             console.error("Failed to parse stored journey");
@@ -35,12 +43,24 @@ function JourneyContent() {
           const response = await fetch(`/api/journey/${templateId}`);
           if (response.ok) {
             const data = await response.json();
-            setJourney(data.journey || null);
+            loadedJourney = data.journey || null;
+            setJourney(loadedJourney);
+          }
+          // Try sessionStorage for onboarding data
+          const stored = sessionStorage.getItem("cx-mate-journey");
+          if (stored) {
+            const parsed = JSON.parse(stored);
+            loadedOnboarding = parsed.onboardingData || null;
           }
         } catch (err) {
           console.error("Failed to load journey:", err);
         }
         setLoading(false);
+      }
+
+      // Build evidence map
+      if (loadedJourney && loadedOnboarding) {
+        setEvidenceMap(buildEvidenceMap(loadedOnboarding, loadedJourney));
       }
     }
     load();
@@ -73,10 +93,9 @@ function JourneyContent() {
 
   return (
     <div className="w-full">
-      {/* Header + View toggle */}
+      {/* View toggle */}
       <div className="text-center mb-6 space-y-4">
-        <h1 className="text-3xl font-bold">{journey.name}</h1>
-        <div className="inline-flex items-center rounded-lg border bg-muted p-1 text-muted-foreground">
+        <div className="inline-flex items-center rounded-lg border bg-secondary p-1 text-muted-foreground">
           <button
             onClick={() => setViewMode("cards")}
             className={`inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition-all ${
@@ -102,7 +121,7 @@ function JourneyContent() {
 
       {/* Content based on view mode */}
       {viewMode === "cards" ? (
-        <JourneyMap journey={journey} />
+        <JourneyMap journey={journey} evidenceMap={evidenceMap} />
       ) : (
         <JourneyVisual journey={journey} />
       )}

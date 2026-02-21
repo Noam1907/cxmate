@@ -17,6 +17,8 @@ import type {
   StagePlaybook,
 } from "@/lib/ai/recommendation-prompt";
 import type { GeneratedJourney } from "@/lib/ai/journey-prompt";
+import type { OnboardingData } from "@/types/onboarding";
+import { buildEvidenceMap, getMomentAnnotations, type EvidenceMap } from "@/lib/evidence-matching";
 import type { OnboardingInput } from "@/lib/validations/onboarding";
 
 // ============================================
@@ -182,10 +184,12 @@ function RecommendationCard({
   rec,
   status,
   onStatusChange,
+  annotations,
 }: {
   rec: PlaybookRecommendation;
   status: RecStatus;
   onStatusChange: () => void;
+  annotations?: { painPoints: string[]; competitorGaps: string[] };
 }) {
   const [expanded, setExpanded] = useState(false);
 
@@ -241,6 +245,28 @@ function RecommendationCard({
             <span>{effortLabel(rec.effort)}</span>
           </div>
 
+          {/* Evidence annotations */}
+          {annotations && (annotations.painPoints.length > 0 || annotations.competitorGaps.length > 0) && (
+            <div className="flex flex-wrap gap-1 mt-1.5">
+              {annotations.painPoints.map((pp, i) => (
+                <span
+                  key={`pp-${i}`}
+                  className="text-[10px] px-1.5 py-0.5 rounded-full bg-violet-100 text-violet-700 border border-violet-200 font-medium"
+                >
+                  For: {pp}
+                </span>
+              ))}
+              {annotations.competitorGaps.map((cg, i) => (
+                <span
+                  key={`cg-${i}`}
+                  className="text-[10px] px-1.5 py-0.5 rounded-full bg-orange-100 text-orange-700 border border-orange-200 font-medium"
+                >
+                  {cg}
+                </span>
+              ))}
+            </div>
+          )}
+
           {/* Expanded details */}
           {expanded && (
             <div
@@ -293,10 +319,12 @@ function StageSection({
   stagePlaybook,
   statuses,
   onStatusChange,
+  evidenceMap,
 }: {
   stagePlaybook: StagePlaybook;
   statuses: Record<string, RecStatus>;
   onStatusChange: (key: string) => void;
+  evidenceMap?: EvidenceMap | null;
 }) {
   const doneCount = stagePlaybook.recommendations.filter(
     (r) => statuses[makeKey(r)] === "done"
@@ -332,12 +360,16 @@ function StageSection({
         {stagePlaybook.recommendations.map((rec, i) => {
           const key = makeKey(rec);
           const status = statuses[key] || "not_started";
+          const ann = evidenceMap
+            ? getMomentAnnotations(rec.stageName, rec.momentName, evidenceMap)
+            : undefined;
           return (
             <RecommendationCard
               key={i}
               rec={rec}
               status={status}
               onStatusChange={() => onStatusChange(key)}
+              annotations={ann}
             />
           );
         })}
@@ -363,6 +395,7 @@ export default function PlaybookPage() {
   const [hasJourney, setHasJourney] = useState(false);
   const [templateId, setTemplateId] = useState("preview");
   const [filter, setFilter] = useState<FilterMode>("all");
+  const [evidenceMap, setEvidenceMap] = useState<EvidenceMap | null>(null);
   const { statuses, setStatus } = useRecommendationStatus();
 
   useEffect(() => {
@@ -373,6 +406,11 @@ export default function PlaybookPage() {
       try {
         const parsed = JSON.parse(stored);
         setTemplateId(parsed.templateId || "preview");
+
+        // Build evidence map for annotations
+        if (parsed.journey && parsed.onboardingData) {
+          setEvidenceMap(buildEvidenceMap(parsed.onboardingData, parsed.journey));
+        }
       } catch {
         // ignore
       }
@@ -492,13 +530,13 @@ export default function PlaybookPage() {
         }));
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
-      <div className="max-w-2xl mx-auto px-4 py-12">
+    <main className="min-h-screen bg-gradient-to-b from-background to-white">
+      <div className="max-w-3xl mx-auto px-6 py-12">
         {/* Header */}
         <div className="text-center space-y-3 mb-8">
-          <div className="text-sm font-medium text-muted-foreground uppercase tracking-widest">
+          <p className="text-sm font-medium text-primary uppercase tracking-widest">
             CX Playbook
-          </div>
+          </p>
           <h1 className="text-3xl font-bold">{playbook.companyName}</h1>
           <div className="flex items-center justify-center gap-3">
             <Badge variant="outline">
@@ -615,6 +653,7 @@ export default function PlaybookPage() {
                   stagePlaybook={sp}
                   statuses={statuses}
                   onStatusChange={handleStatusChange}
+                  evidenceMap={evidenceMap}
                 />
               ))}
           </div>

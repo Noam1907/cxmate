@@ -52,6 +52,8 @@ export interface GeneratedMoment {
   cxToolRecommendation?: string;
   decisionScienceInsight?: string;
   impactIfIgnored?: string;
+  addressesPainPoints?: string[]; // v4: links moment back to user's stated pain point keys
+  competitorGap?: string; // v4: competitor-specific insight for this moment
 }
 
 export interface GeneratedStage {
@@ -73,6 +75,8 @@ export interface ConfrontationInsight {
   immediateAction: string;
   measureWith: string;
   companionAdvice?: string; // v3: CX Mate's peer one-liner
+  addressesPainPoints?: string[]; // v4: which user pain point keys this insight addresses
+  competitorContext?: string; // v4: competitor-specific context for this insight
 }
 
 export interface CxToolRecommendation {
@@ -92,7 +96,7 @@ export interface ImpactProjection {
 }
 
 export interface TechStackRecommendation {
-  category: "crm" | "marketing" | "support" | "analytics" | "cs_platform" | "communication";
+  category: "crm" | "marketing" | "support" | "analytics" | "cs_platform" | "communication" | "bi" | "survey" | "data_infrastructure";
   categoryLabel: string;
   tools: string[];
   whyNow: string;
@@ -503,6 +507,12 @@ ${verticalContext}
 ## Competitive Landscape
 ${input.competitors ? `- Known competitors/alternatives: ${input.competitors}` : "- No competitors specified — use industry knowledge to identify likely alternatives"}
 ${input.companyWebsite ? `- Company website: ${input.companyWebsite}` : ""}
+${input.enrichmentData ? `
+## AI-Enriched Company Intelligence
+- Company description: ${input.enrichmentData.description || "N/A"}
+- Enrichment confidence: ${input.enrichmentData.confidence || "unknown"}
+${input.enrichmentData.reasoning ? `- Analysis notes: ${input.enrichmentData.reasoning}` : ""}
+Use this enrichment data to make your analysis more specific and personalized. If the enrichment data conflicts with user-provided data, prefer the user-provided data.` : ""}
 
 ## Their Challenges
 - Biggest challenge: ${input.biggestChallenge}
@@ -560,6 +570,8 @@ Generate a customized, theory-backed journey map with the CX Mate companion voic
    - Recommend a specific **cxToolRecommendation** (which measurement tool to deploy)
    - Include a **decisionScienceInsight** (what the buyer/customer is psychologically experiencing)
    - State the **impactIfIgnored** (the business cost — use their numbers or benchmarks)
+   - **addressesPainPoints**: Array of pain point keys from the user's input that this moment directly addresses (use the EXACT keys from "Their Challenges" above, e.g. ["churn", "no_visibility"]). If no direct match, omit.
+   - **competitorGap**: If this moment represents a competitive differentiation opportunity against one of their listed competitors, note it (e.g., "Zendesk users frequently complain about slow onboarding — your moment to shine"). If no competitor relevance, omit.
 
 3. **Confrontation Insights (3-5)**: Use the companion voice. Frame as "What typically trips up companies at your stage" not "What you're getting wrong." Each includes:
    - The pattern name
@@ -568,6 +580,8 @@ Generate a customized, theory-backed journey map with the CX Mate companion voic
    - Immediate action
    - What to measure
    - **companionAdvice**: A single-sentence CX Mate comment in first person, like a smart friend saying what they'd do. Examples: "If I were you, I'd fix this before hiring a CS team." or "This is the #1 thing I see killing retention at your stage."
+   - **addressesPainPoints**: Array of pain point keys from the user's input that this insight maps to (use EXACT keys, e.g. ["churn", "handoff_gaps"]). Every insight should map to at least one pain point where possible.
+   - **competitorContext**: If this insight has a competitor angle (e.g., a competitor weakness the user can exploit), note it. Otherwise omit.
 
 4. **CX Tool Roadmap (3-5 tools)**: Matched to their CX maturity. Don't recommend NPS if they have under 50 responses — suggest CSAT instead.
 
@@ -578,11 +592,16 @@ Generate a customized, theory-backed journey map with the CX Mate companion voic
 
 6. **Maturity Assessment**: A 2-3 sentence CX Mate-style assessment. Validate where they are, name what to focus on, say what to avoid doing too early.
 
-7. **Tech Stack Recommendations (3-5)**: Based on their maturity, recommend which tools to connect for CRM, marketing automation, support, analytics, and CS platforms. For each:
-   - Category (crm, marketing, support, analytics, cs_platform, communication)
+7. **Tech Stack Recommendations (4-7)**: Based on their maturity, recommend which tools to connect across their full operational stack. For each:
+   - Category (crm, marketing, support, analytics, cs_platform, communication, bi, survey, data_infrastructure)
    - 2-3 specific tool names (appropriate for their stage — don't recommend Salesforce to a 5-person startup)
    - Why this category matters now
    - What to integrate it with
+
+   Category guidance for the 3 new categories:
+   - **bi** (Business Intelligence): Tools like Metabase, Looker, Tableau, Power BI. Recommend when: scaling stage, >50 customers, or "no_visibility" / "data_silos" pain points.
+   - **survey** (Survey & Feedback): Dedicated tools like Delighted, Typeform, Qualtrics, SurveyMonkey. Recommend when: company measures NPS/CSAT/CES or has "no_feedback_loop" pain point. Keep separate from analytics.
+   - **data_infrastructure** (Data Infrastructure): Data collection/warehousing like Segment, Snowflake, BigQuery, Fivetran. Recommend when: scaling stage, "data_silos" pain point, or 3+ other tools recommended (need data unification).
 
 8. **Assumptions (3-5)**: List the key assumptions behind your analysis. Be transparent about what you inferred vs what the user told you. Examples: "Assumed 4% monthly churn rate (industry benchmark for early-stage B2B SaaS)", "Based on mid-market ACV range of $5K-$20K from your input."
 
@@ -626,7 +645,9 @@ Return a JSON object with this exact structure:
           "actionTemplate": "Specific thing to do/write/send",
           "cxToolRecommendation": "Which CX measurement tool to deploy here and why",
           "decisionScienceInsight": "What the buyer/customer is psychologically experiencing",
-          "impactIfIgnored": "Business cost of not addressing this"
+          "impactIfIgnored": "Business cost of not addressing this",
+          "addressesPainPoints": ["pain_point_key_1"],
+          "competitorGap": "Competitor weakness insight or omit if none"
         }
       ]
     }
@@ -639,7 +660,9 @@ Return a JSON object with this exact structure:
       "businessImpact": "Quantified impact",
       "immediateAction": "What to do right now",
       "measureWith": "Which CX tool to track this",
-      "companionAdvice": "CX Mate's one-liner in first person"
+      "companionAdvice": "CX Mate's one-liner in first person",
+      "addressesPainPoints": ["pain_point_key_1", "pain_point_key_2"],
+      "competitorContext": "Competitor angle or omit if none"
     }
   ],
   "cxToolRoadmap": [
@@ -662,7 +685,7 @@ Return a JSON object with this exact structure:
   ],
   "techStackRecommendations": [
     {
-      "category": "crm" | "marketing" | "support" | "analytics" | "cs_platform" | "communication",
+      "category": "crm" | "marketing" | "support" | "analytics" | "cs_platform" | "communication" | "bi" | "survey" | "data_infrastructure",
       "categoryLabel": "Human-readable category name (e.g. CRM, Marketing Automation)",
       "tools": ["Tool 1", "Tool 2"],
       "whyNow": "Why this category matters at their stage",

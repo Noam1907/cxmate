@@ -6,12 +6,15 @@ import { ConfrontationPanel } from "./confrontation-panel";
 import { CxToolRoadmap } from "./cx-tool-roadmap";
 import { ImpactProjections } from "./impact-projections";
 import type { GeneratedJourney } from "@/lib/ai/journey-prompt";
+import { getMomentAnnotations, type EvidenceMap } from "@/lib/evidence-matching";
+import type { MomentAnnotation } from "./journey-stage-card";
 
 interface JourneyMapProps {
   journey: GeneratedJourney;
+  evidenceMap?: EvidenceMap | null;
 }
 
-export function JourneyMap({ journey }: JourneyMapProps) {
+export function JourneyMap({ journey, evidenceMap }: JourneyMapProps) {
   const salesStages = journey.stages.filter((s) => s.stageType === "sales");
   const customerStages = journey.stages.filter(
     (s) => s.stageType === "customer"
@@ -34,8 +37,23 @@ export function JourneyMap({ journey }: JourneyMapProps) {
     journey.impactProjections ||
     journey.maturityAssessment;
 
+  // Build per-stage annotation maps for inline evidence badges
+  function getStageAnnotations(stageName: string, moments: { name: string }[]): Record<string, MomentAnnotation> | undefined {
+    if (!evidenceMap) return undefined;
+    const annotations: Record<string, MomentAnnotation> = {};
+    let hasAny = false;
+    for (const moment of moments) {
+      const ann = getMomentAnnotations(stageName, moment.name, evidenceMap);
+      if (ann.painPoints.length > 0 || ann.competitorGaps.length > 0) {
+        annotations[moment.name] = ann;
+        hasAny = true;
+      }
+    }
+    return hasAny ? annotations : undefined;
+  }
+
   return (
-    <div className="w-full max-w-3xl mx-auto space-y-8">
+    <div className="w-full max-w-4xl mx-auto space-y-8">
       {/* Header */}
       <div className="text-center space-y-3">
         <h1 className="text-3xl font-bold">{journey.name}</h1>
@@ -81,6 +99,7 @@ export function JourneyMap({ journey }: JourneyMapProps) {
                 stage={stage}
                 index={i}
                 isLast={i === salesStages.length - 1 && customerStages.length === 0}
+                momentAnnotations={getStageAnnotations(stage.name, stage.meaningfulMoments)}
               />
             ))}
           </div>
@@ -117,6 +136,7 @@ export function JourneyMap({ journey }: JourneyMapProps) {
                 stage={stage}
                 index={salesStages.length + i}
                 isLast={i === customerStages.length - 1}
+                momentAnnotations={getStageAnnotations(stage.name, stage.meaningfulMoments)}
               />
             ))}
           </div>

@@ -16,6 +16,9 @@ import type {
   ConfrontationInsight,
   ImpactProjection,
 } from "@/lib/ai/journey-prompt";
+import type { OnboardingData } from "@/types/onboarding";
+import { buildEvidenceMap, type EvidenceMap } from "@/lib/evidence-matching";
+import { EvidenceWall } from "@/components/evidence/evidence-wall";
 
 // ============================================
 // Confrontation Modes (A/B/C)
@@ -312,6 +315,22 @@ function ImpactCard({
 }
 
 // ============================================
+// Tech Stack Category Colors
+// ============================================
+
+const TECH_CATEGORY_COLORS: Record<string, string> = {
+  crm: "bg-blue-100 text-blue-800 border-blue-200",
+  marketing: "bg-purple-100 text-purple-800 border-purple-200",
+  support: "bg-amber-100 text-amber-800 border-amber-200",
+  analytics: "bg-cyan-100 text-cyan-800 border-cyan-200",
+  cs_platform: "bg-emerald-100 text-emerald-800 border-emerald-200",
+  communication: "bg-slate-100 text-slate-800 border-slate-200",
+  bi: "bg-indigo-100 text-indigo-800 border-indigo-200",
+  survey: "bg-pink-100 text-pink-800 border-pink-200",
+  data_infrastructure: "bg-violet-100 text-violet-800 border-violet-200",
+};
+
+// ============================================
 // Main Confrontation Content
 // ============================================
 
@@ -319,21 +338,29 @@ function ConfrontationContent() {
   const searchParams = useSearchParams();
   const templateId = searchParams.get("id");
   const [journey, setJourney] = useState<GeneratedJourney | null>(null);
+  const [onboardingData, setOnboardingData] = useState<Partial<OnboardingData> | null>(null);
   const [companyName, setCompanyName] = useState<string>("");
   const [mode, setMode] = useState<ConfrontationMode>("early_stage");
   const [hasExistingCustomers, setHasExistingCustomers] = useState(false);
   const [loading, setLoading] = useState(true);
   const [headerVisible, setHeaderVisible] = useState(false);
+  const [evidenceMap, setEvidenceMap] = useState<EvidenceMap | null>(null);
 
   useEffect(() => {
     async function load() {
+      let loadedJourney: GeneratedJourney | null = null;
+      let loadedOnboarding: Partial<OnboardingData> | null = null;
+
       if (templateId === "preview" || !templateId) {
         // Preview mode — load from sessionStorage
         const stored = sessionStorage.getItem("cx-mate-journey");
         if (stored) {
           try {
             const data = JSON.parse(stored);
+            loadedJourney = data.journey;
+            loadedOnboarding = data.onboardingData || null;
             setJourney(data.journey);
+            setOnboardingData(loadedOnboarding);
             setCompanyName(data.onboardingData?.companyName || "your company");
             setMode(detectMode(data.onboardingData?.companySize || ""));
             setHasExistingCustomers(
@@ -349,11 +376,14 @@ function ConfrontationContent() {
           const response = await fetch(`/api/journey/${templateId}`);
           if (response.ok) {
             const data = await response.json();
-            setJourney(data.journey || null);
+            loadedJourney = data.journey || null;
+            setJourney(loadedJourney);
             // For persisted journeys, try to get onboarding data from sessionStorage as fallback
             const stored = sessionStorage.getItem("cx-mate-journey");
             if (stored) {
               const parsed = JSON.parse(stored);
+              loadedOnboarding = parsed.onboardingData || null;
+              setOnboardingData(loadedOnboarding);
               setCompanyName(parsed.onboardingData?.companyName || "your company");
               setMode(detectMode(parsed.onboardingData?.companySize || ""));
               setHasExistingCustomers(parsed.onboardingData?.hasExistingCustomers || false);
@@ -363,6 +393,12 @@ function ConfrontationContent() {
           console.error("Failed to load journey:", err);
         }
       }
+
+      // Build evidence map
+      if (loadedJourney && loadedOnboarding) {
+        setEvidenceMap(buildEvidenceMap(loadedOnboarding, loadedJourney));
+      }
+
       setLoading(false);
     }
     load();
@@ -421,8 +457,8 @@ function ConfrontationContent() {
   const config = MODE_CONFIG[mode];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
-      <div className="max-w-2xl mx-auto px-4 py-12">
+    <div className="min-h-screen bg-gradient-to-b from-background to-white">
+      <div className="max-w-3xl mx-auto px-6 py-12">
         {/* Header — dramatic reveal */}
         <div
           className={`text-center space-y-4 mb-12 transition-all duration-1000 ${
@@ -432,9 +468,9 @@ function ConfrontationContent() {
           }`}
         >
           <div className="flex items-center justify-center gap-2">
-            <div className="text-sm font-medium text-muted-foreground uppercase tracking-widest">
+            <p className="text-sm font-medium text-primary uppercase tracking-widest">
               CX Intelligence Report
-            </div>
+            </p>
             <span
               className={`text-xs px-2 py-0.5 rounded-full border font-medium ${config.badgeColor}`}
             >
@@ -481,6 +517,17 @@ function ConfrontationContent() {
             </div>
           </div>
         </FadeIn>
+
+        {/* Evidence Wall — what we know about you */}
+        {evidenceMap && (
+          <FadeIn delay={500} className="mb-0">
+            <EvidenceWall
+              evidenceMap={evidenceMap}
+              companyName={companyName}
+              biggestChallenge={onboardingData?.biggestChallenge}
+            />
+          </FadeIn>
+        )}
 
         {/* Maturity Assessment */}
         {journey.maturityAssessment && (
@@ -557,7 +604,9 @@ function ConfrontationContent() {
                 <FadeIn key={i} delay={2000 + i * 100}>
                   <div className="rounded-xl border bg-white p-4 space-y-2">
                     <div className="flex items-center gap-2">
-                      <span className="text-xs px-2 py-0.5 rounded-full bg-blue-100 text-blue-800 border border-blue-200 font-medium">
+                      <span className={`text-xs px-2 py-0.5 rounded-full border font-medium ${
+                        TECH_CATEGORY_COLORS[rec.category] || "bg-blue-100 text-blue-800 border-blue-200"
+                      }`}>
                         {rec.categoryLabel}
                       </span>
                     </div>

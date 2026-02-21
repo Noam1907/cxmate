@@ -11,10 +11,16 @@ import {
 import { Badge } from "@/components/ui/badge";
 import type { GeneratedStage, GeneratedMoment } from "@/lib/ai/journey-prompt";
 
+export interface MomentAnnotation {
+  painPoints: string[];
+  competitorGaps: string[];
+}
+
 interface JourneyStageCardProps {
   stage: GeneratedStage;
   index: number;
   isLast: boolean;
+  momentAnnotations?: Record<string, MomentAnnotation>;
 }
 
 function getSeverityColor(severity: string) {
@@ -62,7 +68,7 @@ function getMomentTypeBadge(type: string) {
   }
 }
 
-function MomentCard({ moment }: { moment: GeneratedMoment }) {
+function MomentCard({ moment, annotation }: { moment: GeneratedMoment; annotation?: MomentAnnotation }) {
   const [expanded, setExpanded] = useState(false);
   const hasV2Fields =
     moment.diagnosis ||
@@ -84,6 +90,27 @@ function MomentCard({ moment }: { moment: GeneratedMoment }) {
           <div>
             <div className="font-medium text-sm">{moment.name}</div>
             <div className="text-xs opacity-75">{moment.description}</div>
+            {/* Evidence annotations */}
+            {annotation && (annotation.painPoints.length > 0 || annotation.competitorGaps.length > 0) && (
+              <div className="flex flex-wrap gap-1 mt-1.5">
+                {annotation.painPoints.map((pp, i) => (
+                  <span
+                    key={`pp-${i}`}
+                    className="text-[10px] px-1.5 py-0.5 rounded-full bg-violet-100 text-violet-700 border border-violet-200 font-medium"
+                  >
+                    Addresses: {pp}
+                  </span>
+                ))}
+                {annotation.competitorGaps.map((cg, i) => (
+                  <span
+                    key={`cg-${i}`}
+                    className="text-[10px] px-1.5 py-0.5 rounded-full bg-orange-100 text-orange-700 border border-orange-200 font-medium"
+                  >
+                    {cg}
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
         </div>
         <div className="flex gap-1 shrink-0">
@@ -204,6 +231,7 @@ export function JourneyStageCard({
   stage,
   index,
   isLast,
+  momentAnnotations,
 }: JourneyStageCardProps) {
   const hasStageInsights =
     stage.topFailureRisk || stage.successPattern || stage.benchmarkContext;
@@ -281,7 +309,11 @@ export function JourneyStageCard({
               Meaningful Moments ({stage.meaningfulMoments.length})
             </div>
             {stage.meaningfulMoments.map((moment, i) => (
-              <MomentCard key={i} moment={moment} />
+              <MomentCard
+                key={i}
+                moment={moment}
+                annotation={momentAnnotations?.[moment.name]}
+              />
             ))}
           </div>
         </CardContent>
