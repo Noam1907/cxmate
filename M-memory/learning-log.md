@@ -65,6 +65,25 @@ This is the team's collective memory. Every agent reads this before working.
 - **Enrichment API is cheap**: ~300 input tokens for the prompt, ~200 output tokens. Sub-$0.01 per call. No need for caching in MVP — direct Claude call every time. Add caching later if volume justifies it.
 - **Product insight: target audience is stage-based, not size-based**: "Companies that haven't hired a CX expert yet" is the real ICP, not "5-300 employees." A 600-person company with no formal CX is a perfect customer.
 
+### 2026-02-21 — Onboarding UX Polish + Market Validation
+
+- **JSON parse at position 1 = Claude preamble**: The error "Expected property name at position 1 (line 1 column 2)" means Claude output text before the JSON (e.g., "Here is the JSON..."). Fix: `raw.indexOf("{")` to strip preamble, `raw.lastIndexOf("}")` to strip trailer. Apply to both journey and recommendation parsers.
+- **Color hue matters for emotional tone**: Indigo/purple (hue 275) feels cold and techy. Teal (hue 195) feels warm, trustworthy, professional — better fit for CX platform. Use oklch for precise hue control.
+- **scrollIntoView > window.scrollTo for wizard steps**: `window.scrollTo({ top: 0 })` fires before new step renders, sometimes scrolling to wrong position. `useRef` + `useEffect` with `scrollIntoView` fires after React renders the new step.
+- **Sidebar during onboarding = engagement multiplier**: Showing a live-filling sidebar during onboarding (Mesh ROI Calculator pattern) makes users feel their input is being captured and valued. Much more engaging than a blank left panel.
+- **Market validation (CX Today/KPMG/PwC 2026)**: 66% of B2B CX leaders cite data access as #1 obstacle. 58% using autonomous AI. Trusted orgs outperform 4x. Core thesis: "orchestrate the full journey, not patch touchpoints." This validates CX Mate's approach of mapping the entire journey before optimizing individual moments.
+- **Founder insight — "The defensibility is in the foundation, not the agent layer"**: Everyone builds agents (top floor); the competitive moat is in the structured data layer underneath. CX Mate's journey knowledge base, company enrichment data, and structured journey templates ARE the foundation. The AI generation is the visible layer, but the structured CX knowledge (stages, moments, benchmarks, failure patterns, measurement tools) is the real asset. Implication: keep investing in the CX knowledge base quality and structure.
+
+### 2026-02-21 — Mesh-Inspired Visual System + Prompt Completeness + QA Gatekeeper
+
+- **Card hierarchy as a design system**: Consistent pattern across all components: `rounded-2xl border border-border/60 bg-white p-6 shadow-sm` for containers, `border-2 rounded-xl` for interactive options, `shadow-md ring-1 ring-primary/20` for selected states. This visual hierarchy replaces ad-hoc styling and makes new components self-consistent.
+- **System message > prompt instructions for JSON-only output**: Adding `system: "Return ONLY a valid JSON object. No markdown, no explanation."` as a separate API parameter is far more reliable than embedding "Return ONLY JSON" inside the user prompt. Claude treats system messages as harder constraints than in-prompt instructions.
+- **Progressive JSON repair pattern**: 3-level parsing: (1) raw `JSON.parse`, (2) strip trailing commas before `}` and `]`, (3) replace unescaped quotes inside strings. Each level catches different Claude failure modes. Always wrap in try/catch with user-facing error display.
+- **Audit before shipping, not after**: 14 disconnected flows were found in a pre-release audit. Key insight: collecting data ≠ using data. 6 of 33 onboarding fields were collected but never reached Claude. A gatekeeper agent that runs before releases prevents this class of bug entirely.
+- **Role-based prompt personalization**: Telling Claude "this person is a CEO — make recommendations delegatable" or "this person is a Head of CS — make them tactical and hands-on" dramatically changes output quality. The same data produces better results when framed for the reader's role.
+- **AI tool recommendations as mandatory prompt rule**: Adding "ALWAYS RECOMMEND AI SOLUTIONS" with 10 specific categories (chatbots, analytics, meeting assistants, CS platforms, etc.) ensures every playbook recommendation includes a concrete AI tool suggestion. Without this rule, Claude defaults to manual processes.
+- **"Build on existing" instruction for partial CX processes**: When a company says they have partial processes, adding "BUILD ON what they already have. Don't recommend replacing working processes — extend and improve them" prevents Claude from generating from-scratch recommendations that ignore the user's existing work.
+
 ---
 
 ## Version History

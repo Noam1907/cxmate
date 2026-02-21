@@ -25,6 +25,9 @@ Track sprint progress and status.
 | Research pipeline prototype (Claude tool_use) | AI Engineer | P2 | Deferred from Sprint 2 |
 | Curated email/message template library | CX Architect | P2 | Deferred from Sprint 2 |
 | Performance optimization | Tech Lead | P2 | Pending |
+| Mesh-inspired visual overhaul (all step components + wizard sections) | Frontend Dev | P0 | Done |
+| Wire all collected data into Claude prompts (6 missing fields) | AI Engineer | P0 | Done |
+| QA Gatekeeper agent skill | QA Agent | P0 | Done |
 | Full regression testing | QA Agent | P2 | Pending |
 
 ### Sprint Notes
@@ -89,6 +92,23 @@ Track sprint progress and status.
   **(5) AI Prompt v4**: Updated `journey-prompt.ts` — Claude now tags `addressesPainPoints` (exact pain point keys) and `competitorGap`/`competitorContext` on moments and insights. Tech stack expanded from 6→9 categories with 4-7 recommendations.
   Files: types updated in `journey-prompt.ts`, new `evidence-matching.ts`, new `evidence/evidence-wall.tsx`, modified `confrontation/page.tsx`, `journey/page.tsx`, `journey-map.tsx`, `journey-stage-card.tsx`, `playbook/page.tsx`, `dashboard/page.tsx`. Build passes clean. TypeScript passes clean.
 - 2026-02-21: **Next session should start with:** Live test full flow with existing sessionStorage data to verify Evidence Wall + annotations render correctly with fuzzy matching. Then generate a NEW journey to test AI-tagged pain point fields. Then external brand expert visual review. Then playbook persistence (Phase 4). Then journey health scoring (P1).
+- 2026-02-21: **Brand Polish Sprint C: Onboarding UX Overhaul + Color Shift + Live Sidebar.** Addressed 6 founder feedback items + Mesh ROI Calculator inspiration:
+  **(1) JSON Parse Error Fix:** Both `generate-journey.ts` and `generate-recommendations.ts` now strip preamble text before `{` and trailing text after last `}`. Handles Claude outputting "Here is the JSON..." before the actual object.
+  **(2) Color Scheme Shift:** Moved from cold indigo/purple (hue 275) to warm teal (hue 195) with amber accents. More professional, warmer feel for a CX platform. Updated both light and dark mode.
+  **(3) Enrichment Card:** "What I found about [company]" card made significantly larger — border-2, bigger icon, bold title, text-base body, warm gradient background.
+  **(4) Scroll-to-Top:** Replaced unreliable `window.scrollTo` with `useRef` + `useEffect` that fires `scrollIntoView` on step change.
+  **(5) "What You'll Get" Section:** Larger icons (w-12 h-12, text-2xl emojis), colorful gradient backgrounds per card, bolder text.
+  **(6) Generating State:** All text bumped up — insight quotes text-sm, phase titles text-base font-bold, progress bar h-3, "Did you know" card now warm amber.
+  **(7) Live Sidebar During Onboarding (Mesh-inspired):** Removed `/onboarding` from sidebar exclusion list. Sidebar now shows "Your information will appear here as you answer questions" → fills live with company name, logo, vertical, maturity, competitors, pain points, goals. Nav header shows logo-only during onboarding (no nav links). Enhanced sidebar building view with card-based data display (icon + label + value pattern).
+  **(8) Step Headers:** All 8 step components bumped from text-xl to text-2xl.
+  Build passes clean.
+- 2026-02-21: **CX Today Article — Market Validation.** KPMG/PwC/Deloitte research validates CX Mate's core thesis: "orchestrate, don't patch." Key stats: 66% of B2B CX leaders cite data access as #1 obstacle, 58% already using autonomous AI in CX, trusted orgs outperform 4x. Implications: CX Mate helps startups build connected CX foundations before they accumulate legacy fragmentation. Article logged in learning-log.
+- 2026-02-21: **Mesh-Inspired Visual Overhaul + Prompt Wiring + QA Gatekeeper.** Three major deliverables:
+  **(1) Mesh-Inspired Card Hierarchy:** Applied consistent visual system to ALL 9 step components + 3 wizard sections (IntroHero, StepGenerate, GeneratingExperience). Pattern: `rounded-2xl border border-border/60 bg-white p-6 shadow-sm` for containers, `border-2 rounded-xl` for interactive options, `shadow-md ring-1 ring-primary/20` for selected states. Dark sidebar theme (oklch hue 240 navy). Bold DataCard pattern in sidebar. Chat bubble gradient upgrade.
+  **(2) Full Prompt Wiring:** Audited all 33 OnboardingData fields — found 6 fields collected but never sent to Claude (userName, userRole, currentTools, existingJourneyComponents, existingJourneyDescription, customGoal). Added "Who We're Talking To" section (role-based personalization: CEO→strategic, Head of CS→tactical), "Existing CX Processes" section (BUILD ON instruction), currentTools (stack-building guidance) to both journey-prompt.ts and recommendation-prompt.ts. Added Rule 8: mandatory AI tool recommendations (10 specific categories — chatbots, analytics, CS platforms, etc.).
+  **(3) QA Gatekeeper Agent:** New agent skill (`A-agents/qa-gatekeeper-agent.md`) for market-readiness reviews. Runs 5 audit categories: Data Completeness (input→prompt + output→UI pipelines), Flow Integrity (all paths, error handling), UX Coherence (consistent design, no placeholders), AI Quality (JSON repair, prompt completeness), Production Readiness (build, types, security). Outputs pass/fail scorecard with specific file references and fixes. Includes "Known Accepted Gaps" section for intentional deferred items.
+  Build passes clean.
+- 2026-02-21: **Next session should start with:** Full end-to-end QA with the gatekeeper agent. Then playbook persistence (Phase 4). Then journey health scoring (P1). Then Sprint 4 planning (Stripe, landing page, analytics).
 
 ### Sprint 4: Beta Launch (Weeks 7-8)
 - Stripe integration
