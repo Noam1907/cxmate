@@ -276,18 +276,18 @@ export default function DashboardPage() {
     <main className="min-h-screen bg-gradient-to-b from-background to-white">
       <div className="max-w-4xl mx-auto px-6 py-12">
         {/* Header */}
-        <div className="space-y-2 mb-10">
+        <div className="space-y-2 mb-12">
           <p className="text-sm font-medium text-primary uppercase tracking-widest">
             Dashboard
           </p>
-          <h1 className="text-3xl font-bold tracking-tight">{companyName}</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-4xl font-bold tracking-tight">{companyName}</h1>
+          <p className="text-lg text-muted-foreground">
             Your CX overview at a glance.
           </p>
         </div>
 
         {/* Journey Stats */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-10">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-12">
           <StatCard label="Journey stages" value={journeyStats.totalStages} />
           <StatCard
             label="Meaningful moments"
@@ -307,10 +307,10 @@ export default function DashboardPage() {
 
         {/* Playbook Progress */}
         {playbookStats ? (
-          <Card className="mb-10 rounded-2xl">
+          <Card className="mb-12 rounded-2xl">
             <CardHeader>
               <div className="flex items-center justify-between">
-                <CardTitle className="text-lg">Playbook Progress</CardTitle>
+                <CardTitle className="text-xl">Playbook Progress</CardTitle>
                 <Badge
                   variant={playbookStats.pct === 100 ? "default" : "secondary"}
                   className="text-xs"
@@ -358,9 +358,9 @@ export default function DashboardPage() {
             </CardContent>
           </Card>
         ) : (
-          <Card className="mb-10 border-dashed rounded-2xl">
+          <Card className="mb-12 border-dashed rounded-2xl">
             <CardHeader>
-              <CardTitle className="text-lg">Playbook</CardTitle>
+              <CardTitle className="text-xl">Playbook</CardTitle>
               <CardDescription>
                 Generate your playbook to get step-by-step actions, templates,
                 and timelines for every moment in your journey.
@@ -376,9 +376,9 @@ export default function DashboardPage() {
 
         {/* Top Risks */}
         {topInsights.length > 0 && (
-          <Card className="mb-10 border-red-200 rounded-2xl">
+          <Card className="mb-12 border-red-200 rounded-2xl">
             <CardHeader>
-              <CardTitle className="text-lg text-red-900">
+              <CardTitle className="text-xl text-red-900">
                 Top Risks to Address
               </CardTitle>
               <CardDescription>

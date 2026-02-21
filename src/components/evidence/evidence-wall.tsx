@@ -13,9 +13,9 @@ function PainPointCard({ mapping }: { mapping: PainPointMapping }) {
   const isMatched = totalMatches > 0;
 
   const categoryColors: Record<string, string> = {
-    retention: "bg-red-50 text-red-700 border-red-200",
-    acquisition: "bg-blue-50 text-blue-700 border-blue-200",
-    operations: "bg-amber-50 text-amber-700 border-amber-200",
+    retention: "bg-violet-50 text-violet-700 border-violet-200",
+    acquisition: "bg-violet-50 text-violet-600 border-violet-200",
+    operations: "bg-violet-50 text-violet-600 border-violet-200",
   };
 
   return (
@@ -191,10 +191,10 @@ export function EvidenceWall({
   }
 
   return (
-    <div className="mb-10 space-y-6">
+    <div className="space-y-8 bg-gradient-to-b from-violet-50/30 to-transparent rounded-2xl p-6">
       {/* Section header */}
       <div>
-        <h2 className="text-xl font-bold mb-1">What we know about {companyName}</h2>
+        <h2 className="text-2xl font-bold mb-1">What we know about {companyName}</h2>
         <p className="text-sm text-muted-foreground">
           Here&apos;s how your input shaped your journey analysis
         </p>
@@ -238,7 +238,7 @@ export function EvidenceWall({
               }}
             />
           </div>
-          <div className="grid gap-2 sm:grid-cols-2">
+          <div className="grid gap-4 sm:grid-cols-2">
             {painPointMappings.map((mapping) => (
               <PainPointCard key={mapping.painPointKey} mapping={mapping} />
             ))}
@@ -257,7 +257,7 @@ export function EvidenceWall({
               </span>
             )}
           </div>
-          <div className="grid gap-2 sm:grid-cols-2">
+          <div className="grid gap-4 sm:grid-cols-2">
             {competitorMappings.map((mapping) => (
               <CompetitorCard key={mapping.competitor} mapping={mapping} />
             ))}

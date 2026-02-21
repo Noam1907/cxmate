@@ -128,10 +128,12 @@ function FadeIn({
   children,
   delay,
   className = "",
+  slow = false,
 }: {
   children: React.ReactNode;
   delay: number;
   className?: string;
+  slow?: boolean;
 }) {
   const [visible, setVisible] = useState(false);
   useEffect(() => {
@@ -141,7 +143,7 @@ function FadeIn({
 
   return (
     <div
-      className={`transition-all duration-700 ${
+      className={`transition-all ${slow ? "duration-1000" : "duration-700"} ${
         visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
       } ${className}`}
     >
@@ -164,9 +166,9 @@ function InsightRow({
   const [expanded, setExpanded] = useState(false);
 
   const likelihoodStyles = {
-    high: "border-red-300 bg-red-50",
-    medium: "border-orange-300 bg-orange-50",
-    low: "border-yellow-300 bg-yellow-50",
+    high: "border-red-300 bg-red-50 border-l-4 border-l-red-400",
+    medium: "border-orange-300 bg-orange-50 border-l-4 border-l-amber-400",
+    low: "border-yellow-300 bg-yellow-50 border-l-4 border-l-blue-400",
   };
 
   const likelihoodBadge = {
@@ -176,7 +178,7 @@ function InsightRow({
   };
 
   return (
-    <FadeIn delay={800 + index * 200}>
+    <FadeIn delay={1000 + index * 250}>
       <div
         className={`rounded-xl border-2 p-5 cursor-pointer transition-all hover:shadow-md ${
           likelihoodStyles[insight.likelihood]
@@ -319,15 +321,18 @@ function ImpactCard({
 // ============================================
 
 const TECH_CATEGORY_COLORS: Record<string, string> = {
-  crm: "bg-blue-100 text-blue-800 border-blue-200",
-  marketing: "bg-purple-100 text-purple-800 border-purple-200",
-  support: "bg-amber-100 text-amber-800 border-amber-200",
-  analytics: "bg-cyan-100 text-cyan-800 border-cyan-200",
-  cs_platform: "bg-emerald-100 text-emerald-800 border-emerald-200",
-  communication: "bg-slate-100 text-slate-800 border-slate-200",
-  bi: "bg-indigo-100 text-indigo-800 border-indigo-200",
-  survey: "bg-pink-100 text-pink-800 border-pink-200",
-  data_infrastructure: "bg-violet-100 text-violet-800 border-violet-200",
+  // Core tools (primary indigo family)
+  crm: "bg-indigo-100 text-indigo-800 border-indigo-200",
+  marketing: "bg-indigo-100 text-indigo-800 border-indigo-200",
+  support: "bg-indigo-100 text-indigo-800 border-indigo-200",
+  communication: "bg-indigo-100 text-indigo-800 border-indigo-200",
+  cs_platform: "bg-indigo-100 text-indigo-800 border-indigo-200",
+  // Analytics & intelligence (emerald family)
+  analytics: "bg-emerald-100 text-emerald-800 border-emerald-200",
+  bi: "bg-emerald-100 text-emerald-800 border-emerald-200",
+  survey: "bg-emerald-100 text-emerald-800 border-emerald-200",
+  // Infrastructure (slate family)
+  data_infrastructure: "bg-slate-100 text-slate-800 border-slate-200",
 };
 
 // ============================================
@@ -406,7 +411,7 @@ function ConfrontationContent() {
 
   useEffect(() => {
     if (!loading && journey) {
-      const timer = setTimeout(() => setHeaderVisible(true), 200);
+      const timer = setTimeout(() => setHeaderVisible(true), 300);
       return () => clearTimeout(timer);
     }
   }, [loading, journey]);
@@ -461,10 +466,10 @@ function ConfrontationContent() {
       <div className="max-w-3xl mx-auto px-6 py-12">
         {/* Header — dramatic reveal */}
         <div
-          className={`text-center space-y-4 mb-12 transition-all duration-1000 ${
+          className={`text-center space-y-4 mb-12 transition-all duration-[1200ms] ${
             headerVisible
               ? "opacity-100 translate-y-0"
-              : "opacity-0 translate-y-6"
+              : "opacity-0 translate-y-8"
           }`}
         >
           <div className="flex items-center justify-center gap-2">
@@ -486,7 +491,7 @@ function ConfrontationContent() {
         </div>
 
         {/* Quick stats bar */}
-        <FadeIn delay={400} className="mb-10">
+        <FadeIn delay={500} className="mb-12">
           <div className="grid grid-cols-3 gap-4">
             <div className="text-center rounded-xl border bg-white p-4">
               <div className="text-3xl font-bold">
@@ -520,7 +525,7 @@ function ConfrontationContent() {
 
         {/* Evidence Wall — what we know about you */}
         {evidenceMap && (
-          <FadeIn delay={500} className="mb-0">
+          <FadeIn delay={700} className="mb-12" slow>
             <EvidenceWall
               evidenceMap={evidenceMap}
               companyName={companyName}
@@ -531,7 +536,7 @@ function ConfrontationContent() {
 
         {/* Maturity Assessment */}
         {journey.maturityAssessment && (
-          <FadeIn delay={600} className="mb-10">
+          <FadeIn delay={900} className="mb-12">
             <Card className="border-slate-200 bg-gradient-to-br from-slate-50 to-white">
               <CardHeader>
                 <CardTitle className="text-base">
@@ -549,10 +554,10 @@ function ConfrontationContent() {
 
         {/* Confrontation Insights — the core "aha" section */}
         {insights.length > 0 && (
-          <div className="mb-10">
-            <FadeIn delay={700}>
+          <div className="mb-12">
+            <FadeIn delay={900}>
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-bold">
+                <h2 className="text-2xl font-bold">
                   {config.insightsHeading(hasExistingCustomers)}
                 </h2>
                 {highRiskCount > 0 && (
@@ -574,8 +579,8 @@ function ConfrontationContent() {
         {/* Impact Projections — the "what you could gain" section */}
         {projections.length > 0 && (
           <div className="mb-12">
-            <FadeIn delay={1500}>
-              <h2 className="text-xl font-bold mb-4">
+            <FadeIn delay={1700}>
+              <h2 className="text-2xl font-bold mb-4">
                 {config.impactHeading(hasExistingCustomers)}
               </h2>
             </FadeIn>
@@ -591,8 +596,8 @@ function ConfrontationContent() {
         {/* Tech Stack Recommendations */}
         {journey.techStackRecommendations && journey.techStackRecommendations.length > 0 && (
           <div className="mb-12">
-            <FadeIn delay={1900}>
-              <h2 className="text-xl font-bold mb-4">
+            <FadeIn delay={2100}>
+              <h2 className="text-2xl font-bold mb-4">
                 Recommended tech stack
               </h2>
               <p className="text-sm text-muted-foreground mb-4">
@@ -601,7 +606,7 @@ function ConfrontationContent() {
             </FadeIn>
             <div className="grid gap-3">
               {journey.techStackRecommendations.map((rec, i) => (
-                <FadeIn key={i} delay={2000 + i * 100}>
+                <FadeIn key={i} delay={2200 + i * 100}>
                   <div className="rounded-xl border bg-white p-4 space-y-2">
                     <div className="flex items-center gap-2">
                       <span className={`text-xs px-2 py-0.5 rounded-full border font-medium ${
@@ -630,7 +635,7 @@ function ConfrontationContent() {
 
         {/* Assumptions & Methodology */}
         {journey.assumptions && journey.assumptions.length > 0 && (
-          <FadeIn delay={2100} className="mb-10">
+          <FadeIn delay={2300} className="mb-12">
             <details className="group">
               <summary className="cursor-pointer text-sm font-medium text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1">
                 <span className="text-xs group-open:rotate-90 transition-transform">▶</span>
@@ -655,7 +660,7 @@ function ConfrontationContent() {
         )}
 
         {/* CTA — proceed to full journey */}
-        <FadeIn delay={2200} className="text-center space-y-4">
+        <FadeIn delay={2400} className="text-center space-y-4">
           <div className="border-t pt-8">
             <h3 className="text-lg font-semibold mb-2">
               Ready to see the full picture?

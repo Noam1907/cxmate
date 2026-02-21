@@ -346,7 +346,7 @@ function StageSection({
             >
               {stagePlaybook.stageType}
             </Badge>
-            <CardTitle className="text-lg">{stagePlaybook.stageName}</CardTitle>
+            <CardTitle className="text-xl">{stagePlaybook.stageName}</CardTitle>
           </div>
           <span className="text-xs text-muted-foreground">
             {doneCount}/{total} done
@@ -533,11 +533,11 @@ export default function PlaybookPage() {
     <main className="min-h-screen bg-gradient-to-b from-background to-white">
       <div className="max-w-3xl mx-auto px-6 py-12">
         {/* Header */}
-        <div className="text-center space-y-3 mb-8">
+        <div className="text-center space-y-3 mb-12">
           <p className="text-sm font-medium text-primary uppercase tracking-widest">
             CX Playbook
           </p>
-          <h1 className="text-3xl font-bold">{playbook.companyName}</h1>
+          <h1 className="text-4xl font-bold tracking-tight">{playbook.companyName}</h1>
           <div className="flex items-center justify-center gap-3">
             <Badge variant="outline">
               {playbook.totalRecommendations} actions
@@ -550,7 +550,7 @@ export default function PlaybookPage() {
         </div>
 
         {/* Progress bar */}
-        <div className="mb-8">
+        <div className="mb-12">
           <div className="flex justify-between text-xs text-muted-foreground mb-1.5">
             <span>Progress</span>
             <span>
@@ -569,7 +569,7 @@ export default function PlaybookPage() {
 
         {/* Week One Checklist */}
         {playbook.weekOneChecklist && playbook.weekOneChecklist.length > 0 && (
-          <Card className="mb-8 border-amber-200 bg-gradient-to-br from-amber-50/50 to-transparent">
+          <Card className="mb-12 border-amber-200 bg-gradient-to-br from-amber-50/50 to-transparent">
             <CardHeader>
               <CardTitle className="text-base text-amber-900">
                 This week&apos;s checklist
@@ -616,7 +616,7 @@ export default function PlaybookPage() {
 
         {/* Quick Wins view */}
         {filter === "quick_wins" && playbook.quickWins && (
-          <Card className="mb-6 border-emerald-200 bg-gradient-to-br from-emerald-50/50 to-transparent">
+          <Card className="mb-12 border-emerald-200 bg-gradient-to-br from-emerald-50/50 to-transparent">
             <CardHeader>
               <CardTitle className="text-lg text-emerald-900">
                 Quick Wins

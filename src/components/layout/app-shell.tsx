@@ -81,7 +81,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2.5">
                   <div className="w-8 h-8 rounded-lg bg-sidebar-primary/10 flex items-center justify-center">
-                    <span className="text-[10px] font-bold text-sidebar-primary">
+                    <span className="text-sm font-bold text-sidebar-primary">
                       CX
                     </span>
                   </div>

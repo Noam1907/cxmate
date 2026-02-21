@@ -243,8 +243,8 @@ export default function Home() {
       <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-border/60">
         <div className="max-w-5xl mx-auto px-6 flex items-center justify-between h-14">
           <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center">
-              <span className="text-xs font-bold text-primary">CX</span>
+            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+              <span className="text-sm font-bold text-primary">CX</span>
             </div>
             <span className="text-sm font-bold tracking-tight text-foreground">CX Mate</span>
           </div>
