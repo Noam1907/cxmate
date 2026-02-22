@@ -43,10 +43,10 @@ export function NavHeader() {
     <header className="border-b border-white/8 bg-sidebar sticky top-0 z-50">
       <div className="max-w-full px-6 flex items-center justify-between h-14">
         <Link href={isOnboarding ? "/" : "/dashboard"} className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center">
-            <span className="text-sm font-bold text-white/80">CX</span>
+          <div className="w-8 h-8 rounded-lg bg-sidebar-primary flex items-center justify-center">
+            <span className="text-sm font-bold text-sidebar-primary-foreground">CX</span>
           </div>
-          <span className="text-sm font-bold tracking-tight text-white/80">CX Mate</span>
+          <span className="text-sm font-bold tracking-tight text-white">CX Mate</span>
         </Link>
         {!isOnboarding && (
           <nav className="flex items-center gap-1">
