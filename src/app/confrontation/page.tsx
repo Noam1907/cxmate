@@ -120,9 +120,11 @@ function HeroImpactCard({ projections, delay }: { projections: ImpactProjection[
 
   return (
     <div className={`rounded-2xl bg-slate-900 text-white p-8 transition-all duration-700 ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
-      <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-2">Estimated Annual CX Impact</p>
+      <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-2">Revenue at risk — annually</p>
       <div className="text-5xl font-bold tracking-tight">{lo} – {hi}</div>
-      <p className="text-sm text-slate-500 mt-1">per year · based on industry benchmarks</p>
+      <p className="text-sm text-slate-500 mt-2 leading-relaxed max-w-md">
+        Estimated value leaving through CX gaps — based on your deal size, customer count, and industry benchmarks for companies at your stage.
+      </p>
     </div>
   );
 }
@@ -160,7 +162,10 @@ function ImpactBreakdown({ projections, delay }: { projections: ImpactProjection
   return (
     <FadeIn delay={delay}>
       <div className="rounded-xl border bg-white p-6">
-        <h3 className="text-sm font-semibold text-slate-900 mb-5">Impact breakdown</h3>
+        <div className="mb-5">
+          <h3 className="text-sm font-semibold text-slate-900">Where the risk is concentrated</h3>
+          <p className="text-xs text-slate-400 mt-1">Each area is estimated from your deal size × churn rate × industry benchmarks</p>
+        </div>
         <div className="space-y-5">
           {parsed.map((item, i) => {
             const pct = max > 0 ? (item.value / max) * 100 : 0;
@@ -175,7 +180,7 @@ function ImpactBreakdown({ projections, delay }: { projections: ImpactProjection
                 </div>
                 <div className="flex items-center justify-between mt-1.5">
                   <span className="text-xs text-slate-400">{item.timeToRealize}</span>
-                  <span className="text-xs text-slate-400">{item.effort} effort · {item.dataSource === "user_provided" ? "your data" : "benchmark"}</span>
+                  <span className="text-xs text-slate-400">{item.effort} effort · {item.dataSource === "user_provided" ? "your data" : "industry benchmark"}</span>
                 </div>
               </div>
             );
@@ -253,34 +258,29 @@ function AssumptionsSection({ assumptions, projections, delay }: { assumptions: 
 
   return (
     <FadeIn delay={delay}>
-      <div className="rounded-xl border bg-white p-5">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-sm font-medium text-slate-800">How we calculated this</p>
-            <p className="text-xs text-slate-400 mt-0.5">Review data sources and assumptions</p>
-          </div>
-          <button
-            onClick={() => setOpen(!open)}
-            className="text-xs px-3 py-1.5 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 transition-colors"
-          >
-            {open ? "Hide" : "Show assumptions"}
-          </button>
-        </div>
+      <div className="rounded-xl border border-slate-200 bg-slate-50/60 p-5">
+        <button
+          onClick={() => setOpen(!open)}
+          className="w-full flex items-center justify-between text-left"
+        >
+          <span className="text-xs font-medium text-slate-500">How we calculated these numbers</span>
+          <span className="text-xs text-slate-400">{open ? "Hide ↑" : "Show ↓"}</span>
+        </button>
         {open && (
-          <div className="mt-4 pt-4 border-t space-y-4">
+          <div className="mt-4 pt-4 border-t border-slate-200 space-y-3">
             {projections.filter((p) => p.calculation).map((p, i) => (
-              <div key={i} className="rounded-lg bg-slate-50 p-3">
-                <p className="text-xs font-medium text-slate-600 mb-1">{p.area}</p>
-                <p className="text-xs text-slate-500 font-mono">{p.calculation}</p>
+              <div key={i}>
+                <p className="text-xs font-medium text-slate-600 mb-0.5">{p.area}</p>
+                <p className="text-xs text-slate-400 font-mono">{p.calculation}</p>
               </div>
             ))}
             {assumptions.map((a, i) => (
-              <p key={i} className="text-xs text-slate-500 flex gap-2">
-                <span className="text-slate-300 shrink-0">·</span>
+              <p key={i} className="text-xs text-slate-400 flex gap-2">
+                <span className="shrink-0">·</span>
                 <span>{a}</span>
               </p>
             ))}
-            <p className="text-xs text-slate-400 italic pt-2 border-t">Projections are directional estimates, not guarantees.</p>
+            <p className="text-xs text-slate-400 italic pt-2 border-t border-slate-200">These are directional estimates — not guarantees. They exist to help you prioritize.</p>
           </div>
         )}
       </div>
@@ -442,11 +442,12 @@ function ConfrontationContent() {
         {insights.length > 0 && (
           <div className="mb-12">
             <FadeIn delay={1700}>
-              <div className="flex items-center justify-between mb-4">
+              <div className="mb-4">
                 <h2 className="text-xl font-bold text-slate-900">{config.insightsHeading(hasExistingCustomers)}</h2>
-                {highRiskCount > 0 && (
-                  <span className="text-xs font-medium text-slate-500">{highRiskCount} high priority</span>
-                )}
+                <p className="text-sm text-slate-400 mt-1">
+                  Patterns we identified in your journey — click any to see the action plan
+                  {highRiskCount > 0 && <span className="ml-2 text-amber-600 font-medium">· {highRiskCount} high priority</span>}
+                </p>
               </div>
             </FadeIn>
             <div className="space-y-2">
@@ -459,27 +460,26 @@ function ConfrontationContent() {
         {journey.techStackRecommendations && journey.techStackRecommendations.length > 0 && (
           <div className="mb-12">
             <FadeIn delay={2200}>
-              <h2 className="text-xl font-bold text-slate-900 mb-1">Recommended tech stack</h2>
-              <p className="text-sm text-slate-400 mb-5">Tools to connect for maximum CX impact at your stage</p>
+              <h2 className="text-xl font-bold text-slate-900 mb-1">Tools to consider</h2>
+              <p className="text-sm text-slate-400 mb-5">Recommended based on your current stage and gaps</p>
             </FadeIn>
-            <div className="space-y-2">
-              {journey.techStackRecommendations.map((rec, i) => (
-                <FadeIn key={i} delay={2400 + i * 150}>
-                  <div className="rounded-xl border bg-white p-4">
-                    <div className="flex items-start justify-between gap-4 mb-2">
+            <FadeIn delay={2400}>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {journey.techStackRecommendations.map((rec, i) => (
+                  <div key={i} className="rounded-xl border bg-white p-4 space-y-2">
+                    <div className="flex items-center justify-between">
                       <span className="text-xs font-semibold text-slate-400 uppercase tracking-wide">{rec.categoryLabel}</span>
-                      <div className="flex flex-wrap gap-1.5 justify-end">
-                        {rec.tools.map((tool, j) => (
-                          <span key={j} className="text-xs font-medium bg-slate-100 text-slate-700 px-2 py-0.5 rounded-md">{tool}</span>
-                        ))}
-                      </div>
                     </div>
-                    <p className="text-sm text-slate-600">{rec.whyNow}</p>
-                    <p className="text-xs text-slate-400 mt-1">Connect with: {rec.connectWith}</p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {rec.tools.map((tool, j) => (
+                        <span key={j} className="text-xs font-medium bg-primary/8 text-primary px-2 py-0.5 rounded-md">{tool}</span>
+                      ))}
+                    </div>
+                    <p className="text-xs text-slate-500 leading-relaxed">{rec.whyNow}</p>
                   </div>
-                </FadeIn>
-              ))}
-            </div>
+                ))}
+              </div>
+            </FadeIn>
           </div>
         )}
 

@@ -59,8 +59,8 @@ export function NavHeader() {
                   href={item.href}
                   className={`text-xs font-medium px-4 py-2 rounded-lg transition-all duration-200 ${
                     isActive
-                      ? "bg-white/15 text-white"
-                      : "text-white/40 hover:text-white/70 hover:bg-white/8"
+                      ? "bg-white/20 text-white"
+                      : "text-white/65 hover:text-white hover:bg-white/10"
                   }`}
                 >
                   {item.label}

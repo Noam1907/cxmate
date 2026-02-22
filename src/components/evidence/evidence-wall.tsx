@@ -39,12 +39,13 @@ function PainPointCard({ mapping }: { mapping: PainPointMapping }) {
           </div>
           {isMatched ? (
             <p className="text-xs text-violet-600 mt-1">
-              Addressed in {mapping.matchedMoments.length} moment{mapping.matchedMoments.length !== 1 ? "s" : ""}
-              {mapping.matchedInsights.length > 0 &&
-                ` + ${mapping.matchedInsights.length} insight${mapping.matchedInsights.length !== 1 ? "s" : ""}`}
+              Found in your journey map
+              {mapping.matchedMoments.length > 0 && ` — ${mapping.matchedMoments.length} touchpoint${mapping.matchedMoments.length !== 1 ? "s" : ""}`}
+              {mapping.matchedInsights.length > 0 && `, ${mapping.matchedInsights.length} action${mapping.matchedInsights.length !== 1 ? "s" : ""} recommended`}
+              {" ↓ tap to see"}
             </p>
           ) : (
-            <p className="text-xs text-slate-400 mt-1">No direct journey match found</p>
+            <p className="text-xs text-slate-400 mt-1">Not directly mapped — mention in your biggest challenge for better coverage</p>
           )}
         </div>
         {isMatched && (
@@ -211,10 +212,9 @@ export function EvidenceWall({
           </p>
           {biggestChallengeMapping.relatedMoments.length > 0 && (
             <p className="text-xs text-violet-600 mt-2">
-              Addressed in {biggestChallengeMapping.relatedMoments.length} journey moment
-              {biggestChallengeMapping.relatedMoments.length !== 1 ? "s" : ""}
+              This is reflected in {biggestChallengeMapping.relatedMoments.length} touchpoint{biggestChallengeMapping.relatedMoments.length !== 1 ? "s" : ""} in your journey map
               {biggestChallengeMapping.relatedInsights.length > 0 &&
-                ` and ${biggestChallengeMapping.relatedInsights.length} insight${biggestChallengeMapping.relatedInsights.length !== 1 ? "s" : ""}`}
+                ` and ${biggestChallengeMapping.relatedInsights.length} prioritized action${biggestChallengeMapping.relatedInsights.length !== 1 ? "s" : ""} in your playbook`}
             </p>
           )}
         </div>
@@ -246,21 +246,21 @@ export function EvidenceWall({
         </div>
       )}
 
-      {/* Competitive intelligence */}
-      {hasCompetitors && (
+      {/* Competitive intelligence — only show if actual insights exist */}
+      {hasCompetitors && coverage.competitorMentions > 0 && (
         <div>
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-sm font-semibold">Competitive intelligence</h3>
-            {coverage.competitorMentions > 0 && (
-              <span className="text-xs text-orange-600">
-                {coverage.competitorMentions} competitive insight{coverage.competitorMentions !== 1 ? "s" : ""}
-              </span>
-            )}
+            <span className="text-xs text-orange-600">
+              {coverage.competitorMentions} insight{coverage.competitorMentions !== 1 ? "s" : ""}
+            </span>
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
-            {competitorMappings.map((mapping) => (
-              <CompetitorCard key={mapping.competitor} mapping={mapping} />
-            ))}
+            {competitorMappings
+              .filter((m) => m.mentionedInInsights.length > 0 || m.differentiationMoments.length > 0)
+              .map((mapping) => (
+                <CompetitorCard key={mapping.competitor} mapping={mapping} />
+              ))}
           </div>
         </div>
       )}
