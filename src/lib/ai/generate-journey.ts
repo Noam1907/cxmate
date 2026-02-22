@@ -21,7 +21,7 @@ function anthropicRequest(apiKey: string, body: string): Promise<string> {
         headers: {
           "Content-Type": "application/json",
           "Content-Length": Buffer.byteLength(body),
-          "x-api-key": apiKey,
+          "x-api-key": apiKey.trim(),
           "anthropic-version": "2023-06-01",
         },
         timeout: 9 * 60 * 1000, // 9 minute socket timeout
