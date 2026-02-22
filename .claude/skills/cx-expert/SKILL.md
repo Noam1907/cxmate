@@ -3,13 +3,14 @@ name: cx-expert
 description: >
   Customer Experience Expert for CX Mate. Invoke when reviewing AI-generated journey quality,
   evaluating CX methodology, auditing confrontation insights, assessing recommendation relevance,
-  benchmarking against industry standards, or answering CX strategy questions. Use when someone asks
-  "is this journey good?", "review the CX output", "what's the right CX approach for...", or
-  "does this follow CX best practices?". This skill provides deep domain expertise in B2B customer
-  experience — journey mapping, meaningful moments, buyer psychology, lifecycle science, and
-  measurement frameworks.
+  benchmarking against industry standards, answering CX strategy questions, or BUILDING a customer
+  journey from scratch. Use when someone asks "is this journey good?", "review the CX output",
+  "what's the right CX approach for...", "does this follow CX best practices?", "build a journey
+  for...", "design the journey for...", or "map the CX journey for [company/vertical/use case]".
+  This skill provides deep domain expertise in B2B customer experience — journey mapping, meaningful
+  moments, buyer psychology, lifecycle science, and measurement frameworks.
 allowed-tools: Read, Glob, Grep
-argument-hint: "[journey output, CX question, or audit request]"
+argument-hint: "[journey output, CX question, audit request, or company profile to build journey for]"
 ---
 
 # Customer Experience Expert (CCXP)
@@ -283,6 +284,127 @@ Every recommendation CX Mate generates should be evaluated through an AI-first l
 - Flag which playbook actions can be automated vs require human touch
 - For each recommendation: specify whether it's "AI can do this" / "AI assists, human executes" / "Human only"
 - The goal: maximize CX impact while minimizing human effort. The founder has 100 things to do — CX Mate should help them do 80% of CX with 20% of the effort.
+
+## 11. Journey Build Skill
+
+When asked to **build a customer journey** (not just review one), follow this structured protocol. This skill is invoked when someone asks "build a journey for...", "design the journey for...", "what would the journey look like for...", or "map the CX journey for [company/vertical/use case]."
+
+### Step 1 — Profile the Company
+
+Before touching stages, answer these questions from available context:
+
+| Question | Why It Matters |
+|----------|---------------|
+| Do they have existing customers? | Pre-customer = sales-only journey. Post-customer = full lifecycle. |
+| What's their maturity level? | Pre-launch → First Customers → Growing → Scaling. Different moments, different complexity. |
+| What vertical are they in? | SaaS, Professional Services, Marketplace, FinTech — each has vertical-specific moments. |
+| What are their stated pains? | Every journey must address their actual stated pain points. |
+| Who is their buyer vs. user? | B2B has multi-stakeholder buying — don't forget the internal champion and economic buyer. |
+| What are their top competitors? | Competitive moments (evaluation, renewal) need competitor-aware framing. |
+
+### Step 2 — Select the Journey Type
+
+| Journey Type | When to Use | Stages Included |
+|-------------|-------------|-----------------|
+| **Sales-only** | Pre-customer, Pre-launch | Awareness → Evaluation → Purchase |
+| **Post-sale** | Has customers, wants CS focus | Onboarding → Adoption → Retention → Advocacy |
+| **Full lifecycle** | Has customers, wants complete picture | All 7 stages |
+
+### Step 3 — Build Stages
+
+For each stage, define:
+- **Stage name** — Use the company's language, not generic labels
+- **Goal** — What does the company need to achieve in this stage?
+- **Customer emotional state** — What is the customer actually feeling? (Skeptical? Excited? Confused? Tired?)
+- **Critical question** — The one question the customer is asking at this stage
+
+### Step 4 — Map Meaningful Moments
+
+For each stage, identify 5-8 meaningful moments. Each moment must have:
+
+```
+Moment name: [Specific, named interaction — not "send email"]
+Type: moment_of_truth | moment_of_pain | moment_of_delight | moment_of_risk
+Severity: critical | high | medium | low
+Emotional state: [What the customer feels here]
+CX gap: [What companies typically do wrong here]
+```
+
+**Moment quality tests:**
+- Is it specific enough to assign to a role? ("CS Manager calls within 24h" not "provide support")
+- Does it reference their actual vertical/product context?
+- Does it address any of their stated pain points?
+- Could a founder recognize this from their own experience?
+
+### Step 5 — Identify the Confrontation Insights
+
+For each journey, extract 4-6 patterns that represent the highest-risk failures. These become the Confrontation Report.
+
+Each insight needs:
+- **Pattern name**: Short, punchy, memorable ("The Post-Sale Silence", "The Feature Trap")
+- **Likelihood**: high | medium | low (for this specific company)
+- **Business impact**: Revenue at risk in real numbers
+- **Companion advice**: What the CX expert would say if sitting across from the founder
+- **Immediate action**: One thing to do this week
+
+### Step 6 — Calculate Impact Projections
+
+For each major risk area, project annual impact:
+
+```
+Formula: (Revenue at risk) × (Probability of loss) × (Recovery rate if fixed)
+Example: $500K ARR × 15% churn × 60% reduction if fixed = $45K/year saved
+```
+
+Always show your math. Always use conservative estimates. Always express as a range (70-130% of point estimate).
+
+### Step 7 — Validate the Journey
+
+Before finalizing, run these quality checks:
+
+- [ ] Does every stage have at least one "critical" or "high" severity moment?
+- [ ] Are there 0-2 generic moments? (Flag any "generic SaaS boilerplate")
+- [ ] Is the emotional arc realistic? (Not all positive, not all negative)
+- [ ] Do the confrontation insights reference specific company context (vertical, size, maturity)?
+- [ ] Can a founder read the journey and say "yes, that's exactly us"?
+- [ ] Are all stated pain points addressed somewhere in the journey?
+- [ ] Is there at least one moment of delight? (Not everything should be risk-focused)
+
+### Journey Build Output Format
+
+When delivering a built journey, structure it as:
+
+```
+## [Company Name] Customer Journey
+**Type**: [Sales-only / Post-sale / Full lifecycle]
+**Maturity**: [Level]
+**Key insight**: [One sentence — the most important CX truth about this company]
+
+### Stage 1: [Stage Name]
+**Goal**: ...
+**Customer feeling**: ...
+**Critical question**: ...
+
+**Moments:**
+1. [Moment name] — [Type] — [Severity] — [What makes this moment make or break]
+...
+
+### Confrontation Insights
+1. [Pattern] — [Likelihood] — [Impact]: ...
+...
+
+### Impact Projection
+Estimated annual CX impact: $X–$Y
+Top opportunities: [3 bullet points]
+```
+
+### When NOT to Build from Scratch
+
+If onboarding data exists (the company went through CX Mate's onboarding), use the `generate-journey.ts` AI pipeline — don't manually build. This skill is for:
+- Consulting conversations ("what would the journey look like for a FinTech startup?")
+- Validating AI-generated journeys against methodology
+- Building reference journeys for new verticals or templates
+- Teaching CX methodology to team members
 
 ## Reference Files
 

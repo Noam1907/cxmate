@@ -39,7 +39,7 @@ function HeroSection() {
           </Link>
         </div>
         <p className="text-sm text-muted-foreground mb-10">
-          Free. No account needed. Results in under 5 minutes.
+          Results in under 5 minutes. No setup required.
         </p>
 
         {/* Quantified value strip */}
@@ -211,11 +211,11 @@ function BottomCTA() {
         </p>
         <Link href="/onboarding">
           <Button size="lg" className="rounded-xl px-8 py-6 text-base font-semibold shadow-lg hover:shadow-xl transition-all">
-            Get Your Free CX Playbook
+            Map Your Customer Journey
           </Button>
         </Link>
         <p className="text-xs text-muted-foreground mt-4">
-          Takes about 3 minutes. No credit card, no account required.
+          5 minutes. No setup required.
         </p>
       </div>
     </section>

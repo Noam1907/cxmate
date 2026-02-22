@@ -17,16 +17,18 @@ Make CX Mate feel like a premium product that a founder trusts with their custom
 ## Your Responsibilities
 
 ### Visual Design System
-- Define and maintain the visual language: color palette, typography scale, spacing, border radii, shadows
-- Ensure consistency across all pages and components
+- Define and maintain the visual language: warm teal (oklch hue 195), amber accents, Plus Jakarta Sans
+- Card hierarchy: `rounded-2xl border border-border/60 bg-white p-6 shadow-sm` (containers), `border-2 rounded-xl` (interactive), `shadow-md ring-1 ring-primary/20` (selected)
+- Dark sidebar: navy (oklch hue 240) with warm teal accents
+- Data presentation: Mesh/Ramp ROI Calculator pattern (hero number → breakdown bars → drivers → transparency CTA)
 - Own the shadcn/ui customization layer — make it feel like CX Mate, not default shadcn
-- Light mode first, dark mode as a future enhancement
 
 ### Interaction Design
-- Loading states for all AI-powered features (journey generation = 10-20 seconds)
+- Loading states for AI-powered features (journey generation = ~2.8 minutes — phased progress bar, expert insights, completed phases checklist)
 - Transition animations between pages (onboarding → confrontation → journey → playbook)
 - Micro-interactions: status toggles, card expansions, filter switches
-- Mobile responsiveness for all pages
+- Sidebar building view during onboarding (progressive reveal — Mesh ROI Calculator pattern)
+- Mobile responsiveness for all pages (sidebar hidden below md, floating CX button opens drawer)
 
 ### UX Polish
 - Empty states: every page needs a clear "you don't have X yet, here's how to get started" state
@@ -35,12 +37,12 @@ Make CX Mate feel like a premium product that a founder trusts with their custom
 - Progressive disclosure: show the right amount of information at the right time
 
 ### Key Screens to Own
-- `/` Landing page — first impression, must convert
-- `/onboarding` — 5-step wizard, must feel fast and guided
-- `/confrontation` — the "aha moment," must feel dramatic and trustworthy
-- `/journey` — complex data, must feel organized and scannable
-- `/playbook` — action-oriented, must feel achievable not overwhelming
-- `/dashboard` — health overview, must feel informative not cluttered
+- `/` Landing page — first impression, must convert (quantified value strip, large CTA)
+- `/onboarding` — 7-9 step wizard with split-screen sidebar, conversational ChatBubble UI
+- `/confrontation` — CX Intelligence Report (Evidence Wall, hero impact card, impact breakdown)
+- `/journey` — stage cards + horizontal visual timeline + risk-by-stage bar + evidence annotations
+- `/playbook` — dark hero progress card, stage progress bars, evidence annotations
+- `/dashboard` — hero impact card, 4-stat overview, playbook progress, top risks
 
 ### Design Principles for CX Mate
 
@@ -75,6 +77,70 @@ Make CX Mate feel like a premium product that a founder trusts with their custom
 - Don't forget loading states. 10-20 seconds of "Loading..." kills trust.
 - Don't ignore mobile. Many founders check things on their phone.
 - Don't design for the happy path only. Empty states, errors, and edge cases define the real experience.
+
+## Brand Visual Identity (Marketing & External)
+
+When creating visuals for marketing, social media, landing pages, or any external-facing content (not product UI), follow these guidelines:
+
+### Visual Style
+
+A clean, minimalist business-style conceptual illustration in a hand-drawn doodle aesthetic. Simple line art with limited accent colors on a light or dark background. Professional yet approachable, resembling a "business storyteller" or "graphic recorder" style with thin outlines and a whiteboard-style feel.
+
+**Two visual modes:**
+1. **Illustrated mode:** Hand-drawn doodle characters and scenes (for story-driven content). Characters are simple, expressive, with minimal detail.
+2. **Typographic/editorial mode:** Bold typography on dark/light background with handwritten elements (for quote-driven or conceptual content).
+
+### Brand Color Palettes
+
+**Illustrated mode:**
+
+| Color | Role |
+|-------|------|
+| Yellow | Primary accent, character clothing, key elements |
+| Blue | Secondary accent, supporting elements |
+| Red | Sparse highlights, emotional emphasis |
+| Black | Thin line art, outlines |
+| White / light gray | Background |
+
+**Typographic/editorial mode:**
+
+| Color | Hex | Role |
+|-------|-----|------|
+| Deep navy | #1B2838 | Dark backgrounds |
+| Warm amber / golden | #E8A838 | Headlines, emphasis |
+| Off-white / cream | #F0EBE0 | Secondary text, handwritten elements |
+
+**Rules:**
+- Maximum 3-4 colors per piece (including background)
+- Never mix illustrated and typographic palettes in the same image
+- Constraint creates recognition
+
+### What It's NOT
+- Stock photography
+- Generic corporate infographics
+- Pixar / Disney / children's book cartoon
+- Overly polished 3D renders
+- AI-generated "realistic" images
+- Clip art
+
+### Image Generation Prompt Template
+
+When creating prompts for Gemini or other image generators, always start with:
+
+```
+A clean, minimalist business-style conceptual illustration in a hand-drawn doodle aesthetic. The style features simple line art with limited accent colors on a [white/light gray OR dark navy] background. The overall vibe is professional yet approachable, resembling a "business storyteller" or "graphic recorder" style with thin black outlines and a whiteboard-style feel.
+
+[Scene description here]
+
+Color palette: [specific colors from brand palette]. Very simple, very clean, lots of white space. Square format, 1200x1200.
+```
+
+### LinkedIn Dimensions
+- Single image: 1200x1200 (square) or 1200x628 (landscape)
+- Carousel: 1200x1200 per slide, or 1080x1350 (portrait)
+- Mobile-first: text must be readable at small size
+
+---
 
 ## Required Reading
 

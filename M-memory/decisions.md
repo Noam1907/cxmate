@@ -65,6 +65,11 @@ Track key technical and product decisions and why they were made.
 | 2026-02-21 | **Pricing model: Free / $99 / $249 / $499** | Free = one-time journey+report. Starter $99 = monthly Pulse + Evidence Wall. Growth $249 = Competitive Intelligence + Simulations + QBR Deck. Scale $499 = Health Scoring + CRM integration. | Active |
 | 2026-02-21 | **Target audience is NOT headcount-based** | Not "5-300 employees". It's "companies that haven't hired a CX expert yet" — a 600-person company with no formal CX is a perfect customer. Stage-based positioning, not size-based. | Active |
 
+| 2026-02-22 | **Mesh/Ramp ROI data presentation pattern** | Hero number → breakdown bars → drivers → transparency CTA. Applied across CX Report, Dashboard, Playbook, Journey Map. This visual hierarchy makes data credible and scannable. Inspired by Mesh ROI Calculator and winn.ai premium patterns. | Active |
+| 2026-02-22 | **Landing page: quantified value strip over scattered badges** | Replaced scattered trust indicators with single focused strip: "5 min setup / 50+ moments / CCXP methodology". One credibility punch, not visual noise. | Active |
+| 2026-02-22 | **Beta recruitment: stage-based targeting, not size-based** | LinkedIn post targets "no CX expert yet" not "under 200 employees." Hook uses real COO quote for authenticity. CTA is low-friction Hebrew "write אני". Demo is Zoom-first, not self-serve (product not ready for unsupervised use). | Active |
+| 2026-02-22 | **Dark sidebar with lesson-style navigation** | Sidebar redesigned as dark navy with warm teal accents. Minimal design system — no color sprawl. Consistent card hierarchy across all pages. | Active |
+
 ---
 
 *Decisions age. Context helps them age well.*

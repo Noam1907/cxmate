@@ -88,6 +88,30 @@ This applies to:
 - Day 13: Integration + polish
 - Day 14: Sprint review + retrospective
 
+## Agent Onboarding Protocol (MANDATORY for every new session)
+
+Every agent — whether it's the COO, a dev agent, or any specialist — MUST read the core files before doing any work. This is non-negotiable.
+
+### Required Reading (Every Agent, Every Session)
+
+**Tier 1 — Read FIRST (context):**
+1. `C-core/project-brief.md` — What CX Mate is, who it's for, how it works
+2. `C-core/product-architecture.md` — 6-layer intelligence model, onboarding flow, output pages, dual-mode architecture
+3. `C-core/tech-stack.md` — Stack, project structure, key patterns, data model
+
+**Tier 2 — Read for execution context:**
+4. `M-memory/sprint-log.md` — What's done, what's in progress, what's next
+5. `M-memory/decisions.md` — Why we built things the way we did
+6. `M-memory/learning-log.md` — Patterns, gotchas, things we've learned
+
+**Tier 3 — Read your own agent file:**
+7. Your agent-specific `.md` in `A-agents/` — your role, tools, responsibilities
+
+### Why This Matters
+- The product evolved massively since day 1. Files that are 2 days old may already be wrong.
+- An agent that hasn't read the core files will make incorrect assumptions (e.g., thinking we have a 5-step wizard when it's 7-9 steps, or using the wrong color scheme).
+- The COO runs "The Loop" at session end to keep files updated — every agent benefits from reading them at session start.
+
 ## Communication Rules
 - Each agent prefixes output with [AGENT_NAME]:
 - Handoffs include explicit context and expected output
@@ -101,3 +125,5 @@ This applies to:
 - `C-core/product-architecture.md`
 - `C-core/tech-stack.md`
 - `M-memory/sprint-log.md`
+- `M-memory/decisions.md`
+- `M-memory/learning-log.md`

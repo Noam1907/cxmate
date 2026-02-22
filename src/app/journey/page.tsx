@@ -17,6 +17,7 @@ function JourneyContent() {
   const templateId = searchParams.get("id");
   const [journey, setJourney] = useState<GeneratedJourney | null>(null);
   const [evidenceMap, setEvidenceMap] = useState<EvidenceMap | null>(null);
+  const [companyName, setCompanyName] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState<ViewMode>("cards");
 
@@ -33,6 +34,7 @@ function JourneyContent() {
             loadedJourney = data.journey;
             loadedOnboarding = data.onboardingData || null;
             setJourney(data.journey);
+            setCompanyName(data.onboardingData?.companyName || "");
           } catch {
             console.error("Failed to parse stored journey");
           }
@@ -51,6 +53,7 @@ function JourneyContent() {
           if (stored) {
             const parsed = JSON.parse(stored);
             loadedOnboarding = parsed.onboardingData || null;
+            setCompanyName(parsed.onboardingData?.companyName || "");
           }
         } catch (err) {
           console.error("Failed to load journey:", err);
@@ -91,8 +94,26 @@ function JourneyContent() {
     );
   }
 
+  const totalMoments = journey.stages.reduce(
+    (sum, stage) => sum + stage.meaningfulMoments.length,
+    0
+  );
+
   return (
     <div className="w-full">
+      {/* Page header */}
+      <div className="mb-10">
+        <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-2">
+          Journey Map
+        </p>
+        <h1 className="text-4xl font-bold tracking-tight text-slate-900">
+          {companyName || "Your Customer Journey"}
+        </h1>
+        <p className="text-sm text-slate-500 mt-2">
+          {journey.stages.length} stages · {totalMoments} meaningful moments
+        </p>
+      </div>
+
       {/* View toggle */}
       <div className="text-center mb-6 space-y-4">
         <div className="inline-flex items-center rounded-lg border bg-secondary p-1 text-muted-foreground">

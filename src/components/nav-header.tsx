@@ -51,7 +51,8 @@ export function NavHeader() {
         {!isOnboarding && (
           <nav className="flex items-center gap-1">
             {navItems.map((item) => {
-              const isActive = pathname === item.href.split("?")[0];
+              const basePath = item.href.split("?")[0];
+              const isActive = pathname === basePath || pathname.startsWith(basePath + "/");
               return (
                 <Link
                   key={item.href}

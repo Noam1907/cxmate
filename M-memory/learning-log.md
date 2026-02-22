@@ -84,6 +84,32 @@ This is the team's collective memory. Every agent reads this before working.
 - **AI tool recommendations as mandatory prompt rule**: Adding "ALWAYS RECOMMEND AI SOLUTIONS" with 10 specific categories (chatbots, analytics, meeting assistants, CS platforms, etc.) ensures every playbook recommendation includes a concrete AI tool suggestion. Without this rule, Claude defaults to manual processes.
 - **"Build on existing" instruction for partial CX processes**: When a company says they have partial processes, adding "BUILD ON what they already have. Don't recommend replacing working processes — extend and improve them" prevents Claude from generating from-scratch recommendations that ignore the user's existing work.
 
+### 2026-02-22 — Data Presentation Overhaul + Visual System + Beta Prep
+
+- **Hero number → breakdown → drivers = trust architecture**: The Mesh ROI Calculator pattern works because it gives users a number they care about ($X annual impact) then immediately backs it up with how that number breaks down. This visual hierarchy replaces walls of text with scannable, credible data. Applied across CX Report, Dashboard, Playbook, Journey Map.
+- **Horizontal bar charts > tables for comparison data**: Sorted horizontal bars with color coding (green/amber/red) are more intuitive than data tables for showing relative magnitudes. Users see patterns instantly without reading numbers.
+- **Generous whitespace = premium feel**: winn.ai's premium feel comes from spacing, not from colors or animations. `py-12`, `space-y-14`, `gap-8` — give content room to breathe. Dense layouts feel cheap even with good typography.
+- **One credibility strip > scattered badges**: A single focused credibility strip ("5 min / 50+ moments / CCXP methodology") is more convincing than scattered trust badges. Consolidation signals confidence; scattering signals insecurity.
+- **Dark sidebar needs warm accents to avoid "admin panel" feel**: Pure dark sidebar (navy/slate) without warm accent colors feels like a developer tool. Adding teal/amber accents and rounded cards softens it for a CX audience. The sidebar is the user's constant companion — it needs to feel friendly, not clinical.
+- **Keep core files (A/C/M) in sync after every major session**: C-core files drifted 6 days behind actual product state. Any new agent reading the project brief would get a fundamentally wrong picture. Session end = update loop. Non-negotiable.
+
+### 2026-02-22 — Gemini Market Research Integration
+
+Key validated stats for use in impact projections, prompts, and messaging (source: Gemini AI market research, Aberdeen Group, Qualtrics):
+
+- **89% of consumers** switched to a competitor after a poor experience, even if the product was excellent — validates CX Mate's core thesis
+- **SMBs lose 1-9% of total revenue** to operational fragmentation ("things slipping through the cracks"). Mid-market: $500K–$2M annually.
+- **Single missed B2B SaaS renewal** = $200K+ loss per contract — "renewal risk" is a named moment of truth we should surface
+- **Aberdeen Group journey management ROI**: 200% more employee engagement, 3.5x referral revenue, 18x faster sales cycles, 24.9% YoY marketing ROI
+- **23x more likely to acquire customers** and 6x more likely to retain them with data-driven decisions (vs. gut-based)
+- **65% of companies** now use journey mapping for competitive advantage; 57% integrate into CS strategy
+- **18% churn reduction** in SaaS from mapping the onboarding journey — 48-hour login nudge is a specific named best practice
+- **CLV formula**: CLV = (ARPU × Margin) / Churn Rate — should appear in CX Report Assumptions
+- **Agentic AI benchmarks**: 80% FAQ automation, 20% churn reduction via predictive scoring, 4x sales win rate improvement
+- **"Train your gut" framing**: SMBs resist "data-driven" as cold. Reframe: "We don't replace your instincts, we train them." Better than "data-driven."
+- **Revenue Leakage Calculator** opportunity: pre-onboarding hook that quantifies the user's current leakage before they even start
+- Full research saved in: `M-memory/intel/2026-02-22.md`
+
 ---
 
 ## Version History

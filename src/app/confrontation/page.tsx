@@ -191,12 +191,17 @@ function ImpactBreakdown({ projections, delay }: { projections: ImpactProjection
 function InsightRow({ insight, index }: { insight: ConfrontationInsight; index: number }) {
   const [expanded, setExpanded] = useState(false);
 
-  const riskDot = { high: "bg-slate-800", medium: "bg-slate-400", low: "bg-slate-300" }[insight.likelihood];
+  const riskDot = { high: "bg-amber-500", medium: "bg-slate-400", low: "bg-slate-300" }[insight.likelihood];
+  const severityBorder = {
+    high: "border-l-4 border-l-amber-400",
+    medium: "border-l-4 border-l-slate-300",
+    low: "border-l-4 border-l-slate-200",
+  }[insight.likelihood];
 
   return (
-    <FadeIn delay={1200 + index * 150}>
+    <FadeIn delay={1900 + index * 250}>
       <div
-        className="rounded-xl border bg-white p-5 cursor-pointer hover:border-slate-300 transition-colors"
+        className={`rounded-xl border bg-white p-5 cursor-pointer hover:border-slate-300 transition-colors ${severityBorder}`}
         onClick={() => setExpanded(!expanded)}
       >
         <div className="flex items-start justify-between gap-4">
@@ -393,39 +398,39 @@ function ConfrontationContent() {
         {/* Impact hero */}
         {projections.length > 0 && (
           <div className="mb-4">
-            <HeroImpactCard projections={projections} delay={300} />
+            <HeroImpactCard projections={projections} delay={400} />
           </div>
         )}
 
         {/* Stats */}
         <div className="mb-8">
-          <StatRow highRisk={highRiskCount} critical={criticalMoments} moments={totalMoments} delay={500} />
+          <StatRow highRisk={highRiskCount} critical={criticalMoments} moments={totalMoments} delay={700} />
         </div>
 
         {/* Impact breakdown */}
         {projections.length > 0 && (
           <div className="mb-8">
-            <ImpactBreakdown projections={projections} delay={700} />
+            <ImpactBreakdown projections={projections} delay={1000} />
           </div>
         )}
 
         {/* Assumptions */}
         {(journey.assumptions?.length || projections.some((p) => p.calculation)) && (
           <div className="mb-12">
-            <AssumptionsSection assumptions={journey.assumptions || []} projections={projections} delay={900} />
+            <AssumptionsSection assumptions={journey.assumptions || []} projections={projections} delay={1300} />
           </div>
         )}
 
         {/* Evidence */}
         {evidenceMap && (
-          <FadeIn delay={1000} className="mb-12">
+          <FadeIn delay={1500} className="mb-12">
             <EvidenceWall evidenceMap={evidenceMap} companyName={companyName} biggestChallenge={onboardingData?.biggestChallenge} />
           </FadeIn>
         )}
 
         {/* Maturity */}
         {journey.maturityAssessment && (
-          <FadeIn delay={1100} className="mb-12">
+          <FadeIn delay={1700} className="mb-12">
             <div className="rounded-xl border bg-white p-6">
               <h3 className="text-sm font-semibold text-slate-900 mb-2">{config.maturityHeading(hasExistingCustomers)}</h3>
               <p className="text-sm text-slate-500 leading-relaxed">{journey.maturityAssessment}</p>
@@ -436,7 +441,7 @@ function ConfrontationContent() {
         {/* Insights */}
         {insights.length > 0 && (
           <div className="mb-12">
-            <FadeIn delay={1100}>
+            <FadeIn delay={1700}>
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-xl font-bold text-slate-900">{config.insightsHeading(hasExistingCustomers)}</h2>
                 {highRiskCount > 0 && (
@@ -453,13 +458,13 @@ function ConfrontationContent() {
         {/* Tech Stack */}
         {journey.techStackRecommendations && journey.techStackRecommendations.length > 0 && (
           <div className="mb-12">
-            <FadeIn delay={1600}>
+            <FadeIn delay={2200}>
               <h2 className="text-xl font-bold text-slate-900 mb-1">Recommended tech stack</h2>
               <p className="text-sm text-slate-400 mb-5">Tools to connect for maximum CX impact at your stage</p>
             </FadeIn>
             <div className="space-y-2">
               {journey.techStackRecommendations.map((rec, i) => (
-                <FadeIn key={i} delay={1700 + i * 80}>
+                <FadeIn key={i} delay={2400 + i * 150}>
                   <div className="rounded-xl border bg-white p-4">
                     <div className="flex items-start justify-between gap-4 mb-2">
                       <span className="text-xs font-semibold text-slate-400 uppercase tracking-wide">{rec.categoryLabel}</span>

@@ -355,22 +355,31 @@ export default function PlaybookPage() {
         </div>
 
         {/* Quick wins */}
-        {filter === "quick_wins" && playbook.quickWins && (
+        {filter === "quick_wins" && (
           <div className="mb-8">
-            <p className="text-xs text-slate-400 mb-4">Highest impact, lowest effort. Start here.</p>
-            <div>
-              {playbook.quickWins.map((rec, i) => {
-                const key = makeKey(rec);
-                return (
-                  <RecommendationCard
-                    key={i}
-                    rec={rec}
-                    status={statuses[key] || "not_started"}
-                    onStatusChange={() => handleStatusChange(key)}
-                  />
-                );
-              })}
-            </div>
+            {playbook.quickWins && playbook.quickWins.length > 0 ? (
+              <>
+                <p className="text-xs text-slate-400 mb-4">Highest impact, lowest effort. Start here.</p>
+                <div>
+                  {playbook.quickWins.map((rec, i) => {
+                    const key = makeKey(rec);
+                    return (
+                      <RecommendationCard
+                        key={i}
+                        rec={rec}
+                        status={statuses[key] || "not_started"}
+                        onStatusChange={() => handleStatusChange(key)}
+                      />
+                    );
+                  })}
+                </div>
+              </>
+            ) : (
+              <div className="rounded-xl border border-slate-200 bg-slate-50 p-8 text-center">
+                <p className="text-sm font-medium text-slate-500">No quick wins identified yet</p>
+                <p className="text-xs text-slate-400 mt-1">Try regenerating your playbook to get quick win recommendations.</p>
+              </div>
+            )}
           </div>
         )}
 
