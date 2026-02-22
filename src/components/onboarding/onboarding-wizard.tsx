@@ -16,6 +16,7 @@ import { ChatBubble } from "./chat-bubble";
 import { deriveFromMaturity, type OnboardingData } from "@/types/onboarding";
 import { useCompanyProfile } from "@/contexts/company-profile-context";
 import { useCompanyEnrichment } from "@/hooks/use-company-enrichment";
+import { useOnboardingAutosave, loadOnboardingDraft, clearOnboardingDraft } from "@/hooks/use-onboarding-autosave";
 import type { EnrichedCompanyData } from "@/types/enrichment";
 
 type StepKey =
@@ -168,42 +169,34 @@ function StepGenerate({
 
   return (
     <div className="space-y-8">
-      <h2 className="text-2xl font-bold tracking-tight text-foreground">Here&apos;s what I&apos;ll build for you</h2>
-      <ChatBubble>
-        <p>
-          {data.userName ? `${data.userName}, ` : ""}I&apos;ve got everything I need.
-          {" "}Here&apos;s what I&apos;m about to build for <strong>{data.companyName || "you"}</strong>:
+      <div>
+        <h2 className="text-2xl font-bold tracking-tight text-foreground">
+          {data.userName ? `${data.userName}, ready to build.` : "Ready to build."}
+        </h2>
+        <p className="text-muted-foreground mt-2">
+          I&apos;ll analyze <strong>{data.companyName || "your company"}</strong> against patterns from thousands of B2B teams at your stage — then build your playbook.
         </p>
-      </ChatBubble>
-
-      <div className="rounded-2xl border-2 border-primary/20 bg-white p-8 space-y-6 shadow-md">
-        <p className="text-[10px] font-bold text-primary uppercase tracking-[0.15em]">What you&apos;ll get</p>
-        <div className="grid gap-4">
-          {[
-            { icon: "🗺️", bg: "from-teal-50 to-teal-100", title: `End-to-end ${journeyLabel} journey map`, desc: "Every stage your customer goes through — mapped to your specific business" },
-            { icon: "⚡", bg: "from-amber-50 to-amber-100", title: "Meaningful moments analysis", desc: "The make-or-break interactions that determine whether customers stay or leave" },
-            { icon: "🎯", bg: "from-rose-50 to-rose-100", title: "Priority focus areas", desc: "Where to invest your time first for maximum impact — based on your pains and goals" },
-            { icon: "📋", bg: "from-blue-50 to-blue-100", title: "AI-powered playbook with templates", desc: "Actionable recommendations including AI tools you can implement this week" },
-          ].map((item) => (
-            <div key={item.title} className="flex items-start gap-4 rounded-xl bg-background/60 p-4 border border-border/30">
-              <div className={`w-11 h-11 rounded-xl bg-gradient-to-br ${item.bg} flex items-center justify-center shrink-0`}>
-                <span className="text-xl">{item.icon}</span>
-              </div>
-              <div>
-                <div className="font-bold text-sm text-foreground">{item.title}</div>
-                <div className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{item.desc}</div>
-              </div>
-            </div>
-          ))}
-        </div>
       </div>
 
-      <ChatBubble>
-        <p>
-          I&apos;m going to analyze {data.companyName || "your company"} against patterns from
-          {" "}<strong>thousands of B2B companies</strong> at your stage. This is where my CCXP expertise meets real data.
+      <div className="rounded-2xl border border-border/60 bg-white p-6 space-y-3 shadow-sm">
+        <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.15em]">What you&apos;ll get</p>
+        <ul className="space-y-2.5">
+          {[
+            { icon: "🗺️", label: `${journeyLabel.charAt(0).toUpperCase() + journeyLabel.slice(1)} journey map` },
+            { icon: "⚡", label: "Meaningful moments — scored by impact" },
+            { icon: "📊", label: "CX Intelligence Report with risk projections" },
+            { icon: "📋", label: "Prioritized playbook with templates" },
+          ].map((item) => (
+            <li key={item.label} className="flex items-center gap-3 text-sm text-foreground">
+              <span className="text-base w-5 shrink-0">{item.icon}</span>
+              {item.label}
+            </li>
+          ))}
+        </ul>
+        <p className="text-xs text-muted-foreground border-t border-border/40 pt-3 mt-1">
+          Takes about 2–3 minutes. Completely personalized to your business.
         </p>
-      </ChatBubble>
+      </div>
 
       <div className="flex justify-center pt-2">
         <Button
@@ -227,36 +220,11 @@ function GeneratingExperience({ data }: { data: OnboardingData }) {
   const [seconds, setSeconds] = useState(0);
 
   const phases = [
-    {
-      icon: "🔍",
-      title: "Analyzing your company profile",
-      detail: `Looking at ${data.companyName || "your company"}'s stage, customers, and business model`,
-      insight: "Every company has a unique CX fingerprint — I'm identifying yours",
-    },
-    {
-      icon: "🗺️",
-      title: "Mapping your journey stages",
-      detail: `Building a ${data.companyMaturity === "pre_launch" ? "sales" : "full lifecycle"} journey map tailored to your vertical`,
-      insight: "I'm using frameworks trusted by Fortune 500 CX teams, adapted for your stage",
-    },
-    {
-      icon: "⚡",
-      title: "Identifying meaningful moments",
-      detail: "Finding the interactions that make or break customer relationships",
-      insight: "Most companies focus on the wrong touchpoints — I'll show you where the real leverage is",
-    },
-    {
-      icon: "📊",
-      title: "Scoring priorities and building recommendations",
-      detail: "Connecting your pains to specific, actionable improvements",
-      insight: "Every recommendation comes with a clear first step you can take this week",
-    },
-    {
-      icon: "📋",
-      title: "Assembling your personalized playbook",
-      detail: "Pulling together templates, metrics, and an implementation plan",
-      insight: "This isn't generic advice — it's built specifically for your situation",
-    },
+    { title: "Analyzing your company profile", detail: `Mapping ${data.companyName || "your company"}'s stage, customers, and business model` },
+    { title: "Building your journey stages", detail: `Structuring a ${data.companyMaturity === "pre_launch" ? "sales" : "full lifecycle"} map tailored to your vertical` },
+    { title: "Identifying meaningful moments", detail: "Finding the interactions that make or break customer relationships" },
+    { title: "Scoring priorities", detail: "Connecting your pains to specific, actionable improvements" },
+    { title: "Assembling your playbook", detail: "Pulling together templates, metrics, and an implementation plan" },
   ];
 
   // Timer
@@ -276,88 +244,86 @@ function GeneratingExperience({ data }: { data: OnboardingData }) {
     return () => timeouts.forEach(clearTimeout);
   }, []);
 
-  const currentPhase = phases[phase];
-  const progress = Math.min((seconds / 120) * 100, 95); // Cap at 95% until done
+  const progress = Math.min((seconds / 120) * 100, 95);
 
   return (
-    <div className="space-y-8">
-      {/* Hero header with bold progress */}
-      <div className="rounded-2xl border-2 border-primary/20 bg-white p-8 shadow-md text-center space-y-6">
-        <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/15 to-primary/5 flex items-center justify-center mx-auto shadow-sm">
-          <span className="text-xl font-bold text-primary">CX</span>
+    <div className="space-y-10 py-4">
+      {/* Header */}
+      <div className="text-center space-y-3">
+        <div className="w-14 h-14 rounded-2xl bg-primary/8 flex items-center justify-center mx-auto">
+          <span className="text-lg font-bold text-primary">CX</span>
         </div>
-        <div className="space-y-2">
-          <h2 className="text-2xl font-bold text-foreground tracking-tight">
-            Building your CX playbook
-          </h2>
-          <p className="text-sm text-muted-foreground">
-            Your CCXP expert is doing deep analysis
-          </p>
-        </div>
-
-        {/* Bold progress display */}
-        <div className="space-y-3 max-w-sm mx-auto">
-          <div className="h-3 bg-primary/8 rounded-full overflow-hidden">
-            <div
-              className="h-full bg-gradient-to-r from-primary to-primary/60 rounded-full transition-all duration-1000 ease-out"
-              style={{ width: `${progress}%` }}
-            />
-          </div>
-          <div className="flex justify-between items-baseline">
-            <span className="text-2xl font-bold text-foreground tabular-nums">
-              {Math.floor(seconds / 60)}:{(seconds % 60).toString().padStart(2, "0")}
-            </span>
-            <span className="text-xs text-muted-foreground">~2 min total</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Current phase card */}
-      <div className="rounded-2xl border-2 border-primary/15 bg-white p-6 space-y-4 transition-all duration-500 shadow-sm">
-        <div className="flex items-center gap-4">
-          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary/12 to-primary/5 flex items-center justify-center shrink-0">
-            <span className="text-2xl">{currentPhase.icon}</span>
-          </div>
-          <div className="flex-1">
-            <div className="flex items-center gap-2">
-              <span className="font-bold text-base text-foreground">{currentPhase.title}</span>
-              <span className="inline-block w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-            </div>
-            <p className="text-sm text-muted-foreground mt-1">{currentPhase.detail}</p>
-          </div>
-        </div>
-        <div className="border-t border-border/40 pt-3">
-          <p className="text-sm text-primary/80 italic leading-relaxed">&ldquo;{currentPhase.insight}&rdquo;</p>
-        </div>
-      </div>
-
-      {/* Completed phases */}
-      {phase > 0 && (
-        <div className="rounded-2xl border border-border/40 bg-white p-5 space-y-3">
-          <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.15em]">Completed</p>
-          {phases.slice(0, phase).map((p, i) => (
-            <div key={i} className="flex items-center gap-3 text-sm">
-              <span className="w-6 h-6 rounded-full bg-emerald-100 flex items-center justify-center text-xs text-emerald-600 shrink-0 font-bold">✓</span>
-              <span className="text-foreground/70">{p.title}</span>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* Insight / what they'll get */}
-      <div className="rounded-2xl border-2 border-amber-200/60 bg-amber-50/50 p-5 space-y-2">
-        <p className="text-[10px] font-bold text-amber-800 uppercase tracking-[0.15em]">Did you know?</p>
-        <p className="text-base font-medium text-amber-900/80 leading-relaxed">
-          {data.companyMaturity === "pre_launch"
-            ? "Companies that map their sales journey before launch close their first deals 2x faster on average."
-            : data.companyMaturity === "first_customers"
-            ? "Early-stage companies that formalize their CX playbook see 40% higher retention in the first year."
-            : data.companyMaturity === "growing"
-            ? "Growing companies that prioritize the right CX moments reduce churn by up to 30% within a quarter."
-            : "Companies at scale that unify their customer journey see 2x improvement in expansion revenue."
-          }
+        <h2 className="text-2xl font-bold text-foreground tracking-tight">
+          Building your CX playbook
+        </h2>
+        <p className="text-sm text-muted-foreground">
+          Deep analysis in progress — this takes about 2 minutes
         </p>
       </div>
+
+      {/* Progress bar + timer */}
+      <div className="space-y-2">
+        <div className="h-1.5 bg-primary/8 rounded-full overflow-hidden">
+          <div
+            className="h-full bg-primary rounded-full transition-all duration-1000 ease-out"
+            style={{ width: `${progress}%` }}
+          />
+        </div>
+        <div className="flex justify-between items-baseline">
+          <span className="text-xs text-muted-foreground tabular-nums">
+            {Math.floor(seconds / 60)}:{(seconds % 60).toString().padStart(2, "0")} elapsed
+          </span>
+          <span className="text-xs text-muted-foreground">~2 min total</span>
+        </div>
+      </div>
+
+      {/* Phase list */}
+      <div className="space-y-4">
+        {phases.map((p, i) => {
+          const isDone = i < phase;
+          const isActive = i === phase;
+          return (
+            <div
+              key={i}
+              className={`flex items-start gap-3 transition-opacity duration-300 ${
+                isDone || isActive ? "opacity-100" : "opacity-30"
+              }`}
+            >
+              {/* Status indicator */}
+              <div className="mt-0.5 shrink-0">
+                {isDone ? (
+                  <span className="w-5 h-5 rounded-full bg-emerald-100 flex items-center justify-center text-[10px] text-emerald-600 font-bold">✓</span>
+                ) : isActive ? (
+                  <span className="w-5 h-5 rounded-full border-2 border-primary border-t-transparent animate-spin inline-block" />
+                ) : (
+                  <span className="w-5 h-5 rounded-full border border-border/60 inline-block" />
+                )}
+              </div>
+              {/* Text */}
+              <div>
+                <p className={`text-sm font-medium ${isDone ? "text-muted-foreground line-through" : isActive ? "text-foreground" : "text-muted-foreground"}`}>
+                  {p.title}
+                </p>
+                {isActive && (
+                  <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{p.detail}</p>
+                )}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Insight line */}
+      <p className="text-xs text-muted-foreground text-center leading-relaxed border-t border-border/40 pt-6">
+        {data.companyMaturity === "pre_launch"
+          ? "Companies that map their sales journey before launch close first deals 2× faster."
+          : data.companyMaturity === "first_customers"
+          ? "Early-stage teams that formalize CX see 40% higher retention in year one."
+          : data.companyMaturity === "growing"
+          ? "Growing companies that prioritize the right moments reduce churn by up to 30%."
+          : "Unified journey mapping drives 2× improvement in expansion revenue."
+        }
+      </p>
     </div>
   );
 }
@@ -432,6 +398,20 @@ export function OnboardingWizard() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [enrichmentApplied, setEnrichmentApplied] = useState(false);
+  const [restoredDraft, setRestoredDraft] = useState(false);
+  const [showRestoredBanner, setShowRestoredBanner] = useState(false);
+
+  // Restore draft on mount (client-side only)
+  useEffect(() => {
+    const draft = loadOnboardingDraft();
+    if (draft && !restoredDraft) {
+      setData(draft.data);
+      setStep(draft.step);
+      setShowIntro(false); // Skip intro — go straight to where they left off
+      setShowRestoredBanner(true);
+      setRestoredDraft(true);
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Company enrichment — fires once after welcome step
   const { enrichment, isEnriching, enrich } = useCompanyEnrichment();
@@ -498,6 +478,9 @@ export function OnboardingWizard() {
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [enrichment, enrichmentApplied]);
+
+  // Autosave to localStorage — protects against accidental navigation
+  useOnboardingAutosave(data, step);
 
   // Sync onboarding data to sidebar context via useEffect (not during render)
   useEffect(() => {
@@ -568,6 +551,8 @@ export function OnboardingWizard() {
       // Push generated journey to sidebar context
       profileContext.setJourney(result.journey);
       profileContext.setTemplateId(result.templateId);
+      // Clear draft — successfully submitted, no need to restore
+      clearOnboardingDraft();
       router.push(`/confrontation?id=${result.templateId}`);
     } catch (error) {
       // Ignore abort errors from unmount/navigation
@@ -606,6 +591,28 @@ export function OnboardingWizard() {
 
   return (
     <div ref={wizardTopRef} className="w-full max-w-2xl mx-auto">
+      {/* Welcome back banner — shown when draft is restored */}
+      {showRestoredBanner && (
+        <div className="mb-6 flex items-center justify-between gap-3 rounded-xl border border-primary/20 bg-primary/5 px-4 py-3 animate-in fade-in duration-300">
+          <p className="text-sm text-foreground">
+            <span className="font-semibold">Welcome back{data.companyName ? `, ${data.companyName}` : ""}.</span>
+            {" "}Picking up where you left off.
+          </p>
+          <button
+            type="button"
+            onClick={() => {
+              clearOnboardingDraft();
+              setData(initialData);
+              setStep(0);
+              setShowRestoredBanner(false);
+            }}
+            className="text-xs text-muted-foreground hover:text-foreground shrink-0 underline underline-offset-2"
+          >
+            Start fresh
+          </button>
+        </div>
+      )}
+
       {/* Progress bar with step labels */}
       {currentStep?.key !== "generate" && (
         <div className="mb-12">

@@ -16,7 +16,7 @@ export {
   type MomentTemplate,
 } from "./meaningful-moments";
 
-export { VERTICALS, getVertical, type VerticalConfig } from "./verticals";
+export { VERTICALS, BUSINESS_MODELS, INDUSTRY_VERTICALS, getVertical, type VerticalConfig, type BusinessModelConfig } from "./verticals";
 
 // ============================================
 // CX Theory Engine (Layer 3)

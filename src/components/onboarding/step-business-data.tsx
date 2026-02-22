@@ -105,16 +105,16 @@ export function StepBusinessData({ data, onChange }: StepBusinessDataProps) {
 
       {/* Tech Stack */}
       <div className="space-y-2">
-        <Label htmlFor="currentTools" className="text-sm font-semibold text-foreground">What tools do you use for CX today? (optional)</Label>
+        <Label htmlFor="currentTools" className="text-sm font-semibold text-foreground">What tools does your team use? <span className="font-normal text-muted-foreground">(optional)</span></Label>
         <Input
           id="currentTools"
-          placeholder="e.g. HubSpot, Intercom, Zendesk, Salesforce..."
+          placeholder="e.g. Salesforce, HubSpot, Zendesk, Intercom, Jira, Slack..."
           value={data.currentTools || ""}
           onChange={(e) => onChange({ currentTools: e.target.value })}
           className="h-12 rounded-xl border-border/60"
         />
         <p className="text-xs text-muted-foreground">
-          This helps me recommend AI-powered tools that can replace or enhance your current stack
+          CRM, ERP, support, BI, communication — the more I know, the better I can recommend what to add or replace
         </p>
       </div>
     </div>

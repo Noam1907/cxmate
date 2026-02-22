@@ -3,7 +3,7 @@
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { VERTICALS } from "@/lib/cx-knowledge";
+import { BUSINESS_MODELS, INDUSTRY_VERTICALS } from "@/lib/cx-knowledge";
 import { COMPANY_SIZES, type OnboardingData } from "@/types/onboarding";
 import { ChatBubble } from "./chat-bubble";
 import type { EnrichedCompanyData } from "@/types/enrichment";
@@ -83,10 +83,10 @@ export function StepCompany({ data, onChange, enrichment, isEnriching }: StepCom
         </div>
       )}
 
-      {/* Vertical */}
+      {/* Business Model */}
       <div className="rounded-2xl border border-border/60 bg-white p-6 space-y-4 shadow-sm">
         <div className="flex items-center gap-2">
-          <Label className="text-sm font-semibold text-foreground">What does your company do?</Label>
+          <Label className="text-sm font-semibold text-foreground">How does your business work?</Label>
           {verticalWasSuggested && <AiSuggestedBadge />}
         </div>
         <RadioGroup
@@ -96,7 +96,7 @@ export function StepCompany({ data, onChange, enrichment, isEnriching }: StepCom
           }
           className="grid grid-cols-1 sm:grid-cols-2 gap-2.5"
         >
-          {VERTICALS.map((v) => (
+          {BUSINESS_MODELS.map((v) => (
             <label
               key={v.id}
               className={`flex items-start gap-3 rounded-xl border-2 p-4 cursor-pointer transition-all hover:shadow-sm ${
@@ -117,12 +117,36 @@ export function StepCompany({ data, onChange, enrichment, isEnriching }: StepCom
         </RadioGroup>
         {data.vertical === "other" && (
           <Input
-            placeholder="Describe your business"
+            placeholder="Describe your business model"
             value={data.customVertical || ""}
             onChange={(e) => onChange({ customVertical: e.target.value })}
             className="mt-2 h-12 rounded-xl"
           />
         )}
+      </div>
+
+      {/* Industry Vertical — optional qualifier */}
+      <div className="rounded-2xl border border-border/60 bg-white p-6 space-y-4 shadow-sm">
+        <div>
+          <Label className="text-sm font-semibold text-foreground">Which industry are you in? <span className="font-normal text-muted-foreground">(optional)</span></Label>
+          <p className="text-xs text-muted-foreground mt-1">Helps me tailor the journey — e.g. Fintech has compliance moments, Healthtech has procurement cycles</p>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {INDUSTRY_VERTICALS.map((v) => (
+            <button
+              key={v.id}
+              type="button"
+              onClick={() => onChange({ industry: data.industry === v.id ? "" : v.id })}
+              className={`text-sm px-3.5 py-2 rounded-xl border-2 font-medium transition-all ${
+                data.industry === v.id
+                  ? "border-primary bg-primary/8 text-primary"
+                  : "border-border/50 text-muted-foreground hover:border-border hover:text-foreground"
+              }`}
+            >
+              {v.label}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Company Size */}

@@ -12,11 +12,12 @@ interface StepJourneyExistsProps {
   onChange: (updates: Partial<OnboardingData>) => void;
 }
 
+// Ordered by customer lifecycle: Acquire → Onboard → Enable → Support → Grow
 const JOURNEY_COMPONENTS = [
   { value: "sales_pipeline", label: "Sales pipeline / CRM stages", emoji: "📊" },
   { value: "onboarding_checklist", label: "Onboarding flow / checklist", emoji: "✅" },
   { value: "training_program", label: "Training / enablement program", emoji: "🎓" },
-  { value: "cs_playbook", label: "CS playbook / runbook", emoji: "📋" },
+  { value: "cs_playbook", label: "CS playbook / success plans", emoji: "📋" },
   { value: "support_flow", label: "Support / escalation flow", emoji: "🎫" },
   { value: "renewal_process", label: "Renewal / expansion process", emoji: "🔄" },
 ] as const;

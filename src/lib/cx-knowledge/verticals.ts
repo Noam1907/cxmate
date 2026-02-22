@@ -14,6 +14,68 @@ export interface VerticalConfig {
   keyMoments: string[]; // Moments that are especially important for this vertical
 }
 
+// ============================================
+// Business Model — HOW you sell
+// ============================================
+
+export interface BusinessModelConfig {
+  id: string;
+  label: string;
+  description: string;
+}
+
+export const BUSINESS_MODELS: BusinessModelConfig[] = [
+  {
+    id: "b2b_saas",
+    label: "B2B SaaS",
+    description: "Software sold as a subscription to other businesses",
+  },
+  {
+    id: "professional_services",
+    label: "Professional Services",
+    description: "Consulting, agencies, implementation, or managed services",
+  },
+  {
+    id: "marketplace",
+    label: "Marketplace / Platform",
+    description: "Two-sided platform connecting buyers and sellers",
+  },
+  {
+    id: "ecommerce_b2b",
+    label: "B2B E-commerce",
+    description: "Wholesale, distribution, or B2B online retail",
+  },
+  {
+    id: "other",
+    label: "Other",
+    description: "Something else — we'll customize based on your description",
+  },
+];
+
+// ============================================
+// Industry Vertical — WHAT space you're in (optional qualifier)
+// ============================================
+
+export const INDUSTRY_VERTICALS = [
+  { id: "fintech", label: "Fintech / Payments" },
+  { id: "healthtech", label: "Healthtech / MedTech" },
+  { id: "hrtech", label: "HR Tech / Future of Work" },
+  { id: "legaltech", label: "Legal Tech" },
+  { id: "proptech", label: "PropTech / Real Estate" },
+  { id: "edtech", label: "EdTech" },
+  { id: "securitytech", label: "Security / Compliance" },
+  { id: "logisticstech", label: "Logistics / Supply Chain" },
+  { id: "martech", label: "MarTech / AdTech" },
+  { id: "devtools", label: "Developer Tools / Infrastructure" },
+  { id: "foodtech", label: "FoodTech / RestaurantTech" },
+  { id: "other_vertical", label: "Other vertical" },
+] as const;
+
+// ============================================
+// Legacy VERTICALS — kept for AI prompt backward compatibility
+// Maps business model + industry to CX journey characteristics
+// ============================================
+
 export const VERTICALS: VerticalConfig[] = [
   {
     id: "b2b_saas",

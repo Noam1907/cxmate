@@ -17,8 +17,9 @@ export interface OnboardingData {
   currentTools?: string;
 
   // Step 2: Company Context
-  vertical: string;
-  customVertical?: string;
+  vertical: string;           // Business model: b2b_saas / professional_services / marketplace / ecommerce_b2b / other
+  customVertical?: string;    // Free text when vertical = "other"
+  industry?: string;          // Industry vertical: fintech / healthtech / etc. (optional qualifier)
   companySize: string;
 
   // Step 3: Maturity (drives all branching)
@@ -226,46 +227,74 @@ export const GOAL_TIMEFRAME_MAP: Record<string, { timeframe: string; explanation
 // Maturity-Adaptive Pain Points
 // ============================================
 
+// Pain points ordered by customer lifecycle stage: Acquire → Onboard → Enable → Retain → Grow
 export function getPainPointsForMaturity(maturity: CompanyMaturity) {
   switch (maturity) {
     case "pre_launch":
       return [
-        { value: "no_sales_process", label: "Don't know how to structure our sales process", category: "acquisition" as const },
-        { value: "unclear_value_prop", label: "Can't articulate our value prop clearly", category: "acquisition" as const },
-        { value: "unknown_buyer_journey", label: "No idea what the buying journey looks like", category: "acquisition" as const },
+        // Acquisition / Sales
+        { value: "no_sales_process", label: "Don't have a structured sales process yet", category: "acquisition" as const },
+        { value: "unknown_buyer_journey", label: "Don't know what the buying journey looks like", category: "acquisition" as const },
         { value: "losing_deals", label: "Losing deals but don't know why", category: "acquisition" as const },
-        { value: "no_competitive_edge", label: "Don't know how to differentiate from competitors", category: "acquisition" as const },
-        { value: "pricing_uncertainty", label: "Not sure how to price or package our product", category: "operations" as const },
+        { value: "long_sales_cycle", label: "Sales conversations drag on too long", category: "acquisition" as const },
+        // Positioning / Messaging
+        { value: "unclear_value_prop", label: "Hard to explain what we do in a clear way", category: "acquisition" as const },
+        { value: "no_competitive_edge", label: "Not sure how to stand out from competitors", category: "acquisition" as const },
+        // Pricing / Planning
+        { value: "pricing_uncertainty", label: "Not confident in our pricing or packaging", category: "operations" as const },
+        { value: "no_gtm_plan", label: "No clear go-to-market plan", category: "operations" as const },
       ];
     case "first_customers":
       return [
-        { value: "messy_onboarding", label: "Onboarding is messy / manual", category: "retention" as const },
-        { value: "unclear_value", label: "Not sure if customers are getting value", category: "retention" as const },
-        { value: "inconsistent_process", label: "No consistent process — every customer is different", category: "operations" as const },
+        // Acquisition
+        { value: "inconsistent_pipeline", label: "No repeatable way to find new customers", category: "acquisition" as const },
+        // Onboarding
+        { value: "messy_onboarding", label: "Onboarding is messy and inconsistent", category: "retention" as const },
+        { value: "onboarding_too_slow", label: "Takes too long for customers to see value", category: "retention" as const },
+        // Retention / Health
+        { value: "unclear_value", label: "Not sure if customers are actually getting value", category: "retention" as const },
         { value: "worried_about_losing", label: "Worried about losing early customers", category: "retention" as const },
         { value: "no_feedback_loop", label: "No way to know if customers are happy or struggling", category: "operations" as const },
+        // Operations
+        { value: "inconsistent_process", label: "Every customer is handled differently", category: "operations" as const },
         { value: "support_overwhelm", label: "Spending too much time on support / handholding", category: "operations" as const },
+        // Expansion
         { value: "expansion_unknown", label: "Don't know when or how to upsell", category: "acquisition" as const },
       ];
     case "growing":
       return [
-        { value: "churn", label: "Customers leaving without warning", category: "retention" as const },
-        { value: "handoff_gaps", label: "Gaps between sales handoff and CS", category: "operations" as const },
-        { value: "onboarding_too_long", label: "Onboarding takes too long — customers lose interest", category: "retention" as const },
+        // Acquisition / Handoff
+        { value: "handoff_gaps", label: "Sales-to-CS handoff is broken or incomplete", category: "operations" as const },
+        // Onboarding
+        { value: "onboarding_too_long", label: "Onboarding takes too long — customers lose patience", category: "retention" as const },
         { value: "implementation_fails", label: "Customers buy but never fully implement", category: "retention" as const },
-        { value: "no_visibility", label: "No visibility into customer health", category: "operations" as const },
-        { value: "no_playbook", label: "Team doesn't have a playbook to follow", category: "operations" as const },
-        { value: "reactive_support", label: "Always firefighting — can't get ahead of problems", category: "operations" as const },
+        // Customer Health / Retention
+        { value: "churn", label: "Customers leaving without warning", category: "retention" as const },
+        { value: "no_visibility", label: "No visibility into which accounts are at risk", category: "operations" as const },
+        { value: "reactive_support", label: "Always firefighting — can't get ahead of issues", category: "operations" as const },
+        // Operations / Playbook
+        { value: "no_playbook", label: "Team doesn't have a consistent playbook to follow", category: "operations" as const },
+        { value: "manual_processes", label: "Too many manual steps — can't keep up with growth", category: "operations" as const },
+        // Expansion
+        { value: "expansion_missed", label: "Missing upsell and expansion opportunities", category: "acquisition" as const },
       ];
     case "scaling":
       return [
-        { value: "inconsistent_cx", label: "CX is inconsistent across the team", category: "operations" as const },
-        { value: "late_risk_detection", label: "Can't identify at-risk accounts early enough", category: "retention" as const },
+        // Acquisition / Handoff
+        { value: "handoff_gaps", label: "Sales-to-CS handoff gaps are hurting retention", category: "operations" as const },
+        // Onboarding
         { value: "onboarding_scale", label: "Onboarding doesn't scale — too many manual steps", category: "operations" as const },
         { value: "implementation_fails", label: "Customers churn before fully adopting the product", category: "retention" as const },
+        // Customer Health / Retention
+        { value: "late_risk_detection", label: "Can't identify at-risk accounts early enough", category: "retention" as const },
+        { value: "inconsistent_cx", label: "CX quality is inconsistent across the team", category: "operations" as const },
+        // Operations / Visibility
         { value: "no_unified_view", label: "No unified view of the customer lifecycle", category: "operations" as const },
-        { value: "expansion_missed", label: "Missing expansion revenue — no systematic upsell", category: "acquisition" as const },
-        { value: "data_silos", label: "Customer data is scattered across tools", category: "operations" as const },
+        { value: "data_silos", label: "Customer data is scattered across too many tools", category: "operations" as const },
+        { value: "no_health_scoring", label: "No health scoring or early warning system", category: "operations" as const },
+        // Expansion
+        { value: "expansion_missed", label: "Missing expansion revenue — no systematic upsell motion", category: "acquisition" as const },
+        { value: "no_qbr_process", label: "No structured business review or renewal process", category: "operations" as const },
       ];
   }
 }

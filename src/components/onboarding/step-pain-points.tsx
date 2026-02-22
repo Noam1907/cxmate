@@ -51,10 +51,10 @@ export function StepPainPoints({ data, onChange }: StepPainPointsProps) {
         </p>
       </div>
 
-      {/* Pain Points — Maturity-Adaptive */}
+      {/* Pain Points — Maturity-Adaptive, ordered by lifecycle */}
       <div className="rounded-2xl border border-border/60 bg-white p-6 space-y-4 shadow-sm">
-        <Label className="text-sm font-semibold text-foreground">Which of these resonate? (pick all that apply)</Label>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+        <Label className="text-sm font-semibold text-foreground">Which of these resonate? <span className="font-normal text-muted-foreground">(pick all that apply)</span></Label>
+        <div className="grid grid-cols-1 gap-2">
           {painOptions.map((option) => (
             <label
               key={option.value}
@@ -68,12 +68,17 @@ export function StepPainPoints({ data, onChange }: StepPainPointsProps) {
                 type="checkbox"
                 checked={(data.painPoints || []).includes(option.value)}
                 onChange={() => togglePainPoint(option.value)}
-                className="rounded border-input accent-primary"
+                className="rounded border-input accent-primary shrink-0"
               />
               <span className="text-sm font-medium">{option.label}</span>
             </label>
           ))}
         </div>
+        {(data.painPoints || []).length > 0 && (
+          <p className="text-xs text-muted-foreground pt-1">
+            {(data.painPoints || []).length} selected — I&apos;ll prioritize your playbook around these
+          </p>
+        )}
       </div>
 
       {/* Custom Pain Point */}
