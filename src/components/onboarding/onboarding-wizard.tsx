@@ -251,65 +251,85 @@ function GeneratingExperience({ data }: { data: OnboardingData }) {
   const progress = Math.min((seconds / 120) * 100, 95);
 
   return (
-    <div className="space-y-10 py-4">
-      {/* Header */}
+    <div className="rounded-2xl border border-amber-100 bg-gradient-to-b from-amber-50/60 to-orange-50/30 p-8 space-y-8">
+
+      {/* Header — illustrated doodle + warm copy */}
       <div className="text-center space-y-3">
-        <div className="w-14 h-14 rounded-2xl bg-primary/8 flex items-center justify-center mx-auto">
-          <span className="text-lg font-bold text-primary">CX</span>
+        {/* Hand-drawn style map doodle */}
+        <div className="mx-auto w-16 h-16 flex items-center justify-center">
+          <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-16 h-16">
+            {/* Map scroll */}
+            <rect x="8" y="12" width="48" height="40" rx="3" stroke="#92400e" strokeWidth="2" fill="#fffbeb" />
+            <rect x="8" y="12" width="48" height="7" rx="3" stroke="#92400e" strokeWidth="2" fill="#fde68a" />
+            {/* Journey path — hand-drawn dashes */}
+            <path d="M18 36 C22 30 28 42 34 34 C40 26 46 38 50 32" stroke="#d97706" strokeWidth="2.5" strokeLinecap="round" strokeDasharray="4 3" />
+            {/* Stage dots */}
+            <circle cx="18" cy="36" r="3" fill="#d97706" />
+            <circle cx="34" cy="34" r="3" fill="#d97706" />
+            <circle cx="50" cy="32" r="3" fill="#f59e0b" />
+            {/* Sparkle */}
+            <path d="M54 10 L55 7 L56 10 L59 11 L56 12 L55 15 L54 12 L51 11 Z" fill="#fbbf24" />
+          </svg>
         </div>
-        <h2 className="text-2xl font-bold text-foreground tracking-tight">
+        <h2 className="text-2xl font-bold text-slate-800 tracking-tight">
           Building your CX playbook
         </h2>
-        <p className="text-sm text-muted-foreground">
-          Deep analysis in progress — this takes about 2 minutes
+        <p className="text-sm text-slate-500">
+          Deep analysis in progress — about 2 minutes
         </p>
       </div>
 
-      {/* Progress bar + timer */}
-      <div className="space-y-2">
-        <div className="h-1.5 bg-primary/8 rounded-full overflow-hidden">
+      {/* Progress bar — amber, warm */}
+      <div className="space-y-1.5">
+        <div className="h-2 bg-amber-100 rounded-full overflow-hidden">
           <div
-            className="h-full bg-primary rounded-full transition-all duration-1000 ease-out"
+            className="h-full bg-gradient-to-r from-amber-400 to-orange-400 rounded-full transition-all duration-1000 ease-out"
             style={{ width: `${progress}%` }}
           />
         </div>
-        <div className="flex justify-between items-baseline">
-          <span className="text-xs text-muted-foreground tabular-nums">
+        <div className="flex justify-between">
+          <span className="text-[11px] text-slate-400 tabular-nums">
             {Math.floor(seconds / 60)}:{(seconds % 60).toString().padStart(2, "0")} elapsed
           </span>
-          <span className="text-xs text-muted-foreground">~2 min total</span>
+          <span className="text-[11px] text-slate-400">~2 min total</span>
         </div>
       </div>
 
-      {/* Phase list */}
-      <div className="space-y-4">
+      {/* Phase list — no strikethrough, checkmark = done */}
+      <div className="space-y-3">
         {phases.map((p, i) => {
           const isDone = i < phase;
           const isActive = i === phase;
           return (
             <div
               key={i}
-              className={`flex items-start gap-3 transition-opacity duration-300 ${
-                isDone || isActive ? "opacity-100" : "opacity-30"
+              className={`flex items-start gap-3 transition-all duration-500 ${
+                isDone || isActive ? "opacity-100" : "opacity-35"
               }`}
             >
               {/* Status indicator */}
               <div className="mt-0.5 shrink-0">
                 {isDone ? (
-                  <span className="w-5 h-5 rounded-full bg-emerald-100 flex items-center justify-center text-[10px] text-emerald-600 font-bold">✓</span>
+                  <div className="w-5 h-5 rounded-full bg-amber-100 border border-amber-300 flex items-center justify-center">
+                    <svg className="w-3 h-3 text-amber-600" fill="none" viewBox="0 0 12 12" stroke="currentColor" strokeWidth={2.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M2 6l3 3 5-5" />
+                    </svg>
+                  </div>
                 ) : isActive ? (
-                  <span className="w-5 h-5 rounded-full border-2 border-primary border-t-transparent animate-spin inline-block" />
+                  <div className="w-5 h-5 rounded-full border-2 border-amber-400 border-t-transparent animate-spin" />
                 ) : (
-                  <span className="w-5 h-5 rounded-full border border-border/60 inline-block" />
+                  <div className="w-5 h-5 rounded-full border border-slate-200" />
                 )}
               </div>
-              {/* Text */}
+              {/* Text — no strikethrough ever */}
               <div>
-                <p className={`text-sm font-medium ${isDone ? "text-muted-foreground line-through" : isActive ? "text-foreground" : "text-muted-foreground"}`}>
+                <p className={`text-sm font-medium leading-snug ${
+                  isDone ? "text-slate-400" : isActive ? "text-slate-800" : "text-slate-400"
+                }`}>
                   {p.title}
                 </p>
                 {isActive && (
-                  <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{p.detail}</p>
+                  <p className="text-xs text-slate-500 mt-0.5 leading-relaxed">{p.detail}</p>
                 )}
               </div>
             </div>
@@ -317,8 +337,8 @@ function GeneratingExperience({ data }: { data: OnboardingData }) {
         })}
       </div>
 
-      {/* Insight line */}
-      <p className="text-xs text-muted-foreground text-center leading-relaxed border-t border-border/40 pt-6">
+      {/* Insight line — warm, encouraging */}
+      <p className="text-xs text-amber-700/80 text-center leading-relaxed border-t border-amber-100 pt-5 italic">
         {data.companyMaturity === "pre_launch"
           ? "Companies that map their sales journey before launch close first deals 2× faster."
           : data.companyMaturity === "first_customers"
