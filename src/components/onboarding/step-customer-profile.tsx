@@ -164,6 +164,29 @@ export function StepCustomerProfile({ data, onChange, enrichment }: StepCustomer
           ))}
         </RadioGroup>
       </div>
+
+      {/* Pre-live process — only for companies with customers, neutral terminology */}
+      {!isPreLaunch && (
+        <div className="rounded-2xl border border-border/60 bg-white p-6 space-y-3 shadow-sm">
+          <Label htmlFor="preLiveProcess" className="text-sm font-semibold text-foreground">
+            What happens between a signed deal and a live customer?
+          </Label>
+          <p className="text-xs text-muted-foreground -mt-1">
+            Use your own words — installation, setup call, pilot, onboarding sprint, nothing formal...
+          </p>
+          <Textarea
+            id="preLiveProcess"
+            placeholder="e.g. We do a 2-week technical installation, then a training session before they go live"
+            value={data.preLiveProcess || ""}
+            onChange={(e) => onChange({ preLiveProcess: e.target.value })}
+            rows={2}
+            className="rounded-xl border-border/60"
+          />
+          <p className="text-xs text-muted-foreground">
+            This tells me what to call this phase in your journey — so I don&apos;t assume &ldquo;pilot&rdquo; if you call it something else.
+          </p>
+        </div>
+      )}
     </div>
   );
 }

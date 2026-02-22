@@ -12,14 +12,34 @@ interface StepJourneyExistsProps {
   onChange: (updates: Partial<OnboardingData>) => void;
 }
 
-// Ordered by customer lifecycle: Acquire → Onboard → Enable → Support → Grow
+// Strictly ordered by customer lifecycle: Acquire → Close → Onboard → Enable → Engage → Support → Expand
 const JOURNEY_COMPONENTS = [
+  // 1. Pre-sale / Acquisition
+  { value: "ideal_customer_profile", label: "Ideal customer profile (ICP)", emoji: "🎯" },
   { value: "sales_pipeline", label: "Sales pipeline / CRM stages", emoji: "📊" },
-  { value: "onboarding_checklist", label: "Onboarding flow / checklist", emoji: "✅" },
+  { value: "sales_playbook", label: "Sales playbook / talk tracks", emoji: "🗣️" },
+  { value: "demo_process", label: "Demo or trial process", emoji: "🖥️" },
+  { value: "proposal_contract", label: "Proposal / contract flow", emoji: "📝" },
+  // 2. Onboarding
+  { value: "handoff_process", label: "Sales → CS handoff process", emoji: "🤝" },
+  { value: "onboarding_checklist", label: "Onboarding checklist / milestones", emoji: "✅" },
+  { value: "kickoff_process", label: "Kickoff call structure", emoji: "🚀" },
+  { value: "implementation_plan", label: "Implementation / setup plan", emoji: "🔧" },
+  // 3. Enablement
   { value: "training_program", label: "Training / enablement program", emoji: "🎓" },
-  { value: "cs_playbook", label: "CS playbook / success plans", emoji: "📋" },
+  { value: "knowledge_base", label: "Knowledge base / self-serve docs", emoji: "📚" },
+  { value: "adoption_tracking", label: "Product adoption tracking", emoji: "📈" },
+  // 4. Ongoing success
+  { value: "cs_playbook", label: "CS playbook / QBR cadence", emoji: "📋" },
+  { value: "health_scoring", label: "Customer health scoring", emoji: "💚" },
+  { value: "nps_csat", label: "NPS / CSAT / feedback loop", emoji: "⭐" },
+  // 5. Support
   { value: "support_flow", label: "Support / escalation flow", emoji: "🎫" },
+  { value: "sla_process", label: "SLA / response time process", emoji: "⏱️" },
+  // 6. Expansion & Retention
   { value: "renewal_process", label: "Renewal / expansion process", emoji: "🔄" },
+  { value: "upsell_playbook", label: "Upsell / cross-sell playbook", emoji: "📣" },
+  { value: "churn_prevention", label: "Churn prevention / at-risk process", emoji: "🚨" },
 ] as const;
 
 export function StepJourneyExists({ data, onChange }: StepJourneyExistsProps) {
@@ -149,29 +169,45 @@ export function StepJourneyExists({ data, onChange }: StepJourneyExistsProps) {
           </ChatBubble>
 
           {/* Journey component checkboxes */}
-          <div className="space-y-2">
-            <Label>What do you have in place? (check all that apply)</Label>
+          <div className="rounded-2xl border border-border/60 bg-white p-5 space-y-3 shadow-sm">
+            <Label className="text-sm font-semibold text-foreground">
+              What do you have in place? <span className="font-normal text-muted-foreground">(check all that apply)</span>
+            </Label>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              {JOURNEY_COMPONENTS.map((component) => (
-                <label
-                  key={component.value}
-                  className={`flex items-center gap-3 rounded-xl border-2 px-4 py-3 cursor-pointer transition-all hover:shadow-sm ${
-                    existingComponents.includes(component.value)
-                      ? "border-primary bg-primary/5 shadow-sm"
-                      : "border-border/50 hover:border-border"
-                  }`}
-                >
-                  <input
-                    type="checkbox"
-                    checked={existingComponents.includes(component.value)}
-                    onChange={() => toggleComponent(component.value)}
-                    className="rounded border-input"
-                  />
-                  <span className="text-sm">{component.emoji}</span>
-                  <span className="text-sm">{component.label}</span>
-                </label>
-              ))}
+              {JOURNEY_COMPONENTS.map((component) => {
+                const selected = existingComponents.includes(component.value);
+                return (
+                  <button
+                    key={component.value}
+                    type="button"
+                    onClick={() => toggleComponent(component.value)}
+                    className={`flex items-center gap-3 rounded-xl border-2 px-4 py-3 cursor-pointer transition-all text-left hover:shadow-sm ${
+                      selected
+                        ? "border-primary bg-primary/5 shadow-sm"
+                        : "border-border/50 hover:border-border"
+                    }`}
+                  >
+                    {/* Checkmark indicator — no native checkbox */}
+                    <div className={`w-4.5 h-4.5 rounded-md border-2 flex items-center justify-center shrink-0 transition-all ${
+                      selected ? "border-primary bg-primary" : "border-border/60"
+                    }`}>
+                      {selected && (
+                        <svg className="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 12 12" stroke="currentColor" strokeWidth={2.5}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M2 6l3 3 5-5" />
+                        </svg>
+                      )}
+                    </div>
+                    <span className="text-base leading-none">{component.emoji}</span>
+                    <span className="text-sm font-medium text-foreground">{component.label}</span>
+                  </button>
+                );
+              })}
             </div>
+            {existingComponents.length > 0 && (
+              <p className="text-xs text-muted-foreground">
+                {existingComponents.length} selected
+              </p>
+            )}
           </div>
 
           {/* Upload existing CX doc */}

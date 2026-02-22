@@ -37,6 +37,9 @@ export interface OnboardingData {
   customerSize: string;
   mainChannel: string;
 
+  // What happens between deal-close and customer going live (no assumed terminology)
+  preLiveProcess?: string;  // e.g. "installation", "pilot", "onboarding", "nothing formal"
+
   // Step 6: Business Data (growing/scaling only)
   pricingModel: string;
   roughRevenue: string;

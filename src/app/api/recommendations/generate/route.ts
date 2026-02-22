@@ -4,6 +4,9 @@ import { generateRecommendations } from "@/lib/ai/generate-recommendations";
 import { onboardingSchema } from "@/lib/validations/onboarding";
 import type { GeneratedJourney } from "@/lib/ai/journey-prompt";
 
+// Extend Vercel function timeout to 5 minutes — playbook generation takes 2-3 min
+export const maxDuration = 300;
+
 const requestSchema = z.object({
   journey: z.custom<GeneratedJourney>((val) => {
     return (

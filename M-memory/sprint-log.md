@@ -157,3 +157,27 @@ Track sprint progress and status.
 ---
 
 *Ship fast, learn faster.*
+
+---
+
+## Session — 2026-02-22
+
+### Completed this session
+- **CX Report full redesign** — hero "Revenue at risk", impact breakdown with formula subtitle, collapsible assumptions, evidence wall clarity, competitive insights hidden when empty, maturity snapshot clean, no aggressive language, tech stack grid with pills
+- **Journey page full redesign** — removed Risk by Stage bars, ConfrontationPanel, ImpactProjections, CxToolRoadmap; 2-tone color (amber/slate only); readable moment type labels; cleaner stage cards with left-bordered insights
+- **Playbook fix** — maxDuration=300 on both API routes, industry field added to Zod schema
+- **Sidebar color** — lightened from oklch(0.13) to oklch(0.22)
+- **Nav item readability** — text-white/65 for inactive items
+- **Onboarding autosave** — useOnboardingAutosave hook, localStorage draft restore with "Welcome back" banner
+- **Industry split** — vertical = business model, industry = optional qualifier chips
+- **Journey components** — expanded from 6 to 20, lifecycle-ordered (ICP → Sales → Onboard → Enable → Success → Support → Expand), native checkbox replaced with custom checkmark
+- **Pain points** — expanded list, lifecycle ordered, maturity-adaptive
+- **Pre-generate screen** — simplified to 4-item bullet list
+- **Loading screen** — phase list with spinner/check, progress bar, insight line
+- **Tech stack question** — renamed from "CX tools" to "What tools does your team use?"
+- **"What do you have in place?" step** — now shows for first_customers too (not just growing/scaling)
+- **Pre-live process question** — new neutral-language field asking "What happens between deal-close and go-live?" — uses company's own terminology, prevents assumed "pilot" framing
+
+### Next session starts with
+- PDF export feature (playbook + journey map with company logo)
+- Sprint 4: Beta launch prep — auth, DB persistence pipeline

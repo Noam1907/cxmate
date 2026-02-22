@@ -56,8 +56,12 @@ function buildSteps(data: OnboardingData): StepDef[] {
     { key: "maturity", label: "Stage" },
   ];
 
-  // Journey exists question — only for growing/scaling
-  if (data.companyMaturity === "growing" || data.companyMaturity === "scaling") {
+  // Journey exists question — for anyone with customers (first_customers, growing, scaling)
+  if (
+    data.companyMaturity === "first_customers" ||
+    data.companyMaturity === "growing" ||
+    data.companyMaturity === "scaling"
+  ) {
     steps.push({ key: "journey_exists", label: "Journey" });
   }
 

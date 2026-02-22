@@ -9,6 +9,7 @@ export const onboardingSchema = z.object({
   vertical: z.string().min(1, "Vertical is required"),
   companySize: z.string().min(1, "Company size is required"),
   customVertical: z.string().optional(),
+  industry: z.string().optional(), // Industry vertical (fintech, healthtech, etc.) — optional qualifier
 
   // New: maturity-driven
   companyMaturity: z.enum(["pre_launch", "first_customers", "growing", "scaling"]),
@@ -28,6 +29,7 @@ export const onboardingSchema = z.object({
   customerDescription: z.string().min(1, "Customer description is required"),
   customerSize: z.string().min(1, "Customer size is required"),
   mainChannel: z.string().min(1, "Main channel is required"),
+  preLiveProcess: z.string().optional(), // What happens between deal-close and go-live (no assumed terminology)
 
   // Business data (when growing/scaling)
   pricingModel: z.string().default(""),

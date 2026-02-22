@@ -4,6 +4,9 @@ import { generateJourney } from "@/lib/ai/generate-journey";
 import { createClient } from "@/lib/supabase/server";
 import { persistJourney } from "@/lib/services/journey-persistence";
 
+// Extend Vercel function timeout to 5 minutes — journey generation takes ~2.8 min
+export const maxDuration = 300;
+
 export async function POST(request: Request) {
   try {
     const body = await request.json();

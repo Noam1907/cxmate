@@ -259,13 +259,28 @@ export default function PlaybookPage() {
   if (!playbook) {
     return (
       <main className="min-h-screen flex items-center justify-center p-8">
-        <div className="text-center space-y-4 max-w-md">
-          <h1 className="text-2xl font-bold text-slate-900">Your CX Playbook</h1>
-          <p className="text-slate-500">Turn your journey map into a step-by-step action plan with templates and timelines.</p>
-          {error && <p className="text-sm text-red-600 bg-red-50 rounded-lg p-3 border border-red-100">{error}</p>}
-          <Button onClick={handleGenerate} disabled={loading} size="lg">
-            {loading ? "Generating..." : "Generate My Playbook"}
-          </Button>
+        <div className="text-center space-y-5 max-w-md">
+          {loading ? (
+            <>
+              <div className="w-12 h-12 rounded-2xl bg-primary/8 flex items-center justify-center mx-auto">
+                <span className="text-lg font-bold text-primary">CX</span>
+              </div>
+              <h1 className="text-2xl font-bold text-slate-900">Building your playbook</h1>
+              <p className="text-slate-500">Turning your journey map into a step-by-step action plan — takes about 1-2 minutes.</p>
+              <div className="h-1 bg-slate-100 rounded-full overflow-hidden max-w-xs mx-auto">
+                <div className="h-full bg-primary rounded-full animate-pulse w-2/3" />
+              </div>
+            </>
+          ) : (
+            <>
+              <h1 className="text-2xl font-bold text-slate-900">Your CX Playbook</h1>
+              <p className="text-slate-500">Turn your journey map into a step-by-step action plan with templates and timelines.</p>
+              {error && <p className="text-sm text-red-600 bg-red-50 rounded-lg p-3 border border-red-100">{error}</p>}
+              <Button onClick={handleGenerate} disabled={loading} size="lg">
+                Generate My Playbook
+              </Button>
+            </>
+          )}
         </div>
       </main>
     );
