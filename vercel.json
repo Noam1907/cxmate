@@ -1,0 +1,10 @@
+{
+  "functions": {
+    "src/app/api/onboarding/route.ts": {
+      "maxDuration": 300
+    },
+    "src/app/api/recommendations/generate/route.ts": {
+      "maxDuration": 300
+    }
+  }
+}
