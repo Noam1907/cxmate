@@ -196,53 +196,63 @@ function ImpactBreakdown({ projections, delay }: { projections: ImpactProjection
 function InsightRow({ insight, index }: { insight: ConfrontationInsight; index: number }) {
   const [expanded, setExpanded] = useState(false);
 
-  const riskDot = { high: "bg-amber-500", medium: "bg-slate-400", low: "bg-slate-300" }[insight.likelihood];
-  const severityBorder = {
-    high: "border-l-4 border-l-amber-400",
-    medium: "border-l-4 border-l-slate-300",
-    low: "border-l-4 border-l-slate-200",
-  }[insight.likelihood];
+  const riskConfig = {
+    high:   { dot: "bg-rose-400",   label: "High",   labelColor: "text-rose-500"  },
+    medium: { dot: "bg-amber-400",  label: "Medium", labelColor: "text-amber-500" },
+    low:    { dot: "bg-slate-300",  label: "Low",    labelColor: "text-slate-400" },
+  }[insight.likelihood] ?? { dot: "bg-slate-300", label: "", labelColor: "text-slate-400" };
 
   return (
     <FadeIn delay={1900 + index * 250}>
       <div
-        className={`rounded-xl border bg-white p-5 cursor-pointer hover:border-slate-300 transition-colors ${severityBorder}`}
+        className="rounded-xl border border-slate-200 bg-white cursor-pointer hover:border-slate-300 transition-colors"
         onClick={() => setExpanded(!expanded)}
       >
-        <div className="flex items-start justify-between gap-4">
-          <div className="flex items-start gap-3 flex-1">
-            <div className={`w-2 h-2 rounded-full mt-2 shrink-0 ${riskDot}`} />
-            <div className="space-y-1">
-              <div className="flex items-center gap-2">
-                <span className="text-sm font-semibold text-slate-900">{insight.pattern}</span>
-                <span className="text-xs text-slate-400 capitalize">{insight.likelihood} risk</span>
-              </div>
-              <p className="text-sm text-slate-500 leading-relaxed">{insight.description}</p>
-            </div>
-          </div>
-          <span className="text-slate-400 text-sm shrink-0">{expanded ? "−" : "+"}</span>
+        {/* Collapsed — title only */}
+        <div className="flex items-center gap-3 px-5 py-4">
+          <div className={`w-2 h-2 rounded-full shrink-0 ${riskConfig.dot}`} />
+          <span className="text-sm font-semibold text-slate-900 flex-1 leading-snug">{insight.pattern}</span>
+          <span className={`text-xs font-medium shrink-0 ${riskConfig.labelColor}`}>{riskConfig.label}</span>
+          <span className="text-slate-300 text-sm shrink-0 ml-1">{expanded ? "−" : "+"}</span>
         </div>
 
+        {/* Expanded */}
         {expanded && (
-          <div className="mt-4 pt-4 border-t space-y-3 ml-5">
+          <div className="px-5 pb-5 space-y-4 border-t border-slate-100 pt-4">
+
+            {/* Description */}
+            <p className="text-sm text-slate-500 leading-relaxed">{insight.description}</p>
+
+            {/* Key details — 2-col grid, compact */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {insight.businessImpact && (
+                <div className="space-y-1">
+                  <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wide">Impact</p>
+                  <p className="text-sm text-slate-700">{insight.businessImpact}</p>
+                </div>
+              )}
+              {insight.immediateAction && (
+                <div className="space-y-1">
+                  <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wide">Do this now</p>
+                  <p className="text-sm text-slate-700">{insight.immediateAction}</p>
+                </div>
+              )}
+            </div>
+
+            {/* Measure — inline, less prominent */}
+            {insight.measureWith && (
+              <p className="text-xs text-slate-400">
+                <span className="font-medium text-slate-500">Measure: </span>
+                {insight.measureWith}
+              </p>
+            )}
+
+            {/* CX Mate advice — pull-quote style */}
             {insight.companionAdvice && (
-              <div className="rounded-lg bg-slate-50 border border-slate-200 p-3">
-                <p className="text-xs font-semibold text-slate-500 mb-1">CX Mate says</p>
-                <p className="text-sm text-slate-700 italic">&ldquo;{insight.companionAdvice}&rdquo;</p>
+              <div className="border-l-2 border-slate-200 pl-3">
+                <p className="text-sm text-slate-500 italic">&ldquo;{insight.companionAdvice}&rdquo;</p>
               </div>
             )}
-            <div className="rounded-lg bg-slate-50 border border-slate-200 p-3">
-              <p className="text-xs font-semibold text-slate-500 mb-1">Business impact</p>
-              <p className="text-sm text-slate-700">{insight.businessImpact}</p>
-            </div>
-            <div className="rounded-lg bg-slate-50 border border-slate-200 p-3">
-              <p className="text-xs font-semibold text-slate-500 mb-1">Do this now</p>
-              <p className="text-sm text-slate-700">{insight.immediateAction}</p>
-            </div>
-            <div className="rounded-lg bg-slate-50 border border-slate-200 p-3">
-              <p className="text-xs font-semibold text-slate-500 mb-1">Measure with</p>
-              <p className="text-sm text-slate-700">{insight.measureWith}</p>
-            </div>
           </div>
         )}
       </div>
