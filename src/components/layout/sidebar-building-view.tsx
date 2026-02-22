@@ -2,16 +2,19 @@
 
 import { useState } from "react";
 import type { OnboardingData } from "@/types/onboarding";
-import { MATURITY_OPTIONS } from "@/types/onboarding";
 
 interface SidebarBuildingViewProps {
   data: Partial<OnboardingData> | null;
 }
 
-/**
- * Get a company logo URL from the website domain.
- * Uses Google's favicon service (free, no API key).
- */
+const ONBOARDING_STAGES = [
+  { key: "about", label: "About your company" },
+  { key: "journey", label: "Your journey" },
+  { key: "customers", label: "Your customers" },
+  { key: "pains", label: "Challenges & goals" },
+  { key: "summary", label: "Summary" },
+];
+
 function getLogoUrl(website: string): string | null {
   if (!website) return null;
   const domain = website.replace(/^https?:\/\//, "").replace(/\/.*$/, "").trim();
@@ -19,177 +22,125 @@ function getLogoUrl(website: string): string | null {
   return `https://www.google.com/s2/favicons?domain=${domain}&sz=64`;
 }
 
+function getCurrentStageIndex(data: Partial<OnboardingData> | null): number {
+  if (!data?.companyName) return 0;
+  if (!data?.vertical || !data?.companyMaturity) return 0;
+  if (!data?.customerDescription) return 2;
+  if (!data?.biggestChallenge || !data?.primaryGoal) return 3;
+  return 4;
+}
+
 export function SidebarBuildingView({ data }: SidebarBuildingViewProps) {
   const [logoError, setLogoError] = useState(false);
 
-  if (!data || !data.companyName) {
-    return (
-      <div className="flex flex-col items-center justify-center text-center px-4 py-20 space-y-3">
-        <p className="text-sm text-sidebar-foreground/30 leading-relaxed max-w-[200px]">
-          Answer questions and watch your profile build in real time
-        </p>
-      </div>
-    );
-  }
-
-  const maturityOption = data.companyMaturity
-    ? MATURITY_OPTIONS.find((m) => m.value === data.companyMaturity)
-    : null;
-
-  const logoUrl = getLogoUrl(data.companyWebsite || "");
-
-  // Count how many sections are filled
-  const sections = [
-    !!data.companyName,
-    !!data.companyMaturity,
-    !!data.vertical,
-    !!data.customerDescription,
-    !!data.biggestChallenge,
-    !!data.primaryGoal,
-  ];
-  const filledCount = sections.filter(Boolean).length;
-  const progress = Math.round((filledCount / sections.length) * 100);
-
-  const initials = data.companyName.charAt(0).toUpperCase();
+  const currentStage = getCurrentStageIndex(data);
+  const logoUrl = getLogoUrl(data?.companyWebsite || "");
+  const companyName = data?.companyName;
+  const initials = companyName ? companyName.charAt(0).toUpperCase() : null;
 
   return (
-    <div className="space-y-5">
-      {/* Company identity */}
-      <div className="space-y-4">
-        {/* Logo + Company name row */}
-        <div className="flex items-center gap-3">
+    <div className="space-y-6">
+      {/* Company identity — shown once we have a name */}
+      {companyName ? (
+        <div className="flex items-center gap-3 px-1">
           {logoUrl && !logoError ? (
             /* eslint-disable-next-line @next/next/no-img-element */
             <img
               src={logoUrl}
-              alt={`${data.companyName} logo`}
-              width={40}
-              height={40}
-              className="rounded-lg bg-white border border-sidebar-border object-contain p-1"
+              alt={`${companyName} logo`}
+              width={32}
+              height={32}
+              className="rounded-md bg-white/10 object-contain"
               onError={() => setLogoError(true)}
             />
           ) : (
-            <div className="w-10 h-10 rounded-lg bg-primary/8 border border-sidebar-border flex items-center justify-center">
-              <span className="text-base font-bold text-primary">{initials}</span>
+            <div className="w-8 h-8 rounded-md bg-white/10 flex items-center justify-center shrink-0">
+              <span className="text-sm font-bold text-white/80">{initials}</span>
             </div>
           )}
-          <div className="flex-1 min-w-0">
-            <h2 className="text-base font-bold text-sidebar-foreground leading-tight truncate">
-              {data.companyName}
-            </h2>
-            {data.vertical && (
-              <span className="text-xs text-sidebar-foreground/50 mt-0.5 block">
-                {data.vertical === "other"
-                  ? data.customVertical || "Other"
-                  : data.vertical.replace(/_/g, " ")}
-                {data.companySize ? ` · ${data.companySize}` : ""}
-              </span>
-            )}
+          <div className="min-w-0">
+            <p className="text-sm font-semibold text-white/90 truncate">{companyName}</p>
+            <p className="text-[10px] text-white/35 mt-0.5">Building your profile</p>
           </div>
         </div>
-
-        {/* Maturity badge */}
-        {maturityOption && (
-          <div className="text-xs font-medium text-primary bg-primary/6 rounded-lg px-3 py-2">
-            {maturityOption.label}
-          </div>
-        )}
-
-        {/* Progress bar */}
-        <div className="space-y-1.5">
-          <div className="h-1.5 bg-sidebar-border rounded-full overflow-hidden">
-            <div
-              className="h-full bg-primary rounded-full transition-all duration-500"
-              style={{ width: `${progress}%` }}
-            />
-          </div>
-          <p className="text-[10px] text-sidebar-foreground/35 font-medium">
-            {progress}% complete
+      ) : (
+        <div className="px-1">
+          <p className="text-[10px] font-semibold uppercase tracking-widest text-white/30">
+            Getting started
           </p>
         </div>
-      </div>
+      )}
 
-      <div className="border-t border-sidebar-border" />
+      {/* Lesson-style stage list */}
+      <nav className="space-y-0.5">
+        {ONBOARDING_STAGES.map((stage, i) => {
+          const isDone = i < currentStage;
+          const isCurrent = i === currentStage;
+          const isLocked = i > currentStage;
 
-      {/* Data sections — clean labels + values */}
-      <div className="space-y-4">
-        {/* Customer profile */}
-        {data.customerDescription && (
-          <DataSection label="Customers">
-            <p className="text-sm font-medium text-sidebar-foreground leading-snug">{data.customerDescription}</p>
-            {data.customerSize && (
-              <p className="text-xs text-sidebar-foreground/45 mt-0.5">{data.customerSize} segment</p>
-            )}
-          </DataSection>
-        )}
+          return (
+            <div
+              key={stage.key}
+              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all ${
+                isCurrent
+                  ? "bg-white/10"
+                  : isDone
+                  ? "opacity-70"
+                  : "opacity-30"
+              }`}
+            >
+              {/* Step indicator */}
+              <div
+                className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 text-[10px] font-bold transition-all ${
+                  isDone
+                    ? "bg-white/20 text-white"
+                    : isCurrent
+                    ? "bg-white text-slate-900"
+                    : "border border-white/20 text-white/30"
+                }`}
+              >
+                {isDone ? "✓" : i + 1}
+              </div>
 
-        {/* Focus area */}
-        {data.biggestChallenge && (
-          <DataSection label="Focus area">
-            <p className="text-sm text-sidebar-foreground/80 italic leading-snug">
-              &ldquo;{data.biggestChallenge}&rdquo;
-            </p>
-          </DataSection>
-        )}
-
-        {/* Pain points tags */}
-        {data.painPoints && data.painPoints.length > 0 && (
-          <DataSection label="Pain points">
-            <div className="flex flex-wrap gap-1.5">
-              {data.painPoints.slice(0, 5).map((p) => (
-                <span
-                  key={p}
-                  className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-primary/8 text-primary"
-                >
-                  {p.replace(/_/g, " ")}
-                </span>
-              ))}
+              {/* Label */}
+              <span
+                className={`text-xs font-medium leading-tight ${
+                  isCurrent
+                    ? "text-white"
+                    : isDone
+                    ? "text-white/60"
+                    : "text-white/30"
+                }`}
+              >
+                {stage.label}
+              </span>
             </div>
-          </DataSection>
-        )}
+          );
+        })}
+      </nav>
 
-        {/* Goal */}
-        {data.primaryGoal && (
-          <DataSection label="Goal">
-            <p className="text-sm font-medium text-sidebar-foreground">
-              {data.primaryGoal === "something_else" && data.customGoal
-                ? data.customGoal
-                : data.primaryGoal.replace(/_/g, " ")}
-            </p>
-            {data.timeframe && (
-              <p className="text-xs text-sidebar-foreground/45 mt-0.5">
-                {data.timeframe.replace(/_/g, " ")}
-              </p>
-            )}
-          </DataSection>
-        )}
+      {/* Divider */}
+      <div className="border-t border-white/8" />
 
-        {/* Competitors */}
-        {data.competitors && (
-          <DataSection label="Competitors">
-            <div className="flex flex-wrap gap-1.5">
-              {data.competitors.split(",").map((c) => c.trim()).filter(Boolean).slice(0, 4).map((c) => (
-                <span
-                  key={c}
-                  className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-sidebar-accent text-sidebar-foreground/70"
-                >
-                  {c}
-                </span>
-              ))}
+      {/* What's coming next */}
+      <div className="space-y-2 px-1">
+        <p className="text-[10px] font-semibold uppercase tracking-widest text-white/25">
+          After onboarding
+        </p>
+        <div className="space-y-1.5">
+          {[
+            { label: "Dashboard" },
+            { label: "CX Report" },
+            { label: "Journey Map" },
+            { label: "Playbook" },
+          ].map((item) => (
+            <div key={item.label} className="flex items-center gap-3 px-3 py-1.5 opacity-20">
+              <div className="w-1.5 h-1.5 rounded-full bg-white/40 shrink-0" />
+              <span className="text-xs text-white/50">{item.label}</span>
             </div>
-          </DataSection>
-        )}
+          ))}
+        </div>
       </div>
-    </div>
-  );
-}
-
-/** Clean data section — label + content, no icons */
-function DataSection({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <div className="space-y-1">
-      <p className="text-[10px] font-semibold uppercase tracking-wider text-sidebar-foreground/35">{label}</p>
-      {children}
     </div>
   );
 }

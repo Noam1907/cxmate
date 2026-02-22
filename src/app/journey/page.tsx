@@ -131,7 +131,7 @@ function JourneyContent() {
 
 export default function JourneyPage() {
   return (
-    <main className="min-h-screen py-12 px-4">
+    <main className="min-h-screen py-12 px-4 bg-white">
       <Suspense
         fallback={
           <div className="text-center space-y-2 pt-24">

@@ -49,21 +49,21 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <>
       <NavHeader />
-      <div className="grid grid-cols-1 md:grid-cols-[minmax(260px,1fr)_2.5fr] min-h-[calc(100vh-3.5rem)]">
+      <div className="grid grid-cols-1 md:grid-cols-[240px_1fr] min-h-[calc(100vh-3.5rem)]">
         {/* Desktop sidebar */}
         <CxIdentitySidebar />
 
         {/* Main content */}
-        <main className="overflow-y-auto">{children}</main>
+        <main className="overflow-y-auto bg-slate-50">{children}</main>
       </div>
 
       {/* Mobile: floating toggle button */}
       <button
         onClick={() => setMobileOpen(true)}
-        className="fixed bottom-5 left-5 z-40 md:hidden w-11 h-11 rounded-full bg-primary text-primary-foreground shadow-lg hover:shadow-xl transition-all flex items-center justify-center"
-        aria-label="Show CX profile"
+        className="fixed bottom-5 left-5 z-40 md:hidden w-11 h-11 rounded-full bg-slate-900 text-white shadow-lg hover:shadow-xl transition-all flex items-center justify-center"
+        aria-label="Show navigation"
       >
-        <span className="text-[10px] font-bold">CX</span>
+        <span className="text-[10px] font-bold">≡</span>
       </button>
 
       {/* Mobile: slide-over drawer */}
@@ -75,30 +75,18 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             onClick={() => setMobileOpen(false)}
           />
           {/* Drawer */}
-          <aside className="absolute left-0 top-0 bottom-0 w-[300px] bg-sidebar border-r border-sidebar-border overflow-y-auto animate-in slide-in-from-left duration-200">
-            <div className="p-5 space-y-5">
+          <aside className="absolute left-0 top-0 bottom-0 w-[240px] bg-sidebar border-r border-sidebar-border overflow-y-auto animate-in slide-in-from-left duration-200">
+            <div className="p-5 pt-6">
               {/* Close button */}
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-lg bg-sidebar-primary/10 flex items-center justify-center">
-                    <span className="text-sm font-bold text-sidebar-primary">
-                      CX
-                    </span>
-                  </div>
-                  <p className="text-xs font-bold text-sidebar-foreground">
-                    CX Identity
-                  </p>
-                </div>
+              <div className="flex items-center justify-end mb-4">
                 <button
                   onClick={() => setMobileOpen(false)}
-                  className="text-sidebar-foreground/50 hover:text-sidebar-foreground text-lg"
+                  className="text-white/30 hover:text-white/60 text-xl leading-none"
                   aria-label="Close sidebar"
                 >
                   &times;
                 </button>
               </div>
-
-              <div className="border-t border-sidebar-border/50" />
 
               {/* Reuse the same views as desktop */}
               {isOnboarding ? (
