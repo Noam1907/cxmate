@@ -52,22 +52,23 @@ function MomentNode({
       <div className={`w-px h-6 ${isSelected ? "bg-slate-400" : "bg-slate-200"}`} />
 
       {/* Dot */}
-      <button
-        onClick={onClick}
-        title={moment.name}
-        className={`relative group transition-all duration-200 ${isSelected ? "scale-125 z-10" : "hover:scale-110"}`}
-      >
-        <div
+      <div className={`relative group transition-all duration-200 ${isSelected ? "scale-125" : "hover:scale-110"}`} style={{ zIndex: isSelected ? 40 : undefined }}>
+        <button
+          onClick={onClick}
+          title={moment.name}
           className={`w-8 h-8 rounded-full flex items-center justify-center text-[11px] transition-all border border-white shadow-sm ${sev.dot} ${isSelected ? `ring-2 ring-offset-2 ${sev.ring} shadow-md` : ""}`}
         >
           <span className="text-white opacity-80">{typeIcon[moment.type] ?? "•"}</span>
-        </div>
-        {/* Tooltip */}
-        <div className="absolute left-1/2 -translate-x-1/2 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity bg-slate-800 text-white text-[11px] px-2.5 py-1.5 rounded-lg whitespace-nowrap z-30 shadow-lg mt-1.5">
+        </button>
+        {/* Tooltip — above everything */}
+        <div
+          className={`absolute left-1/2 -translate-x-1/2 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity bg-slate-800 text-white text-[11px] px-2.5 py-1.5 rounded-lg whitespace-nowrap shadow-lg ${position === "top" ? "bottom-full mb-2" : "top-full mt-2"}`}
+          style={{ zIndex: 9999 }}
+        >
           {moment.name}
           <div className={`text-[10px] mt-0.5 ${sev.text} font-medium`}>{sev.label}</div>
         </div>
-      </button>
+      </div>
 
       {/* Label */}
       <span className={`mt-1.5 text-[11px] max-w-[80px] text-center leading-tight line-clamp-2 ${isSelected ? "text-slate-700 font-medium" : "text-slate-400"}`}>
@@ -318,8 +319,8 @@ export function JourneyVisual({ journey }: JourneyVisualProps) {
       <JourneySummary journey={journey} />
 
       {/* Flow — horizontal scroll */}
-      <div className="overflow-x-auto pb-4 -mx-4 px-4">
-        <div className="flex items-center min-w-max py-4 px-8 gap-0">
+      <div className="overflow-x-auto overflow-y-visible pb-4 -mx-4 px-4">
+        <div className="flex items-center min-w-max py-4 px-8 gap-0" style={{ overflowY: "visible" }}>
 
           {/* Start */}
           <div className="flex flex-col items-center mr-3">
