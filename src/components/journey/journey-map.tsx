@@ -88,29 +88,23 @@ export function JourneyMap({ journey, evidenceMap }: JourneyMapProps) {
       </div>
 
       {/* Stage health overview bar */}
-      <div className="rounded-2xl border bg-white p-5">
-        <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3">
+      <div className="rounded-xl border bg-white p-5">
+        <div className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-4">
           Risk by Stage
         </div>
-        <div className="space-y-2.5">
+        <div className="space-y-3">
           {stageHealth.map((s, i) => (
             <div key={i} className="flex items-center gap-3">
-              <div className="w-28 text-xs font-medium truncate text-right shrink-0">
+              <div className="w-28 text-xs text-slate-500 truncate text-right shrink-0">
                 {s.name}
               </div>
-              <div className="flex-1 h-2 rounded-full bg-slate-100 overflow-hidden">
+              <div className="flex-1 h-1.5 rounded-full bg-slate-100 overflow-hidden">
                 <div
-                  className={`h-full rounded-full transition-all duration-700 ${
-                    s.pct >= 60
-                      ? "bg-red-500"
-                      : s.pct >= 30
-                      ? "bg-amber-500"
-                      : "bg-emerald-500"
-                  }`}
-                  style={{ width: `${Math.max(s.pct, 5)}%` }}
+                  className="h-full rounded-full bg-slate-800 transition-all duration-700"
+                  style={{ width: `${Math.max(s.pct, 4)}%` }}
                 />
               </div>
-              <div className="w-16 text-xs text-muted-foreground shrink-0">
+              <div className="w-16 text-xs text-slate-400 shrink-0">
                 {s.critical}/{s.total} risky
               </div>
             </div>
@@ -127,11 +121,11 @@ export function JourneyMap({ journey, evidenceMap }: JourneyMapProps) {
       {salesStages.length > 0 && (
         <div className="space-y-4">
           <div className="flex items-center gap-2">
-            <div className="h-px flex-1 bg-blue-200" />
-            <span className="text-sm font-semibold text-blue-700 px-3">
+            <div className="h-px flex-1 bg-slate-200" />
+            <span className="text-xs font-semibold text-slate-400 px-3 uppercase tracking-wide">
               Sales Journey
             </span>
-            <div className="h-px flex-1 bg-blue-200" />
+            <div className="h-px flex-1 bg-slate-200" />
           </div>
           <div className="space-y-6">
             {salesStages.map((stage, i) => (
@@ -150,11 +144,11 @@ export function JourneyMap({ journey, evidenceMap }: JourneyMapProps) {
       {/* Handoff indicator */}
       {salesStages.length > 0 && customerStages.length > 0 && (
         <div className="flex items-center gap-2 py-2">
-          <div className="h-px flex-1 bg-gradient-to-r from-blue-200 to-emerald-200" />
-          <span className="text-xs font-semibold text-muted-foreground px-3 py-1 rounded-full border bg-background">
-            Sales to Customer Handoff
+          <div className="h-px flex-1 bg-slate-200" />
+          <span className="text-xs font-semibold text-slate-400 px-3 py-1 rounded-full border border-slate-200 bg-white uppercase tracking-wide">
+            Handoff
           </span>
-          <div className="h-px flex-1 bg-gradient-to-r from-emerald-200 to-emerald-200" />
+          <div className="h-px flex-1 bg-slate-200" />
         </div>
       )}
 
@@ -163,11 +157,11 @@ export function JourneyMap({ journey, evidenceMap }: JourneyMapProps) {
         <div className="space-y-4">
           {salesStages.length > 0 && (
             <div className="flex items-center gap-2">
-              <div className="h-px flex-1 bg-emerald-200" />
-              <span className="text-sm font-semibold text-emerald-700 px-3">
+              <div className="h-px flex-1 bg-slate-200" />
+              <span className="text-xs font-semibold text-slate-400 px-3 uppercase tracking-wide">
                 Customer Journey
               </span>
-              <div className="h-px flex-1 bg-emerald-200" />
+              <div className="h-px flex-1 bg-slate-200" />
             </div>
           )}
           <div className="space-y-6">
@@ -189,11 +183,11 @@ export function JourneyMap({ journey, evidenceMap }: JourneyMapProps) {
         <>
           {/* Divider */}
           <div className="flex items-center gap-2 py-2">
-            <div className="h-px flex-1 bg-gradient-to-r from-transparent via-slate-300 to-transparent" />
-            <span className="text-sm font-semibold text-slate-500 px-3">
+            <div className="h-px flex-1 bg-slate-200" />
+            <span className="text-xs font-semibold text-slate-400 px-3 uppercase tracking-wide">
               CX Intelligence
             </span>
-            <div className="h-px flex-1 bg-gradient-to-r from-transparent via-slate-300 to-transparent" />
+            <div className="h-px flex-1 bg-slate-200" />
           </div>
 
           {/* Impact Projections + Maturity Assessment */}
