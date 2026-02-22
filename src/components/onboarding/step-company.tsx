@@ -1,7 +1,9 @@
 "use client";
 
+import { useState } from "react";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { BUSINESS_MODELS, INDUSTRY_VERTICALS } from "@/lib/cx-knowledge";
 import { COMPANY_SIZES, type OnboardingData } from "@/types/onboarding";
@@ -30,6 +32,8 @@ export function StepCompany({ data, onChange, enrichment, isEnriching }: StepCom
   const hasEnrichment = !!enrichment;
   const verticalWasSuggested = hasEnrichment && data.vertical === enrichment.suggestedVertical;
   const sizeWasSuggested = hasEnrichment && data.companySize === enrichment.suggestedCompanySize;
+  const [editingDescription, setEditingDescription] = useState(false);
+  const [descriptionOverride, setDescriptionOverride] = useState("");
 
   return (
     <div className="space-y-8">
@@ -60,24 +64,78 @@ export function StepCompany({ data, onChange, enrichment, isEnriching }: StepCom
         </div>
       )}
 
-      {/* Enrichment result card — large, prominent showcase */}
+      {/* Enrichment result card — editable if wrong */}
       {hasEnrichment && enrichment.description && !isEnriching && (
         <div className="rounded-2xl border-2 border-primary/25 bg-gradient-to-br from-primary/5 via-primary/8 to-amber-50/50 p-6 space-y-3 shadow-sm">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-primary/12 flex items-center justify-center shrink-0">
-              <svg className="w-5 h-5 text-primary" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" clipRule="evenodd" />
-              </svg>
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-xl bg-primary/12 flex items-center justify-center shrink-0">
+                <svg className="w-5 h-5 text-primary" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <span className="text-sm font-bold text-foreground tracking-tight">What I found about {data.companyName}</span>
             </div>
-            <span className="text-sm font-bold text-foreground tracking-tight">What I found about {data.companyName}</span>
+            {/* Correct it button */}
+            {!editingDescription && (
+              <button
+                type="button"
+                onClick={() => {
+                  setDescriptionOverride(enrichment.description || "");
+                  setEditingDescription(true);
+                }}
+                className="text-xs text-muted-foreground hover:text-foreground underline underline-offset-2 shrink-0"
+              >
+                Not right? Fix it
+              </button>
+            )}
           </div>
-          <p className="text-base text-foreground leading-relaxed">
-            {enrichment.description}
-          </p>
-          {enrichment.confidence && (
+
+          {editingDescription ? (
+            <div className="space-y-2">
+              <Textarea
+                value={descriptionOverride}
+                onChange={(e) => setDescriptionOverride(e.target.value)}
+                rows={3}
+                className="rounded-xl border-primary/30 bg-white text-sm"
+                placeholder="Describe what your company actually does..."
+                autoFocus
+              />
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    // Store corrected description in additionalContext so it reaches the AI
+                    onChange({ additionalContext: descriptionOverride });
+                    setEditingDescription(false);
+                  }}
+                  className="text-xs font-semibold text-primary hover:text-primary/80"
+                >
+                  Save correction
+                </button>
+                <span className="text-xs text-muted-foreground">·</span>
+                <button
+                  type="button"
+                  onClick={() => setEditingDescription(false)}
+                  className="text-xs text-muted-foreground hover:text-foreground"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          ) : (
+            <p className="text-base text-foreground leading-relaxed">
+              {descriptionOverride || enrichment.description}
+              {descriptionOverride && (
+                <span className="ml-2 text-[11px] text-primary font-medium">(corrected)</span>
+              )}
+            </p>
+          )}
+
+          {enrichment.confidence && !editingDescription && (
             <div className="flex items-center gap-2 text-xs text-muted-foreground pt-1">
               <span className={`w-2 h-2 rounded-full ${enrichment.confidence === "high" ? "bg-emerald-500" : enrichment.confidence === "medium" ? "bg-amber-500" : "bg-gray-400"}`} />
-              {enrichment.confidence === "high" ? "High confidence" : enrichment.confidence === "medium" ? "Medium confidence" : "Best guess"} analysis
+              {enrichment.confidence === "high" ? "High confidence" : enrichment.confidence === "medium" ? "Medium confidence" : "Best guess"} — your corrections override this
             </div>
           )}
         </div>
