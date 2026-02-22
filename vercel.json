@@ -1,9 +1,9 @@
 {
   "functions": {
-    "api/onboarding": {
+    "src/app/api/onboarding/route.ts": {
       "maxDuration": 300
     },
-    "api/recommendations/generate": {
+    "src/app/api/recommendations/generate/route.ts": {
       "maxDuration": 300
     }
   }
