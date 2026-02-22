@@ -119,10 +119,10 @@ function HeroImpactCard({ projections, delay }: { projections: ImpactProjection[
   const hi = formatDollarCompact(Math.round(total * 1.3));
 
   return (
-    <div className={`rounded-2xl bg-slate-900 text-white p-8 transition-all duration-700 ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
+    <div className={`rounded-2xl border border-slate-200 bg-white p-8 transition-all duration-700 ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
       <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-2">Revenue at risk — annually</p>
-      <div className="text-5xl font-bold tracking-tight">{lo} – {hi}</div>
-      <p className="text-sm text-slate-500 mt-2 leading-relaxed max-w-md">
+      <div className="text-5xl font-bold tracking-tight text-slate-900">{lo} – {hi}</div>
+      <p className="text-sm text-slate-400 mt-2 leading-relaxed max-w-md">
         Estimated value leaving through CX gaps — based on your deal size, customer count, and industry benchmarks for companies at your stage.
       </p>
     </div>
@@ -176,7 +176,7 @@ function ImpactBreakdown({ projections, delay }: { projections: ImpactProjection
                   <span className="text-sm font-semibold text-slate-900">{item.potentialImpact}</span>
                 </div>
                 <div className="h-1.5 rounded-full bg-slate-100 overflow-hidden">
-                  <div className="h-full rounded-full bg-slate-800 transition-all duration-1000 ease-out" style={{ width: `${pct}%` }} />
+                  <div className="h-full rounded-full bg-slate-400 transition-all duration-1000 ease-out" style={{ width: `${pct}%` }} />
                 </div>
                 <div className="flex items-center justify-between mt-1.5">
                   <span className="text-xs text-slate-400">{item.timeToRealize}</span>
