@@ -251,39 +251,32 @@ function GeneratingExperience({ data }: { data: OnboardingData }) {
   const progress = Math.min((seconds / 120) * 100, 95);
 
   return (
-    <div className="rounded-2xl border border-amber-100 bg-gradient-to-b from-amber-50/60 to-orange-50/30 p-8 space-y-8">
+    <div className="rounded-2xl border border-slate-200 bg-white p-8 space-y-8">
 
-      {/* Header — illustrated doodle + warm copy */}
+      {/* Header */}
       <div className="text-center space-y-3">
-        {/* Hand-drawn style map doodle */}
-        <div className="mx-auto w-16 h-16 flex items-center justify-center">
-          <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-16 h-16">
-            {/* Map scroll */}
-            <rect x="8" y="12" width="48" height="40" rx="3" stroke="#92400e" strokeWidth="2" fill="#fffbeb" />
-            <rect x="8" y="12" width="48" height="7" rx="3" stroke="#92400e" strokeWidth="2" fill="#fde68a" />
-            {/* Journey path — hand-drawn dashes */}
-            <path d="M18 36 C22 30 28 42 34 34 C40 26 46 38 50 32" stroke="#d97706" strokeWidth="2.5" strokeLinecap="round" strokeDasharray="4 3" />
-            {/* Stage dots */}
-            <circle cx="18" cy="36" r="3" fill="#d97706" />
-            <circle cx="34" cy="34" r="3" fill="#d97706" />
-            <circle cx="50" cy="32" r="3" fill="#f59e0b" />
-            {/* Sparkle */}
-            <path d="M54 10 L55 7 L56 10 L59 11 L56 12 L55 15 L54 12 L51 11 Z" fill="#fbbf24" />
+        <div className="mx-auto w-12 h-12 flex items-center justify-center">
+          <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-12 h-12">
+            <circle cx="24" cy="24" r="20" stroke="#e2e8f0" strokeWidth="2" />
+            <path d="M14 24 C17 19 21 29 24 23 C27 17 31 27 34 22" stroke="#94a3b8" strokeWidth="2" strokeLinecap="round" strokeDasharray="3 2.5" />
+            <circle cx="14" cy="24" r="2.5" fill="#cbd5e1" />
+            <circle cx="24" cy="23" r="2.5" fill="#94a3b8" />
+            <circle cx="34" cy="22" r="2.5" fill="#64748b" />
           </svg>
         </div>
         <h2 className="text-2xl font-bold text-slate-800 tracking-tight">
           Building your CX playbook
         </h2>
-        <p className="text-sm text-slate-500">
+        <p className="text-sm text-slate-400">
           Deep analysis in progress — about 2 minutes
         </p>
       </div>
 
-      {/* Progress bar — amber, warm */}
+      {/* Progress bar */}
       <div className="space-y-1.5">
-        <div className="h-2 bg-amber-100 rounded-full overflow-hidden">
+        <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
           <div
-            className="h-full bg-gradient-to-r from-amber-400 to-orange-400 rounded-full transition-all duration-1000 ease-out"
+            className="h-full bg-slate-400 rounded-full transition-all duration-1000 ease-out"
             style={{ width: `${progress}%` }}
           />
         </div>
@@ -295,7 +288,7 @@ function GeneratingExperience({ data }: { data: OnboardingData }) {
         </div>
       </div>
 
-      {/* Phase list — no strikethrough, checkmark = done */}
+      {/* Phase list */}
       <div className="space-y-3">
         {phases.map((p, i) => {
           const isDone = i < phase;
@@ -304,24 +297,22 @@ function GeneratingExperience({ data }: { data: OnboardingData }) {
             <div
               key={i}
               className={`flex items-start gap-3 transition-all duration-500 ${
-                isDone || isActive ? "opacity-100" : "opacity-35"
+                isDone || isActive ? "opacity-100" : "opacity-30"
               }`}
             >
-              {/* Status indicator */}
               <div className="mt-0.5 shrink-0">
                 {isDone ? (
-                  <div className="w-5 h-5 rounded-full bg-amber-100 border border-amber-300 flex items-center justify-center">
-                    <svg className="w-3 h-3 text-amber-600" fill="none" viewBox="0 0 12 12" stroke="currentColor" strokeWidth={2.5}>
+                  <div className="w-5 h-5 rounded-full bg-slate-100 border border-slate-300 flex items-center justify-center">
+                    <svg className="w-3 h-3 text-slate-500" fill="none" viewBox="0 0 12 12" stroke="currentColor" strokeWidth={2.5}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M2 6l3 3 5-5" />
                     </svg>
                   </div>
                 ) : isActive ? (
-                  <div className="w-5 h-5 rounded-full border-2 border-amber-400 border-t-transparent animate-spin" />
+                  <div className="w-5 h-5 rounded-full border-2 border-slate-400 border-t-transparent animate-spin" />
                 ) : (
                   <div className="w-5 h-5 rounded-full border border-slate-200" />
                 )}
               </div>
-              {/* Text — no strikethrough ever */}
               <div>
                 <p className={`text-sm font-medium leading-snug ${
                   isDone ? "text-slate-400" : isActive ? "text-slate-800" : "text-slate-400"
@@ -337,8 +328,8 @@ function GeneratingExperience({ data }: { data: OnboardingData }) {
         })}
       </div>
 
-      {/* Insight line — warm, encouraging */}
-      <p className="text-xs text-amber-700/80 text-center leading-relaxed border-t border-amber-100 pt-5 italic">
+      {/* Insight line */}
+      <p className="text-xs text-slate-400 text-center leading-relaxed border-t border-slate-100 pt-5 italic">
         {data.companyMaturity === "pre_launch"
           ? "Companies that map their sales journey before launch close first deals 2× faster."
           : data.companyMaturity === "first_customers"
