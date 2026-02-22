@@ -180,6 +180,84 @@ Always use this order. Never skip straight to breakdown without the hero number 
 
 ---
 
+## Brand Visual Identity — Marketing & Illustrated Style
+
+This style governs all external-facing content: marketing visuals, social media, landing page illustrations, onboarding imagery, and any "lighter" moments in the product UI where we want warmth over corporate precision.
+
+**The guiding principle:** The product UI is clean and authoritative (Linear/Vercel aesthetic). The illustrated layer is what makes it feel human and approachable — a founder talking to a founder, not an enterprise software manual.
+
+### Visual Style
+
+A clean, minimalist business-style conceptual illustration in a hand-drawn doodle aesthetic. Simple line art with limited accent colors on a light or dark background. Professional yet approachable, resembling a "business storyteller" or "graphic recorder" style with thin outlines and a whiteboard-style feel.
+
+**Two visual modes:**
+1. **Illustrated mode:** Hand-drawn doodle characters and scenes (for story-driven content). Characters are simple, expressive, with minimal detail.
+2. **Typographic/editorial mode:** Bold typography on dark/light background with handwritten elements (for quote-driven or conceptual content).
+
+### Brand Color Palettes
+
+**Illustrated mode:**
+
+| Color | Role |
+|-------|------|
+| Yellow | Primary accent, character clothing, key elements |
+| Blue | Secondary accent, supporting elements |
+| Red | Sparse highlights, emotional emphasis |
+| Black | Thin line art, outlines |
+| White / light gray | Background |
+
+**Typographic/editorial mode:**
+
+| Color | Hex | Role |
+|-------|-----|------|
+| Deep navy | #1B2838 | Dark backgrounds |
+| Warm amber / golden | #E8A838 | Headlines, emphasis |
+| Off-white / cream | #F0EBE0 | Secondary text, handwritten elements |
+
+**Rules:**
+- Maximum 3-4 colors per piece (including background)
+- Never mix illustrated and typographic palettes in the same image
+- Constraint creates recognition
+
+### What It's NOT
+- Stock photography
+- Generic corporate infographics
+- Pixar / Disney / children's book cartoon
+- Overly polished 3D renders
+- AI-generated "realistic" images
+- Clip art
+
+### Image Generation Prompt Template
+
+When creating prompts for Gemini or other image generators, always start with:
+
+```
+A clean, minimalist business-style conceptual illustration in a hand-drawn doodle aesthetic. The style features simple line art with limited accent colors on a [white/light gray OR dark navy] background. The overall vibe is professional yet approachable, resembling a "business storyteller" or "graphic recorder" style with thin black outlines and a whiteboard-style feel.
+
+[Scene description here]
+
+Color palette: [specific colors from brand palette]. Very simple, very clean, lots of white space. Square format, 1200x1200.
+```
+
+### How the Illustrated Style Informs Product UI
+
+The doodle/illustrated brand voice should leak into the product in subtle ways — not by making the UI cartoonish, but by adding warmth:
+
+- **Empty states:** Use illustrated spot graphics (simple line art) instead of generic icons
+- **Loading states:** The illustrated style can appear during the 2.8-minute generation — a simple doodle of a map being drawn, or a person reviewing a report
+- **Onboarding:** The welcome screen and success moments can carry illustrated accents
+- **Tooltips and helper text:** Written in the "founder talking to founder" voice, not manual language
+- **Celebration moments:** When the journey is ready, when a playbook item is completed — small illustrated touches acknowledge the win
+
+The rule: **the illustrated style lives in the emotional moments, not the data moments.** The confrontation report stays clean. The empty state that says "no journey yet" can have heart.
+
+### LinkedIn Dimensions
+- Single image: 1200x1200 (square) or 1200x628 (landscape)
+- Carousel: 1200x1200 per slide, or 1080x1350 (portrait)
+- Mobile-first: text must be readable at small size
+
+---
+
 ## Required Reading
 
 - `C-core/project-brief.md` (personas, positioning, success metrics)
