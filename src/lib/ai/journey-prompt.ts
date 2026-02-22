@@ -575,61 +575,34 @@ Generate a customized, theory-backed journey map with the CX Mate companion voic
 
 1. **Stages**: Use the standard stages as a foundation but customize names, descriptions, and emotional states to match this specific company. For each stage, identify the top failure risk and recommend the highest-impact success pattern.${!input.hasExistingCustomers ? ' IMPORTANT: ALL stages MUST have stageType: "sales". Do not generate any stages with stageType: "customer". There are no customers yet.' : ""}
 
-2. **Meaningful Moments (2-4 per stage)**: Tailored to their industry and challenges. For each moment:
-   - Provide a theory-backed **diagnosis** (what's likely going wrong and the root cause)
-   - Give a specific **actionTemplate** (exactly what to do, write, or send)
-   - Recommend a specific **cxToolRecommendation** (which measurement tool to deploy)
-   - Include a **decisionScienceInsight** (what the buyer/customer is psychologically experiencing)
-   - State the **impactIfIgnored** (the business cost — use their numbers or benchmarks)
-   - **addressesPainPoints**: Array of pain point keys from the user's input that this moment directly addresses (use the EXACT keys from "Their Challenges" above, e.g. ["churn", "no_visibility"]). If no direct match, omit.
-   - **competitorGap**: If this moment represents a competitive differentiation opportunity against one of their listed competitors, note it (e.g., "Zendesk users frequently complain about slow onboarding — your moment to shine"). If no competitor relevance, omit.
+2. **Meaningful Moments (2-3 per stage, max)**: Tailored to their industry and challenges. For each moment:
+   - Provide a theory-backed **diagnosis** (1 sentence: root cause)
+   - Give a specific **actionTemplate** (1 sentence: exactly what to do)
+   - Recommend a specific **cxToolRecommendation** (1 sentence: which tool + why)
+   - State the **impactIfIgnored** (1 sentence: business cost)
+   - **addressesPainPoints**: Array of pain point keys from user input (only if direct match, else omit)
+   - Omit **decisionScienceInsight** and **competitorGap** to keep output concise
 
-3. **Confrontation Insights (3-5)**: Use the companion voice. Frame as "What typically trips up companies at your stage" not "What you're getting wrong." Each includes:
-   - The pattern name
-   - Likelihood for this company
-   - Business impact (with math if user provided data)
-   - Immediate action
-   - What to measure
-   - **companionAdvice**: A single-sentence CX Mate comment in first person, like a smart friend saying what they'd do. Examples: "If I were you, I'd fix this before hiring a CS team." or "This is the #1 thing I see killing retention at your stage."
-   - **addressesPainPoints**: Array of pain point keys from the user's input that this insight maps to (use EXACT keys, e.g. ["churn", "handoff_gaps"]). Every insight should map to at least one pain point where possible.
-   - **competitorContext**: If this insight has a competitor angle (e.g., a competitor weakness the user can exploit), note it. Otherwise omit.
+3. **Confrontation Insights (3-4 max)**: Companion voice. Each in 1 sentence per field:
+   - Pattern name, likelihood, business impact (with math if user data available), immediate action, what to measure
+   - **companionAdvice**: 1 sentence, first person, direct advice
+   - **addressesPainPoints**: pain point keys (use EXACT keys, omit if no match)
+   - Omit **competitorContext** to keep output concise
 
-4. **CX Tool Roadmap (3-5 tools)**: Matched to their CX maturity. Don't recommend NPS if they have under 50 responses — suggest CSAT instead.
+4. **CX Tool Roadmap (2-3 tools max)**: Most critical tools only. Don't recommend NPS if under 50 responses — suggest CSAT instead.
 
 5. **Impact Projections (2-3)**: Each MUST include:
-   - **calculation**: The math formula (e.g., "50 customers × $12K ACV × 25% churn reduction = $150K")
+   - **calculation**: Math formula (e.g., "50 customers × $12K ACV × 25% churn reduction = $150K")
    - **dataSource**: "user_provided" or "benchmark_estimated"
-   - Show ranges (conservative to optimistic)
+   - Include both dollar amount AND percentage (e.g., "$36K–$72K / 20-40% churn reduction")
 
-6. **Maturity Assessment**: A 2-3 sentence CX Mate-style assessment. Validate where they are, name what to focus on, say what to avoid doing too early.
+6. **Maturity Assessment**: 2 sentences max in companion voice.
 
-7. **Tech Stack Recommendations (4-7)**: Based on their maturity, recommend which tools to connect across their full operational stack. For each:
-   - Category (crm, marketing, support, analytics, cs_platform, communication, bi, survey, data_infrastructure)
-   - 2-3 specific tool names (appropriate for their stage — don't recommend Salesforce to a 5-person startup)
-   - Why this category matters now
-   - What to integrate it with
+7. **Tech Stack Recommendations (3-4 max)**: Most critical categories only. Each: category, 2 tool names, 1-sentence whyNow, 1-sentence connectWith.
 
-   Category guidance for the 3 new categories:
-   - **bi** (Business Intelligence): Tools like Metabase, Looker, Tableau, Power BI. Recommend when: scaling stage, >50 customers, or "no_visibility" / "data_silos" pain points.
-   - **survey** (Survey & Feedback): Dedicated tools like Delighted, Typeform, Qualtrics, SurveyMonkey. Recommend when: company measures NPS/CSAT/CES or has "no_feedback_loop" pain point. Keep separate from analytics.
-   - **data_infrastructure** (Data Infrastructure): Data collection/warehousing like Segment, Snowflake, BigQuery, Fivetran. Recommend when: scaling stage, "data_silos" pain point, or 3+ other tools recommended (need data unification).
+8. **Assumptions (2-3)**: Most important assumptions only, 1 sentence each.
 
-8. **Assumptions (3-5)**: List the key assumptions behind your analysis. Be transparent about what you inferred vs what the user told you. Examples: "Assumed 4% monthly churn rate (industry benchmark for early-stage B2B SaaS)", "Based on mid-market ACV range of $5K-$20K from your input."
-
-9. **Impact Projections — ALWAYS include both dollar amounts AND percentage improvements.** Example: "$36K - $72K annual impact (20-40% churn reduction)". The percentage context helps users gauge if the improvement is realistic.
-
-10. **AI-First Lens**: For EVERY recommendation and action template, consider whether AI can automate it. Flag actions as:
-   - "🤖 AI can do this" — fully automatable (e.g., personalized welcome email, health scoring, sentiment analysis)
-   - "🤖+👤 AI assists" — AI drafts/suggests, human reviews (e.g., QBR deck, renewal strategy, churn outreach)
-   - "👤 Human touch" — requires genuine human connection (e.g., executive sponsor relationship, crisis management)
-   The goal: maximize CX impact while minimizing manual effort. These are small teams — help them do more with less.
-
-11. **Survey Recommendations**: For growing/scaling companies, recommend specific survey tools and timing:
-   - Which survey type (NPS/CSAT/CES) at which journey moment
-   - Specific tool suggestions appropriate for their stage (e.g., Delighted for SMB, Qualtrics for enterprise)
-   - Include this in the CX Tool Roadmap section
-
-Prioritize moments related to their stated pain points. Use plain language. Be the advisor they'd actually want to talk to.
+Prioritize moments related to their stated pain points. Use plain language. Be the advisor they'd actually want to talk to. KEEP IT CONCISE — every field is 1 sentence max.
 
 ## Output Format
 Return a JSON object with this exact structure:
@@ -652,13 +625,11 @@ Return a JSON object with this exact structure:
           "severity": "low" | "medium" | "high" | "critical",
           "triggers": ["signal 1", "signal 2"],
           "recommendations": ["specific action 1", "specific action 2"],
-          "diagnosis": "What's likely going wrong and the root cause",
-          "actionTemplate": "Specific thing to do/write/send",
-          "cxToolRecommendation": "Which CX measurement tool to deploy here and why",
-          "decisionScienceInsight": "What the buyer/customer is psychologically experiencing",
-          "impactIfIgnored": "Business cost of not addressing this",
-          "addressesPainPoints": ["pain_point_key_1"],
-          "competitorGap": "Competitor weakness insight or omit if none"
+          "diagnosis": "Root cause in 1 sentence",
+          "actionTemplate": "Specific action in 1 sentence",
+          "cxToolRecommendation": "Tool + why in 1 sentence",
+          "impactIfIgnored": "Business cost in 1 sentence",
+          "addressesPainPoints": ["pain_point_key_1"]
         }
       ]
     }
@@ -672,8 +643,7 @@ Return a JSON object with this exact structure:
       "immediateAction": "What to do right now",
       "measureWith": "Which CX tool to track this",
       "companionAdvice": "CX Mate's one-liner in first person",
-      "addressesPainPoints": ["pain_point_key_1", "pain_point_key_2"],
-      "competitorContext": "Competitor angle or omit if none"
+      "addressesPainPoints": ["pain_point_key_1", "pain_point_key_2"]
     }
   ],
   "cxToolRoadmap": [

@@ -3,21 +3,18 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import Link from "next/link";
 import type { GeneratedJourney } from "@/lib/ai/journey-prompt";
 import type { GeneratedPlaybook } from "@/lib/ai/recommendation-prompt";
 import type { OnboardingInput } from "@/lib/validations/onboarding";
-import { buildEvidenceMap, getInsightAnnotations, type EvidenceMap } from "@/lib/evidence-matching";
+import {
+  buildEvidenceMap,
+  getInsightAnnotations,
+  type EvidenceMap,
+} from "@/lib/evidence-matching";
 
 // ============================================
-// Data loading from local/session storage
+// Data loading
 // ============================================
 
 interface DashboardData {
@@ -71,6 +68,32 @@ function loadLocalDashboardData(): DashboardData {
 }
 
 // ============================================
+// Dollar parsing
+// ============================================
+
+function parseDollarValue(impact: string): number | null {
+  const match = impact.match(/\$[\d,.]+\s*[KkMmBb]?/);
+  if (!match) return null;
+  let raw = match[0].replace(/[$,]/g, "");
+  let multiplier = 1;
+  if (/[Kk]$/.test(raw)) {
+    multiplier = 1000;
+    raw = raw.replace(/[Kk]$/, "");
+  } else if (/[Mm]$/.test(raw)) {
+    multiplier = 1_000_000;
+    raw = raw.replace(/[Mm]$/, "");
+  }
+  const num = parseFloat(raw);
+  return isNaN(num) ? null : num * multiplier;
+}
+
+function formatDollarCompact(value: number): string {
+  if (value >= 1_000_000) return `$${(value / 1_000_000).toFixed(1)}M`;
+  if (value >= 1_000) return `$${Math.round(value / 1_000)}K`;
+  return `$${Math.round(value)}`;
+}
+
+// ============================================
 // Stats helpers
 // ============================================
 
@@ -82,14 +105,28 @@ function computeJourneyStats(journey: GeneratedJourney) {
   );
   const criticalMoments = journey.stages.reduce(
     (sum, s) =>
-      sum + s.meaningfulMoments.filter((m) => m.severity === "critical").length,
+      sum +
+      s.meaningfulMoments.filter((m) => m.severity === "critical").length,
     0
   );
   const highRiskInsights = (journey.confrontationInsights || []).filter(
     (i) => i.likelihood === "high"
   ).length;
 
-  return { totalStages, totalMoments, criticalMoments, highRiskInsights };
+  const projections = journey.impactProjections || [];
+  const values = projections
+    .map((p) => parseDollarValue(p.potentialImpact))
+    .filter((v): v is number => v !== null);
+  const totalImpact = values.reduce((sum, v) => sum + v, 0);
+
+  return {
+    totalStages,
+    totalMoments,
+    criticalMoments,
+    highRiskInsights,
+    totalImpact,
+    hasImpactData: values.length > 0,
+  };
 }
 
 function computePlaybookStats(
@@ -109,84 +146,6 @@ function computePlaybookStats(
 }
 
 // ============================================
-// Stat Card
-// ============================================
-
-function StatCard({
-  label,
-  value,
-  detail,
-  accent,
-}: {
-  label: string;
-  value: string | number;
-  detail?: string;
-  accent?: boolean;
-}) {
-  return (
-    <div
-      className={`rounded-2xl border p-5 transition-all ${
-        accent
-          ? "border-red-200 bg-red-50/80"
-          : "bg-white hover:shadow-sm"
-      }`}
-    >
-      <div
-        className={`text-3xl font-bold tracking-tight ${accent ? "text-red-700" : "text-foreground"}`}
-      >
-        {value}
-      </div>
-      <div
-        className={`text-xs font-medium mt-1.5 ${
-          accent ? "text-red-600" : "text-muted-foreground"
-        }`}
-      >
-        {label}
-      </div>
-      {detail && (
-        <div className="text-xs text-muted-foreground mt-0.5">{detail}</div>
-      )}
-    </div>
-  );
-}
-
-// ============================================
-// Navigation Card
-// ============================================
-
-function NavCard({
-  href,
-  title,
-  description,
-  badge,
-  badgeColor,
-  dashed,
-}: {
-  href: string;
-  title: string;
-  description: string;
-  badge?: string;
-  badgeColor?: string;
-  dashed?: boolean;
-}) {
-  return (
-    <Link href={href}>
-      <div className={`group rounded-2xl border p-5 bg-white hover:shadow-md transition-all duration-200 cursor-pointer h-full ${dashed ? "border-dashed" : ""}`}>
-        {badge && (
-          <span className={`inline-flex text-xs font-medium px-2 py-0.5 rounded-full border mb-3 ${badgeColor || "bg-slate-50 text-slate-600 border-slate-200"}`}>
-            {badge}
-          </span>
-        )}
-        <h3 className="text-base font-semibold mb-1 group-hover:text-primary transition-colors">{title}</h3>
-        <p className="text-xs text-muted-foreground leading-relaxed">
-          {description}
-        </p>
-      </div>
-    </Link>
-  );
-}
-
-// ============================================
 // Main Dashboard
 // ============================================
 
@@ -197,7 +156,6 @@ export default function DashboardPage() {
     setData(loadLocalDashboardData());
   }, []);
 
-  // Still loading from storage
   if (!data) {
     return (
       <main className="min-h-screen flex items-center justify-center">
@@ -209,18 +167,16 @@ export default function DashboardPage() {
   const hasJourney = !!data.journey;
   const hasPlaybook = !!data.playbook;
 
-  // Empty state — no data at all
+  // Empty state
   if (!hasJourney) {
     return (
       <main className="min-h-screen flex items-center justify-center p-8">
         <div className="text-center space-y-6 max-w-lg">
-          {/* Icon */}
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/8 mx-auto">
             <svg className="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 00-2.455 2.456z" />
             </svg>
           </div>
-
           <div className="space-y-2">
             <p className="text-sm font-medium text-primary uppercase tracking-widest">Dashboard</p>
             <h1 className="text-3xl font-bold tracking-tight">Welcome to CX Mate</h1>
@@ -230,27 +186,11 @@ export default function DashboardPage() {
               actionable playbook.
             </p>
           </div>
-
           <Link href="/onboarding">
             <Button size="lg" className="rounded-xl px-8 py-6 text-base font-semibold shadow-md hover:shadow-lg transition-all">
               Start Onboarding
             </Button>
           </Link>
-
-          <div className="flex items-center justify-center gap-6 text-xs text-muted-foreground pt-2">
-            <span className="flex items-center gap-1.5">
-              <svg className="w-3.5 h-3.5 text-emerald-500" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clipRule="evenodd" /></svg>
-              Free to use
-            </span>
-            <span className="flex items-center gap-1.5">
-              <svg className="w-3.5 h-3.5 text-emerald-500" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clipRule="evenodd" /></svg>
-              AI-powered analysis
-            </span>
-            <span className="flex items-center gap-1.5">
-              <svg className="w-3.5 h-3.5 text-emerald-500" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clipRule="evenodd" /></svg>
-              Ready in minutes
-            </span>
-          </div>
         </div>
       </main>
     );
@@ -267,7 +207,6 @@ export default function DashboardPage() {
     .filter((i) => i.likelihood === "high")
     .slice(0, 3);
 
-  // Evidence map for inline annotations
   const evidenceMap = data.onboarding
     ? buildEvidenceMap(data.onboarding, data.journey!)
     : null;
@@ -276,7 +215,7 @@ export default function DashboardPage() {
     <main className="min-h-screen bg-gradient-to-b from-background to-white">
       <div className="max-w-4xl mx-auto px-6 py-12">
         {/* Header */}
-        <div className="space-y-2 mb-12">
+        <div className="space-y-2 mb-10">
           <p className="text-sm font-medium text-primary uppercase tracking-widest">
             Dashboard
           </p>
@@ -286,172 +225,207 @@ export default function DashboardPage() {
           </p>
         </div>
 
-        {/* Journey Stats */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-12">
-          <StatCard label="Journey stages" value={journeyStats.totalStages} />
-          <StatCard
-            label="Meaningful moments"
-            value={journeyStats.totalMoments}
-          />
-          <StatCard
-            label="Critical risks"
-            value={journeyStats.criticalMoments}
-            accent={journeyStats.criticalMoments > 0}
-          />
-          <StatCard
-            label="High-risk patterns"
-            value={journeyStats.highRiskInsights}
-            accent={journeyStats.highRiskInsights > 0}
-          />
+        {/* Hero Impact Card */}
+        {journeyStats.hasImpactData && (
+          <div className="rounded-2xl bg-slate-900 text-white p-8 mb-6">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="w-8 h-8 rounded-lg bg-emerald-500/20 flex items-center justify-center">
+                <svg className="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <span className="text-sm font-semibold text-emerald-400 uppercase tracking-wider">
+                Estimated Annual CX Impact
+              </span>
+            </div>
+            <div className="text-5xl font-bold tracking-tight mb-1">
+              {formatDollarCompact(Math.round(journeyStats.totalImpact * 0.7))} &ndash;{" "}
+              {formatDollarCompact(Math.round(journeyStats.totalImpact * 1.3))}
+            </div>
+            <div className="text-sm text-slate-400">per year</div>
+          </div>
+        )}
+
+        {/* Stat Cards */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-10">
+          <div className="rounded-xl border bg-white p-5">
+            <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center mb-3">
+              <svg className="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 6.75V15m6-6v8.25m.503 3.498l4.875-2.437c.381-.19.622-.58.622-1.006V4.82c0-.836-.88-1.38-1.628-1.006l-3.869 1.934c-.317.159-.69.159-1.006 0L9.503 3.252a1.125 1.125 0 00-1.006 0L3.622 5.689C3.24 5.88 3 6.27 3 6.695V19.18c0 .836.88 1.38 1.628 1.006l3.869-1.934c.317-.159.69-.159 1.006 0l4.994 2.497c.317.158.69.158 1.006 0z" />
+              </svg>
+            </div>
+            <div className="text-xs text-muted-foreground mb-1">Journey Stages</div>
+            <div className="text-3xl font-bold">{journeyStats.totalStages}</div>
+          </div>
+          <div className="rounded-xl border bg-white p-5">
+            <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center mb-3">
+              <svg className="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
+              </svg>
+            </div>
+            <div className="text-xs text-muted-foreground mb-1">Moments Mapped</div>
+            <div className="text-3xl font-bold">{journeyStats.totalMoments}</div>
+          </div>
+          <div className="rounded-xl border bg-white p-5">
+            <div className="w-8 h-8 rounded-lg bg-red-50 flex items-center justify-center mb-3">
+              <svg className="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+              </svg>
+            </div>
+            <div className="text-xs text-muted-foreground mb-1">Critical Risks</div>
+            <div className={`text-3xl font-bold ${journeyStats.criticalMoments > 0 ? "text-red-700" : ""}`}>
+              {journeyStats.criticalMoments}
+            </div>
+          </div>
+          <div className="rounded-xl border bg-white p-5">
+            <div className="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center mb-3">
+              <svg className="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+              </svg>
+            </div>
+            <div className="text-xs text-muted-foreground mb-1">High-Risk Patterns</div>
+            <div className={`text-3xl font-bold ${journeyStats.highRiskInsights > 0 ? "text-amber-700" : ""}`}>
+              {journeyStats.highRiskInsights}
+            </div>
+          </div>
         </div>
 
         {/* Playbook Progress */}
         {playbookStats ? (
-          <Card className="mb-12 rounded-2xl">
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-xl">Playbook Progress</CardTitle>
-                <Badge
-                  variant={playbookStats.pct === 100 ? "default" : "secondary"}
-                  className="text-xs"
-                >
-                  {playbookStats.pct}%
-                </Badge>
+          <div className="rounded-2xl border bg-white p-6 mb-10">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h2 className="text-lg font-bold">Playbook Progress</h2>
+                <p className="text-sm text-muted-foreground">
+                  {playbookStats.done} of {playbookStats.total} actions complete
+                  {playbookStats.inProgress > 0 &&
+                    ` \u00B7 ${playbookStats.inProgress} in progress`}
+                </p>
               </div>
-              <CardDescription>
-                {playbookStats.done} of {playbookStats.total} actions complete
-                {playbookStats.inProgress > 0 &&
-                  ` / ${playbookStats.inProgress} in progress`}
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {/* Progress bar */}
-              <div className="h-2.5 rounded-full bg-slate-100 overflow-hidden mb-5">
-                <div
-                  className="h-full bg-emerald-500 rounded-full transition-all duration-500"
-                  style={{ width: `${playbookStats.pct}%` }}
-                />
+              <div className="text-3xl font-bold">
+                {playbookStats.pct}
+                <span className="text-lg text-muted-foreground">%</span>
               </div>
-
+            </div>
+            <div className="h-3 rounded-full bg-slate-100 overflow-hidden mb-4">
+              <div
+                className="h-full bg-emerald-500 rounded-full transition-all duration-500"
+                style={{ width: `${playbookStats.pct}%` }}
+              />
+            </div>
+            <div className="flex items-center justify-between">
               <div className="flex gap-6 text-sm">
                 <div>
-                  <span className="font-bold text-red-700">
-                    {playbookStats.mustDo}
-                  </span>{" "}
-                  <span className="text-muted-foreground">must-do items</span>
+                  <span className="font-bold text-red-700">{playbookStats.mustDo}</span>{" "}
+                  <span className="text-muted-foreground">must-do</span>
                 </div>
                 <div>
-                  <span className="font-bold text-emerald-700">
-                    {playbookStats.done}
-                  </span>{" "}
+                  <span className="font-bold text-emerald-700">{playbookStats.done}</span>{" "}
                   <span className="text-muted-foreground">completed</span>
                 </div>
               </div>
-
-              <div className="mt-5">
-                <Link href="/playbook">
-                  <Button variant="outline" size="sm" className="rounded-lg">
-                    Go to Playbook
-                  </Button>
-                </Link>
-              </div>
-            </CardContent>
-          </Card>
-        ) : (
-          <Card className="mb-12 border-dashed rounded-2xl">
-            <CardHeader>
-              <CardTitle className="text-xl">Playbook</CardTitle>
-              <CardDescription>
-                Generate your playbook to get step-by-step actions, templates,
-                and timelines for every moment in your journey.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
               <Link href="/playbook">
-                <Button className="rounded-lg">Generate Playbook</Button>
+                <Button variant="outline" size="sm">Go to Playbook</Button>
               </Link>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
+        ) : (
+          <div className="rounded-2xl border border-dashed bg-white p-6 mb-10">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-lg font-bold">Playbook</h2>
+                <p className="text-sm text-muted-foreground">
+                  Generate your playbook to get step-by-step actions, templates, and timelines.
+                </p>
+              </div>
+              <Link href="/playbook">
+                <Button>Generate Playbook</Button>
+              </Link>
+            </div>
+          </div>
         )}
 
         {/* Top Risks */}
         {topInsights.length > 0 && (
-          <Card className="mb-12 border-red-200 rounded-2xl">
-            <CardHeader>
-              <CardTitle className="text-xl text-red-900">
-                Top Risks to Address
-              </CardTitle>
-              <CardDescription>
-                High-likelihood patterns from your CX intelligence report.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-3">
+          <div className="rounded-2xl border border-red-200 bg-white p-6 mb-10">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-bold text-red-900">Top Risks</h2>
+              <Badge variant="destructive" className="text-xs">
+                {topInsights.length} high priority
+              </Badge>
+            </div>
+            <div className="space-y-3">
               {topInsights.map((insight, i) => {
                 const ann = evidenceMap
                   ? getInsightAnnotations(insight.pattern, evidenceMap)
                   : null;
                 return (
-                  <div
-                    key={i}
-                    className="rounded-xl border border-red-100 bg-red-50/50 p-4"
-                  >
-                    <div className="flex items-center gap-2 mb-1.5">
-                      <span className="font-semibold text-sm">
-                        {insight.pattern}
-                      </span>
-                      <Badge variant="destructive" className="text-xs">
-                        high risk
-                      </Badge>
+                  <div key={i} className="flex items-start gap-3">
+                    <div className="w-6 h-6 rounded-full bg-red-100 flex items-center justify-center shrink-0 mt-0.5">
+                      <span className="text-xs font-bold text-red-700">{i + 1}</span>
                     </div>
-                    <p className="text-xs text-muted-foreground leading-relaxed">
-                      {insight.immediateAction}
-                    </p>
-                    {ann && ann.painPoints.length > 0 && (
-                      <div className="flex flex-wrap gap-1 mt-2">
-                        {ann.painPoints.map((pp, j) => (
-                          <span
-                            key={j}
-                            className="text-[10px] px-1.5 py-0.5 rounded-full bg-violet-100 text-violet-700 border border-violet-200 font-medium"
-                          >
-                            From your input: {pp}
-                          </span>
-                        ))}
-                      </div>
-                    )}
+                    <div className="flex-1 min-w-0">
+                      <div className="text-sm font-semibold">{insight.pattern}</div>
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        {insight.immediateAction}
+                      </p>
+                      {ann && ann.painPoints.length > 0 && (
+                        <div className="flex flex-wrap gap-1 mt-1.5">
+                          {ann.painPoints.map((pp, j) => (
+                            <span key={j} className="text-[10px] px-1.5 py-0.5 rounded-full bg-violet-100 text-violet-700 border border-violet-200 font-medium">
+                              From your input: {pp}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
                   </div>
                 );
               })}
+            </div>
+            <div className="mt-4 pt-3 border-t">
               <Link href={`/confrontation?id=${tid}`}>
-                <Button variant="ghost" size="sm" className="mt-1">
-                  See full report
-                </Button>
+                <Button variant="ghost" size="sm">See full report</Button>
               </Link>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         )}
 
         {/* Quick Navigation */}
         <div className="grid sm:grid-cols-3 gap-4">
-          <NavCard
-            href={`/confrontation?id=${tid}`}
-            title="CX Report"
-            description="Your confrontation insights and impact projections."
-            badge="Insights"
-            badgeColor="bg-red-50 text-red-700 border-red-200"
-          />
-          <NavCard
-            href={`/journey?id=${tid}`}
-            title="Journey Map"
-            description="Full stage-by-stage journey with moments of truth."
-            badge="Visual"
-            badgeColor="bg-blue-50 text-blue-700 border-blue-200"
-          />
-          <NavCard
-            href="/onboarding"
-            title="Re-run Onboarding"
-            description="Start fresh with updated company information."
-            dashed
-          />
+          <Link href={`/confrontation?id=${tid}`}>
+            <div className="group rounded-2xl border bg-white p-5 hover:shadow-md transition-all cursor-pointer h-full">
+              <div className="w-8 h-8 rounded-lg bg-red-50 flex items-center justify-center mb-3">
+                <svg className="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 3v11.25A2.25 2.25 0 006 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0118 16.5h-2.25m-7.5 0h7.5m-7.5 0l-1 3m8.5-3l1 3m0 0l.5 1.5m-.5-1.5h-9.5m0 0l-.5 1.5" />
+                </svg>
+              </div>
+              <h3 className="text-base font-semibold mb-1 group-hover:text-primary transition-colors">CX Report</h3>
+              <p className="text-xs text-muted-foreground leading-relaxed">Intelligence insights and impact projections</p>
+            </div>
+          </Link>
+          <Link href={`/journey?id=${tid}`}>
+            <div className="group rounded-2xl border bg-white p-5 hover:shadow-md transition-all cursor-pointer h-full">
+              <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center mb-3">
+                <svg className="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 6.75V15m6-6v8.25m.503 3.498l4.875-2.437c.381-.19.622-.58.622-1.006V4.82c0-.836-.88-1.38-1.628-1.006l-3.869 1.934c-.317.159-.69.159-1.006 0L9.503 3.252a1.125 1.125 0 00-1.006 0L3.622 5.689C3.24 5.88 3 6.27 3 6.695V19.18c0 .836.88 1.38 1.628 1.006l3.869-1.934c.317-.159.69-.159 1.006 0l4.994 2.497c.317.158.69.158 1.006 0z" />
+                </svg>
+              </div>
+              <h3 className="text-base font-semibold mb-1 group-hover:text-primary transition-colors">Journey Map</h3>
+              <p className="text-xs text-muted-foreground leading-relaxed">Full stage-by-stage journey with moments of truth</p>
+            </div>
+          </Link>
+          <Link href="/onboarding">
+            <div className="group rounded-2xl border border-dashed bg-white p-5 hover:shadow-md transition-all cursor-pointer h-full">
+              <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center mb-3">
+                <svg className="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182" />
+                </svg>
+              </div>
+              <h3 className="text-base font-semibold mb-1 group-hover:text-primary transition-colors">Re-run Analysis</h3>
+              <p className="text-xs text-muted-foreground leading-relaxed">Start fresh with updated company information</p>
+            </div>
+          </Link>
         </div>
       </div>
     </main>

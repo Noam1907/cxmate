@@ -329,12 +329,19 @@ function StageSection({
   const doneCount = stagePlaybook.recommendations.filter(
     (r) => statuses[makeKey(r)] === "done"
   ).length;
+  const inProgressCount = stagePlaybook.recommendations.filter(
+    (r) => statuses[makeKey(r)] === "in_progress"
+  ).length;
   const total = stagePlaybook.recommendations.length;
+  const pct = total > 0 ? Math.round((doneCount / total) * 100) : 0;
+  const mustDoCount = stagePlaybook.recommendations.filter(
+    (r) => r.priority === "must_do"
+  ).length;
 
   return (
-    <Card>
-      <CardHeader>
-        <div className="flex items-center justify-between">
+    <Card className="overflow-hidden">
+      <CardHeader className="pb-4">
+        <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-2">
             <Badge
               variant="outline"
@@ -348,13 +355,31 @@ function StageSection({
             </Badge>
             <CardTitle className="text-xl">{stagePlaybook.stageName}</CardTitle>
           </div>
-          <span className="text-xs text-muted-foreground">
-            {doneCount}/{total} done
-          </span>
+          <div className="text-right">
+            <span className="text-2xl font-bold">{pct}%</span>
+          </div>
         </div>
-        <CardDescription className="text-sm font-medium">
-          Top priority: {stagePlaybook.topPriority}
-        </CardDescription>
+        {/* Per-stage progress bar */}
+        <div className="h-2 rounded-full bg-slate-100 overflow-hidden mb-2">
+          <div
+            className="h-full bg-emerald-500 rounded-full transition-all duration-500"
+            style={{ width: `${pct}%` }}
+          />
+        </div>
+        <div className="flex items-center justify-between">
+          <CardDescription className="text-sm font-medium">
+            Top priority: {stagePlaybook.topPriority}
+          </CardDescription>
+          <div className="flex gap-3 text-xs text-muted-foreground">
+            {mustDoCount > 0 && (
+              <span><span className="font-bold text-red-700">{mustDoCount}</span> must-do</span>
+            )}
+            <span>{doneCount}/{total} done</span>
+            {inProgressCount > 0 && (
+              <span>{inProgressCount} active</span>
+            )}
+          </div>
+        </div>
       </CardHeader>
       <CardContent className="space-y-2">
         {stagePlaybook.recommendations.map((rec, i) => {
@@ -533,38 +558,52 @@ export default function PlaybookPage() {
     <main className="min-h-screen bg-gradient-to-b from-background to-white">
       <div className="max-w-3xl mx-auto px-6 py-12">
         {/* Header */}
-        <div className="text-center space-y-3 mb-12">
+        <div className="text-center space-y-3 mb-8">
           <p className="text-sm font-medium text-primary uppercase tracking-widest">
             CX Playbook
           </p>
           <h1 className="text-4xl font-bold tracking-tight">{playbook.companyName}</h1>
-          <div className="flex items-center justify-center gap-3">
-            <Badge variant="outline">
-              {playbook.totalRecommendations} actions
-            </Badge>
-            <Badge variant="destructive">{playbook.mustDoCount} must-do</Badge>
-            <Badge variant="secondary">
-              {totalDone}/{allRecs.length} done
-            </Badge>
-          </div>
         </div>
 
-        {/* Progress bar */}
-        <div className="mb-12">
-          <div className="flex justify-between text-xs text-muted-foreground mb-1.5">
-            <span>Progress</span>
-            <span>
-              {totalDone} done, {totalInProgress} in progress
-            </span>
+        {/* Hero progress card */}
+        <div className="rounded-2xl bg-slate-900 text-white p-8 mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <div className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-1">
+                Playbook Progress
+              </div>
+              <div className="text-5xl font-bold">
+                {allRecs.length ? Math.round((totalDone / allRecs.length) * 100) : 0}%
+              </div>
+            </div>
+            <div className="grid grid-cols-3 gap-6 text-center">
+              <div>
+                <div className="text-2xl font-bold">{playbook.totalRecommendations}</div>
+                <div className="text-xs text-slate-400">Total</div>
+              </div>
+              <div>
+                <div className="text-2xl font-bold text-red-400">{playbook.mustDoCount}</div>
+                <div className="text-xs text-slate-400">Must-do</div>
+              </div>
+              <div>
+                <div className="text-2xl font-bold text-emerald-400">{totalDone}</div>
+                <div className="text-xs text-slate-400">Done</div>
+              </div>
+            </div>
           </div>
-          <div className="h-2 rounded-full bg-slate-200 overflow-hidden">
+          <div className="h-3 rounded-full bg-white/10 overflow-hidden">
             <div
-              className="h-full bg-emerald-500 transition-all duration-500"
+              className="h-full bg-emerald-500 rounded-full transition-all duration-500"
               style={{
                 width: `${allRecs.length ? (totalDone / allRecs.length) * 100 : 0}%`,
               }}
             />
           </div>
+          {totalInProgress > 0 && (
+            <div className="text-xs text-slate-400 mt-2">
+              {totalInProgress} action{totalInProgress !== 1 ? "s" : ""} in progress
+            </div>
+          )}
         </div>
 
         {/* Week One Checklist */}

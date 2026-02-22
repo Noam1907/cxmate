@@ -372,50 +372,48 @@ function GeneratingExperience({ data }: { data: OnboardingData }) {
 
 function IntroHero({ onStart }: { onStart: () => void }) {
   return (
-    <div className="w-full max-w-2xl mx-auto text-center space-y-12 py-8">
+    <div className="w-full max-w-2xl mx-auto text-center space-y-14 py-12">
       {/* Headline */}
-      <div className="space-y-5">
+      <div className="space-y-6">
         <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/15 to-primary/5 flex items-center justify-center mx-auto shadow-md">
           <span className="text-xl font-bold text-primary">CX</span>
         </div>
-        <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-foreground leading-tight">
+        <h1 className="text-4xl sm:text-5xl font-bold tracking-tight text-foreground leading-[1.1]">
           Your AI CX expert is ready
         </h1>
-        <p className="text-lg text-muted-foreground max-w-md mx-auto leading-relaxed">
+        <p className="text-lg text-muted-foreground max-w-lg mx-auto leading-relaxed">
           CX Mate analyzes your business, maps your customer journey,
           and builds a playbook your team can execute — in under 5 minutes.
         </p>
       </div>
 
       {/* 3 Deliverable Preview Cards */}
-      <div className="grid gap-4 text-left max-w-lg mx-auto">
+      <div className="grid gap-5 text-left max-w-lg mx-auto">
         {[
-          { icon: "📊", bg: "from-rose-50 to-rose-100", title: "CX Intelligence Report", desc: "Honest assessment of your customer experience — risks, gaps, and opportunities backed by evidence" },
-          { icon: "🗺️", bg: "from-teal-50 to-teal-100", title: "Journey Map", desc: "Every stage your customers go through, with meaningful moments scored by severity" },
-          { icon: "📋", bg: "from-amber-50 to-amber-100", title: "Action Playbook", desc: "AI-powered recommendations with templates your team can start executing this week" },
+          { icon: "📊", bg: "from-rose-50 to-rose-100", title: "CX Intelligence Report", desc: "Impact projections, risk analysis, and opportunities backed by your data" },
+          { icon: "🗺️", bg: "from-teal-50 to-teal-100", title: "Journey Map", desc: "Every stage mapped with meaningful moments scored by severity" },
+          { icon: "📋", bg: "from-amber-50 to-amber-100", title: "Action Playbook", desc: "Prioritized recommendations with templates your team can execute this week" },
         ].map((card) => (
-          <div key={card.title} className="flex items-start gap-4 rounded-2xl border-2 border-border/40 bg-white p-6 shadow-sm hover:shadow-md transition-all">
-            <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${card.bg} flex items-center justify-center shrink-0`}>
-              <span className="text-2xl">{card.icon}</span>
+          <div key={card.title} className="flex items-start gap-4 rounded-2xl border bg-white p-6 shadow-sm hover:shadow-md transition-all">
+            <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${card.bg} flex items-center justify-center shrink-0`}>
+              <span className="text-xl">{card.icon}</span>
             </div>
             <div>
               <div className="font-bold text-base text-foreground">{card.title}</div>
-              <div className="text-sm text-muted-foreground mt-1 leading-relaxed">
-                {card.desc}
-              </div>
+              <div className="text-sm text-muted-foreground mt-1 leading-relaxed">{card.desc}</div>
             </div>
           </div>
         ))}
       </div>
 
       {/* CTA */}
-      <div className="space-y-4">
+      <div className="space-y-5">
         <Button
           size="lg"
           onClick={onStart}
-          className="rounded-2xl px-12 py-6 text-base font-bold shadow-lg hover:shadow-xl transition-all"
+          className="rounded-2xl px-12 py-7 text-lg font-bold shadow-lg hover:shadow-xl transition-all"
         >
-          Let&apos;s build yours &rarr;
+          Let&apos;s build yours
         </Button>
         <p className="text-sm text-muted-foreground">
           Takes about 3 minutes. No account needed.

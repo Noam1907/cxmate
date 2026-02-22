@@ -24,36 +24,40 @@ function HeroSection() {
         </h1>
 
         {/* Subheadline */}
-        <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed mb-10">
+        <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed mb-12">
           Tell us your company name and CX Mate does the rest — analyzes your business,
           maps the entire customer lifecycle, and gives you a playbook
           your team can execute this week.
         </p>
 
         {/* CTA cluster */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-6">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">
           <Link href="/onboarding">
-            <Button size="lg" className="rounded-xl px-8 py-6 text-base font-semibold shadow-lg hover:shadow-xl transition-all">
+            <Button size="lg" className="rounded-xl px-10 py-7 text-lg font-semibold shadow-lg hover:shadow-xl transition-all">
               Map Your Customer Journey
             </Button>
           </Link>
-          <span className="text-sm text-muted-foreground">No account needed</span>
         </div>
+        <p className="text-sm text-muted-foreground mb-10">
+          Free. No account needed. Results in under 5 minutes.
+        </p>
 
-        {/* Trust indicators */}
-        <div className="flex items-center justify-center gap-6 text-xs text-muted-foreground">
-          <span className="flex items-center gap-1.5">
-            <svg className="w-3.5 h-3.5 text-emerald-500" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clipRule="evenodd" /></svg>
-            Built on real CX methodology
-          </span>
-          <span className="flex items-center gap-1.5">
-            <svg className="w-3.5 h-3.5 text-emerald-500" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clipRule="evenodd" /></svg>
-            AI-generated in minutes
-          </span>
-          <span className="flex items-center gap-1.5">
-            <svg className="w-3.5 h-3.5 text-emerald-500" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clipRule="evenodd" /></svg>
-            For companies building CX from scratch
-          </span>
+        {/* Quantified value strip */}
+        <div className="flex items-center justify-center gap-8 sm:gap-12 py-6 px-8 rounded-2xl bg-slate-50 border max-w-lg mx-auto">
+          <div className="text-center">
+            <div className="text-2xl font-bold text-foreground">5 min</div>
+            <div className="text-xs text-muted-foreground mt-0.5">Setup time</div>
+          </div>
+          <div className="w-px h-8 bg-border" />
+          <div className="text-center">
+            <div className="text-2xl font-bold text-foreground">50+</div>
+            <div className="text-xs text-muted-foreground mt-0.5">Moments mapped</div>
+          </div>
+          <div className="w-px h-8 bg-border" />
+          <div className="text-center">
+            <div className="text-2xl font-bold text-foreground">CCXP</div>
+            <div className="text-xs text-muted-foreground mt-0.5">Expert methodology</div>
+          </div>
         </div>
       </div>
     </section>

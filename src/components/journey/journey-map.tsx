@@ -52,10 +52,20 @@ export function JourneyMap({ journey, evidenceMap }: JourneyMapProps) {
     return hasAny ? annotations : undefined;
   }
 
+  // Compute per-stage health (% of critical/high moments)
+  const stageHealth = journey.stages.map((stage) => {
+    const total = stage.meaningfulMoments.length;
+    const critical = stage.meaningfulMoments.filter(
+      (m) => m.severity === "critical" || m.severity === "high"
+    ).length;
+    const pct = total > 0 ? Math.round((critical / total) * 100) : 0;
+    return { name: stage.name, stageType: stage.stageType, critical, total, pct };
+  });
+
   return (
     <div className="w-full max-w-4xl mx-auto space-y-8">
       {/* Header */}
-      <div className="text-center space-y-3">
+      <div className="text-center space-y-4">
         <h1 className="text-3xl font-bold">{journey.name}</h1>
         <div className="flex items-center justify-center gap-3">
           <Badge variant="outline">
@@ -74,6 +84,37 @@ export function JourneyMap({ journey, evidenceMap }: JourneyMapProps) {
               AI-diagnosed
             </Badge>
           )}
+        </div>
+      </div>
+
+      {/* Stage health overview bar */}
+      <div className="rounded-2xl border bg-white p-5">
+        <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3">
+          Risk by Stage
+        </div>
+        <div className="space-y-2.5">
+          {stageHealth.map((s, i) => (
+            <div key={i} className="flex items-center gap-3">
+              <div className="w-28 text-xs font-medium truncate text-right shrink-0">
+                {s.name}
+              </div>
+              <div className="flex-1 h-2 rounded-full bg-slate-100 overflow-hidden">
+                <div
+                  className={`h-full rounded-full transition-all duration-700 ${
+                    s.pct >= 60
+                      ? "bg-red-500"
+                      : s.pct >= 30
+                      ? "bg-amber-500"
+                      : "bg-emerald-500"
+                  }`}
+                  style={{ width: `${Math.max(s.pct, 5)}%` }}
+                />
+              </div>
+              <div className="w-16 text-xs text-muted-foreground shrink-0">
+                {s.critical}/{s.total} risky
+              </div>
+            </div>
+          ))}
         </div>
       </div>
 

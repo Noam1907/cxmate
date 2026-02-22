@@ -12,6 +12,47 @@ import {
 } from "./recommendation-prompt";
 import type { GeneratedJourney } from "./journey-prompt";
 import type { OnboardingInput } from "@/lib/validations/onboarding";
+import https from "node:https";
+
+/** Call Anthropic API via node:https to avoid undici's default 5-min headers timeout */
+function anthropicRequest(apiKey: string, body: string): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const req = https.request(
+      {
+        hostname: "api.anthropic.com",
+        path: "/v1/messages",
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Content-Length": Buffer.byteLength(body),
+          "x-api-key": apiKey,
+          "anthropic-version": "2023-06-01",
+        },
+        timeout: 9 * 60 * 1000, // 9 minute socket timeout
+      },
+      (res) => {
+        const chunks: Buffer[] = [];
+        res.on("data", (chunk: Buffer) => chunks.push(chunk));
+        res.on("end", () => {
+          const text = Buffer.concat(chunks).toString("utf-8");
+          if (res.statusCode && res.statusCode >= 400) {
+            reject(new Error(`Claude API error ${res.statusCode}: ${text}`));
+          } else {
+            resolve(text);
+          }
+        });
+        res.on("error", reject);
+      }
+    );
+    req.on("error", reject);
+    req.on("timeout", () => {
+      req.destroy();
+      reject(new Error("Claude API request timed out after 9 minutes"));
+    });
+    req.write(body);
+    req.end();
+  });
+}
 
 export async function generateRecommendations(
   journey: GeneratedJourney,
@@ -26,32 +67,15 @@ export async function generateRecommendations(
 
   const prompt = buildRecommendationPrompt(journey, input);
 
-  const response = await fetch("https://api.anthropic.com/v1/messages", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "x-api-key": apiKey,
-      "anthropic-version": "2023-06-01",
-    },
-    body: JSON.stringify({
-      model: "claude-sonnet-4-5-20251001",
-      max_tokens: 16000,
-      system: "You are a CX expert API. You MUST respond with ONLY a valid JSON object. No preamble, no explanation, no markdown fences, no text before or after the JSON. The very first character of your response must be { and the very last must be }. CRITICAL: Be concise — max 8000 tokens total. Every string field: 1 sentence only. No elaboration. No lists inside strings. Short and punchy.",
-      messages: [
-        {
-          role: "user",
-          content: prompt,
-        },
-      ],
-    }),
+  const requestBody = JSON.stringify({
+    model: "claude-sonnet-4-6",
+    max_tokens: 16000,
+    system: "You are a CX expert API. You MUST respond with ONLY a valid JSON object. No preamble, no explanation, no markdown fences, no text before or after the JSON. The very first character of your response must be { and the very last must be }. CRITICAL: Be concise — max 10000 tokens total. Every string field: 1 sentence only. No elaboration. No lists inside strings. Short and punchy.",
+    messages: [{ role: "user", content: prompt }],
   });
 
-  if (!response.ok) {
-    const errorBody = await response.text();
-    throw new Error(`Claude API error ${response.status}: ${errorBody}`);
-  }
-
-  const message = await response.json();
+  const responseText = await anthropicRequest(apiKey, requestBody);
+  const message = JSON.parse(responseText);
 
   // Check for truncation
   const stopReason = message.stop_reason;

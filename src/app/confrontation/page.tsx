@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -153,6 +153,268 @@ function FadeIn({
 }
 
 // ============================================
+// Parse dollar value from impact string
+// ============================================
+
+function parseDollarValue(impact: string): number | null {
+  // Try to extract a dollar amount like "$50,000" or "$50K" or "$1.2M"
+  const match = impact.match(/\$[\d,.]+\s*[KkMmBb]?/);
+  if (!match) return null;
+
+  let raw = match[0].replace(/[$,]/g, "");
+  let multiplier = 1;
+  if (/[Kk]$/.test(raw)) {
+    multiplier = 1000;
+    raw = raw.replace(/[Kk]$/, "");
+  } else if (/[Mm]$/.test(raw)) {
+    multiplier = 1_000_000;
+    raw = raw.replace(/[Mm]$/, "");
+  } else if (/[Bb]$/.test(raw)) {
+    multiplier = 1_000_000_000;
+    raw = raw.replace(/[Bb]$/, "");
+  }
+
+  const num = parseFloat(raw);
+  return isNaN(num) ? null : num * multiplier;
+}
+
+function formatDollarCompact(value: number): string {
+  if (value >= 1_000_000) return `$${(value / 1_000_000).toFixed(1)}M`;
+  if (value >= 1_000) return `$${Math.round(value / 1_000)}K`;
+  return `$${Math.round(value)}`;
+}
+
+// ============================================
+// Hero Impact Card (Mesh-style)
+// ============================================
+
+function HeroImpactCard({
+  projections,
+  delay,
+}: {
+  projections: ImpactProjection[];
+  delay: number;
+}) {
+  const [visible, setVisible] = useState(false);
+  useEffect(() => {
+    const timer = setTimeout(() => setVisible(true), delay);
+    return () => clearTimeout(timer);
+  }, [delay]);
+
+  // Aggregate total impact range
+  const values = projections
+    .map((p) => parseDollarValue(p.potentialImpact))
+    .filter((v): v is number => v !== null);
+
+  const totalImpact = values.reduce((sum, v) => sum + v, 0);
+  // Show a range: 70%-130% of total
+  const lowEnd = Math.round(totalImpact * 0.7);
+  const highEnd = Math.round(totalImpact * 1.3);
+
+  if (values.length === 0) return null;
+
+  return (
+    <div
+      className={`rounded-2xl bg-slate-900 text-white p-8 transition-all duration-1000 ${
+        visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
+      }`}
+    >
+      <div className="flex items-center gap-2 mb-3">
+        <div className="w-8 h-8 rounded-lg bg-emerald-500/20 flex items-center justify-center">
+          <svg className="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </div>
+        <span className="text-sm font-semibold text-emerald-400 uppercase tracking-wider">
+          Estimated Annual CX Impact
+        </span>
+      </div>
+      <div className="text-5xl font-bold tracking-tight mb-1">
+        <AnimatedValue
+          value={`${formatDollarCompact(lowEnd)} \u2013 ${formatDollarCompact(highEnd)}`}
+          delay={delay + 300}
+        />
+      </div>
+      <div className="text-sm text-slate-400">per year</div>
+    </div>
+  );
+}
+
+// ============================================
+// Stat Pair Cards (Mesh-style)
+// ============================================
+
+function StatPairCards({
+  highRiskCount,
+  criticalMoments,
+  totalMoments,
+  delay,
+}: {
+  highRiskCount: number;
+  criticalMoments: number;
+  totalMoments: number;
+  delay: number;
+}) {
+  return (
+    <FadeIn delay={delay} className="grid grid-cols-3 gap-4">
+      <div className="rounded-xl border bg-white p-5">
+        <div className="w-8 h-8 rounded-lg bg-red-50 flex items-center justify-center mb-3">
+          <svg className="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+          </svg>
+        </div>
+        <div className="text-xs text-muted-foreground mb-1">High-Risk Patterns</div>
+        <div className="text-3xl font-bold">{highRiskCount}</div>
+      </div>
+      <div className="rounded-xl border bg-white p-5">
+        <div className="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center mb-3">
+          <svg className="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
+          </svg>
+        </div>
+        <div className="text-xs text-muted-foreground mb-1">Critical Moments</div>
+        <div className="text-3xl font-bold">{criticalMoments}</div>
+      </div>
+      <div className="rounded-xl border bg-white p-5">
+        <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center mb-3">
+          <svg className="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9 6.75V15m6-6v8.25m.503 3.498l4.875-2.437c.381-.19.622-.58.622-1.006V4.82c0-.836-.88-1.38-1.628-1.006l-3.869 1.934c-.317.159-.69.159-1.006 0L9.503 3.252a1.125 1.125 0 00-1.006 0L3.622 5.689C3.24 5.88 3 6.27 3 6.695V19.18c0 .836.88 1.38 1.628 1.006l3.869-1.934c.317-.159.69-.159 1.006 0l4.994 2.497c.317.158.69.158 1.006 0z" />
+          </svg>
+        </div>
+        <div className="text-xs text-muted-foreground mb-1">Moments Mapped</div>
+        <div className="text-3xl font-bold">{totalMoments}</div>
+      </div>
+    </FadeIn>
+  );
+}
+
+// ============================================
+// Impact Breakdown (horizontal bars — Mesh-style)
+// ============================================
+
+function ImpactBreakdown({
+  projections,
+  delay,
+}: {
+  projections: ImpactProjection[];
+  delay: number;
+}) {
+  const parsed = projections
+    .map((p) => ({
+      ...p,
+      value: parseDollarValue(p.potentialImpact),
+    }))
+    .filter((p): p is typeof p & { value: number } => p.value !== null)
+    .sort((a, b) => b.value - a.value);
+
+  if (parsed.length === 0) return null;
+
+  const maxValue = parsed[0].value;
+
+  return (
+    <FadeIn delay={delay}>
+      <div className="rounded-2xl border bg-white p-6">
+        <h3 className="text-base font-bold mb-5">Impact by Area</h3>
+        <div className="space-y-4">
+          {parsed.map((item, i) => {
+            const pct = maxValue > 0 ? (item.value / maxValue) * 100 : 0;
+            const effortColor =
+              item.effort === "low"
+                ? "bg-emerald-500"
+                : item.effort === "medium"
+                ? "bg-amber-500"
+                : "bg-red-500";
+
+            return (
+              <div key={i}>
+                <div className="flex items-center justify-between mb-1.5">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-medium">{item.area}</span>
+                    <span
+                      className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium text-white ${effortColor}`}
+                    >
+                      {item.effort}
+                    </span>
+                  </div>
+                  <span className="text-sm font-bold text-emerald-700">
+                    {item.potentialImpact}
+                  </span>
+                </div>
+                <div className="h-2.5 rounded-full bg-slate-100 overflow-hidden">
+                  <div
+                    className="h-full rounded-full bg-emerald-500 transition-all duration-1000 ease-out"
+                    style={{ width: `${pct}%` }}
+                  />
+                </div>
+                <div className="flex items-center justify-between mt-1">
+                  <span className="text-xs text-muted-foreground">
+                    {item.timeToRealize}
+                  </span>
+                  {item.dataSource && (
+                    <span
+                      className={`text-[10px] px-1.5 py-0.5 rounded-full border font-medium ${
+                        item.dataSource === "user_provided"
+                          ? "bg-emerald-50 text-emerald-600 border-emerald-200"
+                          : "bg-slate-50 text-slate-500 border-slate-200"
+                      }`}
+                    >
+                      {item.dataSource === "user_provided"
+                        ? "Your data"
+                        : "Industry benchmark"}
+                    </span>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </FadeIn>
+  );
+}
+
+// ============================================
+// Top Drivers (simple bullets — Mesh-style)
+// ============================================
+
+function TopDrivers({
+  insights,
+  delay,
+}: {
+  insights: ConfrontationInsight[];
+  delay: number;
+}) {
+  const topThree = insights
+    .filter((i) => i.likelihood === "high")
+    .slice(0, 3);
+
+  if (topThree.length === 0) return null;
+
+  return (
+    <FadeIn delay={delay}>
+      <div className="space-y-3">
+        <h3 className="text-sm font-semibold text-muted-foreground flex items-center gap-2">
+          <svg className="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
+          </svg>
+          Top Impact Drivers
+        </h3>
+        {topThree.map((insight, i) => (
+          <div key={i} className="flex items-start gap-3">
+            <div className="w-5 h-5 rounded-full bg-emerald-100 flex items-center justify-center shrink-0 mt-0.5">
+              <svg className="w-3 h-3 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={3}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 18L9 11.25l4.306 4.307a11.95 11.95 0 015.814-5.519l2.74-1.22m0 0l-5.94-2.28m5.94 2.28l-2.28 5.941" />
+              </svg>
+            </div>
+            <span className="text-sm">{insight.immediateAction}</span>
+          </div>
+        ))}
+      </div>
+    </FadeIn>
+  );
+}
+
+// ============================================
 // Insight Row (with companionAdvice)
 // ============================================
 
@@ -178,7 +440,7 @@ function InsightRow({
   };
 
   return (
-    <FadeIn delay={1000 + index * 250}>
+    <FadeIn delay={1400 + index * 200}>
       <div
         className={`rounded-xl border-2 p-5 cursor-pointer transition-all hover:shadow-md ${
           likelihoodStyles[insight.likelihood]
@@ -207,7 +469,6 @@ function InsightRow({
 
         {expanded && (
           <div className="mt-4 pt-4 border-t border-current/10 grid gap-3">
-            {/* CX Mate companion advice */}
             {insight.companionAdvice && (
               <div className="rounded-lg bg-slate-800 text-white p-3">
                 <div className="text-xs font-semibold text-slate-300 mb-1">
@@ -246,94 +507,115 @@ function InsightRow({
 }
 
 // ============================================
-// Impact Card (with calculation + dataSource)
+// Tech Stack Category Colors
 // ============================================
 
-function ImpactCard({
-  projection,
-  index,
-}: {
-  projection: ImpactProjection;
-  index: number;
-}) {
-  const effortColor = {
-    low: "bg-emerald-100 text-emerald-800",
-    medium: "bg-yellow-100 text-yellow-800",
-    high: "bg-red-100 text-red-800",
-  };
+const TECH_CATEGORY_COLORS: Record<string, string> = {
+  crm: "bg-indigo-100 text-indigo-800 border-indigo-200",
+  marketing: "bg-indigo-100 text-indigo-800 border-indigo-200",
+  support: "bg-indigo-100 text-indigo-800 border-indigo-200",
+  communication: "bg-indigo-100 text-indigo-800 border-indigo-200",
+  cs_platform: "bg-indigo-100 text-indigo-800 border-indigo-200",
+  analytics: "bg-emerald-100 text-emerald-800 border-emerald-200",
+  bi: "bg-emerald-100 text-emerald-800 border-emerald-200",
+  survey: "bg-emerald-100 text-emerald-800 border-emerald-200",
+  data_infrastructure: "bg-slate-100 text-slate-800 border-slate-200",
+};
 
-  const dataSourceLabel =
-    projection.dataSource === "user_provided"
-      ? "Based on your numbers"
-      : "Based on industry benchmarks";
+// ============================================
+// Assumptions Modal
+// ============================================
+
+function AssumptionsSection({
+  assumptions,
+  projections,
+  delay,
+}: {
+  assumptions: string[];
+  projections: ImpactProjection[];
+  delay: number;
+}) {
+  const [open, setOpen] = useState(false);
 
   return (
-    <FadeIn delay={1600 + index * 150}>
-      <div className="rounded-xl border bg-white p-5 space-y-2">
-        <div className="flex items-start justify-between gap-3">
-          <div className="font-semibold text-sm">{projection.area}</div>
-          <span
-            className={`text-xs px-2 py-0.5 rounded-full font-medium ${
-              effortColor[projection.effort as keyof typeof effortColor] ||
-              effortColor.medium
-            }`}
-          >
-            {projection.effort} effort
-          </span>
-        </div>
-        <div className="text-2xl font-bold text-emerald-700">
-          <AnimatedValue value={projection.potentialImpact} delay={1800 + index * 150} />
-        </div>
-        <div className="text-xs text-muted-foreground">
-          {projection.timeToRealize}
-        </div>
-
-        {/* Transparent calculation */}
-        {projection.calculation && (
-          <div className="mt-2 pt-2 border-t">
-            <div className="text-xs text-muted-foreground font-mono bg-slate-50 rounded px-2 py-1.5">
-              {projection.calculation}
-            </div>
+    <FadeIn delay={delay}>
+      <div className="rounded-2xl border bg-white p-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="text-sm font-semibold">Want to see how we estimated this?</h3>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              Review the data sources and calculations behind these projections
+            </p>
           </div>
-        )}
-
-        {/* Data source badge */}
-        {projection.dataSource && (
-          <div className="flex items-center gap-1">
-            <span
-              className={`text-xs px-2 py-0.5 rounded-full border font-medium ${
-                projection.dataSource === "user_provided"
-                  ? "bg-emerald-50 text-emerald-700 border-emerald-200"
-                  : "bg-slate-50 text-slate-600 border-slate-200"
-              }`}
+          <div className="flex gap-2">
+            <Button
+              variant={open ? "default" : "outline"}
+              size="sm"
+              onClick={() => setOpen(!open)}
             >
-              {dataSourceLabel}
-            </span>
+              {open ? "Hide" : "Review assumptions"}
+            </Button>
+          </div>
+        </div>
+
+        {open && (
+          <div className="mt-4 pt-4 border-t space-y-4">
+            {/* Calculation details per projection */}
+            {projections.filter((p) => p.calculation).length > 0 && (
+              <div>
+                <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">
+                  Calculations
+                </div>
+                <div className="space-y-2">
+                  {projections
+                    .filter((p) => p.calculation)
+                    .map((p, i) => (
+                      <div
+                        key={i}
+                        className="rounded-lg bg-slate-50 border p-3"
+                      >
+                        <div className="text-xs font-medium mb-1">
+                          {p.area}
+                        </div>
+                        <div className="text-xs text-muted-foreground font-mono">
+                          {p.calculation}
+                        </div>
+                      </div>
+                    ))}
+                </div>
+              </div>
+            )}
+
+            {/* Assumptions list */}
+            {assumptions.length > 0 && (
+              <div>
+                <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">
+                  Key assumptions
+                </div>
+                <ul className="space-y-1.5">
+                  {assumptions.map((a, i) => (
+                    <li
+                      key={i}
+                      className="text-xs text-muted-foreground flex items-start gap-2"
+                    >
+                      <span className="mt-1 text-slate-400">&bull;</span>
+                      <span>{a}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            <p className="text-xs text-muted-foreground italic pt-2 border-t">
+              Projections are directional estimates, not predictions. Actual
+              results depend on execution and market conditions.
+            </p>
           </div>
         )}
       </div>
     </FadeIn>
   );
 }
-
-// ============================================
-// Tech Stack Category Colors
-// ============================================
-
-const TECH_CATEGORY_COLORS: Record<string, string> = {
-  // Core tools (primary indigo family)
-  crm: "bg-indigo-100 text-indigo-800 border-indigo-200",
-  marketing: "bg-indigo-100 text-indigo-800 border-indigo-200",
-  support: "bg-indigo-100 text-indigo-800 border-indigo-200",
-  communication: "bg-indigo-100 text-indigo-800 border-indigo-200",
-  cs_platform: "bg-indigo-100 text-indigo-800 border-indigo-200",
-  // Analytics & intelligence (emerald family)
-  analytics: "bg-emerald-100 text-emerald-800 border-emerald-200",
-  bi: "bg-emerald-100 text-emerald-800 border-emerald-200",
-  survey: "bg-emerald-100 text-emerald-800 border-emerald-200",
-  // Infrastructure (slate family)
-  data_infrastructure: "bg-slate-100 text-slate-800 border-slate-200",
-};
 
 // ============================================
 // Main Confrontation Content
@@ -343,7 +625,8 @@ function ConfrontationContent() {
   const searchParams = useSearchParams();
   const templateId = searchParams.get("id");
   const [journey, setJourney] = useState<GeneratedJourney | null>(null);
-  const [onboardingData, setOnboardingData] = useState<Partial<OnboardingData> | null>(null);
+  const [onboardingData, setOnboardingData] =
+    useState<Partial<OnboardingData> | null>(null);
   const [companyName, setCompanyName] = useState<string>("");
   const [mode, setMode] = useState<ConfrontationMode>("early_stage");
   const [hasExistingCustomers, setHasExistingCustomers] = useState(false);
@@ -357,7 +640,6 @@ function ConfrontationContent() {
       let loadedOnboarding: Partial<OnboardingData> | null = null;
 
       if (templateId === "preview" || !templateId) {
-        // Preview mode — load from sessionStorage
         const stored = sessionStorage.getItem("cx-mate-journey");
         if (stored) {
           try {
@@ -366,7 +648,9 @@ function ConfrontationContent() {
             loadedOnboarding = data.onboardingData || null;
             setJourney(data.journey);
             setOnboardingData(loadedOnboarding);
-            setCompanyName(data.onboardingData?.companyName || "your company");
+            setCompanyName(
+              data.onboardingData?.companyName || "your company"
+            );
             setMode(detectMode(data.onboardingData?.companySize || ""));
             setHasExistingCustomers(
               data.onboardingData?.hasExistingCustomers || false
@@ -376,22 +660,26 @@ function ConfrontationContent() {
           }
         }
       } else {
-        // Persisted mode — fetch from API
         try {
           const response = await fetch(`/api/journey/${templateId}`);
           if (response.ok) {
             const data = await response.json();
             loadedJourney = data.journey || null;
             setJourney(loadedJourney);
-            // For persisted journeys, try to get onboarding data from sessionStorage as fallback
             const stored = sessionStorage.getItem("cx-mate-journey");
             if (stored) {
               const parsed = JSON.parse(stored);
               loadedOnboarding = parsed.onboardingData || null;
               setOnboardingData(loadedOnboarding);
-              setCompanyName(parsed.onboardingData?.companyName || "your company");
-              setMode(detectMode(parsed.onboardingData?.companySize || ""));
-              setHasExistingCustomers(parsed.onboardingData?.hasExistingCustomers || false);
+              setCompanyName(
+                parsed.onboardingData?.companyName || "your company"
+              );
+              setMode(
+                detectMode(parsed.onboardingData?.companySize || "")
+              );
+              setHasExistingCustomers(
+                parsed.onboardingData?.hasExistingCustomers || false
+              );
             }
           }
         } catch (err) {
@@ -399,7 +687,6 @@ function ConfrontationContent() {
         }
       }
 
-      // Build evidence map
       if (loadedJourney && loadedOnboarding) {
         setEvidenceMap(buildEvidenceMap(loadedOnboarding, loadedJourney));
       }
@@ -415,6 +702,15 @@ function ConfrontationContent() {
       return () => clearTimeout(timer);
     }
   }, [loading, journey]);
+
+  const insights = useMemo(
+    () => journey?.confrontationInsights || [],
+    [journey]
+  );
+  const projections = useMemo(
+    () => journey?.impactProjections || [],
+    [journey]
+  );
 
   if (loading) {
     return (
@@ -445,8 +741,6 @@ function ConfrontationContent() {
     );
   }
 
-  const insights = journey.confrontationInsights || [];
-  const projections = journey.impactProjections || [];
   const highRiskCount = insights.filter((i) => i.likelihood === "high").length;
   const totalMoments = journey.stages.reduce(
     (sum, s) => sum + s.meaningfulMoments.length,
@@ -464,9 +758,9 @@ function ConfrontationContent() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-white">
       <div className="max-w-3xl mx-auto px-6 py-12">
-        {/* Header — dramatic reveal */}
+        {/* Header */}
         <div
-          className={`text-center space-y-4 mb-12 transition-all duration-[1200ms] ${
+          className={`text-center space-y-4 mb-10 transition-all duration-[1200ms] ${
             headerVisible
               ? "opacity-100 translate-y-0"
               : "opacity-0 translate-y-8"
@@ -490,42 +784,52 @@ function ConfrontationContent() {
           </p>
         </div>
 
-        {/* Quick stats bar */}
-        <FadeIn delay={500} className="mb-12">
-          <div className="grid grid-cols-3 gap-4">
-            <div className="text-center rounded-xl border bg-white p-4">
-              <div className="text-3xl font-bold">
-                <AnimatedValue
-                  value={String(journey.stages.length)}
-                  delay={600}
-                />
-              </div>
-              <div className="text-xs text-muted-foreground mt-1">
-                Journey stages
-              </div>
-            </div>
-            <div className="text-center rounded-xl border bg-white p-4">
-              <div className="text-3xl font-bold">
-                <AnimatedValue value={String(totalMoments)} delay={700} />
-              </div>
-              <div className="text-xs text-muted-foreground mt-1">
-                Meaningful moments
-              </div>
-            </div>
-            <div className="text-center rounded-xl border border-red-200 bg-red-50 p-4">
-              <div className="text-3xl font-bold text-red-700">
-                <AnimatedValue value={String(criticalMoments)} delay={800} />
-              </div>
-              <div className="text-xs text-red-600 mt-1">
-                {config.criticalLabel(hasExistingCustomers)}
-              </div>
-            </div>
-          </div>
-        </FadeIn>
+        {/* === SECTION 1: VALUE (Mesh-style) === */}
 
-        {/* Evidence Wall — what we know about you */}
+        {/* Hero Impact Card — the big number */}
+        {projections.length > 0 && (
+          <div className="mb-6">
+            <HeroImpactCard projections={projections} delay={500} />
+          </div>
+        )}
+
+        {/* Stat pair cards */}
+        <StatPairCards
+          highRiskCount={highRiskCount}
+          criticalMoments={criticalMoments}
+          totalMoments={totalMoments}
+          delay={700}
+        />
+
+        {/* Impact breakdown bars */}
+        {projections.length > 0 && (
+          <div className="mt-6 mb-6">
+            <ImpactBreakdown projections={projections} delay={900} />
+          </div>
+        )}
+
+        {/* Top drivers */}
+        {insights.length > 0 && (
+          <div className="mb-6">
+            <TopDrivers insights={insights} delay={1000} />
+          </div>
+        )}
+
+        {/* Transparency — review assumptions */}
+        {(journey.assumptions?.length || projections.some((p) => p.calculation)) && (
+          <div className="mb-12">
+            <AssumptionsSection
+              assumptions={journey.assumptions || []}
+              projections={projections}
+              delay={1100}
+            />
+          </div>
+        )}
+
+        {/* === SECTION 2: EVIDENCE === */}
+
         {evidenceMap && (
-          <FadeIn delay={700} className="mb-12" slow>
+          <FadeIn delay={1200} className="mb-12" slow>
             <EvidenceWall
               evidenceMap={evidenceMap}
               companyName={companyName}
@@ -534,9 +838,10 @@ function ConfrontationContent() {
           </FadeIn>
         )}
 
-        {/* Maturity Assessment */}
+        {/* === SECTION 3: MATURITY === */}
+
         {journey.maturityAssessment && (
-          <FadeIn delay={900} className="mb-12">
+          <FadeIn delay={1300} className="mb-12">
             <Card className="border-slate-200 bg-gradient-to-br from-slate-50 to-white">
               <CardHeader>
                 <CardTitle className="text-base">
@@ -552,10 +857,11 @@ function ConfrontationContent() {
           </FadeIn>
         )}
 
-        {/* Confrontation Insights — the core "aha" section */}
+        {/* === SECTION 4: DETAILED INSIGHTS === */}
+
         {insights.length > 0 && (
           <div className="mb-12">
-            <FadeIn delay={900}>
+            <FadeIn delay={1300}>
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-2xl font-bold">
                   {config.insightsHeading(hasExistingCustomers)}
@@ -576,90 +882,59 @@ function ConfrontationContent() {
           </div>
         )}
 
-        {/* Impact Projections — the "what you could gain" section */}
-        {projections.length > 0 && (
-          <div className="mb-12">
-            <FadeIn delay={1700}>
-              <h2 className="text-2xl font-bold mb-4">
-                {config.impactHeading(hasExistingCustomers)}
-              </h2>
-            </FadeIn>
+        {/* === SECTION 5: TECH STACK === */}
 
-            <div className="grid gap-3">
-              {projections.map((projection, i) => (
-                <ImpactCard key={i} projection={projection} index={i} />
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Tech Stack Recommendations */}
-        {journey.techStackRecommendations && journey.techStackRecommendations.length > 0 && (
-          <div className="mb-12">
-            <FadeIn delay={2100}>
-              <h2 className="text-2xl font-bold mb-4">
-                Recommended tech stack
-              </h2>
-              <p className="text-sm text-muted-foreground mb-4">
-                Tools to connect for maximum CX impact at your stage
-              </p>
-            </FadeIn>
-            <div className="grid gap-3">
-              {journey.techStackRecommendations.map((rec, i) => (
-                <FadeIn key={i} delay={2200 + i * 100}>
-                  <div className="rounded-xl border bg-white p-4 space-y-2">
-                    <div className="flex items-center gap-2">
-                      <span className={`text-xs px-2 py-0.5 rounded-full border font-medium ${
-                        TECH_CATEGORY_COLORS[rec.category] || "bg-blue-100 text-blue-800 border-blue-200"
-                      }`}>
-                        {rec.categoryLabel}
-                      </span>
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                      {rec.tools.map((tool, j) => (
-                        <span key={j} className="text-sm font-medium bg-slate-100 px-2 py-1 rounded">
-                          {tool}
-                        </span>
-                      ))}
-                    </div>
-                    <p className="text-sm text-muted-foreground">{rec.whyNow}</p>
-                    <p className="text-xs text-muted-foreground">
-                      <span className="font-medium">Connect with:</span> {rec.connectWith}
-                    </p>
-                  </div>
-                </FadeIn>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Assumptions & Methodology */}
-        {journey.assumptions && journey.assumptions.length > 0 && (
-          <FadeIn delay={2300} className="mb-12">
-            <details className="group">
-              <summary className="cursor-pointer text-sm font-medium text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1">
-                <span className="text-xs group-open:rotate-90 transition-transform">▶</span>
-                Assumptions &amp; methodology
-              </summary>
-              <div className="mt-3 rounded-xl border bg-slate-50 p-4 space-y-2">
-                <ul className="space-y-1.5">
-                  {journey.assumptions.map((assumption, i) => (
-                    <li key={i} className="text-xs text-muted-foreground flex items-start gap-2">
-                      <span className="mt-1 text-slate-400">•</span>
-                      <span>{assumption}</span>
-                    </li>
-                  ))}
-                </ul>
-                <p className="text-xs text-muted-foreground italic pt-2 border-t">
-                  Projections are directional estimates, not predictions.
-                  Actual results depend on execution and market conditions.
+        {journey.techStackRecommendations &&
+          journey.techStackRecommendations.length > 0 && (
+            <div className="mb-12">
+              <FadeIn delay={2100}>
+                <h2 className="text-2xl font-bold mb-2">
+                  Recommended tech stack
+                </h2>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Tools to connect for maximum CX impact at your stage
                 </p>
+              </FadeIn>
+              <div className="grid gap-3">
+                {journey.techStackRecommendations.map((rec, i) => (
+                  <FadeIn key={i} delay={2200 + i * 100}>
+                    <div className="rounded-xl border bg-white p-4 space-y-2">
+                      <div className="flex items-center gap-2">
+                        <span
+                          className={`text-xs px-2 py-0.5 rounded-full border font-medium ${
+                            TECH_CATEGORY_COLORS[rec.category] ||
+                            "bg-blue-100 text-blue-800 border-blue-200"
+                          }`}
+                        >
+                          {rec.categoryLabel}
+                        </span>
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        {rec.tools.map((tool, j) => (
+                          <span
+                            key={j}
+                            className="text-sm font-medium bg-slate-100 px-2 py-1 rounded"
+                          >
+                            {tool}
+                          </span>
+                        ))}
+                      </div>
+                      <p className="text-sm text-muted-foreground">
+                        {rec.whyNow}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        <span className="font-medium">Connect with:</span>{" "}
+                        {rec.connectWith}
+                      </p>
+                    </div>
+                  </FadeIn>
+                ))}
               </div>
-            </details>
-          </FadeIn>
-        )}
+            </div>
+          )}
 
-        {/* CTA — proceed to full journey */}
+        {/* === CTA === */}
+
         <FadeIn delay={2400} className="text-center space-y-4">
           <div className="border-t pt-8">
             <h3 className="text-lg font-semibold mb-2">
