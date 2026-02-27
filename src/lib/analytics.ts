@@ -24,6 +24,8 @@ export type AnalyticsEvent =
   | { name: "playbook_generation_started"; template_id?: string }
   | { name: "playbook_generation_succeeded"; recommendation_count?: number }
   | { name: "playbook_generation_failed"; error?: string }
+  | { name: "playbook_pregeneration_started" }
+  | { name: "playbook_pregeneration_succeeded" }
   | { name: "recommendation_status_changed"; status: "in_progress" | "done" | "not_started"; recommendation_key: string; priority?: string }
   // Company enrichment
   | { name: "company_enrichment_succeeded"; confidence?: string; company_name?: string }

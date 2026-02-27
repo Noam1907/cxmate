@@ -621,6 +621,28 @@ export function OnboardingWizard() {
         template_id: result.templateId,
       });
       sessionStorage.setItem("cx-mate-journey", JSON.stringify(result));
+
+      // Fire-and-forget: pre-generate playbook in the background so it's
+      // ready by the time the user finishes reading the journey + CX report.
+      // The fetch continues at the browser network level even after navigation.
+      void (async () => {
+        try {
+          track("playbook_pregeneration_started");
+          const playbookRes = await fetch("/api/recommendations/generate", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ journey: result.journey, onboardingData: result.onboardingData }),
+          });
+          if (playbookRes.ok) {
+            const playbookData = await playbookRes.json();
+            sessionStorage.setItem("cx-mate-playbook", JSON.stringify(playbookData.playbook));
+            track("playbook_pregeneration_succeeded");
+          }
+        } catch {
+          // Silent failure — user can still generate manually from the playbook page
+        }
+      })();
+
       // Push generated journey to sidebar context
       profileContext.setJourney(result.journey);
       profileContext.setTemplateId(result.templateId);

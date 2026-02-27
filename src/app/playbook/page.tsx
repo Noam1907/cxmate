@@ -195,6 +195,8 @@ export default function PlaybookPage() {
   const [templateId, setTemplateId] = useState("preview");
   const [filter, setFilter] = useState<FilterMode>("all");
   const [evidenceMap, setEvidenceMap] = useState<EvidenceMap | null>(null);
+  // true when background pre-generation is in flight (started during onboarding)
+  const [preparing, setPreparing] = useState(false);
   const { statuses, setStatus } = useRecommendationStatus();
 
   useEffect(() => {
@@ -211,9 +213,32 @@ export default function PlaybookPage() {
       const storedPlaybook = sessionStorage.getItem("cx-mate-playbook");
       if (storedPlaybook) {
         try { setPlaybook(JSON.parse(storedPlaybook)); } catch { /* ignore */ }
+      } else {
+        // No playbook yet — background pre-generation may still be in flight
+        setPreparing(true);
       }
     }
   }, []);
+
+  // Poll sessionStorage every 2s waiting for pre-generated playbook to land
+  useEffect(() => {
+    if (!preparing || playbook) return;
+    const poll = setInterval(() => {
+      const stored = sessionStorage.getItem("cx-mate-playbook");
+      if (stored) {
+        try {
+          setPlaybook(JSON.parse(stored));
+          setPreparing(false);
+        } catch { /* ignore */ }
+      }
+    }, 2000);
+    // After 3 min give up polling — show manual generate button as fallback
+    const giveUp = setTimeout(() => {
+      clearInterval(poll);
+      setPreparing(false);
+    }, 3 * 60 * 1000);
+    return () => { clearInterval(poll); clearTimeout(giveUp); };
+  }, [preparing, playbook]);
 
   const handleGenerate = async () => {
     setLoading(true);
@@ -281,16 +306,20 @@ export default function PlaybookPage() {
   }
 
   if (!playbook) {
+    const isGenerating = loading || preparing;
     return (
       <main className="min-h-screen flex items-center justify-center p-8">
         <div className="text-center space-y-5 max-w-md">
-          {loading ? (
+          {isGenerating ? (
             <>
-              <div className="w-12 h-12 rounded-2xl bg-primary/8 flex items-center justify-center mx-auto">
-                <span className="text-lg font-bold text-primary">CX</span>
-              </div>
-              <h1 className="text-2xl font-bold text-slate-900">Building your playbook</h1>
-              <p className="text-slate-500">Turning your journey map into a step-by-step action plan — takes about 1-2 minutes.</p>
+              <h1 className="text-2xl font-bold text-slate-900">
+                {loading ? "Building your playbook" : "Preparing your playbook…"}
+              </h1>
+              <p className="text-slate-500">
+                {loading
+                  ? "Turning your journey map into a step-by-step action plan."
+                  : "Your playbook is being generated in the background. Won't be long."}
+              </p>
               <div className="h-1 bg-slate-100 rounded-full overflow-hidden max-w-xs mx-auto">
                 <div className="h-full bg-primary rounded-full animate-pulse w-2/3" />
               </div>
