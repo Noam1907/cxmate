@@ -93,14 +93,29 @@ function buildEnrichmentPrompt(
   companyName: string,
   websiteContent: string | null
 ): string {
+  // Business model — HOW the company sells (must match BUSINESS_MODELS in the UI)
   const verticalOptions = [
     "b2b_saas",
     "professional_services",
     "marketplace",
-    "fintech",
     "ecommerce_b2b",
-    "healthtech",
     "other",
+  ];
+
+  // Industry — WHAT space they operate in (optional, null if none apply well)
+  const industryOptions = [
+    "fintech",
+    "healthtech",
+    "hrtech",
+    "legaltech",
+    "proptech",
+    "edtech",
+    "securitytech",
+    "logisticstech",
+    "martech",
+    "devtools",
+    "foodtech",
+    "other_vertical",
   ];
 
   const companySizeOptions = ["1-10", "11-50", "51-150", "151-300", "300+"];
@@ -119,7 +134,17 @@ Analyze this company and return a JSON object with these fields. Use the website
 ## Required Output Fields
 
 - **suggestedVertical**: One of: ${JSON.stringify(verticalOptions)}
-  Choose the BEST match. "b2b_saas" = software subscription for businesses. "other" only as last resort.
+  This is the BUSINESS MODEL — HOW they sell, not what industry they're in.
+  "b2b_saas" = software subscription for businesses (most common for tech companies).
+  "professional_services" = consulting, agencies, implementation, managed services.
+  "marketplace" = two-sided platform connecting buyers and sellers.
+  "ecommerce_b2b" = B2B wholesale, distribution, or online retail.
+  "other" = only if none of the above fit.
+  IMPORTANT: Do NOT put fintech, healthtech, etc. here — those are industries, not business models.
+
+- **suggestedIndustry**: One of: ${JSON.stringify(industryOptions)}, or null if none apply clearly.
+  This is the INDUSTRY VERTICAL — WHAT space they're in (e.g., "healthtech" for medical devices).
+  Set to null if the company is a generic B2B SaaS or services company without a specific industry focus.
 
 - **suggestedCompanySize**: One of: ${JSON.stringify(companySizeOptions)}
   Estimate based on any signals: team page, job listings, LinkedIn mentions, about page.
@@ -143,7 +168,7 @@ Analyze this company and return a JSON object with these fields. Use the website
 - Be specific and opinionated — vague answers are worse than slightly wrong ones
 - If the company is well-known, use your knowledge confidently
 - If the company name suggests an industry (e.g., "ShipTech"), use that signal
-- All field values must match the exact options listed above`;
+- suggestedVertical and suggestedIndustry must match the exact options listed above (or null for suggestedIndustry)`;
 }
 
 // ============================================

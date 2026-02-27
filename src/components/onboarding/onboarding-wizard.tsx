@@ -513,6 +513,9 @@ export function OnboardingWizard() {
     if (!data.vertical && enrichment.suggestedVertical) {
       updates.vertical = enrichment.suggestedVertical;
     }
+    if (!data.industry && enrichment.suggestedIndustry) {
+      updates.industry = enrichment.suggestedIndustry;
+    }
     if (!data.companySize && enrichment.suggestedCompanySize) {
       updates.companySize = enrichment.suggestedCompanySize;
     }

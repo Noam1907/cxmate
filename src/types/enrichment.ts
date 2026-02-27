@@ -6,8 +6,10 @@
  */
 
 export interface EnrichedCompanyData {
-  /** Mapped to VERTICALS ids: b2b_saas, professional_services, etc. */
+  /** Mapped to BUSINESS_MODELS ids: b2b_saas, professional_services, marketplace, ecommerce_b2b, other */
   suggestedVertical: string;
+  /** Optional industry tag: fintech, healthtech, hrtech, etc. Maps to INDUSTRY_VERTICALS */
+  suggestedIndustry?: string | null;
   /** Mapped to COMPANY_SIZES values: 1-10, 11-50, etc. */
   suggestedCompanySize: string;
   /** One-line description of what the company does */
