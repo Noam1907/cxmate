@@ -9,6 +9,7 @@ import Link from "next/link";
 import type { GeneratedJourney } from "@/lib/ai/journey-prompt";
 import type { OnboardingData } from "@/types/onboarding";
 import { buildEvidenceMap, type EvidenceMap } from "@/lib/evidence-matching";
+import { track } from "@/lib/analytics";
 
 type ViewMode = "cards" | "visual";
 
@@ -20,6 +21,16 @@ function JourneyContent() {
   const [companyName, setCompanyName] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState<ViewMode>("cards");
+
+  useEffect(() => {
+    if (!loading && journey) {
+      track("journey_map_viewed", {
+        template_id: templateId ?? undefined,
+        stage_count: journey.stages.length,
+      });
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loading, journey]);
 
   useEffect(() => {
     async function load() {

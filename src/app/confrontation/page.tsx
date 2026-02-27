@@ -12,6 +12,7 @@ import type {
 import type { OnboardingData } from "@/types/onboarding";
 import { buildEvidenceMap, type EvidenceMap } from "@/lib/evidence-matching";
 import { EvidenceWall } from "@/components/evidence/evidence-wall";
+import { track } from "@/lib/analytics";
 
 // ─── Confrontation Modes ────────────────────────────────────────────────────
 
@@ -362,8 +363,14 @@ function ConfrontationContent() {
   useEffect(() => {
     if (!loading && journey) {
       const t = setTimeout(() => setHeaderVisible(true), 200);
+      track("cx_report_viewed", {
+        template_id: templateId ?? undefined,
+        company_name: companyName || undefined,
+        mode,
+      });
       return () => clearTimeout(t);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loading, journey]);
 
   const insights = useMemo(() => journey?.confrontationInsights || [], [journey]);

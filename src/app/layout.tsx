@@ -3,6 +3,7 @@ import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { CompanyProfileProvider } from "@/contexts/company-profile-context";
 import { AppShell } from "@/components/layout/app-shell";
+import { PostHogProvider } from "@/components/providers/posthog-provider";
 
 const plusJakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
@@ -25,9 +26,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${plusJakarta.variable} font-sans antialiased`}>
-        <CompanyProfileProvider>
-          <AppShell>{children}</AppShell>
-        </CompanyProfileProvider>
+        <PostHogProvider>
+          <CompanyProfileProvider>
+            <AppShell>{children}</AppShell>
+          </CompanyProfileProvider>
+        </PostHogProvider>
       </body>
     </html>
   );

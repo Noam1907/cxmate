@@ -7,6 +7,7 @@ import type { GeneratedJourney } from "@/lib/ai/journey-prompt";
 import type { GeneratedPlaybook } from "@/lib/ai/recommendation-prompt";
 import type { OnboardingInput } from "@/lib/validations/onboarding";
 import { buildEvidenceMap, getInsightAnnotations } from "@/lib/evidence-matching";
+import { track } from "@/lib/analytics";
 
 // ─── Data loading ─────────────────────────────────────────────────────────────
 
@@ -85,7 +86,13 @@ function computePlaybookStats(playbook: GeneratedPlaybook, statuses: Record<stri
 export default function DashboardPage() {
   const [data, setData] = useState<DashboardData | null>(null);
 
-  useEffect(() => { setData(loadLocalDashboardData()); }, []);
+  useEffect(() => {
+    const loaded = loadLocalDashboardData();
+    setData(loaded);
+    if (loaded.journey) {
+      track("dashboard_viewed", { template_id: loaded.templateId || undefined });
+    }
+  }, []);
 
   if (!data) {
     return <main className="min-h-screen flex items-center justify-center"><p className="text-slate-400">Loading...</p></main>;

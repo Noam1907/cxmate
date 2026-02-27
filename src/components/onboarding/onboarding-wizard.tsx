@@ -18,6 +18,7 @@ import { useCompanyProfile } from "@/contexts/company-profile-context";
 import { useCompanyEnrichment } from "@/hooks/use-company-enrichment";
 import { useOnboardingAutosave, loadOnboardingDraft, clearOnboardingDraft } from "@/hooks/use-onboarding-autosave";
 import type { EnrichedCompanyData } from "@/types/enrichment";
+import { track } from "@/lib/analytics";
 
 type StepKey =
   | "welcome"
@@ -520,6 +521,15 @@ export function OnboardingWizard() {
       enrich(data.companyName, data.companyWebsite);
     }
 
+    // Track step completion
+    if (currentStep) {
+      track("onboarding_step_completed", {
+        step_key: currentStep.key,
+        step_number: step + 1,
+        company_name: data.companyName,
+      });
+    }
+
     if (step < totalSteps - 1) {
       setStep((s) => s + 1);
     }
@@ -532,6 +542,7 @@ export function OnboardingWizard() {
   };
 
   const handleSubmit = async (retryCount = 0) => {
+    const generationStartTime = Date.now();
     setIsSubmitting(true);
     setSubmitError(null);
     try {
@@ -546,6 +557,12 @@ export function OnboardingWizard() {
       const submitData = enrichment
         ? { ...data, enrichmentData: enrichment }
         : data;
+
+      track("journey_generation_started", {
+        maturity: data.companyMaturity,
+        journey_type: data.journeyType,
+        has_existing_customers: data.hasExistingCustomers,
+      });
 
       const response = await fetch("/api/onboarding", {
         method: "POST",
@@ -562,6 +579,10 @@ export function OnboardingWizard() {
       }
 
       const result = await response.json();
+      track("journey_generation_succeeded", {
+        duration_seconds: Math.round((Date.now() - generationStartTime) / 1000),
+        template_id: result.templateId,
+      });
       sessionStorage.setItem("cx-mate-journey", JSON.stringify(result));
       // Push generated journey to sidebar context
       profileContext.setJourney(result.journey);
@@ -574,12 +595,12 @@ export function OnboardingWizard() {
       if (error instanceof DOMException && error.name === "AbortError") {
         const isTimeout = abortRef.current?.signal?.reason === "Request timed out";
         if (isTimeout) {
-          // Auto-retry once on timeout
           if (retryCount < 1) {
-            console.log("Generation timed out, retrying...");
+            track("journey_generation_retried");
             handleSubmit(retryCount + 1);
             return;
           }
+          track("journey_generation_failed", { error_type: "timeout", retry_count: retryCount });
           setSubmitError("Generation is taking longer than expected. Please try again — it usually works on the second attempt.");
           setIsSubmitting(false);
         }
@@ -587,6 +608,7 @@ export function OnboardingWizard() {
         return;
       }
       console.error("Onboarding error:", error);
+      track("journey_generation_failed", { error_type: "api_error", retry_count: retryCount });
       const message = error instanceof Error
         ? error.message
         : "Something went wrong. Please try again.";
@@ -601,7 +623,10 @@ export function OnboardingWizard() {
 
   // Show intro hero before any form
   if (showIntro) {
-    return <IntroHero onStart={() => setShowIntro(false)} />;
+    return <IntroHero onStart={() => {
+      setShowIntro(false);
+      track("onboarding_started");
+    }} />;
   }
 
   return (

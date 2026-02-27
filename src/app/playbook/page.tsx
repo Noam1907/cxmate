@@ -7,6 +7,7 @@ import type { GeneratedPlaybook, PlaybookRecommendation, StagePlaybook } from "@
 import type { GeneratedJourney } from "@/lib/ai/journey-prompt";
 import type { OnboardingInput } from "@/lib/validations/onboarding";
 import { buildEvidenceMap, getMomentAnnotations, type EvidenceMap } from "@/lib/evidence-matching";
+import { track } from "@/lib/analytics";
 
 // ─── Status ───────────────────────────────────────────────────────────────────
 
@@ -217,6 +218,7 @@ export default function PlaybookPage() {
   const handleGenerate = async () => {
     setLoading(true);
     setError(null);
+    track("playbook_generation_started", { template_id: templateId || undefined });
     try {
       const stored = sessionStorage.getItem("cx-mate-journey");
       if (!stored) throw new Error("No journey data found");
@@ -230,10 +232,16 @@ export default function PlaybookPage() {
       });
       if (!response.ok) throw new Error("Failed to generate recommendations");
       const result = await response.json();
-      setPlaybook(result.playbook);
-      sessionStorage.setItem("cx-mate-playbook", JSON.stringify(result.playbook));
+      const generatedPlaybook: GeneratedPlaybook = result.playbook;
+      setPlaybook(generatedPlaybook);
+      sessionStorage.setItem("cx-mate-playbook", JSON.stringify(generatedPlaybook));
+      track("playbook_generation_succeeded", {
+        recommendation_count: generatedPlaybook.stagePlaybooks?.flatMap((s) => s.recommendations).length,
+      });
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong");
+      const errMsg = err instanceof Error ? err.message : "Something went wrong";
+      setError(errMsg);
+      track("playbook_generation_failed", { error: errMsg });
     } finally {
       setLoading(false);
     }
@@ -241,7 +249,15 @@ export default function PlaybookPage() {
 
   const handleStatusChange = (key: string) => {
     const current = statuses[key] || "not_started";
-    setStatus(key, statusCycle(current));
+    const next = statusCycle(current);
+    setStatus(key, next);
+    const allRecs = playbook?.stagePlaybooks.flatMap((s) => s.recommendations) ?? [];
+    const rec = allRecs.find((r) => makeKey(r) === key);
+    track("recommendation_status_changed", {
+      status: next,
+      recommendation_key: key,
+      priority: rec?.priority,
+    });
   };
 
   if (!hasJourney) {
