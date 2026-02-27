@@ -369,20 +369,57 @@ function IntroHero({ onStart }: { onStart: () => void }) {
         </p>
       </div>
 
-      {/* 3 Deliverable Preview Cards */}
-      <div className="grid gap-5 text-left max-w-lg mx-auto">
+      {/* 3-Step Story Flow */}
+      <div className="relative max-w-sm mx-auto text-left">
         {[
-          { icon: "🗺️", bg: "from-teal-50 to-teal-100", title: "Map your journey", desc: "Every stage, every moment where customers decide to stay — or leave." },
-          { icon: "📊", bg: "from-rose-50 to-rose-100", title: "Find what's costing you", desc: "Revenue at risk, critical gaps, ranked by urgency. Backed by your numbers." },
-          { icon: "✅", bg: "from-amber-50 to-amber-100", title: "Fix it this week", desc: "A prioritized action plan with templates ready to execute — starting Monday." },
-        ].map((card) => (
-          <div key={card.title} className="flex items-start gap-4 rounded-2xl border bg-white p-6 shadow-sm hover:shadow-md transition-all">
-            <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${card.bg} flex items-center justify-center shrink-0`}>
-              <span className="text-xl">{card.icon}</span>
+          {
+            num: "01",
+            accent: "bg-teal-500",
+            ring: "ring-teal-500/20",
+            label: "text-teal-600",
+            title: "Map your journey",
+            desc: "Every stage, every moment where customers decide to stay — or leave.",
+          },
+          {
+            num: "02",
+            accent: "bg-rose-500",
+            ring: "ring-rose-500/20",
+            label: "text-rose-600",
+            title: "Find what's costing you",
+            desc: "Revenue at risk, critical gaps, ranked by urgency. Backed by your numbers.",
+          },
+          {
+            num: "03",
+            accent: "bg-amber-500",
+            ring: "ring-amber-500/20",
+            label: "text-amber-600",
+            title: "Fix it this week",
+            desc: "A prioritized action plan with templates ready to execute — starting Monday.",
+          },
+        ].map((step, i, arr) => (
+          <div key={step.num} className="flex gap-5">
+            {/* Timeline spine */}
+            <div className="flex flex-col items-center">
+              <div
+                className={`w-9 h-9 rounded-full ${step.accent} ring-4 ${step.ring} flex items-center justify-center shrink-0 shadow-sm`}
+              >
+                <span className="text-white text-[11px] font-bold tracking-tight">{step.num}</span>
+              </div>
+              {i < arr.length - 1 && (
+                <div className="w-px bg-slate-200 flex-1 my-2" />
+              )}
             </div>
-            <div>
-              <div className="font-bold text-base text-foreground">{card.title}</div>
-              <div className="text-sm text-muted-foreground mt-1 leading-relaxed">{card.desc}</div>
+            {/* Content */}
+            <div className={i < arr.length - 1 ? "pb-8 pt-1" : "pt-1"}>
+              <div className={`text-[11px] font-semibold uppercase tracking-widest ${step.label} mb-0.5`}>
+                Step {step.num}
+              </div>
+              <div className="font-semibold text-[15px] text-foreground leading-snug">
+                {step.title}
+              </div>
+              <div className="text-sm text-muted-foreground mt-1 leading-relaxed">
+                {step.desc}
+              </div>
             </div>
           </div>
         ))}
