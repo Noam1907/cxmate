@@ -229,7 +229,7 @@ function GeneratingExperience({ data }: { data: OnboardingData }) {
     { title: "Building your journey stages", detail: `Structuring a ${data.companyMaturity === "pre_launch" ? "sales" : "full lifecycle"} map tailored to your vertical` },
     { title: "Identifying meaningful moments", detail: "Finding the interactions that make or break customer relationships" },
     { title: "Scoring priorities", detail: "Connecting your pains to specific, actionable improvements" },
-    { title: "Assembling your playbook", detail: "Pulling together templates, metrics, and an implementation plan" },
+    { title: "Generating your intelligence report", detail: "Mapping risk areas, impact projections, and your personalised action items" },
   ];
 
   // Timer
@@ -266,7 +266,7 @@ function GeneratingExperience({ data }: { data: OnboardingData }) {
           </svg>
         </div>
         <h2 className="text-2xl font-bold text-slate-800 tracking-tight">
-          Building your CX playbook
+          Building your CX intelligence
         </h2>
         <p className="text-sm text-slate-400">
           Deep analysis in progress — about 2 minutes
@@ -364,17 +364,17 @@ function IntroHero({ onStart }: { onStart: () => void }) {
           Your AI CX expert is ready
         </h1>
         <p className="text-lg text-muted-foreground max-w-lg mx-auto leading-relaxed">
-          CX Mate analyzes your business, maps your customer journey,
-          and builds a playbook your team can execute — in under 5 minutes.
+          Your customers have a journey whether you designed it or not.
+          In 3 minutes, we&apos;ll map it, find what&apos;s breaking, and tell you exactly what to fix.
         </p>
       </div>
 
       {/* 3 Deliverable Preview Cards */}
       <div className="grid gap-5 text-left max-w-lg mx-auto">
         {[
-          { icon: "📊", bg: "from-rose-50 to-rose-100", title: "CX Intelligence Report", desc: "Impact projections, risk analysis, and opportunities backed by your data" },
-          { icon: "🗺️", bg: "from-teal-50 to-teal-100", title: "Journey Map", desc: "Every stage mapped with meaningful moments scored by severity" },
-          { icon: "📋", bg: "from-amber-50 to-amber-100", title: "Action Playbook", desc: "Prioritized recommendations with templates your team can execute this week" },
+          { icon: "🗺️", bg: "from-teal-50 to-teal-100", title: "Map your journey", desc: "Every stage, every moment where customers decide to stay — or leave." },
+          { icon: "📊", bg: "from-rose-50 to-rose-100", title: "Find what's costing you", desc: "Revenue at risk, critical gaps, ranked by urgency. Backed by your numbers." },
+          { icon: "✅", bg: "from-amber-50 to-amber-100", title: "Fix it this week", desc: "A prioritized action plan with templates ready to execute — starting Monday." },
         ].map((card) => (
           <div key={card.title} className="flex items-start gap-4 rounded-2xl border bg-white p-6 shadow-sm hover:shadow-md transition-all">
             <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${card.bg} flex items-center justify-center shrink-0`}>
@@ -395,7 +395,7 @@ function IntroHero({ onStart }: { onStart: () => void }) {
           onClick={onStart}
           className="rounded-2xl px-12 py-7 text-lg font-bold shadow-lg hover:shadow-xl transition-all"
         >
-          Let&apos;s build yours
+          Map my journey →
         </Button>
         <p className="text-sm text-muted-foreground">
           Takes about 3 minutes. No account needed.
@@ -589,7 +589,7 @@ export function OnboardingWizard() {
       profileContext.setTemplateId(result.templateId);
       // Clear draft — successfully submitted, no need to restore
       clearOnboardingDraft();
-      router.push(`/confrontation?id=${result.templateId}`);
+      router.push(`/journey?id=${result.templateId}`);
     } catch (error) {
       // Ignore abort errors from unmount/navigation
       if (error instanceof DOMException && error.name === "AbortError") {
@@ -601,7 +601,7 @@ export function OnboardingWizard() {
             return;
           }
           track("journey_generation_failed", { error_type: "timeout", retry_count: retryCount });
-          setSubmitError("Generation is taking longer than expected. Please try again — it usually works on the second attempt.");
+          setSubmitError("Generation took a bit longer than usual. Please try again — your data is saved.");
           setIsSubmitting(false);
         }
         // Otherwise it's a navigation abort — ignore

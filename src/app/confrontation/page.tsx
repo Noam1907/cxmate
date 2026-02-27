@@ -18,14 +18,15 @@ import { track } from "@/lib/analytics";
 
 type ConfrontationMode = "early_stage" | "growing" | "established";
 
-function detectMode(companySize: string): ConfrontationMode {
-  switch (companySize) {
-    case "1-10":
-    case "11-50":
+function detectMode(companyMaturity?: string): ConfrontationMode {
+  switch (companyMaturity) {
+    case "pre_launch":
+    case "first_customers":
       return "early_stage";
-    case "51-150":
-    case "151-300":
+    case "growing":
       return "growing";
+    case "scaling":
+      return "established";
     default:
       return "early_stage";
   }
@@ -328,7 +329,7 @@ function ConfrontationContent() {
             setJourney(data.journey);
             setOnboardingData(loadedOnboarding);
             setCompanyName(data.onboardingData?.companyName || "your company");
-            setMode(detectMode(data.onboardingData?.companySize || ""));
+            setMode(detectMode(data.onboardingData?.companyMaturity));
             setHasExistingCustomers(data.onboardingData?.hasExistingCustomers || false);
           } catch { /* ignore */ }
         }

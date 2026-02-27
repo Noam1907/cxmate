@@ -157,6 +157,16 @@ function JourneyContent() {
       ) : (
         <JourneyVisual journey={journey} />
       )}
+
+      {/* CTA → CX Report */}
+      <div className="border-t mt-12 pt-10 flex flex-col sm:flex-row items-center gap-3">
+        <Link href={`/confrontation?id=${templateId}`}>
+          <Button size="lg">See Your CX Intelligence Report</Button>
+        </Link>
+        <Link href="/playbook">
+          <Button size="lg" variant="outline">Get Your Playbook</Button>
+        </Link>
+      </div>
     </div>
   );
 }
