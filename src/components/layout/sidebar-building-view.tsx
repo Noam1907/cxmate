@@ -25,6 +25,12 @@ function getLogoUrl(website: string): string | null {
 function getCurrentStageIndex(data: Partial<OnboardingData> | null): number {
   if (!data?.companyName) return 0;
   if (!data?.vertical || !data?.companyMaturity) return 0;
+  // For maturities that include the journey step, stay on stage 1 until it's answered
+  const hasJourneyStep =
+    data.companyMaturity === "first_customers" ||
+    data.companyMaturity === "growing" ||
+    data.companyMaturity === "scaling";
+  if (hasJourneyStep && !data?.hasExistingJourney) return 1;
   if (!data?.customerDescription) return 2;
   if (!data?.biggestChallenge || !data?.primaryGoal) return 3;
   return 4;

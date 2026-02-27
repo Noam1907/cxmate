@@ -354,9 +354,9 @@ function GeneratingExperience({ data }: { data: OnboardingData }) {
 
 function IntroHero({ onStart }: { onStart: () => void }) {
   return (
-    <div className="w-full max-w-2xl mx-auto text-center space-y-14 py-12">
+    <div className="w-full max-w-2xl mx-auto text-center space-y-8 py-6">
       {/* Headline */}
-      <div className="space-y-6">
+      <div className="space-y-4">
         <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/15 to-primary/5 flex items-center justify-center mx-auto shadow-md">
           <span className="text-xl font-bold text-primary">CX</span>
         </div>
@@ -369,7 +369,21 @@ function IntroHero({ onStart }: { onStart: () => void }) {
         </p>
       </div>
 
-      {/* 3-Step Story Flow */}
+      {/* CTA — above the fold, before the step list */}
+      <div className="space-y-3">
+        <Button
+          size="lg"
+          onClick={onStart}
+          className="rounded-2xl px-12 py-7 text-lg font-bold shadow-lg hover:shadow-xl transition-all"
+        >
+          Map my journey →
+        </Button>
+        <p className="text-sm text-muted-foreground">
+          Takes about 3 minutes. No account needed.
+        </p>
+      </div>
+
+      {/* 3-Step Story Flow — supporting detail below CTA */}
       <div className="relative max-w-sm mx-auto text-left">
         {[
           {
@@ -410,7 +424,7 @@ function IntroHero({ onStart }: { onStart: () => void }) {
               )}
             </div>
             {/* Content */}
-            <div className={i < arr.length - 1 ? "pb-8 pt-1" : "pt-1"}>
+            <div className={i < arr.length - 1 ? "pb-6 pt-1" : "pt-1"}>
               <div className={`text-[11px] font-semibold uppercase tracking-widest ${step.label} mb-0.5`}>
                 Step {step.num}
               </div>
@@ -423,20 +437,6 @@ function IntroHero({ onStart }: { onStart: () => void }) {
             </div>
           </div>
         ))}
-      </div>
-
-      {/* CTA */}
-      <div className="space-y-5">
-        <Button
-          size="lg"
-          onClick={onStart}
-          className="rounded-2xl px-12 py-7 text-lg font-bold shadow-lg hover:shadow-xl transition-all"
-        >
-          Map my journey →
-        </Button>
-        <p className="text-sm text-muted-foreground">
-          Takes about 3 minutes. No account needed.
-        </p>
       </div>
     </div>
   );
@@ -704,7 +704,7 @@ export function OnboardingWizard() {
             ))}
           </div>
           <p className="text-center text-xs text-muted-foreground font-medium">
-            Step {safeStep + 1} of {totalSteps} &middot; {currentStep?.label}
+            Step {safeStep + 1} &middot; {currentStep?.label}
           </p>
         </div>
       )}
