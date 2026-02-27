@@ -230,7 +230,15 @@ export default function PlaybookPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ journey, onboardingData }),
       });
-      if (!response.ok) throw new Error("Failed to generate recommendations");
+      if (!response.ok) {
+        let errMsg = "Failed to generate recommendations";
+        try {
+          const errBody = await response.json();
+          if (errBody?.details) errMsg = `Validation error: ${JSON.stringify(errBody.details).slice(0, 200)}`;
+          else if (errBody?.error) errMsg = errBody.error;
+        } catch { /* ignore parse error */ }
+        throw new Error(errMsg);
+      }
       const result = await response.json();
       const generatedPlaybook: GeneratedPlaybook = result.playbook;
       setPlaybook(generatedPlaybook);

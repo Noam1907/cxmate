@@ -121,11 +121,11 @@ function HeroImpactCard({ projections, delay }: { projections: ImpactProjection[
   const hi = formatDollarCompact(Math.round(total * 1.3));
 
   return (
-    <div className={`rounded-2xl border border-slate-200 bg-white p-8 transition-all duration-700 ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
-      <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-2">Revenue at risk — annually</p>
-      <div className="text-5xl font-bold tracking-tight text-slate-900">{lo} – {hi}</div>
-      <p className="text-sm text-slate-400 mt-2 leading-relaxed max-w-md">
-        Estimated value leaving through CX gaps — based on your deal size, customer count, and industry benchmarks for companies at your stage.
+    <div className={`rounded-2xl bg-slate-900 text-white p-8 transition-all duration-700 ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
+      <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-3">Revenue leaving through CX gaps — annually</p>
+      <div className="text-6xl font-bold tracking-tight">{lo} – {hi}</div>
+      <p className="text-sm text-slate-400 mt-3 leading-relaxed max-w-md">
+        Based on your deal size, customer count, and industry benchmarks. Fix the issues below to recapture it.
       </p>
     </div>
   );
@@ -135,17 +135,19 @@ function HeroImpactCard({ projections, delay }: { projections: ImpactProjection[
 
 function StatRow({ highRisk, critical, moments, delay }: { highRisk: number; critical: number; moments: number; delay: number }) {
   return (
-    <FadeIn delay={delay} className="grid grid-cols-3 divide-x border rounded-xl overflow-hidden bg-white">
-      {[
-        { label: "High-risk patterns", value: highRisk },
-        { label: "Critical moments", value: critical },
-        { label: "Moments mapped", value: moments },
-      ].map(({ label, value }) => (
-        <div key={label} className="p-5">
-          <div className="text-3xl font-bold tracking-tight">{value}</div>
-          <div className="text-xs text-slate-500 mt-1">{label}</div>
-        </div>
-      ))}
+    <FadeIn delay={delay} className="grid grid-cols-3 gap-3">
+      <div className={`rounded-xl p-5 ${highRisk > 0 ? "bg-rose-50 border border-rose-100" : "bg-white border border-slate-200"}`}>
+        <div className={`text-3xl font-bold tracking-tight ${highRisk > 0 ? "text-rose-600" : "text-slate-900"}`}>{highRisk}</div>
+        <div className={`text-xs mt-1 font-medium ${highRisk > 0 ? "text-rose-500" : "text-slate-500"}`}>High-risk patterns</div>
+      </div>
+      <div className={`rounded-xl p-5 ${critical > 0 ? "bg-amber-50 border border-amber-100" : "bg-white border border-slate-200"}`}>
+        <div className={`text-3xl font-bold tracking-tight ${critical > 0 ? "text-amber-700" : "text-slate-900"}`}>{critical}</div>
+        <div className={`text-xs mt-1 font-medium ${critical > 0 ? "text-amber-600" : "text-slate-500"}`}>Critical moments</div>
+      </div>
+      <div className="rounded-xl p-5 bg-white border border-slate-200">
+        <div className="text-3xl font-bold tracking-tight text-slate-900">{moments}</div>
+        <div className="text-xs text-slate-500 mt-1 font-medium">Moments mapped</div>
+      </div>
     </FadeIn>
   );
 }
@@ -193,63 +195,87 @@ function ImpactBreakdown({ projections, delay }: { projections: ImpactProjection
   );
 }
 
-// ─── Insight Row ─────────────────────────────────────────────────────────────
+// ─── Insight Card ─────────────────────────────────────────────────────────────
 
-function InsightRow({ insight, index }: { insight: ConfrontationInsight; index: number }) {
+function InsightCard({ insight, index }: { insight: ConfrontationInsight; index: number }) {
   const [expanded, setExpanded] = useState(false);
 
-  const riskConfig = {
-    high:   { dot: "bg-rose-400",   label: "High",   labelColor: "text-rose-500"  },
-    medium: { dot: "bg-amber-400",  label: "Medium", labelColor: "text-amber-500" },
-    low:    { dot: "bg-slate-300",  label: "Low",    labelColor: "text-slate-400" },
-  }[insight.likelihood] ?? { dot: "bg-slate-300", label: "", labelColor: "text-slate-400" };
+  const isHigh = insight.likelihood === "high";
+  const isMedium = insight.likelihood === "medium";
+
+  const cardStyle = isHigh
+    ? "border-l-4 border-l-rose-500 border-t border-r border-b border-rose-100 bg-rose-50/40"
+    : isMedium
+    ? "border-l-4 border-l-amber-400 border-t border-r border-b border-amber-100 bg-amber-50/20"
+    : "border border-slate-200 bg-white";
+
+  const badge = isHigh
+    ? <span className="text-[10px] font-bold uppercase tracking-widest text-rose-600 bg-rose-100 px-2 py-0.5 rounded-full shrink-0">Urgent</span>
+    : isMedium
+    ? <span className="text-[10px] font-bold uppercase tracking-widest text-amber-700 bg-amber-100 px-2 py-0.5 rounded-full shrink-0">Important</span>
+    : <span className="text-[10px] font-medium uppercase tracking-widest text-slate-400 shrink-0">On radar</span>;
 
   return (
-    <FadeIn delay={1900 + index * 250}>
+    <FadeIn delay={1900 + index * 200}>
       <div
-        className="rounded-xl border border-slate-200 bg-white cursor-pointer hover:border-slate-300 transition-colors"
+        className={`rounded-xl cursor-pointer transition-all hover:shadow-sm ${cardStyle}`}
         onClick={() => setExpanded(!expanded)}
       >
-        {/* Collapsed — title only */}
-        <div className="flex items-center gap-3 px-5 py-4">
-          <div className={`w-2 h-2 rounded-full shrink-0 ${riskConfig.dot}`} />
-          <span className="text-sm font-semibold text-slate-900 flex-1 leading-snug">{insight.pattern}</span>
-          <span className={`text-xs font-medium shrink-0 ${riskConfig.labelColor}`}>{riskConfig.label}</span>
-          <span className="text-slate-300 text-sm shrink-0 ml-1">{expanded ? "−" : "+"}</span>
-        </div>
-
-        {/* Expanded */}
-        {expanded && (
-          <div className="px-5 pb-5 space-y-4 border-t border-slate-100 pt-4">
-
-            {/* Description */}
-            <p className="text-sm text-slate-500 leading-relaxed">{insight.description}</p>
-
-            {/* Key details — 2-col grid, compact */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {insight.businessImpact && (
-                <div className="space-y-1">
-                  <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wide">Impact</p>
-                  <p className="text-sm text-slate-700">{insight.businessImpact}</p>
-                </div>
-              )}
-              {insight.immediateAction && (
-                <div className="space-y-1">
-                  <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wide">Do this now</p>
-                  <p className="text-sm text-slate-700">{insight.immediateAction}</p>
-                </div>
+        {/* Collapsed header */}
+        <div className="flex items-start gap-3 px-5 py-4">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 mb-1.5">
+              {badge}
+              {isHigh && !expanded && insight.immediateAction && (
+                <span className="text-[10px] text-rose-500 font-medium truncate hidden sm:block">
+                  Act: {insight.immediateAction.slice(0, 50)}{insight.immediateAction.length > 50 ? "…" : ""}
+                </span>
               )}
             </div>
+            <p className={`text-sm font-semibold leading-snug ${isHigh ? "text-slate-900" : isMedium ? "text-slate-800" : "text-slate-700"}`}>
+              {insight.pattern}
+            </p>
+          </div>
+          <span className={`text-sm shrink-0 mt-0.5 ${isHigh ? "text-rose-300" : isMedium ? "text-amber-300" : "text-slate-300"}`}>
+            {expanded ? "−" : "+"}
+          </span>
+        </div>
 
-            {/* Measure — inline, less prominent */}
+        {/* Expanded detail */}
+        {expanded && (
+          <div className={`px-5 pb-5 space-y-4 border-t pt-4 ${isHigh ? "border-rose-100" : isMedium ? "border-amber-100" : "border-slate-100"}`}>
+
+            <p className="text-sm text-slate-600 leading-relaxed">{insight.description}</p>
+
+            {/* Immediate action — most prominent element */}
+            {insight.immediateAction && (
+              <div className={`rounded-lg p-4 ${isHigh ? "bg-rose-50 border border-rose-200" : isMedium ? "bg-amber-50 border border-amber-200" : "bg-slate-50 border border-slate-200"}`}>
+                <p className={`text-[10px] font-bold uppercase tracking-widest mb-1.5 ${isHigh ? "text-rose-600" : isMedium ? "text-amber-700" : "text-slate-500"}`}>
+                  {isHigh ? "Do this now" : "Next action"}
+                </p>
+                <p className={`text-sm font-medium ${isHigh ? "text-rose-900" : isMedium ? "text-amber-900" : "text-slate-700"}`}>
+                  {insight.immediateAction}
+                </p>
+              </div>
+            )}
+
+            {/* Business impact */}
+            {insight.businessImpact && (
+              <div>
+                <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide mb-1">Business impact</p>
+                <p className="text-sm text-slate-700">{insight.businessImpact}</p>
+              </div>
+            )}
+
+            {/* Measure */}
             {insight.measureWith && (
               <p className="text-xs text-slate-400">
-                <span className="font-medium text-slate-500">Measure: </span>
+                <span className="font-medium text-slate-500">Measure with: </span>
                 {insight.measureWith}
               </p>
             )}
 
-            {/* CX Mate advice — pull-quote style */}
+            {/* Companion advice */}
             {insight.companionAdvice && (
               <div className="border-l-2 border-slate-200 pl-3">
                 <p className="text-sm text-slate-500 italic">&ldquo;{insight.companionAdvice}&rdquo;</p>
@@ -407,23 +433,23 @@ function ConfrontationContent() {
       <div className="max-w-2xl mx-auto px-6 py-16">
 
         {/* Header */}
-        <div className={`mb-12 transition-all duration-700 ${headerVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
-          <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-3">{config.label}</p>
-          <h1 className="text-4xl font-bold tracking-tight text-slate-900 mb-3">{config.headline(companyName)}</h1>
+        <div className={`mb-10 transition-all duration-700 ${headerVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
+          <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest mb-2">{config.label}</p>
+          <h1 className="text-4xl font-bold tracking-tight text-slate-900 mb-3 leading-tight">{config.headline(companyName)}</h1>
           <p className="text-base text-slate-500 leading-relaxed">{config.subtitle}</p>
+        </div>
+
+        {/* Stats — first thing visible, gives context before the money number */}
+        <div className="mb-6">
+          <StatRow highRisk={highRiskCount} critical={criticalMoments} moments={totalMoments} delay={300} />
         </div>
 
         {/* Impact hero */}
         {projections.length > 0 && (
-          <div className="mb-4">
-            <HeroImpactCard projections={projections} delay={400} />
+          <div className="mb-8">
+            <HeroImpactCard projections={projections} delay={600} />
           </div>
         )}
-
-        {/* Stats */}
-        <div className="mb-8">
-          <StatRow highRisk={highRiskCount} critical={criticalMoments} moments={totalMoments} delay={700} />
-        </div>
 
         {/* Impact breakdown */}
         {projections.length > 0 && (
@@ -456,21 +482,63 @@ function ConfrontationContent() {
           </FadeIn>
         )}
 
-        {/* Insights */}
+        {/* Insights — grouped by priority */}
         {insights.length > 0 && (
           <div className="mb-12">
             <FadeIn delay={1700}>
-              <div className="mb-4">
-                <h2 className="text-xl font-bold text-slate-900">{config.insightsHeading(hasExistingCustomers)}</h2>
-                <p className="text-sm text-slate-400 mt-1">
-                  Patterns we identified in your journey — click any to see the action plan
-                  {highRiskCount > 0 && <span className="ml-2 text-amber-600 font-medium">· {highRiskCount} high priority</span>}
-                </p>
+              <div className="mb-6">
+                <h2 className="text-2xl font-bold text-slate-900">{config.insightsHeading(hasExistingCustomers)}</h2>
+                <p className="text-sm text-slate-400 mt-1.5">Click any issue to see what to do — ordered by urgency</p>
               </div>
             </FadeIn>
-            <div className="space-y-2">
-              {insights.map((insight, i) => <InsightRow key={i} insight={insight} index={i} />)}
-            </div>
+
+            {/* HIGH risk group */}
+            {insights.filter((i) => i.likelihood === "high").length > 0 && (
+              <FadeIn delay={1800} className="mb-6">
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="w-2.5 h-2.5 rounded-full bg-rose-500 shrink-0" />
+                  <p className="text-xs font-bold uppercase tracking-widest text-rose-600">Fix these first</p>
+                  <span className="text-xs text-slate-400">({insights.filter((i) => i.likelihood === "high").length})</span>
+                </div>
+                <div className="space-y-2">
+                  {insights.filter((i) => i.likelihood === "high").map((insight, i) => (
+                    <InsightCard key={i} insight={insight} index={i} />
+                  ))}
+                </div>
+              </FadeIn>
+            )}
+
+            {/* MEDIUM risk group */}
+            {insights.filter((i) => i.likelihood === "medium").length > 0 && (
+              <FadeIn delay={2000} className="mb-6">
+                <div className="flex items-center gap-2 mb-3 mt-2">
+                  <div className="w-2.5 h-2.5 rounded-full bg-amber-400 shrink-0" />
+                  <p className="text-xs font-bold uppercase tracking-widest text-amber-700">Also important</p>
+                  <span className="text-xs text-slate-400">({insights.filter((i) => i.likelihood === "medium").length})</span>
+                </div>
+                <div className="space-y-2">
+                  {insights.filter((i) => i.likelihood === "medium").map((insight, i) => (
+                    <InsightCard key={i} insight={insight} index={i + insights.filter((x) => x.likelihood === "high").length} />
+                  ))}
+                </div>
+              </FadeIn>
+            )}
+
+            {/* LOW risk group */}
+            {insights.filter((i) => i.likelihood === "low").length > 0 && (
+              <FadeIn delay={2200} className="mb-6">
+                <div className="flex items-center gap-2 mb-3 mt-2">
+                  <div className="w-2.5 h-2.5 rounded-full bg-slate-300 shrink-0" />
+                  <p className="text-xs font-bold uppercase tracking-widest text-slate-400">On the radar</p>
+                  <span className="text-xs text-slate-400">({insights.filter((i) => i.likelihood === "low").length})</span>
+                </div>
+                <div className="space-y-2">
+                  {insights.filter((i) => i.likelihood === "low").map((insight, i) => (
+                    <InsightCard key={i} insight={insight} index={i + insights.filter((x) => x.likelihood !== "low").length} />
+                  ))}
+                </div>
+              </FadeIn>
+            )}
           </div>
         )}
 
