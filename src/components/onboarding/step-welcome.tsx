@@ -13,38 +13,22 @@ interface StepWelcomeProps {
 
 /**
  * Guess a website domain from a company name.
- * Handles common TLDs: .ai, .io, .co, .com
- * "Orca AI" → "orca.ai"
- * "Mesh Payments" → "meshpayments.com"
- * "Acme Labs" → "acmelabs.io" (if "labs" → .io hint)
+ * Conservative: only guesses single-word names (e.g. "Acme" → "acme.com").
+ * Multi-word names like "Orca AI" are skipped — too ambiguous to guess reliably
+ * ("orca.ai" vs "orca-ai.io" — we'd get it wrong half the time).
+ * User types their real URL instead.
  */
 function guessWebsite(name: string): string {
   const lower = name.toLowerCase().trim();
   if (!lower) return "";
 
-  // Detect TLD hints in the name itself
-  const tldHints: Record<string, string> = {
-    ai: ".ai",
-    io: ".io",
-    co: ".co",
-  };
-
-  // Check if the last word is a known TLD hint
   const words = lower.split(/\s+/);
-  const lastWord = words[words.length - 1];
 
-  if (tldHints[lastWord] && words.length > 1) {
-    // "Orca AI" → "orca.ai", "Beam AI" → "beam.ai"
-    const nameWithoutTld = words.slice(0, -1).join("").replace(/[^a-z0-9]/g, "");
-    return nameWithoutTld ? `${nameWithoutTld}${tldHints[lastWord]}` : "";
-  }
+  // Multi-word names: too risky to guess — skip
+  if (words.length > 1) return "";
 
-  // Default: strip common suffixes, collapse, append .com
-  const cleaned = lower
-    .replace(/[^a-z0-9\s]/g, "")
-    .replace(/\b(inc|corp|ltd|llc|company|group|technologies|tech|software)\b/g, "")
-    .trim()
-    .replace(/\s+/g, "");
+  // Single word: strip noise, append .com
+  const cleaned = lower.replace(/[^a-z0-9]/g, "");
   return cleaned ? `${cleaned}.com` : "";
 }
 
@@ -137,7 +121,7 @@ export function StepWelcome({ data, onChange }: StepWelcomeProps) {
           <Label htmlFor="companyWebsite" className="text-sm font-semibold text-foreground">Company website</Label>
           <Input
             id="companyWebsite"
-            placeholder="e.g. orca.ai"
+            placeholder="e.g. acme.com"
             value={data.companyWebsite}
             onChange={(e) => handleWebsiteChange(e.target.value)}
             className="h-12 rounded-xl border-border/60 text-sm"

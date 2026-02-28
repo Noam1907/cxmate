@@ -76,11 +76,11 @@ export function SidebarCompleteView({
             alt={`${companyName} logo`}
             width={32}
             height={32}
-            className="rounded-md bg-white/10 object-contain"
+            className="rounded-md bg-white p-0.5 object-contain"
             onError={() => setLogoError(true)}
           />
         ) : (
-          <div className="w-8 h-8 rounded-md bg-white/10 flex items-center justify-center shrink-0">
+          <div className="w-8 h-8 rounded-md bg-white/15 flex items-center justify-center shrink-0">
             <span className="text-sm font-bold text-white/80">{initials}</span>
           </div>
         )}

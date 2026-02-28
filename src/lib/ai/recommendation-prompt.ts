@@ -188,6 +188,12 @@ ${input.userRole ? `Tailor owner assignments and language to their role. If they
 - Has existing customers: ${input.hasExistingCustomers ? "Yes" : "No (pre-customer)"}
 - Customers: ${input.customerDescription} (${input.customerSize})
 - Main channel: ${input.mainChannel}
+${input.preLiveProcess ? `- Pre-live / implementation process: ${input.preLiveProcess}` : ""}
+${input.pricingModel ? `- Pricing model: ${input.pricingModel}` : ""}
+${input.roughRevenue ? `- Revenue range: ${input.roughRevenue}` : ""}
+${input.averageDealSize ? `- Avg deal size: ${input.averageDealSize}` : ""}
+${input.customerCount ? `- Customer count: ${input.customerCount}` : ""}
+${input.competitors ? `- Competitors: ${input.competitors}` : ""}
 ${input.currentTools ? `- Current tools/stack: ${input.currentTools}\nWhen recommending tools or automation, BUILD ON their existing stack. Recommend integrations, not replacements. If they use HubSpot, recommend HubSpot workflows — don't suggest switching to Salesforce.` : ""}
 ${input.hasExistingJourney === "yes" || input.hasExistingJourney === "partial" ? `
 ## Existing Processes (Don't Reinvent)

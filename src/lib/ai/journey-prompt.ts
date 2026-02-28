@@ -385,7 +385,8 @@ function buildBusinessDataContext(input: OnboardingInput): string {
 - Customers: ~${p.customerCount} (${calculations.customerCount.source})
 - Average ACV: $${p.averageACV.toLocaleString()} (${calculations.averageACV.source})
 - Est. monthly churn: ${p.monthlyChurnRate}% (${calculations.churnRate.source})
-- Est. annual revenue: $${p.annualRevenue?.toLocaleString()} (${calculations.annualRevenue.source})`;
+- Est. annual revenue: $${p.annualRevenue?.toLocaleString()} (${calculations.annualRevenue.source})
+${input.pricingModel ? `- Pricing model: ${input.pricingModel}` : ""}`;
 
   if (dataSource === "user_provided") {
     context += `
@@ -507,6 +508,7 @@ ${verticalContext}
 - Their customers: ${input.customerDescription}
 - Customer size: ${input.customerSize}
 - Main acquisition channel: ${input.mainChannel}
+${input.preLiveProcess ? `- Pre-live / implementation process: ${input.preLiveProcess}` : ""}
 ${input.currentTools ? `- Current CX tools/stack: ${input.currentTools}` : ""}
 
 ## Existing CX Processes
