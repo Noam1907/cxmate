@@ -230,6 +230,7 @@ function GeneratingExperience({ data }: { data: OnboardingData }) {
     { title: "Identifying meaningful moments", detail: "Finding the interactions that make or break customer relationships" },
     { title: "Scoring priorities", detail: "Connecting your pains to specific, actionable improvements" },
     { title: "Generating your intelligence report", detail: "Mapping risk areas, impact projections, and your personalised action items" },
+    { title: "Building your action playbook", detail: "Turning every insight into a step-by-step action with templates and timelines" },
   ];
 
   // Timer
@@ -240,16 +241,16 @@ function GeneratingExperience({ data }: { data: OnboardingData }) {
     return () => clearInterval(timer);
   }, []);
 
-  // Phase progression — staggered timing for realism
+  // Phase progression — staggered timing across full ~3 min generation window
   useEffect(() => {
-    const timings = [0, 15000, 35000, 60000, 90000];
+    const timings = [0, 15000, 35000, 60000, 90000, 115000];
     const timeouts = timings.map((ms, i) =>
       setTimeout(() => setPhase(i), ms)
     );
     return () => timeouts.forEach(clearTimeout);
   }, []);
 
-  const progress = Math.min((seconds / 120) * 100, 95);
+  const progress = Math.min((seconds / 180) * 100, 95);
 
   return (
     <div className="rounded-2xl border border-slate-200 bg-white p-8 space-y-8">
@@ -269,7 +270,7 @@ function GeneratingExperience({ data }: { data: OnboardingData }) {
           Building your CX intelligence
         </h2>
         <p className="text-sm text-slate-400">
-          Deep analysis in progress — about 2 minutes
+          Building your full CX package — journey, report, and playbook
         </p>
       </div>
 
@@ -285,7 +286,7 @@ function GeneratingExperience({ data }: { data: OnboardingData }) {
           <span className="text-[11px] text-slate-400 tabular-nums">
             {Math.floor(seconds / 60)}:{(seconds % 60).toString().padStart(2, "0")} elapsed
           </span>
-          <span className="text-[11px] text-slate-400">~2 min total</span>
+          <span className="text-[11px] text-slate-400">~3 min total</span>
         </div>
       </div>
 
@@ -625,26 +626,23 @@ export function OnboardingWizard() {
       });
       sessionStorage.setItem("cx-mate-journey", JSON.stringify(result));
 
-      // Fire-and-forget: pre-generate playbook in the background so it's
-      // ready by the time the user finishes reading the journey + CX report.
-      // The fetch continues at the browser network level even after navigation.
-      void (async () => {
-        try {
-          track("playbook_pregeneration_started");
-          const playbookRes = await fetch("/api/recommendations/generate", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ journey: result.journey, onboardingData: result.onboardingData }),
-          });
-          if (playbookRes.ok) {
-            const playbookData = await playbookRes.json();
-            sessionStorage.setItem("cx-mate-playbook", JSON.stringify(playbookData.playbook));
-            track("playbook_pregeneration_succeeded");
-          }
-        } catch {
-          // Silent failure — user can still generate manually from the playbook page
+      // Generate playbook synchronously — user waits once for both.
+      // Fire-and-forget was unreliable: browsers cancel in-flight fetches on navigation.
+      try {
+        track("playbook_pregeneration_started");
+        const playbookRes = await fetch("/api/recommendations/generate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ journey: result.journey, onboardingData: result.onboardingData }),
+        });
+        if (playbookRes.ok) {
+          const playbookData = await playbookRes.json();
+          sessionStorage.setItem("cx-mate-playbook", JSON.stringify(playbookData.playbook));
+          track("playbook_pregeneration_succeeded");
         }
-      })();
+      } catch {
+        // Non-fatal — user can still generate manually from the playbook page
+      }
 
       // Push generated journey to sidebar context
       profileContext.setJourney(result.journey);

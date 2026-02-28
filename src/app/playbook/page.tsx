@@ -232,11 +232,12 @@ export default function PlaybookPage() {
         } catch { /* ignore */ }
       }
     }, 2000);
-    // After 3 min give up polling — show manual generate button as fallback
+    // After 30s give up polling — playbook should already be in sessionStorage
+    // (generation now happens synchronously during onboarding loading screen)
     const giveUp = setTimeout(() => {
       clearInterval(poll);
       setPreparing(false);
-    }, 3 * 60 * 1000);
+    }, 30 * 1000);
     return () => { clearInterval(poll); clearTimeout(giveUp); };
   }, [preparing, playbook]);
 
