@@ -464,6 +464,7 @@ export function OnboardingWizard() {
       setShowIntro(false); // Skip intro — go straight to where they left off
       setShowRestoredBanner(true);
       setRestoredDraft(true);
+      track("onboarding_draft_restored", { step_number: draft.step });
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 

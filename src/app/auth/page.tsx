@@ -3,6 +3,7 @@
 import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { track, identify } from "@/lib/analytics";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -40,6 +41,13 @@ function AuthContent() {
       return;
     }
 
+    // Identify user + track login
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      identify(user.id, { email: user.email });
+      track("user_logged_in");
+    }
+
     router.push(redirectTo);
     router.refresh();
   }
@@ -65,6 +73,8 @@ function AuthContent() {
       setLoading(false);
       return;
     }
+
+    track("user_signed_up");
 
     setMessage("Check your email for a confirmation link.");
     setLoading(false);
