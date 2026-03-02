@@ -60,18 +60,18 @@ export function SidebarBuildingView({ data }: SidebarBuildingViewProps) {
               onError={() => setLogoError(true)}
             />
           ) : (
-            <div className="w-8 h-8 rounded-md bg-white/15 flex items-center justify-center shrink-0">
-              <span className="text-sm font-bold text-white/80">{initials}</span>
+            <div className="w-8 h-8 rounded-md bg-teal-50 flex items-center justify-center shrink-0">
+              <span className="text-sm font-bold text-teal-700">{initials}</span>
             </div>
           )}
           <div className="min-w-0">
-            <p className="text-sm font-semibold text-white/90 truncate">{companyName}</p>
-            <p className="text-[10px] text-white/35 mt-0.5">Building your profile</p>
+            <p className="text-sm font-semibold text-slate-800 truncate">{companyName}</p>
+            <p className="text-[10px] text-slate-400 mt-0.5">Building your profile</p>
           </div>
         </div>
       ) : (
         <div className="px-1">
-          <p className="text-[10px] font-semibold uppercase tracking-widest text-white/30">
+          <p className="text-[10px] font-semibold uppercase tracking-widest text-slate-400">
             Getting started
           </p>
         </div>
@@ -89,20 +89,20 @@ export function SidebarBuildingView({ data }: SidebarBuildingViewProps) {
               key={stage.key}
               className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all ${
                 isCurrent
-                  ? "bg-white/10"
+                  ? "bg-teal-50"
                   : isDone
-                  ? "opacity-70"
-                  : "opacity-30"
+                  ? "opacity-80"
+                  : "opacity-40"
               }`}
             >
               {/* Step indicator */}
               <div
                 className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 text-[10px] font-bold transition-all ${
                   isDone
-                    ? "bg-white/20 text-white"
+                    ? "bg-teal-100 text-teal-700"
                     : isCurrent
-                    ? "bg-white text-slate-900"
-                    : "border border-white/20 text-white/30"
+                    ? "bg-teal-600 text-white"
+                    : "border border-slate-200 text-slate-300"
                 }`}
               >
                 {isDone ? "✓" : i + 1}
@@ -112,10 +112,10 @@ export function SidebarBuildingView({ data }: SidebarBuildingViewProps) {
               <span
                 className={`text-xs font-medium leading-tight ${
                   isCurrent
-                    ? "text-white"
+                    ? "text-teal-700 font-semibold"
                     : isDone
-                    ? "text-white/60"
-                    : "text-white/30"
+                    ? "text-slate-600"
+                    : "text-slate-300"
                 }`}
               >
                 {stage.label}
@@ -126,11 +126,11 @@ export function SidebarBuildingView({ data }: SidebarBuildingViewProps) {
       </nav>
 
       {/* Divider */}
-      <div className="border-t border-white/8" />
+      <div className="border-t border-slate-100" />
 
       {/* What's coming next */}
       <div className="space-y-2 px-1">
-        <p className="text-[10px] font-semibold uppercase tracking-widest text-white/25">
+        <p className="text-[10px] font-semibold uppercase tracking-widest text-slate-400">
           After onboarding
         </p>
         <div className="space-y-1.5">
@@ -140,9 +140,9 @@ export function SidebarBuildingView({ data }: SidebarBuildingViewProps) {
             { label: "Journey Map" },
             { label: "Playbook" },
           ].map((item) => (
-            <div key={item.label} className="flex items-center gap-3 px-3 py-1.5 opacity-20">
-              <div className="w-1.5 h-1.5 rounded-full bg-white/40 shrink-0" />
-              <span className="text-xs text-white/50">{item.label}</span>
+            <div key={item.label} className="flex items-center gap-3 px-3 py-1.5 opacity-40">
+              <div className="w-1.5 h-1.5 rounded-full bg-slate-300 shrink-0" />
+              <span className="text-xs text-slate-400">{item.label}</span>
             </div>
           ))}
         </div>

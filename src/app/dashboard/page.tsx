@@ -116,6 +116,7 @@ export default function DashboardPage() {
   const jStats = computeJourneyStats(data.journey);
   const pStats = data.playbook ? computePlaybookStats(data.playbook, data.recStatuses) : null;
   const companyName = data.onboarding?.companyName || "Your Company";
+  const firstName = data.onboarding?.userName?.split(" ")[0] || "";
   const tid = data.templateId || "preview";
   const topInsights = (data.journey.confrontationInsights || []).filter((i) => i.likelihood === "high").slice(0, 3);
   const evidenceMap = data.onboarding ? buildEvidenceMap(data.onboarding, data.journey) : null;
@@ -126,13 +127,18 @@ export default function DashboardPage() {
 
         {/* Header */}
         <div className="mb-10">
+          {firstName && (
+            <p className="text-sm text-teal-600 font-medium mb-1">
+              Good to see you, {firstName}.
+            </p>
+          )}
           <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-2">Dashboard</p>
-          <h1 className="text-4xl font-bold tracking-tight text-slate-900">{companyName}</h1>
+          <h1 className="text-4xl font-bold tracking-tight text-slate-800">{companyName}</h1>
         </div>
 
         {/* Hero impact */}
         {jStats.hasImpactData && (
-          <div className="rounded-2xl bg-slate-900 text-white p-8 mb-6">
+          <div className="rounded-2xl bg-gradient-to-br from-slate-800 to-teal-900 text-white p-8 mb-6">
             <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-2">Estimated Annual CX Impact</p>
             <div className="text-5xl font-bold tracking-tight">
               {formatDollarCompact(Math.round(jStats.totalImpact * 0.7))} – {formatDollarCompact(Math.round(jStats.totalImpact * 1.3))}
@@ -169,7 +175,7 @@ export default function DashboardPage() {
               <div className="text-3xl font-bold text-slate-900">{pStats.pct}<span className="text-base text-slate-400">%</span></div>
             </div>
             <div className="h-1.5 rounded-full bg-slate-100 overflow-hidden mb-4">
-              <div className="h-full bg-slate-800 rounded-full transition-all duration-500" style={{ width: `${pStats.pct}%` }} />
+              <div className="h-full bg-teal-600 rounded-full transition-all duration-500" style={{ width: `${pStats.pct}%` }} />
             </div>
             <div className="flex items-center justify-between">
               <div className="flex gap-5 text-xs text-slate-500">

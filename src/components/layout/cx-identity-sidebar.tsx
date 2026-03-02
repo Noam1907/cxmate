@@ -12,7 +12,7 @@ export function CxIdentitySidebar() {
   const isOnboarding = pathname === "/onboarding";
 
   return (
-    <aside className="bg-sidebar text-sidebar-foreground border-r border-sidebar-border h-[calc(100vh-3.5rem)] sticky top-14 overflow-y-auto hidden md:block">
+    <aside className="bg-white border-r border-slate-200 h-[calc(100vh-3.5rem)] sticky top-14 overflow-y-auto hidden md:block">
       <div className="p-5 pt-6">
         {/* Content — switches between building and complete */}
         {isOnboarding ? (

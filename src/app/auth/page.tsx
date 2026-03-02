@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
+import { track, identify } from "@/lib/analytics";
 
 function AuthContent() {
   const router = useRouter();
@@ -29,7 +30,7 @@ function AuthContent() {
     setLoading(true);
     setError("");
 
-    const { error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
@@ -38,6 +39,11 @@ function AuthContent() {
       setError(error.message);
       setLoading(false);
       return;
+    }
+
+    if (data.user) {
+      identify(data.user.id, { email: data.user.email });
+      track("user_logged_in");
     }
 
     router.push(redirectTo);
@@ -66,6 +72,7 @@ function AuthContent() {
       return;
     }
 
+    track("user_signed_up");
     setMessage("Check your email for a confirmation link.");
     setLoading(false);
   }

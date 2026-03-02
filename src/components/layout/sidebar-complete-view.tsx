@@ -80,15 +80,15 @@ export function SidebarCompleteView({
             onError={() => setLogoError(true)}
           />
         ) : (
-          <div className="w-8 h-8 rounded-md bg-white/15 flex items-center justify-center shrink-0">
-            <span className="text-sm font-bold text-white/80">{initials}</span>
+          <div className="w-8 h-8 rounded-md bg-teal-50 flex items-center justify-center shrink-0">
+            <span className="text-sm font-bold text-teal-700">{initials}</span>
           </div>
         )}
         <div className="min-w-0">
-          <p className="text-sm font-semibold text-white/90 truncate">
+          <p className="text-sm font-semibold text-slate-800 truncate">
             {companyName || "Your Company"}
           </p>
-          <p className="text-[10px] text-white/35 mt-0.5">CX Mate</p>
+          <p className="text-[10px] text-slate-400 mt-0.5">CX Mate</p>
         </div>
       </div>
 
@@ -102,16 +102,16 @@ export function SidebarCompleteView({
               href={item.href}
               className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all group ${
                 isActive
-                  ? "bg-white/10"
-                  : "hover:bg-white/5"
+                  ? "bg-teal-50"
+                  : "hover:bg-slate-50"
               }`}
             >
               {/* Step number */}
               <div
                 className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 text-[10px] font-bold transition-all ${
                   isActive
-                    ? "bg-white text-slate-900"
-                    : "bg-white/10 text-white/40 group-hover:bg-white/15 group-hover:text-white/60"
+                    ? "bg-teal-600 text-white"
+                    : "bg-slate-100 text-slate-400 group-hover:bg-slate-200 group-hover:text-slate-600"
                 }`}
               >
                 {i + 1}
@@ -121,13 +121,13 @@ export function SidebarCompleteView({
               <div className="min-w-0 flex-1">
                 <p
                   className={`text-xs font-medium leading-tight truncate ${
-                    isActive ? "text-white" : "text-white/50 group-hover:text-white/70"
+                    isActive ? "text-teal-700 font-semibold" : "text-slate-500 group-hover:text-slate-700"
                   }`}
                 >
                   {item.label}
                 </p>
                 {isActive && item.sublabel && (
-                  <p className="text-[10px] text-white/35 mt-0.5 truncate">{item.sublabel}</p>
+                  <p className="text-[10px] text-slate-400 mt-0.5 truncate">{item.sublabel}</p>
                 )}
               </div>
             </Link>
@@ -136,15 +136,15 @@ export function SidebarCompleteView({
       </nav>
 
       {/* Divider + Re-run */}
-      <div className="border-t border-white/8 pt-4">
+      <div className="border-t border-slate-100 pt-4">
         <Link
           href="/onboarding"
-          className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/5 transition-all group"
+          className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-50 transition-all group"
         >
-          <div className="w-5 h-5 rounded-full bg-white/6 flex items-center justify-center shrink-0">
-            <span className="text-[9px] text-white/30">↺</span>
+          <div className="w-5 h-5 rounded-full bg-slate-100 flex items-center justify-center shrink-0">
+            <span className="text-[9px] text-slate-400">↺</span>
           </div>
-          <span className="text-[11px] text-white/30 group-hover:text-white/50 transition-colors">
+          <span className="text-[11px] text-slate-400 group-hover:text-slate-600 transition-colors">
             Re-run analysis
           </span>
         </Link>

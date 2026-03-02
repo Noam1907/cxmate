@@ -181,3 +181,28 @@ Track sprint progress and status.
 ### Next session starts with
 - PDF export feature (playbook + journey map with company logo)
 - Sprint 4: Beta launch prep — auth, DB persistence pipeline
+
+---
+
+## Session — 2026-03-02
+
+### Completed this session
+- **Tester behavior tracking — session recording enabled** in PostHog provider (`posthog-provider.tsx`): `session_recording` block with password-only masking. Testers can now be watched as session replays in PostHog.
+- **User identification wired** in `auth/page.tsx`: `identify(userId, { email })` on login, `track("user_logged_in")` on login, `track("user_signed_up")` on signup. Was previously defined in schema but never called.
+- **Company enrichment events wired** in `use-company-enrichment.ts`: `company_enrichment_succeeded` (with confidence + company name) and `company_enrichment_failed` called after each enrichment attempt.
+- **New analytics event** added to schema: `pdf_exported` with `{ page: "journey" | "cx_report" | "playbook" | "dashboard" }`.
+- **PDF export** — browser print-based (no new deps). Print CSS added to `globals.css` (hides nav/sidebar/buttons, formats cards, handles page breaks). New reusable `ExportPdfButton` component (`src/components/ui/export-pdf-button.tsx`). Export buttons added to Journey Map, CX Report, and Playbook headers.
+- **Daily digest email system** — built full pipeline: `src/app/api/digest/send/route.ts` (pulls Supabase stats, composes HTML email, sends via Resend), secured with `CRON_SECRET` header. Vercel cron job configured in `vercel.json` to fire daily at 8am UTC. HTML email template with user/journey stats + PostHog session replay link. New env vars documented in `.env.local.example`.
+- **Resend** installed (`resend@6.9.3`).
+- **Vault files** synced (sprint-log, decisions, learning-log, C-core).
+
+### Open items requiring user action
+- Set `RESEND_API_KEY` in `.env.local` and Vercel env vars (get from resend.com — free tier)
+- Set `DIGEST_EMAIL` to your inbox
+- Set `CRON_SECRET` to any random string (also in Vercel env vars)
+- Verify PostHog `NEXT_PUBLIC_POSTHOG_KEY` is set in Vercel (session recording only works with a valid key)
+
+### Next session starts with
+- Design review + monetization (Stripe integration: products, pricing, checkout flow, subscription management)
+- Journey health scoring (P1)
+- Full regression QA before beta launch

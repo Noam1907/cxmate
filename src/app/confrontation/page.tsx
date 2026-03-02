@@ -13,6 +13,7 @@ import type { OnboardingData } from "@/types/onboarding";
 import { buildEvidenceMap, type EvidenceMap } from "@/lib/evidence-matching";
 import { EvidenceWall } from "@/components/evidence/evidence-wall";
 import { track } from "@/lib/analytics";
+import { ExportPdfButton } from "@/components/ui/export-pdf-button";
 
 // ─── Confrontation Modes ────────────────────────────────────────────────────
 
@@ -121,7 +122,7 @@ function HeroImpactCard({ projections, delay }: { projections: ImpactProjection[
   const hi = formatDollarCompact(Math.round(total * 1.3));
 
   return (
-    <div className={`rounded-2xl bg-slate-900 text-white p-8 transition-all duration-700 ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
+    <div className={`rounded-2xl bg-gradient-to-br from-slate-800 to-teal-900 text-white p-8 transition-all duration-700 ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
       <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-3">Revenue leaving through CX gaps — annually</p>
       <div className="text-6xl font-bold tracking-tight">{lo} – {hi}</div>
       <p className="text-sm text-slate-400 mt-3 leading-relaxed max-w-md">
@@ -334,6 +335,7 @@ function ConfrontationContent() {
   const [journey, setJourney] = useState<GeneratedJourney | null>(null);
   const [onboardingData, setOnboardingData] = useState<Partial<OnboardingData> | null>(null);
   const [companyName, setCompanyName] = useState<string>("");
+  const [firstName, setFirstName] = useState<string>("");
   const [mode, setMode] = useState<ConfrontationMode>("early_stage");
   const [hasExistingCustomers, setHasExistingCustomers] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -355,6 +357,7 @@ function ConfrontationContent() {
             setJourney(data.journey);
             setOnboardingData(loadedOnboarding);
             setCompanyName(data.onboardingData?.companyName || "your company");
+            setFirstName(data.onboardingData?.userName?.split(" ")[0] || "");
             setMode(detectMode(data.onboardingData?.companyMaturity));
             setHasExistingCustomers(data.onboardingData?.hasExistingCustomers || false);
           } catch { /* ignore */ }
@@ -372,6 +375,7 @@ function ConfrontationContent() {
               loadedOnboarding = parsed.onboardingData || null;
               setOnboardingData(loadedOnboarding);
               setCompanyName(parsed.onboardingData?.companyName || "your company");
+              setFirstName(parsed.onboardingData?.userName?.split(" ")[0] || "");
               setMode(detectMode(parsed.onboardingData?.companySize || ""));
               setHasExistingCustomers(parsed.onboardingData?.hasExistingCustomers || false);
             }
@@ -434,9 +438,19 @@ function ConfrontationContent() {
 
         {/* Header */}
         <div className={`mb-10 transition-all duration-700 ${headerVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
-          <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest mb-2">{config.label}</p>
-          <h1 className="text-4xl font-bold tracking-tight text-slate-900 mb-3 leading-tight">{config.headline(companyName)}</h1>
-          <p className="text-base text-slate-500 leading-relaxed">{config.subtitle}</p>
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              {firstName && (
+                <p className="text-sm text-teal-600 font-medium mb-1">
+                  Here&apos;s what we found, {firstName}.
+                </p>
+              )}
+              <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest mb-2">{config.label}</p>
+              <h1 className="text-4xl font-bold tracking-tight text-slate-800 mb-3 leading-tight">{config.headline(companyName)}</h1>
+              <p className="text-base text-slate-500 leading-relaxed">{config.subtitle}</p>
+            </div>
+            <ExportPdfButton page="cx_report" title={`${companyName || "CX Mate"} — CX Intelligence Report`} />
+          </div>
         </div>
 
         {/* Stats — first thing visible, gives context before the money number */}
