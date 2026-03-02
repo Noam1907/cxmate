@@ -43,6 +43,15 @@ export function PostHogProvider({ children }: { children: React.ReactNode }) {
       capture_pageleave: true,            // Track when users leave
       autocapture: false,                 // We track events explicitly — no noise
       persistence: "localStorage",
+      // Session recording — lets us watch tester behaviour as replays
+      session_recording: {
+        maskAllInputs: false,             // Show inputs so we can see the flow
+        maskInputFn: (text, element) => {
+          // Mask passwords only
+          if ((element as HTMLInputElement)?.type === "password") return "••••••••";
+          return text;
+        },
+      },
       loaded: (ph) => {
         if (process.env.NODE_ENV === "development") {
           ph.debug();

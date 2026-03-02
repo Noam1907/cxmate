@@ -8,6 +8,7 @@ import type { GeneratedJourney } from "@/lib/ai/journey-prompt";
 import type { OnboardingInput } from "@/lib/validations/onboarding";
 import { buildEvidenceMap, getMomentAnnotations, type EvidenceMap } from "@/lib/evidence-matching";
 import { track } from "@/lib/analytics";
+import { ExportPdfButton } from "@/components/ui/export-pdf-button";
 
 // ─── Status ───────────────────────────────────────────────────────────────────
 
@@ -358,9 +359,12 @@ export default function PlaybookPage() {
       <div className="max-w-2xl mx-auto px-6 py-16">
 
         {/* Header */}
-        <div className="mb-10">
-          <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-2">CX Playbook</p>
-          <h1 className="text-4xl font-bold tracking-tight text-slate-900">{playbook.companyName}</h1>
+        <div className="mb-10 flex items-start justify-between gap-4">
+          <div>
+            <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-2">CX Playbook</p>
+            <h1 className="text-4xl font-bold tracking-tight text-slate-900">{playbook.companyName}</h1>
+          </div>
+          <ExportPdfButton page="playbook" title={`${playbook.companyName} — CX Playbook`} />
         </div>
 
         {/* Progress hero */}

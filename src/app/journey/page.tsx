@@ -10,6 +10,7 @@ import type { GeneratedJourney } from "@/lib/ai/journey-prompt";
 import type { OnboardingData } from "@/types/onboarding";
 import { buildEvidenceMap, type EvidenceMap } from "@/lib/evidence-matching";
 import { track } from "@/lib/analytics";
+import { ExportPdfButton } from "@/components/ui/export-pdf-button";
 
 type ViewMode = "cards" | "visual";
 
@@ -113,16 +114,19 @@ function JourneyContent() {
   return (
     <div className="w-full">
       {/* Page header */}
-      <div className="mb-10">
-        <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-2">
-          Journey Map
-        </p>
-        <h1 className="text-4xl font-bold tracking-tight text-slate-900">
-          {companyName || "Your Customer Journey"}
-        </h1>
-        <p className="text-sm text-slate-500 mt-2">
-          {journey.stages.length} stages · {totalMoments} meaningful moments
-        </p>
+      <div className="mb-10 flex items-start justify-between gap-4">
+        <div>
+          <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-2">
+            Journey Map
+          </p>
+          <h1 className="text-4xl font-bold tracking-tight text-slate-900">
+            {companyName || "Your Customer Journey"}
+          </h1>
+          <p className="text-sm text-slate-500 mt-2">
+            {journey.stages.length} stages · {totalMoments} meaningful moments
+          </p>
+        </div>
+        <ExportPdfButton page="journey" title={`${companyName || "CX Mate"} — Journey Map`} />
       </div>
 
       {/* View toggle */}

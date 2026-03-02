@@ -136,3 +136,72 @@
     @apply bg-background text-foreground;
     }
 }
+
+/* ─── Print / PDF Export ──────────────────────────────────────────────────── */
+@media print {
+  /* Reset background to white, text to black */
+  body {
+    background: white !important;
+    color: #111 !important;
+    font-size: 11pt;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* Hide chrome: nav, sidebar, buttons, controls */
+  nav,
+  [data-sidebar],
+  [data-print-hide],
+  .no-print {
+    display: none !important;
+  }
+
+  /* Remove shadows and borders that don't print well */
+  * {
+    box-shadow: none !important;
+  }
+
+  /* Cards print with a light border */
+  [data-print-card] {
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 8px !important;
+    background: white !important;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  /* Page breaks between major sections */
+  [data-print-break-before] {
+    break-before: page;
+    page-break-before: always;
+  }
+
+  /* Print-specific header with company name */
+  [data-print-header] {
+    display: block !important;
+    border-bottom: 2px solid #0d9488;
+    padding-bottom: 12px;
+    margin-bottom: 24px;
+  }
+
+  /* Main content fills full width */
+  main,
+  [data-print-content] {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  /* Ensure links show URL */
+  a[href]:after {
+    content: none;
+  }
+
+  /* Stage cards stay together */
+  [data-print-stage] {
+    break-inside: avoid;
+    page-break-inside: avoid;
+    margin-bottom: 16px;
+  }
+}

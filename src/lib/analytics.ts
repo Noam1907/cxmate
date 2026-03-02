@@ -32,7 +32,9 @@ export type AnalyticsEvent =
   | { name: "company_enrichment_failed"; company_name?: string }
   // Auth
   | { name: "user_signed_up" }
-  | { name: "user_logged_in" };
+  | { name: "user_logged_in" }
+  // Export
+  | { name: "pdf_exported"; page: "journey" | "cx_report" | "playbook" | "dashboard" };
 
 // ─── Track Function ───────────────────────────────────────────────────────────
 

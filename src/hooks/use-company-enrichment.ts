@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useRef } from "react";
 import type { EnrichedCompanyData, EnrichmentResponse } from "@/types/enrichment";
+import { track } from "@/lib/analytics";
 
 interface UseCompanyEnrichmentReturn {
   /** The enrichment result, or null if not yet enriched */
@@ -74,16 +75,22 @@ export function useCompanyEnrichment(): UseCompanyEnrichmentReturn {
           setEnrichment(data.enrichedData);
           lastEnrichedRef.current = key;
           setIsEnriching(false);
+          track("company_enrichment_succeeded", {
+            confidence: data.enrichedData.confidence,
+            company_name: companyName,
+          });
           return data.enrichedData;
         }
 
         setIsEnriching(false);
+        track("company_enrichment_failed", { company_name: companyName });
         return null;
       } catch (err) {
         const isTimeout =
           err instanceof DOMException && err.name === "AbortError";
         setError(isTimeout ? "Analysis timed out" : "Could not analyze company");
         setIsEnriching(false);
+        track("company_enrichment_failed", { company_name: companyName });
         return null;
       }
     },

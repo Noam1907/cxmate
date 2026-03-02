@@ -13,6 +13,7 @@ import type { OnboardingData } from "@/types/onboarding";
 import { buildEvidenceMap, type EvidenceMap } from "@/lib/evidence-matching";
 import { EvidenceWall } from "@/components/evidence/evidence-wall";
 import { track } from "@/lib/analytics";
+import { ExportPdfButton } from "@/components/ui/export-pdf-button";
 
 // ─── Confrontation Modes ────────────────────────────────────────────────────
 
@@ -434,9 +435,14 @@ function ConfrontationContent() {
 
         {/* Header */}
         <div className={`mb-10 transition-all duration-700 ${headerVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
-          <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest mb-2">{config.label}</p>
-          <h1 className="text-4xl font-bold tracking-tight text-slate-900 mb-3 leading-tight">{config.headline(companyName)}</h1>
-          <p className="text-base text-slate-500 leading-relaxed">{config.subtitle}</p>
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest mb-2">{config.label}</p>
+              <h1 className="text-4xl font-bold tracking-tight text-slate-900 mb-3 leading-tight">{config.headline(companyName)}</h1>
+              <p className="text-base text-slate-500 leading-relaxed">{config.subtitle}</p>
+            </div>
+            <ExportPdfButton page="cx_report" title={`${companyName || "CX Mate"} — CX Intelligence Report`} />
+          </div>
         </div>
 
         {/* Stats — first thing visible, gives context before the money number */}
