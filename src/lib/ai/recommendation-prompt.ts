@@ -41,6 +41,7 @@ export interface StagePlaybook {
   stageType: "sales" | "customer";
   topPriority: string; // The single most important thing to do at this stage
   recommendations: PlaybookRecommendation[];
+  measurementPlan?: string; // Which CX measurement to set up at this stage (NPS/CSAT/CES/event trigger) and when
 }
 
 export interface GeneratedPlaybook {
@@ -250,7 +251,15 @@ Rules:
    - AI workflow automation (Zapier AI, Make, n8n) for process automation
    - LLM-powered personalization for emails, onboarding flows, and customer communications
    When recommending AI tools, be specific: name the tool, explain HOW it applies to their specific moment, and note if it replaces manual work. The future of CX is AI-augmented — make sure every playbook reflects this.
-${!input.hasExistingCustomers ? '9. **PRE-CUSTOMER CONSTRAINT (CRITICAL):** This company has NO customers yet. Every recommendation MUST be sales-focused (winning first customers). Do NOT generate any recommendations about customer onboarding, customer success, retention, renewal, or expansion. Those do not apply. The weekOneChecklist and quickWins must also be 100% sales-focused.' : ""}
+9. **ALWAYS INCLUDE MEASUREMENT SETUP.** Every stage playbook MUST include at least one "type: measurement" recommendation. Choose the RIGHT measurement tool for this stage using the CX Measurement Tools knowledge above:
+   - **Demo/Trial** → Post-interaction survey (CSAT/stars after every demo), CES after trial setup. Template: a 2-question email sent within 1 hour of the demo.
+   - **Onboarding** → Onboarding completion tracking (milestone-based funnel), CES at Day 3 ("How easy was setup?"), CSAT at Day 7. Template: a simple 1-question in-app survey or email.
+   - **Adoption** → NPS at Day 30 (first baseline), event-triggered alerts (usage decline, inactivity > 14 days). Template: a Day 30 NPS email + what to do when someone scores 0-6.
+   - **Value Realization / Renewal** → Quarterly NPS, health score inputs, pre-renewal NPS at Day -60. Template: renewal risk survey email.
+   - **Sales stages (Evaluation/Close)** → Post-demo CSAT, win/loss analysis process.
+   - **General:** Include a ready-to-use survey question or trigger definition. Tell them exactly WHAT to send, WHEN to send it, and WHAT to do with a low score. Don't just say "measure NPS" — give them the Day 30 email template.
+   Set the "measurementPlan" field for each stage: name the measurement tool + when to fire it (e.g., "NPS at Day 30 + CSAT after every support ticket").
+${!input.hasExistingCustomers ? '10. **PRE-CUSTOMER CONSTRAINT (CRITICAL):** This company has NO customers yet. Every recommendation MUST be sales-focused (winning first customers). Do NOT generate any recommendations about customer onboarding, customer success, retention, renewal, or expansion. Those do not apply. The weekOneChecklist and quickWins must also be 100% sales-focused.' : ""}
 
 ## Output Format
 
@@ -265,6 +274,7 @@ Return a JSON object with this exact structure:
       "stageName": "Stage Name",
       "stageType": "sales" | "customer",
       "topPriority": "The single most important thing at this stage (one sentence)",
+      "measurementPlan": "Which CX measurement to set up at this stage and when (e.g., 'NPS at Day 30 via Delighted + CSAT after every support ticket via Intercom')",
       "recommendations": [
         {
           "momentName": "Which moment this addresses",

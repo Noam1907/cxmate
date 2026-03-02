@@ -96,9 +96,11 @@ CX Mate wins by being the **smartest path to a CX strategy**. Not the most power
 
 ## Pricing Model
 
-| Tier | Price | Includes |
-|------|-------|----------|
-| **Free** | $0 | One-time journey map + CX report (try before you buy) |
-| **Starter** | $99/mo | Monthly CX Pulse + Evidence Wall |
-| **Growth** | $249/mo | Competitive Intelligence + Simulations + QBR Deck |
-| **Scale** | $499/mo | Health Scoring + CRM integration |
+| Tier | Price | Includes | Upgrade Trigger |
+|------|-------|----------|----------------|
+| **Free** | $0 | Full one-time run (journey + CX report + playbook) · PDF export · NotebookLM export | "I want to track if I'm improving" |
+| **Starter** | $79/mo or $149 one-time | Save + return · Revenue Protected counter · Monthly CX Score · Evidence Wall · Slack nudges | "I want real data, not estimates" |
+| **Pro** | $199/mo | Monthly Pulse delta · HubSpot/Intercom integration · Competitive CX monitoring · AI stack recommendations · Simulations | "I need to present this to my board" |
+| **Premium** | $1,200/year | Board Deck generator · Multi-seat · QBR reports · CRM write-back · CX Mate MCP server | — |
+
+*Updated 2026-03-02 after cross-validation with ChatGPT + Gemini. Full rationale in O-output/monetization-strategy-2026-03-02.md*

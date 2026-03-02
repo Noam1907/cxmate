@@ -120,14 +120,38 @@ Track sprint progress and status.
 - 2026-02-22: **Next session should start with:** Run the app end-to-end with a customer watching. All visual changes are shipped. Remaining for Sprint 3: playbook persistence (Phase 4), "Save My Results" CTA (Phase 5), journey health scoring (P1). Then Sprint 4 (beta launch).
 - 2026-02-22: **LinkedIn Beta Recruitment Post — READY.** Full team stress test on beta recruitment post. COO drove content strategy, Product Lead validated ICP alignment, CX Architect confirmed messaging integrity, Tech Lead flagged demo readiness (Zoom-first, not self-serve), QA caught edge cases (follow-up message needed, "how many" for beta). Identified gap: no LinkedIn Content Expert agent — created ad-hoc review covering hook strength, format, hashtags, timing. Key decisions: (1) target is stage-based not size-based ("no CX expert yet" not "under 200 employees"), (2) hook uses real COO quote for authenticity, (3) CTA is "write אני" for low friction, (4) targeting founders/COOs/CX owners. Post approved for publish. **Action item:** prepare follow-up DM template for respondents.
 
-### Sprint 4: Beta Launch (Weeks 7-8)
-- Stripe integration
-- Landing page
-- Analytics setup (PostHog)
-- Beta invite system
-- Documentation
-- Security audit
-- Load testing
+### Sprint 4: Beta Launch (Weeks 7-8) ← CURRENT
+
+**Goal:** First beta users in the product, first paid conversions, demo-ready at all times.
+
+**Immediate (before Sunday 2026-03-01 demo):**
+- [x] Error boundaries on all output pages (confrontation, journey, playbook, dashboard, global)
+- [x] console.log removed from onboarding-wizard.tsx
+- [x] vercel.json updated (enrich-company timeout added)
+- [x] Agent system upgraded to 17 agents (Strategic Decision Team added)
+- [x] C-core completed: voice-dna.md + icp-profile.md created
+- [x] MEMORY.md updated to reflect Sprint 4 state
+- [x] qa-gatekeeper Claude skill wrapper created
+
+| Task | Agent | Priority | Status |
+|------|-------|----------|--------|
+| PDF export (playbook + journey map) | Frontend Dev | P0 | Pending |
+| "Save My Results" CTA for anonymous users | Frontend Dev | P0 | Pending |
+| Playbook persistence to Supabase (Phase 4) | Backend Dev | P0 | Pending |
+| PostHog analytics integration | DevOps Agent | P0 | Pending |
+| Stripe integration + pricing page | Backend Dev | P0 | Pending |
+| Beta invite system | Growth Agent | P0 | Pending |
+| Full regression QA (gatekeeper audit) | QA Gatekeeper | P0 | Pending |
+| Journey health scoring | AI Engineer | P1 | Pending |
+| Journey editing | Frontend Dev | P1 | Pending |
+| Security audit | Tech Lead | P1 | Pending |
+| Load testing | DevOps Agent | P2 | Pending |
+| MCP research pipeline spike | AI Engineer | P2 | Sprint 5 |
+| Curated email template library | CX Architect | P2 | Deferred |
+
+### Sprint Notes
+- 2026-02-27: **Sprint 4 kickoff.** Agent system overhauled (17 agents, Strategic Decision Team added, all C-core files complete). Demo-critical fixes shipped: error boundaries on all routes, vercel.json updated, console.log cleaned. Build passes clean. First beta demo Sunday 2026-03-01.
+- 2026-02-27: **Next session should start with:** Full end-to-end demo run-through (anonymous preview flow). Then PDF export. Then "Save My Results" CTA. Keep gatekeeper running before every demo.
 
 ---
 
@@ -206,3 +230,29 @@ Track sprint progress and status.
 - Design review + monetization (Stripe integration: products, pricing, checkout flow, subscription management)
 - Journey health scoring (P1)
 - Full regression QA before beta launch
+
+---
+
+## Session — 2026-03-02 (Strategic / Design Session)
+
+### Completed this session
+- **Light palette nav + sidebar shipped** — Flipped dark navy (`bg-sidebar`) to white/slate/teal across nav-header, cx-identity-sidebar, sidebar-complete-view, sidebar-building-view, app-shell (mobile drawer + toggle). Teal active states, slate text hierarchy. Committed `f8e75d6`, merged to main, deployed to Vercel.
+- **Worktree explained** — `claude/festive-kepler` was a git worktree (isolated branch for safe development). Merged to main and worktree can be cleaned up.
+- **Monetization model finalized** — Cross-validated with ChatGPT + Gemini. 4-tier hybrid: Free (full one-time run) / Starter $79/mo OR $149 one-time / Pro $199/mo / Premium $1,200/year. Old $99/$249/$499 model retired. Beta experiment: run both monthly + one-time at Starter to see what users prefer.
+- **CX Impact Proof Architecture designed** — 3 layers: (1) Proxy Impact (benchmark-based Revenue Protected counter, no integrations), (2) Pulse Delta (monthly before/after CX Score, Starter), (3) Real Data Validation (HubSpot/Intercom validates benchmarks, Pro). CX Mate captures "before state" at onboarding — unique advantage.
+- **CX Score (0-100) designed** — Single trackable number. Stage breakdown. Vertical+maturity benchmarks. Monthly update. Board-friendly. Compounds in value the longer you subscribe.
+- **NotebookLM positioned as FREE tier** — "Open in NotebookLM" exports structured markdown (journey + report + playbook). Users create infographics, decks, board summaries → share → brand exposure → new users. Growth mechanic, not paywall.
+- **Integration roadmap designed** — Data IN (HubSpot, Intercom, Mixpanel) at Pro tier. Intelligence OUT (NotebookLM Free, Slack/Notion Starter, Board Deck/MCP Server Premium). MCP dramatically reduces integration complexity.
+- **CX Mate as MCP Server** — Long-term moat. Premium tier. Any AI tool queries journey/report/playbook via MCP protocol.
+- **Vault files updated** — O-output/monetization-strategy-2026-03-02.md created. C-core/product-architecture.md updated (CX Score, Impact Proof, NotebookLM, Integration Architecture). C-core/project-brief.md pricing model updated. M-memory/decisions.md updated with all 11 decisions.
+
+### Two new issues raised (need action next session)
+1. **Living CX knowledge base** — The 8-module CX theory engine must be continuously updated with latest CX research, not treated as a one-time build. Process needed: CX Intel Digest → B-brain/INBOX/ → quarterly promotion to knowledge base modules.
+2. **NPS / event-triggered polls missing** — No suggestions for NPS surveys, CSAT polls, CES measurement, or event-triggered in-app surveys anywhere in playbook output. P0 gap — a CX platform without measurement suggestions is incomplete. Needs to be added to: journey prompt recommendation engine, playbook action templates, and possibly a dedicated "Measure" action category.
+
+### Next session starts with
+- Address the measurement gap: add NPS/CSAT/CES/event-triggered poll suggestions to recommendation engine + playbook templates
+- Stripe integration (Starter tier first: $79/mo + $149 one-time, two Stripe products)
+- Revenue Protected counter on Dashboard (benchmark-based, starts $0, grows with playbook completion)
+- "Save My Results" CTA for anonymous users
+- Full regression QA (gatekeeper audit)

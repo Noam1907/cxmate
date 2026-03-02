@@ -144,14 +144,75 @@ All pages support both modes. Pages check `templateId`: `"preview"` → sessionS
 
 ---
 
-## Pricing Model
+## Pricing Model (Updated 2026-03-02)
 
-| Tier | Price | Value Layer |
-|------|-------|-------------|
-| **Free** | $0 | One-time journey map + CX report |
-| **Starter** | $99/mo | Monthly Pulse + Evidence Wall |
-| **Growth** | $249/mo | Competitive Intelligence + Simulations + QBR |
-| **Scale** | $499/mo | Health Scoring + CRM integration |
+| Tier | Price | Value Layer | Core Unlock |
+|------|-------|-------------|-------------|
+| **Free** | $0 | Trust-building | Full one-time run · NotebookLM export · PDF export |
+| **Starter** | $79/mo or $149 one-time | Progress tracking | Save + return · Revenue Protected counter · Monthly CX Score · Evidence Wall |
+| **Pro** | $199/mo | Real data + intelligence | Monthly Pulse delta · HubSpot/Intercom integration · Competitive CX monitoring · AI stack recommendations · Simulations |
+| **Premium** | $1,200/year | Org-wide + board-ready | Board Deck generator · Multi-seat · QBR reports · CRM write-back · CX Mate MCP server |
+
+---
+
+## The Impact Proof System (2026-03-02)
+
+CX Mate is the first CX tool that can actually show impact over time because it captures the BEFORE state at onboarding. Three layers:
+
+### Layer 1 — Proxy Impact (no integrations)
+Playbook completion triggers benchmark-based impact estimates:
+- Each completed action maps to an industry benchmark (e.g. "Add in-app guidance → 15–25% activation churn reduction")
+- Dashboard shows a **Revenue Protected counter** — starts $0, grows as playbook items are completed
+- All estimates show their methodology transparently ("based on industry benchmarks for SaaS Growing stage")
+
+### Layer 2 — Pulse Delta (monthly subscription value)
+Monthly re-run generates a before/after comparison:
+- **CX Score** (0–100): single trackable number, broken down by stage, benchmarked against vertical/maturity peers
+- Risk level changes since last month
+- Which stages improved, which need focus
+- Revenue at risk trend over time
+
+### Layer 3 — Real Data Validation (Pro integration unlock)
+HubSpot/Intercom data validates whether benchmark estimates held true:
+- "Estimated $40K churn risk → Actual HubSpot data shows 12% churn improvement = ~$31K protected"
+- Transforms AI opinion into ground truth
+
+---
+
+## The CX Score
+
+A single 0–100 number representing overall CX health. Updated monthly with each Pulse.
+
+- **Breakdown:** by journey stage (Onboarding / Activation / Renewal / Expansion)
+- **Benchmark:** vs. vertical + maturity peers (e.g. "SaaS Growing avg: 54. You: 61 ✓")
+- **Trend:** line chart over time — compounds in value the longer you subscribe
+- **Board-friendly:** founders report this number to investors without needing CX jargon
+
+---
+
+## NotebookLM Export (Free Tier Feature)
+
+Every user gets a "Open in NotebookLM" button alongside Export PDF. CX Mate exports structured markdown (journey + CX report + playbook) that feeds directly into NotebookLM.
+
+**Why free:** Users create infographics, decks, and board summaries from their CX data in minutes. They share those outputs (LinkedIn, investor updates, team wikis) → brand exposure → new users. This is a growth mechanic, not a premium unlock.
+
+---
+
+## Integration Architecture
+
+### Data IN — Replace Estimates with Reality (Pro tier)
+- **HubSpot:** Real deal size, conversion rates, churn → validates revenue impact estimates
+- **Intercom:** Support volume, CSAT, ticket themes → validates journey risk scores
+- **Mixpanel/Amplitude:** Product adoption, feature usage → validates stage-level analysis
+
+### Intelligence OUT — Push CX Mate Everywhere
+- **Email digest:** Daily CX Pulse (built ✅, Starter+)
+- **NotebookLM:** Full CX report as structured doc (Free)
+- **Slack:** Daily nudges, playbook reminders (Starter)
+- **Notion:** Journey map + playbook as living page (Starter)
+- **Board Deck:** Auto-generated slides (Premium)
+- **ChatGPT Action:** CX Mate data as GPT context (Pro)
+- **CX Mate MCP Server:** Any AI tool queries journey/report/playbook (Premium)
 
 ---
 

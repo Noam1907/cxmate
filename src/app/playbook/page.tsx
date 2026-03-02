@@ -157,6 +157,15 @@ function StageSection({
         <h3 className="text-base font-semibold text-slate-900">{stagePlaybook.stageName}</h3>
         <span className="text-xs text-slate-400">{doneCount}/{total} done</span>
       </div>
+      {/* Measurement plan chip */}
+      {stagePlaybook.measurementPlan && (
+        <div className="flex items-center gap-1.5 mb-2">
+          <span className="text-[10px] font-medium text-violet-600 bg-violet-50 border border-violet-100 px-2 py-0.5 rounded-full flex items-center gap-1">
+            <span>📊</span>
+            <span>Measure: {stagePlaybook.measurementPlan}</span>
+          </span>
+        </div>
+      )}
       {/* Thin progress bar */}
       <div className="h-px bg-slate-100 mb-4 overflow-hidden rounded-full">
         <div className="h-full bg-teal-600 transition-all duration-500" style={{ width: `${pct}%` }} />
