@@ -49,25 +49,37 @@ export function NavHeader() {
           <span className="text-sm font-semibold tracking-tight text-slate-800">CX Mate</span>
         </Link>
         {!isOnboarding && (
-          <nav className="flex items-center gap-0.5">
-            {navItems.map((item) => {
-              const basePath = item.href.split("?")[0];
-              const isActive = pathname === basePath || pathname.startsWith(basePath + "/");
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={`text-xs font-medium px-3.5 py-2 rounded-lg transition-all duration-150 ${
-                    isActive
-                      ? "bg-teal-50 text-teal-700 font-semibold"
-                      : "text-slate-500 hover:text-slate-800 hover:bg-slate-100"
-                  }`}
-                >
-                  {item.label}
-                </Link>
-              );
-            })}
-          </nav>
+          <div className="flex items-center gap-3">
+            <nav className="flex items-center gap-0.5">
+              {navItems.map((item) => {
+                const basePath = item.href.split("?")[0];
+                const isActive = pathname === basePath || pathname.startsWith(basePath + "/");
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={`text-xs font-medium px-3.5 py-2 rounded-lg transition-all duration-150 ${
+                      isActive
+                        ? "bg-teal-50 text-teal-700 font-semibold"
+                        : "text-slate-500 hover:text-slate-800 hover:bg-slate-100"
+                    }`}
+                  >
+                    {item.label}
+                  </Link>
+                );
+              })}
+            </nav>
+
+            {/* Upgrade CTA — hidden on pricing page */}
+            {pathname !== "/pricing" && (
+              <Link
+                href="/pricing"
+                className="text-xs font-semibold text-teal-700 border border-teal-300 bg-teal-50 hover:bg-teal-100 px-3 py-1.5 rounded-lg transition-colors"
+              >
+                Upgrade ✦
+              </Link>
+            )}
+          </div>
         )}
       </div>
     </header>
