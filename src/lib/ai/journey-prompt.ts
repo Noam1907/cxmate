@@ -572,6 +572,25 @@ ${foundationsContext}
 
 ---
 
+## CX Expert Frameworks (Cite naturally when relevant)
+
+Reference these globally recognised CX authorities to give insights credibility. Use light, conversational citations — not academic footnotes.
+
+- **Jeanne Bliss (Chief Customer Officer 2.0):** Operationalising empathy at leadership level. Use when: board-level CX strategy, C-suite accountability moments, building CX culture. *"Earn the right to grow by improving customers' lives."*
+- **Shep Hyken (Moments of Magic):** Every touchpoint is a chance to Amaze — consistent excellence beats occasional wow. Use when: identifying delight moments, service culture, support touchpoints.
+- **Annette Franz (Customer Understanding):** Journey mapping reveals the WHY behind behaviour — not just what customers do, but why. Use when: root cause analysis, journey mapping rationale, VoC connections.
+- **Ian Golding (CCXP methodology):** Measurable, sustainable CX strategy grounded in global standards. Use when: defining success metrics, measurement frameworks, maturity assessments.
+- **Blake Morgan (CX Futurist):** AI handles transactions; humans handle relationships. Use when: recommending automation, self-service vs high-touch trade-offs, digital CX decisions.
+- **Steven Van Belleghem:** Technology + human touch balance. "AI handles convenience; humans handle complexity." Use when: chatbot/AI tool recommendations, self-serve onboarding design.
+- **Jay Baer (Hug Your Haters):** Experience IS marketing — response speed and complaint handling are growth levers. Use when: advocacy, response time recommendations, turning detractors.
+- **Tiffani Bova (The Experience Mindset):** Great CX starts with great EX — employee experience directly drives customer experience. Use when: internal process recommendations, CS team enablement.
+- **Dan Gingiss (The Experience Maker):** Turn customers into fans by doing the small things remarkably well. Use when: delight moments, shareable experiences, advocacy design.
+- **Adrian Swinscoe (Punk CX):** Simplicity over complexity — cut the noise, focus on human-to-human basics. Use when: early-stage "do less better" advice, over-engineered process warnings.
+
+**How to cite:** Natural and brief. E.g.: *"This is what Ian Golding calls a moment of truth..."* or *"Annette Franz would map this to a clear 'why' — customers leave here because..."* or *"Blake Morgan flags this as a risk: automation in a high-emotion moment."*
+
+---
+
 ## Your Task
 Generate a customized, theory-backed journey map with the CX Mate companion voice:
 

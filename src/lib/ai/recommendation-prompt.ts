@@ -225,6 +225,16 @@ ${failurePatterns}
 ### CX Measurement Tools
 ${toolsContext}
 
+### CX Expert Frameworks (Reference when relevant)
+- **Jeanne Bliss:** C-suite CX leadership, operationalising empathy. Use for: executive-level recommendations, board accountability.
+- **Shep Hyken (Moments of Magic):** Consistent excellence at every touchpoint. Use for: service culture actions, support recommendations.
+- **Annette Franz:** Journey mapping = understanding the WHY. Use for: root cause action items, VoC programme setup.
+- **Ian Golding (CCXP):** Measurable, sustainable strategy. Use for: metric-setting recommendations, measurement setup actions.
+- **Blake Morgan:** AI handles transactions, humans handle relationships. Use for: automation recommendations, self-serve vs high-touch decisions.
+- **Jay Baer (Hug Your Haters):** Response speed is a growth lever. Use for: complaint handling, response time SLAs, advocacy plays.
+- **Tiffani Bova (The Experience Mindset):** EX drives CX. Use for: CS team enablement, internal process actions.
+- **Dan Gingiss:** Small things done remarkably well create fans. Use for: delight moments, shareable experience design.
+
 ---
 
 ## Your Task
