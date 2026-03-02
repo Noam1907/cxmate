@@ -139,7 +139,7 @@ Track sprint progress and status.
 | "Save My Results" CTA for anonymous users | Frontend Dev | P0 | Pending |
 | Playbook persistence to Supabase (Phase 4) | Backend Dev | P0 | Pending |
 | PostHog analytics integration | DevOps Agent | P0 | Pending |
-| Stripe integration + pricing page | Backend Dev | P0 | Pending |
+| Stripe integration + pricing page | Backend Dev | P0 | Done ✅ |
 | Beta invite system | Growth Agent | P0 | Pending |
 | Full regression QA (gatekeeper audit) | QA Gatekeeper | P0 | Pending |
 | Journey health scoring | AI Engineer | P1 | Pending |
@@ -230,6 +230,58 @@ Track sprint progress and status.
 - Design review + monetization (Stripe integration: products, pricing, checkout flow, subscription management)
 - Journey health scoring (P1)
 - Full regression QA before beta launch
+
+---
+
+## Session — 2026-03-02 (Stripe Integration + CX Influencer KB)
+
+### Completed this session
+
+**PDF Export improvement:**
+- Created `src/components/pdf/print-cover.tsx` — personalised cover page ("Dear [Name], here is your [Journey Map / CX Report / Playbook]")
+- Full print CSS overhaul in `globals.css` — A4 page margins, grid collapse, cover page as page 1 (`break-after: page`)
+- `PrintCover` injected into confrontation, journey, and playbook pages
+- Added `firstName` state to journey page (was missing)
+
+**CX Influencer Knowledge Base:**
+- Created `B-brain/01-cx-methodology/cx-influencers-2026.md` — full reference guide for 12 CX world experts (Bliss, Hyken, Kaufman, Morgan, Van Belleghem, Baer, Golding, Franz, Bova, Gingiss, Swinscoe, Sherman)
+- Injected expert frameworks into both `journey-prompt.ts` and `recommendation-prompt.ts` — "Cite naturally when relevant" section with per-expert use cases. AI now cites Ian Golding, Annette Franz, etc. naturally in its output.
+
+**NPS/Measurement mandate:**
+- Added Rule 9 (measurement mandate) to `recommendation-prompt.ts` — explicit NPS/CSAT/CES/event-trigger recommendation per stage (Demo→CSAT, Onboarding→CES+milestone, Adoption→NPS Day 30, Renewal→pre-renewal NPS Day -60)
+- Added `measurementPlan?: string` field to `StagePlaybook` interface
+- Rendered as violet badge (📊 Measure: ...) per stage in playbook page
+
+**Stripe Integration — COMPLETE:**
+- `stripe` and `@stripe/stripe-js` installed
+- `src/lib/stripe.ts` — lazy singleton + `STRIPE_PRICES` constants + `planTierFromPriceId()`. API version `2026-02-25.clover`
+- `supabase/migrations/002_billing.sql` — adds 5 Stripe billing columns to `organizations`
+- `POST /api/billing/create-checkout` — creates Stripe Checkout session (subscription for monthly, payment for one-time)
+- `POST /api/billing/webhook` — verifies stripe-signature, handles checkout.session.completed + subscription lifecycle events → updates `organizations.plan_tier`
+- `POST /api/billing/portal` — creates Stripe Customer Portal session for self-serve billing
+- `GET /api/billing/verify-session` — confirms plan activation on success page
+- `/pricing` page — 4-tier pricing (Free / Starter / Pro / Premium). Starter has dual CTA: "Subscribe monthly — $79/mo" + "Pay once — $149"
+- `/billing/success` page — personalised confirmation ("You're on CX Mate Starter 🎉"), unlocked features list, Go to Dashboard CTA
+- Nav header: "Upgrade ✦" pill CTA linking to /pricing (hidden on pricing page itself)
+- `.env.local.example` updated with all 5 Stripe env vars
+
+### Stripe task table update
+
+| Task | Status |
+|------|--------|
+| Stripe integration + pricing page | ✅ Done |
+
+### Open items requiring user action (Stripe)
+1. **Create products in Stripe Dashboard** — "CX Mate Starter Monthly" ($79/mo recurring) and "CX Mate Starter One-Time" ($149 one-time). Paste the Price IDs into Vercel env vars.
+2. **Register webhook in Stripe Dashboard** → `POST https://[your-domain]/api/billing/webhook` — copy the webhook secret to `STRIPE_WEBHOOK_SECRET`
+3. **Run DB migration**: `supabase db push` to apply `002_billing.sql`
+4. **Configure Stripe Customer Portal** in Stripe Dashboard (Settings → Billing → Customer Portal) — enable cancellation, invoice download
+
+### Next session starts with
+- "Save My Results" CTA for anonymous users (P0 — before first paid beta)
+- Run the gatekeeper audit before next demo
+- Revenue Protected counter on dashboard
+- Journey health scoring (P1)
 
 ---
 
