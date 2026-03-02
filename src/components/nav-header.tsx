@@ -40,13 +40,16 @@ export function NavHeader() {
   ];
 
   return (
-    <header className="border-b border-white/8 bg-sidebar sticky top-0 z-50">
+    <header className="border-b border-slate-200 bg-white sticky top-0 z-50">
       <div className="max-w-full px-6 flex items-center justify-between h-14">
-        <Link href={isOnboarding ? "/" : "/dashboard"} className="flex items-center">
-          <span className="text-sm font-bold tracking-tight text-white">CX Mate</span>
+        <Link href={isOnboarding ? "/" : "/dashboard"} className="flex items-center gap-2">
+          <div className="w-7 h-7 rounded-lg bg-teal-600 flex items-center justify-center shrink-0">
+            <span className="text-xs font-bold text-white">CX</span>
+          </div>
+          <span className="text-sm font-semibold tracking-tight text-slate-800">CX Mate</span>
         </Link>
         {!isOnboarding && (
-          <nav className="flex items-center gap-1">
+          <nav className="flex items-center gap-0.5">
             {navItems.map((item) => {
               const basePath = item.href.split("?")[0];
               const isActive = pathname === basePath || pathname.startsWith(basePath + "/");
@@ -54,10 +57,10 @@ export function NavHeader() {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`text-xs font-medium px-4 py-2 rounded-lg transition-all duration-200 ${
+                  className={`text-xs font-medium px-3.5 py-2 rounded-lg transition-all duration-150 ${
                     isActive
-                      ? "bg-white/20 text-white"
-                      : "text-white/65 hover:text-white hover:bg-white/10"
+                      ? "bg-teal-50 text-teal-700 font-semibold"
+                      : "text-slate-500 hover:text-slate-800 hover:bg-slate-100"
                   }`}
                 >
                   {item.label}

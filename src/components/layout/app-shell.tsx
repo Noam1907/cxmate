@@ -60,7 +60,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       {/* Mobile: floating toggle button */}
       <button
         onClick={() => setMobileOpen(true)}
-        className="fixed bottom-5 left-5 z-40 md:hidden w-11 h-11 rounded-full bg-slate-900 text-white shadow-lg hover:shadow-xl transition-all flex items-center justify-center"
+        className="fixed bottom-5 left-5 z-40 md:hidden w-11 h-11 rounded-full bg-teal-600 text-white shadow-lg hover:shadow-xl transition-all flex items-center justify-center"
         aria-label="Show navigation"
       >
         <span className="text-[10px] font-bold">≡</span>
@@ -75,13 +75,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             onClick={() => setMobileOpen(false)}
           />
           {/* Drawer */}
-          <aside className="absolute left-0 top-0 bottom-0 w-[240px] bg-sidebar border-r border-sidebar-border overflow-y-auto animate-in slide-in-from-left duration-200">
+          <aside className="absolute left-0 top-0 bottom-0 w-[240px] bg-white border-r border-slate-200 overflow-y-auto animate-in slide-in-from-left duration-200">
             <div className="p-5 pt-6">
               {/* Close button */}
               <div className="flex items-center justify-end mb-4">
                 <button
                   onClick={() => setMobileOpen(false)}
-                  className="text-white/30 hover:text-white/60 text-xl leading-none"
+                  className="text-slate-400 hover:text-slate-600 text-xl leading-none"
                   aria-label="Close sidebar"
                 >
                   &times;
