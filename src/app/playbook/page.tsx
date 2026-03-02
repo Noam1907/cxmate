@@ -73,9 +73,9 @@ function RecommendationCard({
   const [expanded, setExpanded] = useState(false);
 
   const checkboxStyle = status === "done"
-    ? "bg-slate-800 border-slate-800 text-white"
+    ? "bg-teal-700 border-teal-700 text-white"
     : status === "in_progress"
-    ? "border-slate-400 bg-white"
+    ? "border-teal-400 bg-white"
     : "border-slate-300 bg-white";
 
   const isPriority = rec.priority === "must_do";
@@ -159,7 +159,7 @@ function StageSection({
       </div>
       {/* Thin progress bar */}
       <div className="h-px bg-slate-100 mb-4 overflow-hidden rounded-full">
-        <div className="h-full bg-slate-800 transition-all duration-500" style={{ width: `${pct}%` }} />
+        <div className="h-full bg-teal-600 transition-all duration-500" style={{ width: `${pct}%` }} />
       </div>
       {/* Recommendations */}
       <div>
@@ -196,6 +196,7 @@ export default function PlaybookPage() {
   const [templateId, setTemplateId] = useState("preview");
   const [filter, setFilter] = useState<FilterMode>("all");
   const [evidenceMap, setEvidenceMap] = useState<EvidenceMap | null>(null);
+  const [firstName, setFirstName] = useState<string>("");
   // true when background pre-generation is in flight (started during onboarding)
   const [preparing, setPreparing] = useState(false);
   const { statuses, setStatus } = useRecommendationStatus();
@@ -209,6 +210,8 @@ export default function PlaybookPage() {
         setTemplateId(parsed.templateId || "preview");
         if (parsed.journey && parsed.onboardingData) {
           setEvidenceMap(buildEvidenceMap(parsed.onboardingData, parsed.journey));
+          const name = parsed.onboardingData?.userName?.split(" ")[0] || "";
+          if (name) setFirstName(name);
         }
       } catch { /* ignore */ }
       const storedPlaybook = sessionStorage.getItem("cx-mate-playbook");
@@ -361,14 +364,19 @@ export default function PlaybookPage() {
         {/* Header */}
         <div className="mb-10 flex items-start justify-between gap-4">
           <div>
+            {firstName && (
+              <p className="text-sm text-teal-600 font-medium mb-1">
+                {pct > 0 ? `Keep it up, ${firstName}.` : `Let's get started, ${firstName}.`}
+              </p>
+            )}
             <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-2">CX Playbook</p>
-            <h1 className="text-4xl font-bold tracking-tight text-slate-900">{playbook.companyName}</h1>
+            <h1 className="text-4xl font-bold tracking-tight text-slate-800">{playbook.companyName}</h1>
           </div>
           <ExportPdfButton page="playbook" title={`${playbook.companyName} — CX Playbook`} />
         </div>
 
         {/* Progress hero */}
-        <div className="rounded-2xl bg-slate-900 text-white p-8 mb-8">
+        <div className="rounded-2xl bg-gradient-to-br from-slate-800 to-teal-900 text-white p-8 mb-8">
           <div className="flex items-end justify-between mb-5">
             <div>
               <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-1">Progress</p>
@@ -419,7 +427,7 @@ export default function PlaybookPage() {
               key={mode}
               onClick={() => setFilter(mode)}
               className={`px-3 py-1.5 text-xs font-medium rounded-full border transition-colors ${
-                filter === mode ? "bg-slate-900 text-white border-slate-900" : "bg-white text-slate-500 border-slate-200 hover:border-slate-300"
+                filter === mode ? "bg-teal-700 text-white border-teal-700" : "bg-white text-slate-500 border-slate-200 hover:border-slate-300"
               }`}
             >
               {mode === "all" ? "All" : mode === "must_do" ? "Must do" : "Quick wins"}
