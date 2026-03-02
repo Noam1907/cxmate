@@ -11,6 +11,7 @@ import type { OnboardingData } from "@/types/onboarding";
 import { buildEvidenceMap, type EvidenceMap } from "@/lib/evidence-matching";
 import { track } from "@/lib/analytics";
 import { ExportPdfButton } from "@/components/ui/export-pdf-button";
+import { PrintCover } from "@/components/pdf/print-cover";
 
 type ViewMode = "cards" | "visual";
 
@@ -20,6 +21,7 @@ function JourneyContent() {
   const [journey, setJourney] = useState<GeneratedJourney | null>(null);
   const [evidenceMap, setEvidenceMap] = useState<EvidenceMap | null>(null);
   const [companyName, setCompanyName] = useState<string>("");
+  const [firstName, setFirstName] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState<ViewMode>("cards");
 
@@ -47,6 +49,7 @@ function JourneyContent() {
             loadedOnboarding = data.onboardingData || null;
             setJourney(data.journey);
             setCompanyName(data.onboardingData?.companyName || "");
+            setFirstName(data.onboardingData?.userName?.split(" ")[0] || "");
           } catch {
             console.error("Failed to parse stored journey");
           }
@@ -66,6 +69,7 @@ function JourneyContent() {
             const parsed = JSON.parse(stored);
             loadedOnboarding = parsed.onboardingData || null;
             setCompanyName(parsed.onboardingData?.companyName || "");
+            setFirstName(parsed.onboardingData?.userName?.split(" ")[0] || "");
           }
         } catch (err) {
           console.error("Failed to load journey:", err);
@@ -113,6 +117,13 @@ function JourneyContent() {
 
   return (
     <div className="w-full">
+      {/* PDF cover page — invisible on screen, page 1 of exported PDF */}
+      <PrintCover
+        firstName={firstName || undefined}
+        companyName={companyName || undefined}
+        documentType="Journey Map"
+      />
+
       {/* Page header */}
       <div className="mb-10 flex items-start justify-between gap-4">
         <div>

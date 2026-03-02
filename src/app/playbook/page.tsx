@@ -9,6 +9,7 @@ import type { OnboardingInput } from "@/lib/validations/onboarding";
 import { buildEvidenceMap, getMomentAnnotations, type EvidenceMap } from "@/lib/evidence-matching";
 import { track } from "@/lib/analytics";
 import { ExportPdfButton } from "@/components/ui/export-pdf-button";
+import { PrintCover } from "@/components/pdf/print-cover";
 
 // ─── Status ───────────────────────────────────────────────────────────────────
 
@@ -368,6 +369,13 @@ export default function PlaybookPage() {
 
   return (
     <main className="min-h-screen bg-white">
+      {/* PDF cover page — invisible on screen, page 1 of exported PDF */}
+      <PrintCover
+        firstName={firstName || undefined}
+        companyName={playbook.companyName || undefined}
+        documentType="CX Playbook"
+      />
+
       <div className="max-w-2xl mx-auto px-6 py-16">
 
         {/* Header */}

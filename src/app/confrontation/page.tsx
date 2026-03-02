@@ -14,6 +14,7 @@ import { buildEvidenceMap, type EvidenceMap } from "@/lib/evidence-matching";
 import { EvidenceWall } from "@/components/evidence/evidence-wall";
 import { track } from "@/lib/analytics";
 import { ExportPdfButton } from "@/components/ui/export-pdf-button";
+import { PrintCover } from "@/components/pdf/print-cover";
 
 // ─── Confrontation Modes ────────────────────────────────────────────────────
 
@@ -434,6 +435,13 @@ function ConfrontationContent() {
 
   return (
     <div className="min-h-screen bg-white">
+      {/* PDF cover page — invisible on screen, page 1 of exported PDF */}
+      <PrintCover
+        firstName={firstName || undefined}
+        companyName={companyName || undefined}
+        documentType="CX Intelligence Report"
+      />
+
       <div className="max-w-2xl mx-auto px-6 py-16">
 
         {/* Header */}
