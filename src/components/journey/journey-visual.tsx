@@ -1,15 +1,11 @@
 "use client";
 
-import { useState, useRef, type ReactNode } from "react";
+import { useState } from "react";
 import type {
   GeneratedJourney,
   GeneratedStage,
   GeneratedMoment,
 } from "@/lib/ai/journey-prompt";
-import {
-  Warning, Sparkle, Diamond, ArrowRight, Circle,
-  X, Check, CaretDown,
-} from "@phosphor-icons/react";
 
 interface JourneyVisualProps {
   journey: GeneratedJourney;
@@ -19,59 +15,212 @@ interface JourneyVisualProps {
 // Severity — minimal, non-screaming palette
 // ============================================
 
-const severityConfig: Record<string, { dot: string; ring: string; text: string; label: string }> = {
+const severityConfig = {
   critical: { dot: "bg-rose-400", ring: "ring-rose-200", text: "text-rose-600", label: "Critical" },
   high:     { dot: "bg-amber-400", ring: "ring-amber-200", text: "text-amber-600", label: "High" },
   medium:   { dot: "bg-slate-400", ring: "ring-slate-200", text: "text-slate-500", label: "Medium" },
   low:      { dot: "bg-slate-300", ring: "ring-slate-100", text: "text-slate-400", label: "Low" },
 };
 
-const typeIcon: Record<string, ReactNode> = {
-  risk:     <Warning size={14} weight="bold" />,
-  delight:  <Sparkle size={14} weight="fill" />,
-  decision: <Diamond size={14} weight="fill" />,
-  handoff:  <ArrowRight size={14} weight="bold" />,
+const typeIcon: Record<string, string> = {
+  risk:     "⚠",
+  delight:  "★",
+  decision: "◆",
+  handoff:  "→",
 };
 
-function getTypeLabel(type: string): string {
-  switch (type) {
-    case "risk": return "Risk";
-    case "delight": return "Delight";
-    case "decision": return "Decision";
-    case "handoff": return "Handoff";
-    default: return type;
-  }
+// ============================================
+// Moment Node — minimal dot
+// ============================================
+
+function MomentNode({
+  moment,
+  isSelected,
+  onClick,
+  position,
+}: {
+  moment: GeneratedMoment;
+  isSelected: boolean;
+  onClick: () => void;
+  position: "top" | "bottom";
+}) {
+  const sev = severityConfig[moment.severity] ?? severityConfig.medium;
+
+  return (
+    <div className={`flex flex-col items-center ${position === "top" ? "flex-col-reverse" : ""}`}>
+      {/* Stem */}
+      <div className={`w-px h-6 ${isSelected ? "bg-slate-400" : "bg-slate-200"}`} />
+
+      {/* Dot */}
+      <div className={`relative group transition-all duration-200 ${isSelected ? "scale-125" : "hover:scale-110"}`} style={{ zIndex: isSelected ? 40 : undefined }}>
+        <button
+          onClick={onClick}
+          title={moment.name}
+          className={`w-8 h-8 rounded-full flex items-center justify-center text-xs transition-all border border-white shadow-sm ${sev.dot} ${isSelected ? `ring-2 ring-offset-2 ${sev.ring} shadow-md` : ""}`}
+        >
+          <span className="text-white opacity-80">{typeIcon[moment.type] ?? "•"}</span>
+        </button>
+        {/* Tooltip — above everything */}
+        <div
+          className={`absolute left-1/2 -translate-x-1/2 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity bg-slate-800 text-white text-xs px-2.5 py-1.5 rounded-lg whitespace-nowrap shadow-lg ${position === "top" ? "bottom-full mb-2" : "top-full mt-2"}`}
+          style={{ zIndex: 9999 }}
+        >
+          {moment.name}
+          <div className={`text-xs mt-0.5 ${sev.text} font-medium`}>{sev.label}</div>
+        </div>
+      </div>
+
+      {/* Label */}
+      <span className={`mt-1.5 text-xs max-w-[80px] text-center leading-tight line-clamp-2 ${isSelected ? "text-slate-700 font-medium" : "text-slate-400"}`}>
+        {moment.name}
+      </span>
+    </div>
+  );
 }
 
 // ============================================
-// Moment Detail — expanded inline
+// Stage Node — clean white card
+// ============================================
+
+function StageNode({
+  stage,
+  index,
+  onSelectMoment,
+  selectedMoment,
+}: {
+  stage: GeneratedStage;
+  index: number;
+  onSelectMoment: (m: GeneratedMoment | null) => void;
+  selectedMoment: GeneratedMoment | null;
+}) {
+  const moments = stage.meaningfulMoments;
+  const hasCritical = moments.some((m) => m.severity === "critical");
+  const isCustomer = stage.stageType === "customer";
+
+  return (
+    <div className="flex flex-col items-center gap-0 min-w-[180px]">
+      {/* Top moments */}
+      <div className="flex items-end gap-4 min-h-[110px] pb-0">
+        {moments
+          .filter((_, i) => i % 2 === 0)
+          .map((moment, i) => (
+            <MomentNode
+              key={i}
+              moment={moment}
+              isSelected={selectedMoment?.name === moment.name}
+              onClick={() => onSelectMoment(selectedMoment?.name === moment.name ? null : moment)}
+              position="top"
+            />
+          ))}
+      </div>
+
+      {/* Stage card */}
+      <div className="relative w-full">
+        {/* Pipe */}
+        <div className="absolute top-1/2 left-0 right-0 h-px -translate-y-1/2 bg-slate-200" />
+
+        {/* Card */}
+        <div className={`relative mx-auto w-[160px] rounded-2xl border bg-white p-4 text-center shadow-sm z-10 ${hasCritical ? "border-rose-200" : "border-slate-200"}`}>
+          {/* Stage number */}
+          <div className={`absolute -top-3 left-1/2 -translate-x-1/2 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shadow-sm text-white ${isCustomer ? "bg-slate-600" : "bg-slate-400"}`}>
+            {index + 1}
+          </div>
+
+          {/* Type label */}
+          <div className={`text-xs uppercase tracking-widest font-semibold mb-1 ${isCustomer ? "text-slate-500" : "text-slate-400"}`}>
+            {stage.stageType}
+          </div>
+
+          <h3 className="text-sm font-semibold text-slate-800 leading-tight">{stage.name}</h3>
+
+          <p className="text-xs text-slate-400 italic mt-1 leading-tight line-clamp-1">
+            &ldquo;{stage.emotionalState}&rdquo;
+          </p>
+
+          {hasCritical && (
+            <div className="mt-2 text-xs text-rose-500 font-medium">
+              ⚠ risk
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Bottom moments */}
+      <div className="flex items-start gap-4 min-h-[110px] pt-0">
+        {moments
+          .filter((_, i) => i % 2 === 1)
+          .map((moment, i) => (
+            <MomentNode
+              key={i}
+              moment={moment}
+              isSelected={selectedMoment?.name === moment.name}
+              onClick={() => onSelectMoment(selectedMoment?.name === moment.name ? null : moment)}
+              position="bottom"
+            />
+          ))}
+      </div>
+    </div>
+  );
+}
+
+// ============================================
+// Connector between stages
+// ============================================
+
+function StageConnector({ fromType, toType }: { fromType: string; toType: string }) {
+  const isHandoff = fromType !== toType;
+
+  return (
+    <div className="flex flex-col items-center justify-center self-center -mx-1 z-0">
+      {isHandoff ? (
+        <div className="flex flex-col items-center gap-1">
+          <div className="text-xs font-semibold text-slate-400 bg-white border border-slate-200 px-2 py-0.5 rounded-full whitespace-nowrap shadow-sm">
+            Handoff
+          </div>
+          <svg width="36" height="14" viewBox="0 0 36 14">
+            <line x1="2" y1="7" x2="28" y2="7" stroke="#cbd5e1" strokeWidth="1.5" strokeLinecap="round" />
+            <polygon points="25,4 33,7 25,10" fill="#cbd5e1" />
+          </svg>
+        </div>
+      ) : (
+        <svg width="28" height="14" viewBox="0 0 28 14">
+          <line x1="2" y1="7" x2="20" y2="7" stroke="#e2e8f0" strokeWidth="1.5" strokeDasharray="3 3" strokeLinecap="round" />
+          <polygon points="18,4 26,7 18,10" fill="#e2e8f0" />
+        </svg>
+      )}
+    </div>
+  );
+}
+
+// ============================================
+// Moment Detail Panel
 // ============================================
 
 function MomentDetail({ moment, onClose }: { moment: GeneratedMoment; onClose: () => void }) {
   const sev = severityConfig[moment.severity] ?? severityConfig.medium;
 
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-5 space-y-3 shadow-sm animate-in fade-in slide-in-from-top-2 duration-200 ml-8">
+    <div className="rounded-2xl border border-slate-200 bg-white p-6 space-y-4 shadow-sm animate-in fade-in slide-in-from-bottom-3 duration-300 max-w-3xl mx-auto">
       {/* Header */}
-      <div className="flex items-start justify-between gap-3">
-        <div className="flex items-center gap-2.5">
-          <div className={`w-7 h-7 rounded-full flex items-center justify-center text-white shadow-sm ${sev.dot}`}>
-            {typeIcon[moment.type] ?? <Circle size={12} weight="fill" />}
+      <div className="flex items-start justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <div className={`w-9 h-9 rounded-full flex items-center justify-center text-sm text-white shadow-sm ${sev.dot}`}>
+            {typeIcon[moment.type] ?? "•"}
           </div>
           <div>
-            <h4 className="font-semibold text-slate-900 text-sm">{moment.name}</h4>
+            <h3 className="font-semibold text-slate-900 text-base">{moment.name}</h3>
             <div className="flex items-center gap-2 mt-0.5">
-              <span className={`text-xs font-medium ${sev.text}`}>{sev.label}</span>
+              <span className={`text-xs font-medium ${sev.text}`}>{sev.label} severity</span>
               <span className="text-slate-300">·</span>
-              <span className="text-xs text-slate-400 capitalize">{moment.type}</span>
+              <span className="text-xs text-slate-400 capitalize">{moment.type} moment</span>
             </div>
           </div>
         </div>
         <button
           onClick={onClose}
-          className="text-slate-300 hover:text-slate-500 p-1 rounded-lg hover:bg-slate-100 transition-colors"
+          className="text-slate-300 hover:text-slate-500 p-1.5 rounded-lg hover:bg-slate-100 transition-colors"
         >
-          <X size={16} />
+          ✕
         </button>
       </div>
 
@@ -81,27 +230,27 @@ function MomentDetail({ moment, onClose }: { moment: GeneratedMoment; onClose: (
       )}
 
       {/* Insight cards */}
-      <div className="grid gap-2.5 sm:grid-cols-2">
+      <div className="grid gap-3 sm:grid-cols-2">
         {moment.diagnosis && (
-          <div className="rounded-lg bg-slate-50 border border-slate-100 p-3 space-y-1">
+          <div className="rounded-xl bg-slate-50 border border-slate-100 p-4 space-y-1.5">
             <div className="text-xs font-bold text-slate-400 uppercase tracking-wide">Diagnosis</div>
             <div className="text-sm text-slate-700">{moment.diagnosis}</div>
           </div>
         )}
         {moment.actionTemplate && (
-          <div className="rounded-lg bg-slate-50 border border-slate-100 p-3 space-y-1">
-            <div className="text-xs font-bold text-slate-400 uppercase tracking-wide">Action</div>
+          <div className="rounded-xl bg-slate-50 border border-slate-100 p-4 space-y-1.5">
+            <div className="text-xs font-bold text-slate-400 uppercase tracking-wide">Recommended Action</div>
             <div className="text-sm text-slate-700">{moment.actionTemplate}</div>
           </div>
         )}
         {moment.decisionScienceInsight && (
-          <div className="rounded-lg bg-slate-50 border border-slate-100 p-3 space-y-1">
+          <div className="rounded-xl bg-slate-50 border border-slate-100 p-4 space-y-1.5">
             <div className="text-xs font-bold text-slate-400 uppercase tracking-wide">Buyer Psychology</div>
             <div className="text-sm text-slate-700">{moment.decisionScienceInsight}</div>
           </div>
         )}
         {moment.impactIfIgnored && (
-          <div className="rounded-lg bg-slate-50 border border-slate-100 p-3 space-y-1">
+          <div className="rounded-xl bg-slate-50 border border-slate-100 p-4 space-y-1.5">
             <div className="text-xs font-bold text-slate-400 uppercase tracking-wide">If Ignored</div>
             <div className="text-sm text-slate-700">{moment.impactIfIgnored}</div>
           </div>
@@ -110,12 +259,12 @@ function MomentDetail({ moment, onClose }: { moment: GeneratedMoment; onClose: (
 
       {/* Recommendations */}
       {moment.recommendations && moment.recommendations.length > 0 && (
-        <div className="rounded-lg bg-slate-50 border border-slate-100 p-3 space-y-1.5">
+        <div className="rounded-xl bg-slate-50 border border-slate-100 p-4 space-y-2">
           <div className="text-xs font-bold text-slate-400 uppercase tracking-wide">Recommendations</div>
-          <ul className="space-y-1.5">
+          <ul className="space-y-2">
             {moment.recommendations.map((rec, i) => (
               <li key={i} className="flex items-start gap-2 text-sm text-slate-700">
-                <ArrowRight size={14} weight="bold" className="text-slate-300 mt-1 shrink-0" />
+                <span className="text-slate-300 font-bold mt-0.5 shrink-0">→</span>
                 <span>{rec}</span>
               </li>
             ))}
@@ -127,237 +276,7 @@ function MomentDetail({ moment, onClose }: { moment: GeneratedMoment; onClose: (
 }
 
 // ============================================
-// Moment Row — compact inline within stage
-// ============================================
-
-function MomentRow({
-  moment,
-  isSelected,
-  onClick,
-}: {
-  moment: GeneratedMoment;
-  isSelected: boolean;
-  onClick: () => void;
-}) {
-  const sev = severityConfig[moment.severity] ?? severityConfig.medium;
-  const isAtRisk = moment.severity === "critical" || moment.severity === "high";
-
-  return (
-    <div className="space-y-0">
-      <button
-        onClick={onClick}
-        className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-all ${
-          isSelected
-            ? "bg-slate-100"
-            : "hover:bg-slate-50"
-        }`}
-      >
-        {/* Severity dot with icon */}
-        <div className={`w-6 h-6 rounded-full flex items-center justify-center text-white shrink-0 ${sev.dot}`}>
-          <span className="opacity-90 flex items-center justify-center">
-            {typeIcon[moment.type] ?? <Circle size={8} weight="fill" />}
-          </span>
-        </div>
-
-        {/* Name + type */}
-        <div className="flex-1 min-w-0">
-          <div className="text-sm font-medium text-slate-800 truncate">{moment.name}</div>
-        </div>
-
-        {/* Type + severity badges */}
-        <div className="flex items-center gap-1.5 shrink-0">
-          <span className="text-xs text-slate-400">{getTypeLabel(moment.type)}</span>
-          {isAtRisk && (
-            <span className={`text-xs font-semibold ${sev.text}`}>
-              {sev.label}
-            </span>
-          )}
-          <CaretDown
-            size={14}
-            weight="bold"
-            className={`text-slate-300 transition-transform ${isSelected ? "rotate-180" : ""}`}
-          />
-        </div>
-      </button>
-
-      {/* Expanded detail inline */}
-      {isSelected && (
-        <MomentDetail moment={moment} onClose={onClick} />
-      )}
-    </div>
-  );
-}
-
-// ============================================
-// Stage Card — vertical layout
-// ============================================
-
-function VerticalStageCard({
-  stage,
-  index,
-  isLast,
-  selectedMoment,
-  onSelectMoment,
-  stageRef,
-}: {
-  stage: GeneratedStage;
-  index: number;
-  isLast: boolean;
-  selectedMoment: GeneratedMoment | null;
-  onSelectMoment: (m: GeneratedMoment | null) => void;
-  stageRef: (el: HTMLDivElement | null) => void;
-}) {
-  const hasCritical = stage.meaningfulMoments.some((m) => m.severity === "critical");
-  const isCustomer = stage.stageType === "customer";
-
-  return (
-    <div ref={stageRef} className="relative flex gap-4">
-      {/* Timeline rail */}
-      <div className="flex flex-col items-center shrink-0">
-        {/* Stage number circle */}
-        <div
-          className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white shadow-sm z-10 ${
-            isCustomer ? "bg-slate-700" : "bg-slate-400"
-          }`}
-        >
-          {index + 1}
-        </div>
-        {/* Vertical line */}
-        {!isLast && (
-          <div className="w-px flex-1 bg-slate-200 mt-0" />
-        )}
-      </div>
-
-      {/* Stage content */}
-      <div className={`flex-1 pb-8 ${isLast ? "" : ""}`}>
-        <div className={`rounded-2xl border bg-white shadow-sm overflow-hidden ${hasCritical ? "border-rose-200" : "border-slate-200"}`}>
-          {/* Stage header */}
-          <div className="px-5 pt-4 pb-3">
-            <div className="flex items-start justify-between gap-2">
-              <div>
-                <div className="flex items-center gap-2">
-                  <span className="text-xs uppercase tracking-widest font-semibold text-slate-400">
-                    {stage.stageType}
-                  </span>
-                  {hasCritical && (
-                    <span className="text-xs text-rose-500 font-medium flex items-center gap-0.5">
-                      <Warning size={12} weight="bold" /> risk
-                    </span>
-                  )}
-                </div>
-                <h3 className="text-base font-semibold text-slate-900 mt-1">{stage.name}</h3>
-                {stage.description && (
-                  <p className="text-sm text-slate-500 mt-0.5 leading-relaxed">{stage.description}</p>
-                )}
-              </div>
-              {stage.emotionalState && (
-                <div className="text-right shrink-0">
-                  <div className="text-xs text-slate-400 font-medium">Feels</div>
-                  <div className="text-sm font-semibold text-slate-700 capitalize">{stage.emotionalState}</div>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Moments list */}
-          <div className="border-t border-slate-100 px-2 py-2">
-            <div className="text-xs font-semibold text-slate-400 uppercase tracking-wide px-3 py-1.5">
-              {stage.meaningfulMoments.length} moments
-            </div>
-            <div className="space-y-0.5">
-              {stage.meaningfulMoments.map((moment, i) => (
-                <MomentRow
-                  key={i}
-                  moment={moment}
-                  isSelected={selectedMoment?.name === moment.name}
-                  onClick={() =>
-                    onSelectMoment(
-                      selectedMoment?.name === moment.name ? null : moment
-                    )
-                  }
-                />
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ============================================
-// Handoff Divider
-// ============================================
-
-function HandoffDivider() {
-  return (
-    <div className="relative flex gap-4">
-      <div className="flex flex-col items-center shrink-0">
-        <div className="w-px flex-1 bg-slate-200" />
-        <div className="w-6 h-6 rounded-full bg-white border-2 border-slate-300 flex items-center justify-center z-10 my-1">
-          <ArrowRight size={12} weight="bold" className="text-slate-400" />
-        </div>
-        <div className="w-px flex-1 bg-slate-200" />
-      </div>
-      <div className="flex items-center py-2">
-        <span className="text-xs font-semibold text-slate-400 uppercase tracking-widest bg-white border border-slate-200 px-3 py-1 rounded-full shadow-sm">
-          Handoff
-        </span>
-      </div>
-    </div>
-  );
-}
-
-// ============================================
-// Stage Overview Bar — clickable pills
-// ============================================
-
-function StageOverviewBar({
-  journey,
-  onStageClick,
-}: {
-  journey: GeneratedJourney;
-  onStageClick: (index: number) => void;
-}) {
-  return (
-    <div className="flex items-center gap-1 overflow-x-auto pb-1 -mx-1 px-1">
-      {journey.stages.map((stage, i) => {
-        const hasCritical = stage.meaningfulMoments.some(
-          (m) => m.severity === "critical"
-        );
-        const isCustomer = stage.stageType === "customer";
-
-        return (
-          <div key={i} className="flex items-center shrink-0">
-            <button
-              onClick={() => onStageClick(i)}
-              className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all hover:bg-slate-100 ${
-                hasCritical ? "text-rose-600" : "text-slate-600"
-              }`}
-              title={stage.name}
-            >
-              <div
-                className={`w-4 h-4 rounded-full flex items-center justify-center text-white text-[10px] font-bold ${
-                  isCustomer ? "bg-slate-700" : "bg-slate-400"
-                }`}
-              >
-                {i + 1}
-              </div>
-              <span className="max-w-[100px] truncate">{stage.name}</span>
-              {hasCritical && <Warning size={12} weight="bold" className="text-rose-400" />}
-            </button>
-            {i < journey.stages.length - 1 && (
-              <div className="w-3 h-px bg-slate-200 shrink-0" />
-            )}
-          </div>
-        );
-      })}
-    </div>
-  );
-}
-
-// ============================================
-// Summary Stats
+// Summary Bar
 // ============================================
 
 function JourneySummary({ journey }: { journey: GeneratedJourney }) {
@@ -372,17 +291,18 @@ function JourneySummary({ journey }: { journey: GeneratedJourney }) {
     <div className="flex flex-wrap items-center justify-center gap-5 text-xs text-slate-400">
       <div className="flex items-center gap-1.5">
         <div className="w-2 h-2 rounded-full bg-slate-400" />
-        <span>{salesStages} sales</span>
+        <span>{salesStages} sales stages</span>
       </div>
       <div className="flex items-center gap-1.5">
-        <div className="w-2 h-2 rounded-full bg-slate-700" />
-        <span>{csStages} customer</span>
+        <div className="w-2 h-2 rounded-full bg-slate-600" />
+        <span>{csStages} customer stages</span>
       </div>
       <span className="text-slate-200">|</span>
-      <span>{totalMoments} moments</span>
+      <span>{totalMoments} moments mapped</span>
       {criticalMoments > 0 && (
         <span className="text-rose-400 font-medium">{criticalMoments} critical</span>
       )}
+      <span className="text-slate-300 italic">Click any dot to explore</span>
     </div>
   );
 }
@@ -393,28 +313,60 @@ function JourneySummary({ journey }: { journey: GeneratedJourney }) {
 
 export function JourneyVisual({ journey }: JourneyVisualProps) {
   const [selectedMoment, setSelectedMoment] = useState<GeneratedMoment | null>(null);
-  const stageRefs = useRef<(HTMLDivElement | null)[]>([]);
-
-  const handleStageClick = (index: number) => {
-    stageRefs.current[index]?.scrollIntoView({
-      behavior: "smooth",
-      block: "start",
-    });
-  };
-
-  // Find handoff boundary
-  const handoffIndex = journey.stages.findIndex(
-    (s, i) => i > 0 && s.stageType !== journey.stages[i - 1].stageType
-  );
 
   return (
-    <div className="w-full max-w-3xl mx-auto space-y-6">
-      {/* Summary stats */}
+    <div className="w-full space-y-6">
       <JourneySummary journey={journey} />
 
-      {/* Quick-jump overview bar */}
-      <div className="rounded-xl border bg-white p-3 shadow-sm">
-        <StageOverviewBar journey={journey} onStageClick={handleStageClick} />
+      {/* Flow — horizontal scroll */}
+      <div className="overflow-x-auto overflow-y-visible pb-4 -mx-4 px-4">
+        <div className="flex items-center min-w-max py-4 px-8 gap-0" style={{ overflowY: "visible" }}>
+
+          {/* Start */}
+          <div className="flex flex-col items-center mr-3">
+            <div className="w-9 h-9 rounded-full bg-slate-800 text-white flex items-center justify-center text-xs font-bold shadow-sm">
+              Start
+            </div>
+          </div>
+
+          {/* Arrow */}
+          <svg width="20" height="14" viewBox="0 0 20 14" className="-mr-1">
+            <line x1="0" y1="7" x2="14" y2="7" stroke="#e2e8f0" strokeWidth="1.5" />
+            <polygon points="12,4 20,7 12,10" fill="#e2e8f0" />
+          </svg>
+
+          {/* Stages */}
+          {journey.stages.map((stage, i) => (
+            <div key={i} className="flex items-center">
+              <StageNode
+                stage={stage}
+                index={i}
+                onSelectMoment={setSelectedMoment}
+                selectedMoment={selectedMoment}
+              />
+              {i < journey.stages.length - 1 && (
+                <StageConnector
+                  fromType={stage.stageType}
+                  toType={journey.stages[i + 1].stageType}
+                />
+              )}
+            </div>
+          ))}
+
+          {/* Arrow */}
+          <svg width="20" height="14" viewBox="0 0 20 14" className="-ml-1">
+            <line x1="0" y1="7" x2="14" y2="7" stroke="#e2e8f0" strokeWidth="1.5" />
+            <polygon points="12,4 20,7 12,10" fill="#e2e8f0" />
+          </svg>
+
+          {/* End */}
+          <div className="flex flex-col items-center ml-3">
+            <div className="w-10 h-10 rounded-full bg-emerald-500 text-white flex items-center justify-center shadow-sm">
+              <span className="text-base">✓</span>
+            </div>
+            <span className="text-xs text-slate-400 mt-1">Live</span>
+          </div>
+        </div>
       </div>
 
       {/* Legend */}
@@ -428,47 +380,10 @@ export function JourneyVisual({ journey }: JourneyVisualProps) {
         ))}
       </div>
 
-      {/* Vertical timeline */}
-      <div className="relative">
-        {/* Start indicator */}
-        <div className="flex gap-4 mb-2">
-          <div className="flex flex-col items-center shrink-0">
-            <div className="w-8 h-8 rounded-full bg-slate-800 text-white flex items-center justify-center text-xs font-bold shadow-sm">
-              Start
-            </div>
-            <div className="w-px h-4 bg-slate-200" />
-          </div>
-        </div>
-
-        {/* Stages */}
-        {journey.stages.map((stage, i) => (
-          <div key={i}>
-            {/* Handoff divider */}
-            {i === handoffIndex && <HandoffDivider />}
-
-            <VerticalStageCard
-              stage={stage}
-              index={i}
-              isLast={i === journey.stages.length - 1}
-              selectedMoment={selectedMoment}
-              onSelectMoment={setSelectedMoment}
-              stageRef={(el) => { stageRefs.current[i] = el; }}
-            />
-          </div>
-        ))}
-
-        {/* End indicator */}
-        <div className="flex gap-4 mt-2">
-          <div className="flex flex-col items-center shrink-0">
-            <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center shadow-sm">
-              <Check size={18} weight="bold" />
-            </div>
-          </div>
-          <div className="flex items-center">
-            <span className="text-xs font-medium text-slate-400">Journey complete</span>
-          </div>
-        </div>
-      </div>
+      {/* Selected detail */}
+      {selectedMoment && (
+        <MomentDetail moment={selectedMoment} onClose={() => setSelectedMoment(null)} />
+      )}
     </div>
   );
 }
