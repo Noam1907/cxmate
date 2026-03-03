@@ -14,6 +14,7 @@ import { StepGoals } from "./step-goals";
 import { StepCompetitors } from "./step-competitors";
 import { ChatBubble } from "./chat-bubble";
 import { deriveFromMaturity, type OnboardingData } from "@/types/onboarding";
+import { MapTrifold, Lightning, ChartBar, ClipboardText } from "@phosphor-icons/react";
 import { useCompanyProfile } from "@/contexts/company-profile-context";
 import { useCompanyEnrichment } from "@/hooks/use-company-enrichment";
 import { useOnboardingAutosave, loadOnboardingDraft, clearOnboardingDraft } from "@/hooks/use-onboarding-autosave";
@@ -187,13 +188,13 @@ function StepGenerate({
         <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.15em]">What you&apos;ll get</p>
         <ul className="space-y-2.5">
           {[
-            { icon: "🗺️", label: `${journeyLabel.charAt(0).toUpperCase() + journeyLabel.slice(1)} journey map` },
-            { icon: "⚡", label: "Meaningful moments — scored by impact" },
-            { icon: "📊", label: "CX Intelligence Report with risk projections" },
-            { icon: "📋", label: "Prioritized playbook with templates" },
+            { icon: <MapTrifold size={18} weight="duotone" className="text-primary" />, label: `${journeyLabel.charAt(0).toUpperCase() + journeyLabel.slice(1)} journey map` },
+            { icon: <Lightning size={18} weight="duotone" className="text-primary" />, label: "Meaningful moments — scored by impact" },
+            { icon: <ChartBar size={18} weight="duotone" className="text-primary" />, label: "CX Intelligence Report with risk projections" },
+            { icon: <ClipboardText size={18} weight="duotone" className="text-primary" />, label: "Prioritized playbook with templates" },
           ].map((item) => (
             <li key={item.label} className="flex items-center gap-3 text-sm text-foreground">
-              <span className="text-base w-5 shrink-0">{item.icon}</span>
+              <span className="w-5 shrink-0">{item.icon}</span>
               {item.label}
             </li>
           ))}
@@ -389,9 +390,9 @@ function IntroHero({ onStart }: { onStart: () => void }) {
         {[
           {
             num: "01",
-            accent: "bg-teal-500",
-            ring: "ring-teal-500/20",
-            label: "text-teal-600",
+            accent: "bg-primary",
+            ring: "ring-primary/20",
+            label: "text-primary",
             title: "Map your journey",
             desc: "Every stage, every moment where customers decide to stay — or leave.",
           },
@@ -429,7 +430,7 @@ function IntroHero({ onStart }: { onStart: () => void }) {
               <div className={`text-[11px] font-semibold uppercase tracking-widest ${step.label} mb-0.5`}>
                 Step {step.num}
               </div>
-              <div className="font-semibold text-[15px] text-foreground leading-snug">
+              <div className="font-semibold text-base text-foreground leading-snug">
                 {step.title}
               </div>
               <div className="text-sm text-muted-foreground mt-1 leading-relaxed">

@@ -12,6 +12,9 @@ import { buildEvidenceMap, type EvidenceMap } from "@/lib/evidence-matching";
 import { track } from "@/lib/analytics";
 import { ExportPdfButton } from "@/components/ui/export-pdf-button";
 import { PrintCover } from "@/components/pdf/print-cover";
+import { List, MapTrifold } from "@phosphor-icons/react";
+import { PageLoading } from "@/components/ui/page-loading";
+import { JourneyFeedbackChat } from "@/components/journey/journey-feedback-chat";
 
 type ViewMode = "cards" | "visual";
 
@@ -86,14 +89,7 @@ function JourneyContent() {
   }, [templateId]);
 
   if (loading) {
-    return (
-      <div className="text-center space-y-2">
-        <div className="text-2xl font-bold">Loading your journey...</div>
-        <p className="text-muted-foreground">
-          Preparing your customer experience map
-        </p>
-      </div>
-    );
+    return <PageLoading label="Preparing your journey map..." />;
   }
 
   if (!journey) {
@@ -151,7 +147,7 @@ function JourneyContent() {
                 : "hover:text-foreground"
             }`}
           >
-            <span className="text-xs">☰</span> Detail View
+            <List size={16} weight="duotone" /> Detail View
           </button>
           <button
             onClick={() => setViewMode("visual")}
@@ -161,7 +157,7 @@ function JourneyContent() {
                 : "hover:text-foreground"
             }`}
           >
-            <span className="text-xs">🗺</span> Journey Map
+            <MapTrifold size={16} weight="duotone" /> Journey Map
           </button>
         </div>
       </div>
@@ -182,6 +178,9 @@ function JourneyContent() {
           <Button size="lg" variant="outline">Get Your Playbook</Button>
         </Link>
       </div>
+
+      {/* Feedback chat — floating panel */}
+      <JourneyFeedbackChat />
     </div>
   );
 }
@@ -190,11 +189,7 @@ export default function JourneyPage() {
   return (
     <main className="min-h-screen py-12 px-4 bg-white">
       <Suspense
-        fallback={
-          <div className="text-center space-y-2 pt-24">
-            <div className="text-2xl font-bold">Loading...</div>
-          </div>
-        }
+        fallback={<PageLoading label="Loading..." />}
       >
         <JourneyContent />
       </Suspense>

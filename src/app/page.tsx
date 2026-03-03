@@ -1,5 +1,8 @@
+"use client";
+
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { FileText, Sparkle, Lightning, GraduationCap, ShieldCheck, Users } from "@phosphor-icons/react";
 
 function HeroSection() {
   return (
@@ -12,7 +15,7 @@ function HeroSection() {
         {/* Pill badge */}
         <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/8 border border-primary/15 mb-8">
           <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-          <span className="text-xs font-medium text-primary">AI-powered CX for B2B startups</span>
+          <span className="text-xs font-medium text-primary">AI-powered CX intelligence</span>
         </div>
 
         {/* Headline */}
@@ -71,33 +74,21 @@ function HowItWorksSection() {
       title: "Tell us about your business",
       description:
         "Answer a few questions about your company, customers, and goals. Our AI adapts to your maturity stage.",
-      icon: (
-        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
-        </svg>
-      ),
+      icon: <FileText size={24} weight="duotone" />,
     },
     {
       number: "02",
       title: "AI maps your journey",
       description:
         "CX Mate generates a complete customer journey with stages, meaningful moments, and risk analysis.",
-      icon: (
-        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 00-2.455 2.456z" />
-        </svg>
-      ),
+      icon: <Sparkle size={24} weight="duotone" />,
     },
     {
       number: "03",
       title: "Get your playbook",
       description:
         "Receive prioritized actions with templates, timelines, and expected outcomes your team can start executing immediately.",
-      icon: (
-        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
-        </svg>
-      ),
+      icon: <Lightning size={24} weight="duotone" />,
     },
   ];
 
@@ -135,11 +126,51 @@ function HowItWorksSection() {
   );
 }
 
+function SocialProofSection() {
+  const proofs = [
+    {
+      icon: <GraduationCap size={20} weight="duotone" />,
+      title: "CCXP methodology",
+      description: "Built on frameworks used by certified CX professionals worldwide.",
+    },
+    {
+      icon: <ShieldCheck size={20} weight="duotone" />,
+      title: "Industry benchmarks",
+      description: "Every recommendation is grounded in real performance data from your vertical.",
+    },
+    {
+      icon: <Users size={20} weight="duotone" />,
+      title: "Made for lean teams",
+      description: "Designed for startups and SMBs without a dedicated CX department.",
+    },
+  ];
+
+  return (
+    <section className="bg-background">
+      <div className="max-w-5xl mx-auto px-6 py-16">
+        <div className="grid sm:grid-cols-3 gap-8">
+          {proofs.map((proof) => (
+            <div key={proof.title} className="flex items-start gap-3">
+              <div className="shrink-0 w-10 h-10 rounded-xl bg-primary/8 text-primary flex items-center justify-center">
+                {proof.icon}
+              </div>
+              <div>
+                <h3 className="text-sm font-semibold text-foreground">{proof.title}</h3>
+                <p className="text-sm text-muted-foreground mt-1 leading-relaxed">{proof.description}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function FeaturesSection() {
   const features = [
     {
       title: "CX Intelligence Report",
-      description: "Confrontation-style analysis that shows you what's actually happening in your customer experience — the risks, the gaps, and the opportunities.",
+      description: "Honest gap analysis that shows what's really happening in your customer experience — the risks, the gaps, and the opportunities.",
       badge: "Insights",
       badgeColor: "bg-primary/8 text-primary border-primary/15",
     },
@@ -252,16 +283,22 @@ export default function Home() {
             </div>
             <span className="text-sm font-bold tracking-tight text-foreground">CX Mate</span>
           </div>
-          <Link href="/onboarding">
-            <Button size="sm" className="rounded-lg">
-              Get Started
-            </Button>
-          </Link>
+          <div className="flex items-center gap-4">
+            <Link href="/auth" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+              Log in
+            </Link>
+            <Link href="/onboarding">
+              <Button size="sm" className="rounded-lg">
+                Get Started
+              </Button>
+            </Link>
+          </div>
         </div>
       </header>
 
       <HeroSection />
       <HowItWorksSection />
+      <SocialProofSection />
       <FeaturesSection />
       <BottomCTA />
       <Footer />

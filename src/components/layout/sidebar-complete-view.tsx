@@ -80,8 +80,8 @@ export function SidebarCompleteView({
             onError={() => setLogoError(true)}
           />
         ) : (
-          <div className="w-8 h-8 rounded-md bg-teal-50 flex items-center justify-center shrink-0">
-            <span className="text-sm font-bold text-teal-700">{initials}</span>
+          <div className="w-8 h-8 rounded-md bg-primary/10 flex items-center justify-center shrink-0">
+            <span className="text-sm font-bold text-primary">{initials}</span>
           </div>
         )}
         <div className="min-w-0">
@@ -102,7 +102,7 @@ export function SidebarCompleteView({
               href={item.href}
               className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all group ${
                 isActive
-                  ? "bg-teal-50"
+                  ? "bg-primary/10"
                   : "hover:bg-slate-50"
               }`}
             >
@@ -110,7 +110,7 @@ export function SidebarCompleteView({
               <div
                 className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 text-[10px] font-bold transition-all ${
                   isActive
-                    ? "bg-teal-600 text-white"
+                    ? "bg-primary text-white"
                     : "bg-slate-100 text-slate-400 group-hover:bg-slate-200 group-hover:text-slate-600"
                 }`}
               >
@@ -121,7 +121,7 @@ export function SidebarCompleteView({
               <div className="min-w-0 flex-1">
                 <p
                   className={`text-xs font-medium leading-tight truncate ${
-                    isActive ? "text-teal-700 font-semibold" : "text-slate-500 group-hover:text-slate-700"
+                    isActive ? "text-primary font-semibold" : "text-slate-500 group-hover:text-slate-700"
                   }`}
                 >
                   {item.label}

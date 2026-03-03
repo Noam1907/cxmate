@@ -3,6 +3,7 @@
 import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { PageLoading } from "@/components/ui/page-loading";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -210,11 +211,7 @@ function AuthContent() {
 export default function AuthPage() {
   return (
     <Suspense
-      fallback={
-        <div className="min-h-screen flex items-center justify-center bg-background">
-          <div className="text-muted-foreground">Loading...</div>
-        </div>
-      }
+      fallback={<PageLoading />}
     >
       <AuthContent />
     </Suspense>

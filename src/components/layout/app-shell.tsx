@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { NavHeader } from "@/components/nav-header";
 import { useCompanyProfile } from "@/contexts/company-profile-context";
+import { ListDashes, X } from "@phosphor-icons/react";
 import { CxIdentitySidebar } from "./cx-identity-sidebar";
 import { SidebarBuildingView } from "./sidebar-building-view";
 import { SidebarCompleteView } from "./sidebar-complete-view";
@@ -60,10 +61,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       {/* Mobile: floating toggle button */}
       <button
         onClick={() => setMobileOpen(true)}
-        className="fixed bottom-5 left-5 z-40 md:hidden w-11 h-11 rounded-full bg-teal-600 text-white shadow-lg hover:shadow-xl transition-all flex items-center justify-center"
+        className="fixed bottom-5 left-5 z-40 md:hidden w-11 h-11 rounded-full bg-primary text-white shadow-lg hover:shadow-xl transition-all flex items-center justify-center"
         aria-label="Show navigation"
       >
-        <span className="text-[10px] font-bold">≡</span>
+        <ListDashes size={20} weight="bold" />
       </button>
 
       {/* Mobile: slide-over drawer */}
@@ -81,10 +82,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <div className="flex items-center justify-end mb-4">
                 <button
                   onClick={() => setMobileOpen(false)}
-                  className="text-slate-400 hover:text-slate-600 text-xl leading-none"
+                  className="text-slate-400 hover:text-slate-600"
                   aria-label="Close sidebar"
                 >
-                  &times;
+                  <X size={20} />
                 </button>
               </div>
 

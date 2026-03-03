@@ -425,25 +425,25 @@ export function getGoalsForPainAndMaturity(
 export const MATURITY_OPTIONS = [
   {
     value: "pre_launch" as CompanyMaturity,
-    emoji: "🚀",
+    iconName: "Rocket" as const,
     label: "Pre-launch / Pre-revenue",
     subtitle: "No paying customers yet — building our go-to-market",
   },
   {
     value: "first_customers" as CompanyMaturity,
-    emoji: "🌱",
+    iconName: "Seedling" as const,
     label: "First customers",
     subtitle: "1-10 customers — figuring out what works",
   },
   {
     value: "growing" as CompanyMaturity,
-    emoji: "📈",
+    iconName: "TrendUp" as const,
     label: "Growing",
     subtitle: "11-50 customers — building our first playbook",
   },
   {
     value: "scaling" as CompanyMaturity,
-    emoji: "🏗️",
+    iconName: "Buildings" as const,
     label: "Scaling",
     subtitle: "50+ customers — formalizing and optimizing",
   },

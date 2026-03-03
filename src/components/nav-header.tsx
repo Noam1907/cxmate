@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { Sparkle } from "@phosphor-icons/react";
 
 function getTemplateId(): string {
   try {
@@ -25,12 +26,13 @@ export function NavHeader() {
     setTemplateId(getTemplateId());
   }, []);
 
-  // Hide nav on home page and auth
-  if (pathname === "/" || pathname.startsWith("/auth")) {
+  // Hide nav on home page only
+  if (pathname === "/") {
     return null;
   }
 
   const isOnboarding = pathname === "/onboarding";
+  const isAuth = pathname.startsWith("/auth");
 
   const navItems = [
     { href: "/dashboard", label: "Dashboard" },
@@ -42,13 +44,13 @@ export function NavHeader() {
   return (
     <header className="border-b border-slate-200 bg-white sticky top-0 z-50">
       <div className="max-w-full px-6 flex items-center justify-between h-14">
-        <Link href={isOnboarding ? "/" : "/dashboard"} className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-lg bg-teal-600 flex items-center justify-center shrink-0">
+        <Link href={isOnboarding || isAuth ? "/" : "/dashboard"} className="flex items-center gap-2">
+          <div className="w-7 h-7 rounded-lg bg-primary flex items-center justify-center shrink-0">
             <span className="text-xs font-bold text-white">CX</span>
           </div>
           <span className="text-sm font-semibold tracking-tight text-slate-800">CX Mate</span>
         </Link>
-        {!isOnboarding && (
+        {!isOnboarding && !isAuth && (
           <div className="flex items-center gap-3">
             <nav className="flex items-center gap-0.5">
               {navItems.map((item) => {
@@ -60,7 +62,7 @@ export function NavHeader() {
                     href={item.href}
                     className={`text-xs font-medium px-3.5 py-2 rounded-lg transition-all duration-150 ${
                       isActive
-                        ? "bg-teal-50 text-teal-700 font-semibold"
+                        ? "bg-primary/10 text-primary font-semibold"
                         : "text-slate-500 hover:text-slate-800 hover:bg-slate-100"
                     }`}
                   >
@@ -74,12 +76,20 @@ export function NavHeader() {
             {pathname !== "/pricing" && (
               <Link
                 href="/pricing"
-                className="text-xs font-semibold text-teal-700 border border-teal-300 bg-teal-50 hover:bg-teal-100 px-3 py-1.5 rounded-lg transition-colors"
+                className="text-xs font-semibold text-primary border border-primary/30 bg-primary/10 hover:bg-primary/15 px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1"
               >
-                Upgrade ✦
+                Upgrade <Sparkle size={12} weight="fill" />
               </Link>
             )}
           </div>
+        )}
+        {isAuth && (
+          <Link
+            href="/onboarding"
+            className="text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
+          >
+            Start free →
+          </Link>
         )}
       </div>
     </header>

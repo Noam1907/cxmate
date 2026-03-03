@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import type { OnboardingData } from "@/types/onboarding";
+import { Check } from "@phosphor-icons/react";
 
 interface SidebarBuildingViewProps {
   data: Partial<OnboardingData> | null;
@@ -60,8 +61,8 @@ export function SidebarBuildingView({ data }: SidebarBuildingViewProps) {
               onError={() => setLogoError(true)}
             />
           ) : (
-            <div className="w-8 h-8 rounded-md bg-teal-50 flex items-center justify-center shrink-0">
-              <span className="text-sm font-bold text-teal-700">{initials}</span>
+            <div className="w-8 h-8 rounded-md bg-primary/10 flex items-center justify-center shrink-0">
+              <span className="text-sm font-bold text-primary">{initials}</span>
             </div>
           )}
           <div className="min-w-0">
@@ -89,7 +90,7 @@ export function SidebarBuildingView({ data }: SidebarBuildingViewProps) {
               key={stage.key}
               className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all ${
                 isCurrent
-                  ? "bg-teal-50"
+                  ? "bg-primary/10"
                   : isDone
                   ? "opacity-80"
                   : "opacity-40"
@@ -99,20 +100,20 @@ export function SidebarBuildingView({ data }: SidebarBuildingViewProps) {
               <div
                 className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 text-[10px] font-bold transition-all ${
                   isDone
-                    ? "bg-teal-100 text-teal-700"
+                    ? "bg-primary/15 text-primary"
                     : isCurrent
-                    ? "bg-teal-600 text-white"
+                    ? "bg-primary text-white"
                     : "border border-slate-200 text-slate-300"
                 }`}
               >
-                {isDone ? "✓" : i + 1}
+                {isDone ? <Check size={12} weight="bold" /> : i + 1}
               </div>
 
               {/* Label */}
               <span
                 className={`text-xs font-medium leading-tight ${
                   isCurrent
-                    ? "text-teal-700 font-semibold"
+                    ? "text-primary font-semibold"
                     : isDone
                     ? "text-slate-600"
                     : "text-slate-300"

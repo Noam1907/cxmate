@@ -15,6 +15,7 @@ import { EvidenceWall } from "@/components/evidence/evidence-wall";
 import { track } from "@/lib/analytics";
 import { ExportPdfButton } from "@/components/ui/export-pdf-button";
 import { PrintCover } from "@/components/pdf/print-cover";
+import { PageLoading } from "@/components/ui/page-loading";
 
 // ─── Confrontation Modes ────────────────────────────────────────────────────
 
@@ -212,10 +213,10 @@ function InsightCard({ insight, index }: { insight: ConfrontationInsight; index:
     : "border border-slate-200 bg-white";
 
   const badge = isHigh
-    ? <span className="text-[10px] font-bold uppercase tracking-widest text-rose-600 bg-rose-100 px-2 py-0.5 rounded-full shrink-0">Urgent</span>
+    ? <span className="text-xs font-bold uppercase tracking-widest text-rose-600 bg-rose-100 px-2 py-0.5 rounded-full shrink-0">Urgent</span>
     : isMedium
-    ? <span className="text-[10px] font-bold uppercase tracking-widest text-amber-700 bg-amber-100 px-2 py-0.5 rounded-full shrink-0">Important</span>
-    : <span className="text-[10px] font-medium uppercase tracking-widest text-slate-400 shrink-0">On radar</span>;
+    ? <span className="text-xs font-bold uppercase tracking-widest text-amber-700 bg-amber-100 px-2 py-0.5 rounded-full shrink-0">Important</span>
+    : <span className="text-xs font-medium uppercase tracking-widest text-slate-400 shrink-0">On radar</span>;
 
   return (
     <FadeIn delay={1900 + index * 200}>
@@ -229,7 +230,7 @@ function InsightCard({ insight, index }: { insight: ConfrontationInsight; index:
             <div className="flex items-center gap-2 mb-1.5">
               {badge}
               {isHigh && !expanded && insight.immediateAction && (
-                <span className="text-[10px] text-rose-500 font-medium truncate hidden sm:block">
+                <span className="text-xs text-rose-500 font-medium truncate hidden sm:block">
                   Act: {insight.immediateAction.slice(0, 50)}{insight.immediateAction.length > 50 ? "…" : ""}
                 </span>
               )}
@@ -252,7 +253,7 @@ function InsightCard({ insight, index }: { insight: ConfrontationInsight; index:
             {/* Immediate action — most prominent element */}
             {insight.immediateAction && (
               <div className={`rounded-lg p-4 ${isHigh ? "bg-rose-50 border border-rose-200" : isMedium ? "bg-amber-50 border border-amber-200" : "bg-slate-50 border border-slate-200"}`}>
-                <p className={`text-[10px] font-bold uppercase tracking-widest mb-1.5 ${isHigh ? "text-rose-600" : isMedium ? "text-amber-700" : "text-slate-500"}`}>
+                <p className={`text-xs font-bold uppercase tracking-widest mb-1.5 ${isHigh ? "text-rose-600" : isMedium ? "text-amber-700" : "text-slate-500"}`}>
                   {isHigh ? "Do this now" : "Next action"}
                 </p>
                 <p className={`text-sm font-medium ${isHigh ? "text-rose-900" : isMedium ? "text-amber-900" : "text-slate-700"}`}>
@@ -264,7 +265,7 @@ function InsightCard({ insight, index }: { insight: ConfrontationInsight; index:
             {/* Business impact */}
             {insight.businessImpact && (
               <div>
-                <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide mb-1">Business impact</p>
+                <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-1">Business impact</p>
                 <p className="text-sm text-slate-700">{insight.businessImpact}</p>
               </div>
             )}
@@ -409,11 +410,7 @@ function ConfrontationContent() {
   const projections = useMemo(() => journey?.impactProjections || [], [journey]);
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p className="text-slate-400">Loading your report...</p>
-      </div>
-    );
+    return <PageLoading label="Loading your CX report..." />;
   }
 
   if (!journey) {
@@ -449,11 +446,11 @@ function ConfrontationContent() {
           <div className="flex items-start justify-between gap-4">
             <div>
               {firstName && (
-                <p className="text-sm text-teal-600 font-medium mb-1">
+                <p className="text-sm text-primary font-medium mb-1">
                   Here&apos;s what we found, {firstName}.
                 </p>
               )}
-              <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest mb-2">{config.label}</p>
+              <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-2">{config.label}</p>
               <h1 className="text-4xl font-bold tracking-tight text-slate-800 mb-3 leading-tight">{config.headline(companyName)}</h1>
               <p className="text-base text-slate-500 leading-relaxed">{config.subtitle}</p>
             </div>
@@ -610,7 +607,7 @@ function ConfrontationContent() {
 
 export default function ConfrontationPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><p className="text-slate-400">Loading...</p></div>}>
+    <Suspense fallback={<PageLoading label="Loading..." />}>
       <ConfrontationContent />
     </Suspense>
   );

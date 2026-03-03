@@ -6,6 +6,14 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { JOURNEY_EXISTS_OPTIONS, type OnboardingData } from "@/types/onboarding";
 import { ChatBubble } from "./chat-bubble";
+import {
+  Crosshair, ChartBar, ChatTeardrop, Monitor, PencilLine,
+  Handshake, CheckCircle, Rocket, Wrench, GraduationCap,
+  BookOpen, TrendUp, ClipboardText, Heartbeat, Star,
+  Ticket, Timer, ArrowsClockwise, Megaphone, Siren,
+  Paperclip, X,
+} from "@phosphor-icons/react";
+import type { ReactNode } from "react";
 
 interface StepJourneyExistsProps {
   data: OnboardingData;
@@ -13,53 +21,56 @@ interface StepJourneyExistsProps {
 }
 
 // Grouped by customer lifecycle phase: Acquire → Onboard → Enable → Retain → Expand
-const JOURNEY_COMPONENT_GROUPS = [
+const JOURNEY_COMPONENT_GROUPS: {
+  label: string;
+  items: { value: string; label: string; icon: ReactNode }[];
+}[] = [
   {
     label: "Pre-sale",
     items: [
-      { value: "ideal_customer_profile", label: "Ideal customer profile (ICP)", emoji: "🎯" },
-      { value: "sales_pipeline", label: "Sales pipeline / CRM stages", emoji: "📊" },
-      { value: "sales_playbook", label: "Sales playbook / talk tracks", emoji: "🗣️" },
-      { value: "demo_process", label: "Demo or trial process", emoji: "🖥️" },
-      { value: "proposal_contract", label: "Proposal / contract flow", emoji: "📝" },
+      { value: "ideal_customer_profile", label: "Ideal customer profile (ICP)", icon: <Crosshair size={18} weight="duotone" /> },
+      { value: "sales_pipeline", label: "Sales pipeline / CRM stages", icon: <ChartBar size={18} weight="duotone" /> },
+      { value: "sales_playbook", label: "Sales playbook / talk tracks", icon: <ChatTeardrop size={18} weight="duotone" /> },
+      { value: "demo_process", label: "Demo or trial process", icon: <Monitor size={18} weight="duotone" /> },
+      { value: "proposal_contract", label: "Proposal / contract flow", icon: <PencilLine size={18} weight="duotone" /> },
     ],
   },
   {
     label: "Onboarding",
     items: [
-      { value: "handoff_process", label: "Sales → CS handoff process", emoji: "🤝" },
-      { value: "onboarding_checklist", label: "Onboarding checklist / milestones", emoji: "✅" },
-      { value: "kickoff_process", label: "Kickoff call structure", emoji: "🚀" },
-      { value: "implementation_plan", label: "Implementation / setup plan", emoji: "🔧" },
+      { value: "handoff_process", label: "Sales → CS handoff process", icon: <Handshake size={18} weight="duotone" /> },
+      { value: "onboarding_checklist", label: "Onboarding checklist / milestones", icon: <CheckCircle size={18} weight="duotone" /> },
+      { value: "kickoff_process", label: "Kickoff call structure", icon: <Rocket size={18} weight="duotone" /> },
+      { value: "implementation_plan", label: "Implementation / setup plan", icon: <Wrench size={18} weight="duotone" /> },
     ],
   },
   {
     label: "Enablement",
     items: [
-      { value: "training_program", label: "Training / enablement program", emoji: "🎓" },
-      { value: "knowledge_base", label: "Knowledge base / self-serve docs", emoji: "📚" },
-      { value: "adoption_tracking", label: "Product adoption tracking", emoji: "📈" },
+      { value: "training_program", label: "Training / enablement program", icon: <GraduationCap size={18} weight="duotone" /> },
+      { value: "knowledge_base", label: "Knowledge base / self-serve docs", icon: <BookOpen size={18} weight="duotone" /> },
+      { value: "adoption_tracking", label: "Product adoption tracking", icon: <TrendUp size={18} weight="duotone" /> },
     ],
   },
   {
     label: "Ongoing Success",
     items: [
-      { value: "cs_playbook", label: "CS playbook / QBR cadence", emoji: "📋" },
-      { value: "health_scoring", label: "Customer health scoring", emoji: "💚" },
-      { value: "nps_csat", label: "NPS / CSAT / feedback loop", emoji: "⭐" },
-      { value: "support_flow", label: "Support / escalation flow", emoji: "🎫" },
-      { value: "sla_process", label: "SLA / response time process", emoji: "⏱️" },
+      { value: "cs_playbook", label: "CS playbook / QBR cadence", icon: <ClipboardText size={18} weight="duotone" /> },
+      { value: "health_scoring", label: "Customer health scoring", icon: <Heartbeat size={18} weight="duotone" /> },
+      { value: "nps_csat", label: "NPS / CSAT / feedback loop", icon: <Star size={18} weight="duotone" /> },
+      { value: "support_flow", label: "Support / escalation flow", icon: <Ticket size={18} weight="duotone" /> },
+      { value: "sla_process", label: "SLA / response time process", icon: <Timer size={18} weight="duotone" /> },
     ],
   },
   {
     label: "Expansion",
     items: [
-      { value: "renewal_process", label: "Renewal / expansion process", emoji: "🔄" },
-      { value: "upsell_playbook", label: "Upsell / cross-sell playbook", emoji: "📣" },
-      { value: "churn_prevention", label: "Churn prevention / at-risk process", emoji: "🚨" },
+      { value: "renewal_process", label: "Renewal / expansion process", icon: <ArrowsClockwise size={18} weight="duotone" /> },
+      { value: "upsell_playbook", label: "Upsell / cross-sell playbook", icon: <Megaphone size={18} weight="duotone" /> },
+      { value: "churn_prevention", label: "Churn prevention / at-risk process", icon: <Siren size={18} weight="duotone" /> },
     ],
   },
-] as const;
+];
 
 
 export function StepJourneyExists({ data, onChange }: StepJourneyExistsProps) {
@@ -229,7 +240,7 @@ export function StepJourneyExists({ data, onChange }: StepJourneyExistsProps) {
                               </svg>
                             )}
                           </div>
-                          <span className="text-base leading-none">{component.emoji}</span>
+                          <span className="text-primary/70 shrink-0">{component.icon}</span>
                           <span className="text-sm font-medium text-foreground">{component.label}</span>
                         </button>
                       );
@@ -246,14 +257,14 @@ export function StepJourneyExists({ data, onChange }: StepJourneyExistsProps) {
             <div className="rounded-lg border-2 border-dashed border-border/70 p-4 text-center space-y-2 hover:border-primary/40 transition-colors">
               {uploadedFileName ? (
                 <div className="flex items-center justify-center gap-2">
-                  <span className="text-sm">📎</span>
+                  <Paperclip size={16} weight="duotone" className="text-muted-foreground shrink-0" />
                   <span className="text-sm font-medium text-foreground">{uploadedFileName}</span>
                   <button
                     type="button"
                     onClick={handleRemoveFile}
-                    className="text-xs text-muted-foreground hover:text-red-500 transition-colors ml-1"
+                    className="text-muted-foreground hover:text-red-500 transition-colors ml-1"
                   >
-                    ✕
+                    <X size={14} />
                   </button>
                 </div>
               ) : (

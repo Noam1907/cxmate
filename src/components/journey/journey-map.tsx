@@ -47,7 +47,7 @@ export function JourneyMap({ journey, evidenceMap }: JourneyMapProps) {
           {salesStages.length > 0 && customerStages.length > 0 && (
             <div className="flex items-center gap-3">
               <div className="h-px flex-1 bg-slate-100" />
-              <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest">
+              <span className="text-xs font-semibold text-slate-400 uppercase tracking-widest">
                 Sales Journey
               </span>
               <div className="h-px flex-1 bg-slate-100" />
@@ -71,7 +71,7 @@ export function JourneyMap({ journey, evidenceMap }: JourneyMapProps) {
       {salesStages.length > 0 && customerStages.length > 0 && (
         <div className="flex items-center gap-3 py-1">
           <div className="h-px flex-1 bg-slate-100" />
-          <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest px-3 py-1 rounded-full border border-slate-200 bg-white">
+          <span className="text-xs font-semibold text-slate-400 uppercase tracking-widest px-3 py-1 rounded-full border border-slate-200 bg-white">
             Handoff
           </span>
           <div className="h-px flex-1 bg-slate-100" />
@@ -84,7 +84,7 @@ export function JourneyMap({ journey, evidenceMap }: JourneyMapProps) {
           {salesStages.length > 0 && (
             <div className="flex items-center gap-3">
               <div className="h-px flex-1 bg-slate-100" />
-              <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest">
+              <span className="text-xs font-semibold text-slate-400 uppercase tracking-widest">
                 Customer Journey
               </span>
               <div className="h-px flex-1 bg-slate-100" />

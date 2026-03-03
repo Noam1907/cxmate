@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { ChartBar } from "@phosphor-icons/react";
 
 export default function ConfrontationError({
   error,
@@ -19,7 +20,7 @@ export default function ConfrontationError({
     <div className="min-h-screen flex items-center justify-center bg-background">
       <div className="max-w-md w-full mx-auto px-6 text-center space-y-6">
         <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto">
-          <span className="text-3xl">📊</span>
+          <ChartBar size={32} weight="duotone" className="text-primary" />
         </div>
         <div className="space-y-2">
           <h2 className="text-xl font-bold text-foreground">CX Report couldn&apos;t load</h2>

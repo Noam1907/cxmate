@@ -8,6 +8,7 @@ import type { GeneratedPlaybook } from "@/lib/ai/recommendation-prompt";
 import type { OnboardingInput } from "@/lib/validations/onboarding";
 import { buildEvidenceMap, getInsightAnnotations } from "@/lib/evidence-matching";
 import { track } from "@/lib/analytics";
+import { PageLoading } from "@/components/ui/page-loading";
 
 // ─── Data loading ─────────────────────────────────────────────────────────────
 
@@ -95,7 +96,7 @@ export default function DashboardPage() {
   }, []);
 
   if (!data) {
-    return <main className="min-h-screen flex items-center justify-center"><p className="text-slate-400">Loading...</p></main>;
+    return <main className="min-h-screen"><PageLoading label="Loading your dashboard..." /></main>;
   }
 
   if (!data.journey) {
@@ -128,7 +129,7 @@ export default function DashboardPage() {
         {/* Header */}
         <div className="mb-10">
           {firstName && (
-            <p className="text-sm text-teal-600 font-medium mb-1">
+            <p className="text-sm text-primary font-medium mb-1">
               Good to see you, {firstName}.
             </p>
           )}
@@ -175,7 +176,7 @@ export default function DashboardPage() {
               <div className="text-3xl font-bold text-slate-900">{pStats.pct}<span className="text-base text-slate-400">%</span></div>
             </div>
             <div className="h-1.5 rounded-full bg-slate-100 overflow-hidden mb-4">
-              <div className="h-full bg-teal-600 rounded-full transition-all duration-500" style={{ width: `${pStats.pct}%` }} />
+              <div className="h-full bg-primary rounded-full transition-all duration-500" style={{ width: `${pStats.pct}%` }} />
             </div>
             <div className="flex items-center justify-between">
               <div className="flex gap-5 text-xs text-slate-500">
@@ -216,7 +217,7 @@ export default function DashboardPage() {
                       {ann && ann.painPoints.length > 0 && (
                         <div className="flex flex-wrap gap-1 mt-1.5">
                           {ann.painPoints.map((pp, j) => (
-                            <span key={j} className="text-[10px] px-1.5 py-0.5 rounded bg-slate-100 text-slate-500 font-medium">
+                            <span key={j} className="text-xs px-1.5 py-0.5 rounded bg-slate-100 text-slate-500 font-medium">
                               {pp}
                             </span>
                           ))}

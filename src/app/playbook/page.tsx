@@ -8,6 +8,7 @@ import type { GeneratedJourney } from "@/lib/ai/journey-prompt";
 import type { OnboardingInput } from "@/lib/validations/onboarding";
 import { buildEvidenceMap, getMomentAnnotations, type EvidenceMap } from "@/lib/evidence-matching";
 import { track } from "@/lib/analytics";
+import { Check, ChartBar } from "@phosphor-icons/react";
 import { ExportPdfButton } from "@/components/ui/export-pdf-button";
 import { PrintCover } from "@/components/pdf/print-cover";
 
@@ -56,7 +57,7 @@ function CopyButton({ text }: { text: string }) {
     navigator.clipboard.writeText(text).then(() => { setCopied(true); setTimeout(() => setCopied(false), 2000); });
   }, [text]);
   return (
-    <button onClick={handle} className="text-[10px] px-2 py-0.5 rounded border border-slate-200 text-slate-400 hover:text-slate-600 hover:bg-slate-50 transition-colors shrink-0">
+    <button onClick={handle} className="text-xs px-2 py-0.5 rounded border border-slate-200 text-slate-400 hover:text-slate-600 hover:bg-slate-50 transition-colors shrink-0">
       {copied ? "Copied" : "Copy"}
     </button>
   );
@@ -74,9 +75,9 @@ function RecommendationCard({
   const [expanded, setExpanded] = useState(false);
 
   const checkboxStyle = status === "done"
-    ? "bg-teal-700 border-teal-700 text-white"
+    ? "bg-primary border-primary text-white"
     : status === "in_progress"
-    ? "border-teal-400 bg-white"
+    ? "border-primary/40 bg-white"
     : "border-slate-300 bg-white";
 
   const isPriority = rec.priority === "must_do";
@@ -89,7 +90,7 @@ function RecommendationCard({
           onClick={onStatusChange}
           className={`mt-0.5 shrink-0 w-4 h-4 rounded border flex items-center justify-center transition-colors ${checkboxStyle}`}
         >
-          {status === "done" && <span className="text-white text-[10px] font-bold">✓</span>}
+          {status === "done" && <Check size={12} weight="bold" className="text-white" />}
           {status === "in_progress" && <span className="w-1.5 h-1.5 rounded-full bg-slate-400" />}
         </button>
 
@@ -103,9 +104,9 @@ function RecommendationCard({
             </button>
             <div className="flex items-center gap-1.5 shrink-0">
               {isPriority && (
-                <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-wide">{priorityLabel(rec.priority)}</span>
+                <span className="text-xs font-semibold text-slate-500 uppercase tracking-wide">{priorityLabel(rec.priority)}</span>
               )}
-              <span className="text-[10px] text-slate-400">{effortLabel(rec.effort)}</span>
+              <span className="text-xs text-slate-400">{effortLabel(rec.effort)}</span>
             </div>
           </div>
           <p className="text-xs text-slate-400 mt-0.5">{rec.owner} · {rec.timing}</p>
@@ -115,18 +116,18 @@ function RecommendationCard({
               {rec.template && (
                 <div className="rounded-lg bg-slate-50 border border-slate-200 p-3">
                   <div className="flex items-center justify-between mb-1.5">
-                    <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide">Template</span>
+                    <span className="text-xs font-semibold text-slate-400 uppercase tracking-wide">Template</span>
                     <CopyButton text={rec.template} />
                   </div>
                   <p className="text-xs text-slate-600 whitespace-pre-line leading-relaxed">{rec.template}</p>
                 </div>
               )}
               <div className="rounded-lg bg-slate-50 border border-slate-200 p-3">
-                <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide mb-1">Expected outcome</p>
+                <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-1">Expected outcome</p>
                 <p className="text-xs text-slate-600">{rec.expectedOutcome}</p>
               </div>
               <div className="rounded-lg bg-slate-50 border border-slate-200 p-3">
-                <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide mb-1">Measure with</p>
+                <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-1">Measure with</p>
                 <p className="text-xs text-slate-600">{rec.measureWith}</p>
               </div>
             </div>
@@ -161,15 +162,15 @@ function StageSection({
       {/* Measurement plan chip */}
       {stagePlaybook.measurementPlan && (
         <div className="flex items-center gap-1.5 mb-2">
-          <span className="text-[10px] font-medium text-violet-600 bg-violet-50 border border-violet-100 px-2 py-0.5 rounded-full flex items-center gap-1">
-            <span>📊</span>
+          <span className="text-xs font-medium text-primary bg-primary/10 border border-primary/15 px-2 py-0.5 rounded-full flex items-center gap-1">
+            <ChartBar size={14} weight="duotone" />
             <span>Measure: {stagePlaybook.measurementPlan}</span>
           </span>
         </div>
       )}
       {/* Thin progress bar */}
       <div className="h-px bg-slate-100 mb-4 overflow-hidden rounded-full">
-        <div className="h-full bg-teal-600 transition-all duration-500" style={{ width: `${pct}%` }} />
+        <div className="h-full bg-primary transition-all duration-500" style={{ width: `${pct}%` }} />
       </div>
       {/* Recommendations */}
       <div>
@@ -382,7 +383,7 @@ export default function PlaybookPage() {
         <div className="mb-10 flex items-start justify-between gap-4">
           <div>
             {firstName && (
-              <p className="text-sm text-teal-600 font-medium mb-1">
+              <p className="text-sm text-primary font-medium mb-1">
                 {pct > 0 ? `Keep it up, ${firstName}.` : `Let's get started, ${firstName}.`}
               </p>
             )}
@@ -444,7 +445,7 @@ export default function PlaybookPage() {
               key={mode}
               onClick={() => setFilter(mode)}
               className={`px-3 py-1.5 text-xs font-medium rounded-full border transition-colors ${
-                filter === mode ? "bg-teal-700 text-white border-teal-700" : "bg-white text-slate-500 border-slate-200 hover:border-slate-300"
+                filter === mode ? "bg-primary text-white border-primary" : "bg-white text-slate-500 border-slate-200 hover:border-slate-300"
               }`}
             >
               {mode === "all" ? "All" : mode === "must_do" ? "Must do" : "Quick wins"}

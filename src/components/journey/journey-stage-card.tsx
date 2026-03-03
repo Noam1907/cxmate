@@ -55,9 +55,9 @@ function MomentCard({ moment, annotation }: { moment: GeneratedMoment; annotatio
           <div className="flex items-start justify-between gap-2">
             <div className="font-medium text-sm text-slate-800">{moment.name}</div>
             <div className="flex items-center gap-1.5 shrink-0">
-              <span className="text-[11px] text-slate-400 font-medium">{getMomentTypeLabel(moment.type)}</span>
+              <span className="text-xs text-slate-400 font-medium">{getMomentTypeLabel(moment.type)}</span>
               {isAtRisk && (
-                <span className={`text-[11px] font-semibold uppercase tracking-wide ${style.label}`}>
+                <span className={`text-xs font-semibold uppercase tracking-wide ${style.label}`}>
                   {moment.severity}
                 </span>
               )}
@@ -71,7 +71,7 @@ function MomentCard({ moment, annotation }: { moment: GeneratedMoment; annotatio
               {annotation.painPoints.map((pp, i) => (
                 <span
                   key={`pp-${i}`}
-                  className="text-[10px] px-2 py-0.5 rounded-full bg-violet-50 text-violet-600 border border-violet-200 font-medium"
+                  className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20 font-medium"
                 >
                   ↳ {pp}
                 </span>
@@ -79,7 +79,7 @@ function MomentCard({ moment, annotation }: { moment: GeneratedMoment; annotatio
               {annotation.competitorGaps.map((cg, i) => (
                 <span
                   key={`cg-${i}`}
-                  className="text-[10px] px-2 py-0.5 rounded-full bg-slate-100 text-slate-500 border border-slate-200 font-medium"
+                  className="text-xs px-2 py-0.5 rounded-full bg-slate-100 text-slate-500 border border-slate-200 font-medium"
                 >
                   {cg}
                 </span>
@@ -95,7 +95,7 @@ function MomentCard({ moment, annotation }: { moment: GeneratedMoment; annotatio
           {/* What they're thinking */}
           {moment.decisionScienceInsight && (
             <div>
-              <div className="text-[11px] font-semibold text-slate-500 uppercase tracking-wide mb-1">What they&apos;re thinking</div>
+              <div className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">What they&apos;re thinking</div>
               <p className="text-xs text-slate-600 leading-relaxed italic">&ldquo;{moment.decisionScienceInsight}&rdquo;</p>
             </div>
           )}
@@ -103,7 +103,7 @@ function MomentCard({ moment, annotation }: { moment: GeneratedMoment; annotatio
           {/* Diagnosis */}
           {moment.diagnosis && (
             <div>
-              <div className="text-[11px] font-semibold text-slate-500 uppercase tracking-wide mb-1">What&apos;s likely going wrong</div>
+              <div className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">What&apos;s likely going wrong</div>
               <p className="text-xs text-slate-600 leading-relaxed">{moment.diagnosis}</p>
             </div>
           )}
@@ -111,7 +111,7 @@ function MomentCard({ moment, annotation }: { moment: GeneratedMoment; annotatio
           {/* Triggers */}
           {moment.triggers.length > 0 && (
             <div>
-              <div className="text-[11px] font-semibold text-slate-500 uppercase tracking-wide mb-1">Triggers</div>
+              <div className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Triggers</div>
               <ul className="space-y-0.5">
                 {moment.triggers.map((trigger, i) => (
                   <li key={i} className="text-xs text-slate-600 flex items-start gap-1.5">
@@ -126,7 +126,7 @@ function MomentCard({ moment, annotation }: { moment: GeneratedMoment; annotatio
           {/* What to do */}
           {moment.recommendations.length > 0 && (
             <div>
-              <div className="text-[11px] font-semibold text-slate-500 uppercase tracking-wide mb-1">What to do</div>
+              <div className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">What to do</div>
               <ul className="space-y-1">
                 {moment.recommendations.map((rec, i) => (
                   <li key={i} className="text-xs text-slate-700 flex items-start gap-1.5">
@@ -141,7 +141,7 @@ function MomentCard({ moment, annotation }: { moment: GeneratedMoment; annotatio
           {/* Action template */}
           {moment.actionTemplate && (
             <div>
-              <div className="text-[11px] font-semibold text-slate-500 uppercase tracking-wide mb-1">Action template</div>
+              <div className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Action template</div>
               <p className="text-xs text-slate-600 leading-relaxed whitespace-pre-line bg-slate-50 rounded-lg px-3 py-2 border border-slate-100">
                 {moment.actionTemplate}
               </p>
@@ -151,7 +151,7 @@ function MomentCard({ moment, annotation }: { moment: GeneratedMoment; annotatio
           {/* Measure with */}
           {moment.cxToolRecommendation && (
             <div>
-              <div className="text-[11px] font-semibold text-slate-500 uppercase tracking-wide mb-1">Measure with</div>
+              <div className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Measure with</div>
               <p className="text-xs text-slate-600">{moment.cxToolRecommendation}</p>
             </div>
           )}
@@ -159,12 +159,12 @@ function MomentCard({ moment, annotation }: { moment: GeneratedMoment; annotatio
           {/* If you ignore this */}
           {moment.impactIfIgnored && (
             <div>
-              <div className="text-[11px] font-semibold text-amber-600 uppercase tracking-wide mb-1">If ignored</div>
+              <div className="text-xs font-semibold text-amber-600 uppercase tracking-wide mb-1">If ignored</div>
               <p className="text-xs text-amber-700 leading-relaxed">{moment.impactIfIgnored}</p>
             </div>
           )}
 
-          <div className="text-[11px] text-slate-300 text-center pt-1">tap to collapse</div>
+          <div className="text-xs text-slate-300 text-center pt-1">tap to collapse</div>
         </div>
       )}
     </div>
@@ -209,7 +209,7 @@ export function JourneyStageCard({
                 {/* Customer feels — right-aligned, subtle */}
                 {stage.emotionalState && (
                   <div className="text-right shrink-0">
-                    <div className="text-[11px] text-slate-400 uppercase tracking-wide font-medium">Customer feels</div>
+                    <div className="text-xs text-slate-400 uppercase tracking-wide font-medium">Customer feels</div>
                     <div className="text-sm font-semibold text-slate-700 capitalize mt-0.5">{stage.emotionalState}</div>
                   </div>
                 )}
@@ -218,7 +218,7 @@ export function JourneyStageCard({
               {/* At-risk count pill */}
               {criticalCount > 0 && (
                 <div className="mt-2">
-                  <span className="text-[11px] font-semibold text-amber-700 bg-amber-50 border border-amber-200 px-2.5 py-1 rounded-full">
+                  <span className="text-xs font-semibold text-amber-700 bg-amber-50 border border-amber-200 px-2.5 py-1 rounded-full">
                     {criticalCount} at-risk {criticalCount === 1 ? "moment" : "moments"}
                   </span>
                 </div>
@@ -253,7 +253,7 @@ export function JourneyStageCard({
 
         {/* Moments list */}
         <div className="px-5 pb-5 space-y-2">
-          <div className="text-[11px] font-semibold text-slate-400 uppercase tracking-wide mb-3">
+          <div className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-3">
             {stage.meaningfulMoments.length} moments
           </div>
           {stage.meaningfulMoments.map((moment, i) => (

@@ -2,6 +2,15 @@
 
 import { MATURITY_OPTIONS, deriveFromMaturity, type OnboardingData, type CompanyMaturity } from "@/types/onboarding";
 import { ChatBubble } from "./chat-bubble";
+import { Rocket, Plant, TrendUp, Buildings } from "@phosphor-icons/react";
+import type { ReactNode } from "react";
+
+const maturityIcons: Record<string, ReactNode> = {
+  Rocket: <Rocket size={24} weight="duotone" className="text-primary" />,
+  Seedling: <Plant size={24} weight="duotone" className="text-primary" />,
+  TrendUp: <TrendUp size={24} weight="duotone" className="text-primary" />,
+  Buildings: <Buildings size={24} weight="duotone" className="text-primary" />,
+};
 
 interface StepMaturityProps {
   data: OnboardingData;
@@ -47,7 +56,7 @@ export function StepMaturity({ data, onChange }: StepMaturityProps) {
                 ? "bg-primary/15"
                 : "bg-primary/8"
             }`}>
-              <span className="text-2xl">{option.emoji}</span>
+              {maturityIcons[option.iconName]}
             </div>
             <div className="space-y-1">
               <div className="font-bold text-sm text-foreground">{option.label}</div>
