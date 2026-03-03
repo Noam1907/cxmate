@@ -109,7 +109,10 @@ function RecommendationCard({
               <span className="text-xs text-slate-400">{effortLabel(rec.effort)}</span>
             </div>
           </div>
-          <p className="text-xs text-slate-400 mt-0.5">{rec.owner} · {rec.timing}</p>
+          <div className="flex items-center gap-2 mt-1 flex-wrap">
+            <span className="text-xs font-medium text-slate-600 bg-slate-100 px-2 py-0.5 rounded-full">{rec.owner}</span>
+            <span className="text-xs text-slate-400">{rec.timing}</span>
+          </div>
 
           {expanded && (
             <div className="mt-3 space-y-2" onClick={() => setExpanded(false)}>

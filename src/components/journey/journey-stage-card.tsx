@@ -201,28 +201,22 @@ export function JourneyStageCard({
             </div>
 
             <div className="flex-1 min-w-0">
-              <div className="flex items-start justify-between gap-2">
-                <div>
-                  <h3 className="text-base font-semibold text-slate-900">{stage.name}</h3>
-                  <p className="text-sm text-slate-500 mt-0.5 leading-snug">{stage.description}</p>
-                </div>
-                {/* Customer feels — right-aligned, subtle */}
-                {stage.emotionalState && (
-                  <div className="text-right shrink-0">
-                    <div className="text-xs text-slate-400 uppercase tracking-wide font-medium">Customer feels</div>
-                    <div className="text-sm font-semibold text-slate-700 capitalize mt-0.5">{stage.emotionalState}</div>
-                  </div>
-                )}
-              </div>
+              <h3 className="text-base font-semibold text-slate-900">{stage.name}</h3>
+              <p className="text-sm text-slate-500 mt-0.5 leading-snug">{stage.description}</p>
 
-              {/* At-risk count pill */}
-              {criticalCount > 0 && (
-                <div className="mt-2">
+              {/* Metadata pills — emotional state + at-risk count */}
+              <div className="flex items-center flex-wrap gap-2 mt-2">
+                {stage.emotionalState && (
+                  <span className="text-xs text-slate-500 bg-slate-50 border border-slate-200 px-2.5 py-1 rounded-full line-clamp-1">
+                    Customer feels: <span className="font-medium text-slate-700">{stage.emotionalState}</span>
+                  </span>
+                )}
+                {criticalCount > 0 && (
                   <span className="text-xs font-semibold text-amber-700 bg-amber-50 border border-amber-200 px-2.5 py-1 rounded-full">
                     {criticalCount} at-risk {criticalCount === 1 ? "moment" : "moments"}
                   </span>
-                </div>
-              )}
+                )}
+              </div>
             </div>
           </div>
         </div>

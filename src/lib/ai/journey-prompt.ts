@@ -592,7 +592,7 @@ Apply these proven CX frameworks and principles throughout your analysis. Integr
 ## Your Task
 Generate a customized, theory-backed journey map with the CX Mate companion voice:
 
-1. **Stages**: Use the standard stages as a foundation but customize names, descriptions, and emotional states to match this specific company. For each stage, identify the top failure risk and recommend the highest-impact success pattern.${!input.hasExistingCustomers ? ' IMPORTANT: ALL stages MUST have stageType: "sales". Do not generate any stages with stageType: "customer". There are no customers yet.' : ""}
+1. **Stages**: Use the standard stages as a foundation but customize names, descriptions, and emotional states to match this specific company. **emotionalState must be 2-4 words** (e.g. "Skeptical but engaged", "Anxious and overwhelmed", "Cautiously optimistic") — never a full sentence. For each stage, identify the top failure risk and recommend the highest-impact success pattern.${!input.hasExistingCustomers ? ' IMPORTANT: ALL stages MUST have stageType: "sales". Do not generate any stages with stageType: "customer". There are no customers yet.' : ""}
 
 2. **Meaningful Moments (2-3 per stage, max)**: Tailored to their industry and challenges. For each moment:
    - Provide a theory-backed **diagnosis** (1 sentence: root cause)
@@ -632,7 +632,7 @@ Return a JSON object with this exact structure:
       "name": "Stage Name",
       "stageType": "sales" | "customer",
       "description": "What happens at this stage for this specific company",
-      "emotionalState": "how the customer feels",
+      "emotionalState": "2-4 words max (e.g. 'Skeptical but engaged', 'Cautiously optimistic', 'Anxious and overwhelmed')",
       "topFailureRisk": "The most likely CX failure pattern at this stage",
       "successPattern": "The highest-impact success intervention for this stage",
       "benchmarkContext": "How similar companies perform at this stage",
