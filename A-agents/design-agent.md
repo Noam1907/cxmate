@@ -263,3 +263,4 @@ The rule: **the illustrated style lives in the emotional moments, not the data m
 - `C-core/project-brief.md` (personas, positioning, success metrics)
 - `C-core/product-architecture.md` (product layers, user flow)
 - `M-memory/learning-log.md` (UX patterns discovered)
+- `B-brain/01-cx-methodology/` (CX domain knowledge — journey stages, moments taxonomy, expert frameworks)

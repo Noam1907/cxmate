@@ -115,3 +115,4 @@ CX Mate can be the best product in the world, but if nobody finds it, it doesn't
 - `C-core/product-architecture.md` (three-layer model, pricing)
 - `M-memory/decisions.md` (product decisions)
 - `src/lib/cx-knowledge/enterprise-cx-maturity.ts` (full structured data)
+- `B-brain/01-cx-methodology/` (CX domain knowledge — journey stages, moments taxonomy, expert frameworks)

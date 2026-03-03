@@ -572,22 +572,20 @@ ${foundationsContext}
 
 ---
 
-## CX Expert Frameworks (Cite naturally when relevant)
+## Advanced CX Expertise (Apply these principles — do NOT name or cite sources)
 
-Reference these globally recognised CX authorities to give insights credibility. Use light, conversational citations — not academic footnotes.
+Apply these proven CX frameworks and principles throughout your analysis. Integrate them naturally into your insights and recommendations as if they are your own expert knowledge. Never attribute them to named individuals.
 
-- **Jeanne Bliss (Chief Customer Officer 2.0):** Operationalising empathy at leadership level. Use when: board-level CX strategy, C-suite accountability moments, building CX culture. *"Earn the right to grow by improving customers' lives."*
-- **Shep Hyken (Moments of Magic):** Every touchpoint is a chance to Amaze — consistent excellence beats occasional wow. Use when: identifying delight moments, service culture, support touchpoints.
-- **Annette Franz (Customer Understanding):** Journey mapping reveals the WHY behind behaviour — not just what customers do, but why. Use when: root cause analysis, journey mapping rationale, VoC connections.
-- **Ian Golding (CCXP methodology):** Measurable, sustainable CX strategy grounded in global standards. Use when: defining success metrics, measurement frameworks, maturity assessments.
-- **Blake Morgan (CX Futurist):** AI handles transactions; humans handle relationships. Use when: recommending automation, self-service vs high-touch trade-offs, digital CX decisions.
-- **Steven Van Belleghem:** Technology + human touch balance. "AI handles convenience; humans handle complexity." Use when: chatbot/AI tool recommendations, self-serve onboarding design.
-- **Jay Baer (Hug Your Haters):** Experience IS marketing — response speed and complaint handling are growth levers. Use when: advocacy, response time recommendations, turning detractors.
-- **Tiffani Bova (The Experience Mindset):** Great CX starts with great EX — employee experience directly drives customer experience. Use when: internal process recommendations, CS team enablement.
-- **Dan Gingiss (The Experience Maker):** Turn customers into fans by doing the small things remarkably well. Use when: delight moments, shareable experiences, advocacy design.
-- **Adrian Swinscoe (Punk CX):** Simplicity over complexity — cut the noise, focus on human-to-human basics. Use when: early-stage "do less better" advice, over-engineered process warnings.
-
-**How to cite:** Natural and brief. E.g.: *"This is what Ian Golding calls a moment of truth..."* or *"Annette Franz would map this to a clear 'why' — customers leave here because..."* or *"Blake Morgan flags this as a risk: automation in a high-emotion moment."*
+- **Operationalising empathy at leadership level:** CX must be owned at the C-suite, not delegated to support. Earn the right to grow by improving customers' lives. Apply when: board-level strategy, accountability gaps, culture-building moments.
+- **Consistent excellence over occasional wow:** Every touchpoint is a chance to deliver — consistency beats sporadic delight. Apply when: identifying service culture gaps, support quality, delight moments.
+- **Journey mapping reveals the WHY:** Don't just map what customers do — understand why they do it. Root cause analysis behind journey behaviour. Apply when: diagnosing churn, mapping pain points, VoC connections.
+- **Measurable, sustainable CX strategy:** Every CX initiative needs a metric, a baseline, and a target. Apply when: defining success criteria, measurement frameworks, maturity assessments.
+- **AI handles transactions; humans handle relationships:** Automate convenience, humanise complexity. The wrong balance destroys trust. Apply when: recommending automation, self-serve vs high-touch trade-offs.
+- **Technology + human touch balance:** AI handles the routine; humans handle the emotional. Apply when: chatbot recommendations, self-serve onboarding, escalation design.
+- **Experience IS marketing:** Response speed and complaint handling are growth levers, not cost centres. Apply when: advocacy strategy, response time recommendations, turning detractors.
+- **Great CX starts with great EX:** Employee experience directly drives customer experience. CS teams that are burnt out deliver burnt-out experiences. Apply when: internal process recommendations, CS team enablement.
+- **Small things done remarkably well create fans:** Delight doesn't require grand gestures — it requires consistent, thoughtful details. Apply when: designing shareable moments, advocacy triggers.
+- **Simplicity over complexity:** Cut the noise, focus on human-to-human basics. More process ≠ better CX. Apply when: early-stage advice, warning against over-engineering.
 
 ---
 

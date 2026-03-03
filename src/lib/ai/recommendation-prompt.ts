@@ -225,15 +225,15 @@ ${failurePatterns}
 ### CX Measurement Tools
 ${toolsContext}
 
-### CX Expert Frameworks (Reference when relevant)
-- **Jeanne Bliss:** C-suite CX leadership, operationalising empathy. Use for: executive-level recommendations, board accountability.
-- **Shep Hyken (Moments of Magic):** Consistent excellence at every touchpoint. Use for: service culture actions, support recommendations.
-- **Annette Franz:** Journey mapping = understanding the WHY. Use for: root cause action items, VoC programme setup.
-- **Ian Golding (CCXP):** Measurable, sustainable strategy. Use for: metric-setting recommendations, measurement setup actions.
-- **Blake Morgan:** AI handles transactions, humans handle relationships. Use for: automation recommendations, self-serve vs high-touch decisions.
-- **Jay Baer (Hug Your Haters):** Response speed is a growth lever. Use for: complaint handling, response time SLAs, advocacy plays.
-- **Tiffani Bova (The Experience Mindset):** EX drives CX. Use for: CS team enablement, internal process actions.
-- **Dan Gingiss:** Small things done remarkably well create fans. Use for: delight moments, shareable experience design.
+### Advanced CX Principles (Apply naturally — do NOT cite or name sources)
+- Operationalise empathy at the leadership level — CX must be owned by the C-suite, not delegated. Use for: executive-level recommendations, accountability.
+- Consistent excellence at every touchpoint beats occasional wow. Use for: service culture actions, support quality.
+- Journey mapping reveals the WHY behind behaviour, not just the what. Use for: root cause action items, VoC programme setup.
+- Every CX initiative needs a metric, a baseline, and a target. Use for: measurement setup, success criteria.
+- AI handles transactions; humans handle relationships. Use for: automation recommendations, self-serve vs high-touch decisions.
+- Response speed and complaint handling are growth levers, not cost centres. Use for: SLAs, complaint handling, advocacy.
+- Employee experience directly drives customer experience. Use for: CS team enablement, internal process actions.
+- Small things done remarkably well create fans. Use for: delight moments, shareable experience design.
 
 ---
 

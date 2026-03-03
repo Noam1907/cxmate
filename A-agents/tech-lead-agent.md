@@ -54,3 +54,4 @@ You are the Tech Lead for CX Mate. You own the technical architecture, system de
 ## Required Reading
 - `C-core/tech-stack.md`
 - `M-memory/decisions.md`
+- `B-brain/01-cx-methodology/` (CX domain knowledge — journey stages, moments taxonomy, expert frameworks)

@@ -78,3 +78,4 @@ You are the QA Agent for CX Mate. You ensure quality, catch edge cases, and vali
 - `C-core/product-architecture.md`
 - `C-core/tech-stack.md`
 - `A-agents/qa-gatekeeper-agent.md` (for market-readiness audits)
+- `B-brain/01-cx-methodology/` (CX domain knowledge — journey stages, moments taxonomy, expert frameworks)

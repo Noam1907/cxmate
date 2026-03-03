@@ -104,8 +104,11 @@ Every agent — whether it's the COO, a dev agent, or any specialist — MUST re
 5. `M-memory/decisions.md` — Why we built things the way we did
 6. `M-memory/learning-log.md` — Patterns, gotchas, things we've learned
 
-**Tier 3 — Read your own agent file:**
-7. Your agent-specific `.md` in `A-agents/` — your role, tools, responsibilities
+**Tier 3 — Domain knowledge (ALL agents):**
+7. `B-brain/01-cx-methodology/` — Journey stages, meaningful moments taxonomy, CX influencer frameworks. This is the CX expertise dataset. All agents must understand this — it informs AI prompts, product decisions, and UX design.
+
+**Tier 4 — Read your own agent file:**
+8. Your agent-specific `.md` in `A-agents/` — your role, tools, responsibilities
 
 ### Why This Matters
 - The product evolved massively since day 1. Files that are 2 days old may already be wrong.
@@ -127,3 +130,4 @@ Every agent — whether it's the COO, a dev agent, or any specialist — MUST re
 - `M-memory/sprint-log.md`
 - `M-memory/decisions.md`
 - `M-memory/learning-log.md`
+- `B-brain/01-cx-methodology/` (CX domain knowledge — journey stages, moments taxonomy, expert frameworks)

@@ -217,3 +217,4 @@ These are documented product decisions, not bugs:
 - `src/types/onboarding.ts` (the data contract)
 - `src/lib/ai/journey-prompt.ts` (journey generation context)
 - `src/lib/ai/recommendation-prompt.ts` (playbook generation context)
+- `B-brain/01-cx-methodology/` (CX domain knowledge — journey stages, moments taxonomy, expert frameworks)

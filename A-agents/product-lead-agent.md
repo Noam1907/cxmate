@@ -78,3 +78,4 @@ Enterprises with 1,000+ employees, dedicated CX teams, and massive budgets STILL
 - `C-core/product-architecture.md`
 - `M-memory/decisions.md`
 - `src/lib/cx-knowledge/enterprise-cx-maturity.ts`
+- `B-brain/01-cx-methodology/` (CX domain knowledge — journey stages, moments taxonomy, expert frameworks)

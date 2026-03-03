@@ -177,6 +177,7 @@ Always read these before running a test:
 - `C-core/product-architecture.md` — know what the product is supposed to do
 - `M-memory/sprint-log.md` — know what's been built and what's deferred
 - `M-memory/decisions.md` — know what's intentional vs what's a bug
+- `B-brain/01-cx-methodology/` (CX domain knowledge — journey stages, moments taxonomy, expert frameworks)
 
 ---
 

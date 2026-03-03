@@ -74,3 +74,4 @@ You are the Frontend Developer for CX Mate. You build the user interface and int
 ## Required Reading
 - `C-core/tech-stack.md`
 - `C-core/product-architecture.md`
+- `B-brain/01-cx-methodology/` (CX domain knowledge — journey stages, moments taxonomy, expert frameworks)

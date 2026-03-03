@@ -89,3 +89,4 @@ Build a deployment pipeline that lets the team ship multiple times per day with 
 - `C-core/tech-stack.md` (technology decisions)
 - `M-memory/decisions.md` (architecture decisions)
 - `M-memory/sprint-log.md` (what's been built and what's deployed)
+- `B-brain/01-cx-methodology/` (CX domain knowledge — journey stages, moments taxonomy, expert frameworks)

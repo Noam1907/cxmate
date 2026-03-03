@@ -141,3 +141,4 @@ You ESCALATE to the user:
 - `M-memory/decisions.md`
 - `M-memory/learning-log.md`
 - `A-agents/orchestrator-agent.md` (team structure)
+- `B-brain/01-cx-methodology/` (CX domain knowledge — journey stages, moments taxonomy, expert frameworks)

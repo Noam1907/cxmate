@@ -76,3 +76,4 @@ You are the Backend Developer for CX Mate. You build the API layer, database, an
 ## Required Reading
 - `C-core/tech-stack.md`
 - `M-memory/decisions.md`
+- `B-brain/01-cx-methodology/` (CX domain knowledge — journey stages, moments taxonomy, expert frameworks)

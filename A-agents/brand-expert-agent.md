@@ -196,3 +196,4 @@ After auditing all pages, deliver a **Brand Punch List**:
 - `M-memory/learning-log.md` (UX patterns and decisions)
 - `M-memory/decisions.md` (why things are built the way they are)
 - `src/app/globals.css` (current design tokens)
+- `B-brain/01-cx-methodology/` (CX domain knowledge — journey stages, moments taxonomy, expert frameworks)
