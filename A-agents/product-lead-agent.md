@@ -73,9 +73,59 @@ Enterprises with 1,000+ employees, dedicated CX teams, and massive budgets STILL
 - Would a founder with zero CX expertise understand this in 5 seconds?
 - Does this leverage AI in a way enterprises aren't? (only 13% have recommendation engines)
 
+## Competitive Feature Gap Map
+
+**Primary reference:** `B-brain/02-market-research/competitive-landscape.md`
+
+### What Competitors Do Poorly (Build These First)
+
+| Competitor Weakness | How Many Reviews Mention It | CX Mate Opportunity |
+|---|---|---|
+| Reporting rigidity (ChurnZero) | 87+ independent G2 mentions | Native journey-to-board-deck export |
+| Steep learning curve (all competitors) | Top complaint for all 4 | 1-conversation UX, no setup required |
+| Slow implementation (Gainsight 12-24 wks) | Widely documented | Minutes-not-months as core brand promise |
+| Analytics show "what" not "why" (Gainsight) | Qualitative pattern | Diagnosis-first recommendations |
+| Integration bugs (Planhat) | 55 G2 mentions | CRM-free by design (no integration required) |
+| No revenue data integration (Planhat) | Named dealbreaker | Revenue impact baked in from day one |
+| Data quality prerequisite (ChurnZero) | Critical — not disclosed pre-sale | Works from conversation data alone |
+| Post-merger fragmentation (Totango) | 3 separate subscriptions | Single coherent product |
+
+### Anti-Patterns — What NOT to Build (Competitor Failure Modes)
+
+1. **Admin-dependent complexity** (Gainsight's sin): Don't build features that require a dedicated ops person
+2. **Blank canvas overwhelm** (Planhat's sin): Always guide users through a structured path — never dump them into an empty workspace
+3. **Report-first, insight-second** (ChurnZero/Gainsight): Don't build dashboards that require BI tool exports for real insights
+4. **Split automation systems** (Gainsight's Rules Engine + Journey Orchestrator): Keep automation unified and simple
+5. **Integration-gated value** (ChurnZero's data prerequisite): Value must work before the CRM is connected
+
+### Feature Decisions Informed by Competitor Data
+
+**P0 — Build because competitors fail here:**
+- Journey Playbook as the output (not a dashboard) — competitors give dashboards, we give actions
+- Board-ready CX Report — competitors require BI exports; we auto-generate it
+- Revenue impact projections — 83% of enterprises can't do this; we do it at onboarding
+
+**P1 — Build as differentiator:**
+- Competitive CX Intelligence (Pro tier) — identify competitor journey weaknesses from G2/Capterra data
+- "48-hour nudge" moment template — proven 18% churn reduction in SaaS
+
+**P2 — Watch competitors, build if they fix their gaps:**
+- Health scoring — ChurnZero does this well; only build if we have real usage data
+- CSM workflow management — Totango SuccessBLOCs are solid; don't compete here
+
+### Market Reality Check (Competitive Context)
+
+- Gainsight's real TCO: $50K+ license + $10-50K implementation + $100K admin salary = $160K+ year one
+- ChurnZero effective pricing (after negotiation): $15-26K/year — not as cheap as they appear
+- Totango Starter: $249/month ($2,988/year) — the only publicly priced competitor
+- Planhat: $25-40K/year, unlimited seats — attractive for growing CS teams wanting company-wide access
+
+**Our price positioning:** Free tier + $79/month is radically cheaper at the same or better time-to-value.
+
 ## Required Reading
 - `C-core/project-brief.md`
 - `C-core/product-architecture.md`
 - `M-memory/decisions.md`
 - `src/lib/cx-knowledge/enterprise-cx-maturity.ts`
 - `B-brain/01-cx-methodology/` (CX domain knowledge — journey stages, moments taxonomy, expert frameworks)
+- `B-brain/02-market-research/competitive-landscape.md` (competitor weaknesses, feature gaps, pricing intelligence)

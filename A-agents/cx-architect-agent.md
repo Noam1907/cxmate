@@ -113,7 +113,55 @@ This data is critical context for everything you design. If enterprises are this
 - Always show the "what if" — the gap between current state and best practice
 - Reference: `src/lib/cx-knowledge/enterprise-cx-maturity.ts` for full structured data
 
+## Competitive Journey Intelligence
+
+**Primary reference:** `B-brain/02-market-research/competitive-landscape.md`
+
+### How Competitors Structure Journeys (Their Methodology)
+
+**Gainsight:**
+- Journey Orchestrator + Rules Engine (separate systems — confusing)
+- Color-coded health scorecards (Green/Yellow/Red)
+- Segment-based messaging: enterprise vs. SMB get different flows
+- Eats their own cooking (their CX is built on their own tools)
+- **Gap:** Analytics show "what" not "why" — reports for presentations, not diagnosis
+
+**ChurnZero:**
+- Milestone tracking + task automation + real-time alerts
+- AI Teammates (Q3 2025): autonomous multi-step task execution
+- Segmented onboarding intensity: enterprise, mid-market, tech-touch
+- CES measurement after every implementation project close
+- **Gap:** Reporting is Achilles heel — 87+ independent G2 mentions. Data-driven leaders must export to BI tools.
+
+**Totango:**
+- SuccessBLOC framework: pre-built composable workflow templates
+- Stage-based with KPI scorecards (time-in-onboarding, time-per-stage, CSAT)
+- 20-minute self-paced setup course
+- **Gap:** Post-merger fragmentation (Totango + Catalyst + Unison AI = three products). Journey coherence is broken.
+
+**Planhat:**
+- Customer-facing portals: collaborative success plans + transparency
+- Template-driven with defined value milestones
+- Cross-process: connects onboarding to sales handover, renewal, issue tracking
+- **Gap:** Integration reliability is "super buggy." No revenue data integration (dealbreaker for expansion teams).
+
+### CX Methodology Gaps We Fill (That Competitors Don't)
+
+1. **Pre-customer journey design:** All competitors assume you already have customers. CX Mate starts at stage zero.
+2. **Full lifecycle view:** Competitors focus post-sale. We map sales + customer + full lifecycle together.
+3. **Journey intentionality:** Competitors optimize existing journeys. We design intentional ones from scratch.
+4. **No CX team required:** All competitors require a CS team to run their tools. Our methodology works for the founder alone.
+5. **Revenue impact transparency:** 83% of enterprises can't prove CX ROI. We bake impact formulas into every recommendation.
+
+### When Designing Journeys — Differentiate From Competitor Patterns
+
+- Don't just give scorecards (Gainsight/ChurnZero) — give the *why* behind each score
+- Don't just give templates (Totango SuccessBLOCs) — give templates *calibrated to their specific business data*
+- Don't give a blank canvas (Planhat) — guide the user through a structured methodology they don't need expertise to follow
+- Don't separate automation systems (Gainsight's split Rules Engine + Journey Orchestrator) — every recommendation is a single coherent action
+
 ## Required Reading
 - `C-core/project-brief.md`
 - `B-brain/01-cx-methodology/`
 - `src/lib/cx-knowledge/enterprise-cx-maturity.ts`
+- `B-brain/02-market-research/competitive-landscape.md` (competitor methodology patterns, journey gaps)

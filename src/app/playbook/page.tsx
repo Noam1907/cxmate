@@ -11,6 +11,7 @@ import { track } from "@/lib/analytics";
 import { Check, ChartBar } from "@phosphor-icons/react";
 import { ExportPdfButton } from "@/components/ui/export-pdf-button";
 import { PrintCover } from "@/components/pdf/print-cover";
+import { SaveResultsBanner } from "@/components/ui/save-results-banner";
 
 // ─── Status ───────────────────────────────────────────────────────────────────
 
@@ -395,6 +396,9 @@ export default function PlaybookPage() {
           </div>
           <ExportPdfButton page="playbook" title={`${playbook.companyName} — CX Playbook`} />
         </div>
+
+        {/* Save banner — anonymous users only */}
+        <SaveResultsBanner isPreview={templateId === "preview"} companyName={playbook.companyName} />
 
         {/* Progress hero */}
         <div className="rounded-2xl bg-gradient-to-br from-slate-800 to-teal-900 text-white p-8 mb-8">

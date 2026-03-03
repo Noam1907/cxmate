@@ -15,6 +15,7 @@ import { PrintCover } from "@/components/pdf/print-cover";
 import { List, MapTrifold } from "@phosphor-icons/react";
 import { PageLoading } from "@/components/ui/page-loading";
 import { JourneyFeedbackChat } from "@/components/journey/journey-feedback-chat";
+import { SaveResultsBanner } from "@/components/ui/save-results-banner";
 
 type ViewMode = "cards" | "visual";
 
@@ -135,6 +136,9 @@ function JourneyContent() {
         </div>
         <ExportPdfButton page="journey" title={`${companyName || "CX Mate"} — Journey Map`} />
       </div>
+
+      {/* Save banner — anonymous users only */}
+      <SaveResultsBanner isPreview={templateId === "preview" || !templateId} companyName={companyName} />
 
       {/* View toggle */}
       <div className="text-center mb-6 space-y-4">

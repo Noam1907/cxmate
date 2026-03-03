@@ -109,6 +109,46 @@ CX Mate can be the best product in the world, but if nobody finds it, it doesn't
 4. **The solution:** CX Mate — AI co-pilot that delivers enterprise CX intelligence in 5 minutes
 5. **The proof:** Transparent impact projections, real math, actionable playbook
 
+## Competitive Positioning
+
+**Primary reference:** `B-brain/02-market-research/competitive-landscape.md`
+
+### Our Category Framing
+We are NOT a CS platform (Gainsight, ChurnZero, Totango, Planhat). We are a **journey design platform**. Competitors manage existing customers reactively. CX Mate designs the journey proactively — before problems happen.
+
+### Implementation Speed = Our #1 Weapon
+| Platform | Time to Value |
+|---|---|
+| Gainsight | 12-24 weeks (+ $100K admin) |
+| ChurnZero | 6-8 weeks |
+| Totango | 4-8 weeks |
+| **CX Mate** | **One conversation** |
+
+**Use this in every competitive context.** "Minutes, not months" is validated by real market data, not just a tagline.
+
+### Competitor Messaging Angles
+
+**vs. Gainsight:** "Gainsight is the enterprise standard — for enterprises. We give founders the same strategic intelligence without the 24-week implementation or dedicated admin hire."
+
+**vs. ChurnZero:** "ChurnZero is great for CSMs already managing accounts. CX Mate maps your journey *before* problems happen — so there's less for your CSMs to fix."
+
+**vs. Totango/Planhat:** "These are workflow tools for CS teams. CX Mate works when you don't have a CS team yet — that's the whole point."
+
+### New Stats to Add to Copy (2026)
+| Stat | Copy Angle |
+|---|---|
+| 89% switched after poor experience — even with great product | "Your product isn't the problem. Your journey is." |
+| Aberdeen Group: journey management → 18x faster sales cycles, 3.5x referral revenue | Social proof for "why journeys matter" |
+| 23x more likely to acquire customers with structured decisions | ROI argument for moving from gut feel |
+| SMBs lose 1-9% revenue to operational fragmentation | Dollar hook: "How much is your broken journey costing you?" |
+| Gainsight's real implementation: 12-24 weeks (vs 8-week claim) | Speed comparison — always cite this when competing |
+
+### Anti-Patterns in Competitive Messaging
+- Do NOT compare feature-by-feature to Gainsight — we lose on features, win on fit
+- Do NOT mention "CS platform" — this frames us wrong for founders who don't have a CS team
+- Do NOT use "churn prevention" as the primary angle — pre-launch founders have no churn yet
+- DO use "journey design" as the primary category — universal across all 4 maturity stages
+
 ## Required Reading
 
 - `C-core/project-brief.md` (target customer, personas, positioning)
@@ -116,3 +156,4 @@ CX Mate can be the best product in the world, but if nobody finds it, it doesn't
 - `M-memory/decisions.md` (product decisions)
 - `src/lib/cx-knowledge/enterprise-cx-maturity.ts` (full structured data)
 - `B-brain/01-cx-methodology/` (CX domain knowledge — journey stages, moments taxonomy, expert frameworks)
+- `B-brain/02-market-research/competitive-landscape.md` (competitor positioning, vulnerabilities, messaging angles)

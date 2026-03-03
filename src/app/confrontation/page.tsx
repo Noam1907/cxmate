@@ -16,6 +16,7 @@ import { track } from "@/lib/analytics";
 import { ExportPdfButton } from "@/components/ui/export-pdf-button";
 import { PrintCover } from "@/components/pdf/print-cover";
 import { PageLoading } from "@/components/ui/page-loading";
+import { SaveResultsBanner } from "@/components/ui/save-results-banner";
 
 // ─── Confrontation Modes ────────────────────────────────────────────────────
 
@@ -457,6 +458,9 @@ function ConfrontationContent() {
             <ExportPdfButton page="cx_report" title={`${companyName || "CX Mate"} — CX Intelligence Report`} />
           </div>
         </div>
+
+        {/* Save banner — anonymous users only */}
+        <SaveResultsBanner isPreview={templateId === "preview" || !templateId} companyName={companyName} />
 
         {/* Stats — first thing visible, gives context before the money number */}
         <div className="mb-6">

@@ -9,6 +9,7 @@ import type { OnboardingInput } from "@/lib/validations/onboarding";
 import { buildEvidenceMap, getInsightAnnotations } from "@/lib/evidence-matching";
 import { track } from "@/lib/analytics";
 import { PageLoading } from "@/components/ui/page-loading";
+import { SaveResultsBanner } from "@/components/ui/save-results-banner";
 
 // ─── Data loading ─────────────────────────────────────────────────────────────
 
@@ -136,6 +137,9 @@ export default function DashboardPage() {
           <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-2">Dashboard</p>
           <h1 className="text-4xl font-bold tracking-tight text-slate-800">{companyName}</h1>
         </div>
+
+        {/* Save banner — anonymous users only */}
+        <SaveResultsBanner isPreview={tid === "preview"} companyName={companyName} />
 
         {/* Hero impact */}
         {jStats.hasImpactData && (

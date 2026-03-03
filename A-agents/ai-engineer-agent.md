@@ -92,7 +92,63 @@ You are the AI Engineer for CX Mate. You design and implement the intelligence l
 - **Competitive CX intelligence:** Enterprises struggle with "poor integration across systems" (49%) — we integrate intelligence from day one
 - **AI-generated QBR decks:** CX leadership is weak (only 10% "very strong") — we can auto-generate the reports leaders need
 
+## Competitive AI Intelligence
+
+**Primary reference:** `B-brain/02-market-research/competitive-landscape.md`
+
+### Where Competitors Are with AI (2026)
+
+**Gainsight:**
+- Horizon AI: CoPilot (natural language queries), Smart Summaries, Account Health AI
+- Predictive churn scoring built in (but notoriously "shows what, not why")
+- Rules Engine + Journey Orchestrator = separate systems, neither is AI-native
+- **Gap:** Their AI is retrofitted onto old architecture. Still requires dedicated admin to configure.
+
+**ChurnZero:**
+- AI Teammates (Q3 2025): autonomous multi-step task execution, proactive planning, in-platform assistance
+- AI-enhanced onboarding: analyzes customer data to personalize onboarding flows
+- Strong health scoring with product-usage integration
+- **Gap:** AI is strong for existing customer management, not for journey design. Reporting still requires human BI exports.
+
+**Totango:**
+- Unison AI: third product line (separate subscription from Totango and Catalyst)
+- Post-merger fragmentation means AI is disconnected from the core workflow
+- **Gap:** Three products, three AIs, no coherent intelligence layer.
+
+**Planhat:**
+- Limited AI features publicly documented
+- Data modeling is strong, but AI intelligence layer is thin
+- **Gap:** Buggy integrations mean AI outputs are only as good as broken data feeds.
+
+### Where CX Mate Leapfrogs
+
+1. **Journey-first AI, not CS-management AI:** Competitors use AI to manage existing customers. We use AI to design the journey before customers arrive. Different problem, different value.
+
+2. **One conversation → full map:** No competitor delivers a complete journey + recommendations from a single conversation. They all require data imports, CRM connection, weeks of configuration.
+
+3. **Transparent impact math:** We calculate and show the revenue impact formula. Even ChurnZero (the #1 G2 CS platform) can't automatically connect journey moments to revenue. 83% of enterprises can't prove CX ROI — we do it at onboarding.
+
+4. **AI without prerequisites:** ChurnZero AI "fails with messy CRMs" (their top unclaimed pre-sale risk). CX Mate AI works from conversation data alone.
+
+### Competitive Intelligence as a Future AI Feature
+
+Based on the Vitally test (`O-output/competitor-intel-test-vitally.md`), we can deliver B/B+ quality competitor CX intelligence:
+
+- **Signal source:** G2/Capterra/Gartner Peer Insights review corpus (1,558+ reviews for ChurnZero alone = statistically reliable)
+- **High confidence:** Implementation timelines, top complaint patterns, CX vulnerability identification
+- **Lower confidence:** Exact pricing (Vendr estimates), internal onboarding details (marketing-only)
+- **Build when:** Pro tier is shipping. Position as "Identify competitor CX weaknesses based on real customer feedback."
+- **Do NOT promise:** Exact pricing, proprietary competitor data, real-time monitoring. Promise synthesis and pattern-matching.
+
+### Prompt Implications from Competitive Research
+
+- **Add "48-hour login nudge" as a named moment template:** Aberdeen Group research shows this drives 18% churn reduction in SaaS — every SaaS onboarding journey should auto-include it
+- **Make diagnosis prominent:** Gainsight's biggest complaint is "shows what, not why." Our prompts must always explain *why* a moment matters, not just flag it
+- **Revenue integration signals:** When generating playbooks, always include an explicit revenue impact estimate — this is the gap 83% of enterprises can't fill, and it's our strongest differentiator
+- **Agentic AI benchmarks to include in prompts:** AI agents resolve 80% of FAQs, reduce churn 20% via predictive scoring, 4x sales win rate improvement — use these as benchmark references in recommendations
+
 ## Required Reading
 - `C-core/tech-stack.md`
 - `B-brain/01-cx-methodology/`
 - `src/lib/cx-knowledge/enterprise-cx-maturity.ts`
+- `B-brain/02-market-research/competitive-landscape.md` (competitor AI capabilities, positioning vs our intelligence layer)

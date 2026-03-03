@@ -2,64 +2,60 @@
 
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { FileText, Sparkle, Lightning, GraduationCap, ShieldCheck, Users } from "@phosphor-icons/react";
+import { FileText, Sparkle, Lightning } from "@phosphor-icons/react";
 
 function HeroSection() {
   return (
     <section className="relative overflow-hidden">
-      {/* Subtle grid background */}
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#e5e7eb_1px,transparent_1px),linear-gradient(to_bottom,#e5e7eb_1px,transparent_1px)] bg-[size:4rem_4rem] opacity-30" />
       <div className="absolute inset-0 bg-gradient-to-b from-white via-transparent to-white" />
 
-      <div className="relative max-w-5xl mx-auto px-6 pt-24 pb-20 text-center">
+      <div className="relative max-w-4xl mx-auto px-6 pt-24 pb-20 text-center">
         {/* Pill badge */}
         <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/8 border border-primary/15 mb-8">
           <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-          <span className="text-xs font-medium text-primary">AI-powered CX intelligence</span>
+          <span className="text-xs font-medium text-primary">Built on certified CX expert methodology</span>
         </div>
 
         {/* Headline */}
         <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-foreground leading-[1.08] mb-6">
-          Map your customer{" "}
+          Stop building your customer{" "}
           <span className="text-primary">journey</span>
           <br className="hidden sm:block" />
-          in minutes, not months
+          by accident.
         </h1>
 
-        {/* Subheadline */}
-        <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed mb-12">
-          Tell us your company name and CX Mate does the rest — analyzes your business,
-          maps the entire customer lifecycle, and gives you a playbook
-          your team can execute this week.
+        {/* Subheadline — the copy the user loves, now in the hero */}
+        <p className="text-lg sm:text-xl text-muted-foreground max-w-xl mx-auto leading-relaxed mb-10">
+          Your customers have a journey — whether you designed it or not.
+          Find out what it looks like and where to improve it.
         </p>
 
-        {/* CTA cluster */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">
-          <Link href="/onboarding">
-            <Button size="lg" className="rounded-xl px-10 py-7 text-lg font-semibold shadow-lg hover:shadow-xl transition-all">
-              Map Your Customer Journey
-            </Button>
-          </Link>
-        </div>
-        <p className="text-sm text-muted-foreground mb-10">
+        {/* CTA */}
+        <Link href="/onboarding">
+          <Button size="lg" className="rounded-xl px-10 py-7 text-lg font-semibold shadow-lg hover:shadow-xl transition-all">
+            Get Your Action Playbook
+          </Button>
+        </Link>
+        <p className="text-sm text-muted-foreground mt-4 mb-10">
           One conversation. No setup required.
         </p>
 
-        {/* Quantified value strip */}
-        <div className="flex items-center justify-center gap-8 sm:gap-12 py-6 px-8 rounded-2xl bg-slate-50 border max-w-lg mx-auto">
+        {/* Value strip */}
+        <div className="flex items-center justify-center gap-8 sm:gap-12 py-5 px-8 rounded-2xl bg-slate-50 border max-w-md mx-auto">
           <div className="text-center">
-            <div className="text-2xl font-bold text-foreground">Minutes</div>
+            <div className="text-xl font-bold text-foreground">Minutes</div>
             <div className="text-xs text-muted-foreground mt-0.5">Not months</div>
           </div>
-          <div className="w-px h-8 bg-border" />
+          <div className="w-px h-7 bg-border" />
           <div className="text-center">
-            <div className="text-2xl font-bold text-foreground">50+</div>
+            <div className="text-xl font-bold text-foreground">50+</div>
             <div className="text-xs text-muted-foreground mt-0.5">Moments mapped</div>
           </div>
-          <div className="w-px h-8 bg-border" />
+          <div className="w-px h-7 bg-border" />
           <div className="text-center">
-            <div className="text-2xl font-bold text-foreground">CCXP</div>
-            <div className="text-xs text-muted-foreground mt-0.5">Expert methodology</div>
+            <div className="text-xl font-bold text-foreground">Expert</div>
+            <div className="text-xs text-muted-foreground mt-0.5">CX methodology</div>
           </div>
         </div>
       </div>
@@ -72,92 +68,46 @@ function HowItWorksSection() {
     {
       number: "01",
       title: "Tell us about your business",
-      description:
-        "Answer a few questions about your company, customers, and goals. Our AI adapts to your maturity stage.",
+      description: "One conversation — your stage, your customers, your biggest challenges. CX Mate adapts to where you are.",
       icon: <FileText size={24} weight="duotone" />,
     },
     {
       number: "02",
-      title: "AI maps your journey",
-      description:
-        "CX Mate generates a complete customer journey with stages, meaningful moments, and risk analysis.",
+      title: "We map everything",
+      description: "50+ meaningful moments across your customer lifecycle, analyzed against real CX methodology.",
       icon: <Sparkle size={24} weight="duotone" />,
     },
     {
       number: "03",
-      title: "Get your playbook",
-      description:
-        "Receive prioritized actions with templates, timelines, and expected outcomes your team can start executing immediately.",
+      title: "You get a playbook",
+      description: "Prioritized actions with templates and expected outcomes. Not theory — what to do this week.",
       icon: <Lightning size={24} weight="duotone" />,
     },
   ];
 
   return (
     <section className="bg-white border-y border-border/50">
-      <div className="max-w-5xl mx-auto px-6 py-20">
-        <div className="text-center mb-14">
+      <div className="max-w-5xl mx-auto px-6 py-16">
+        <div className="text-center mb-12">
           <p className="text-sm font-medium text-primary uppercase tracking-widest mb-3">How it works</p>
           <h2 className="text-3xl sm:text-4xl font-bold tracking-tight">
-            Three steps to better CX
+            One conversation. Your whole journey.
           </h2>
         </div>
 
         <div className="grid sm:grid-cols-3 gap-8 sm:gap-12">
           {steps.map((step) => (
-            <div key={step.number} className="relative">
-              {/* Step card */}
-              <div className="space-y-4">
-                <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-primary/8 text-primary">
-                  {step.icon}
-                </div>
-                <div className="flex items-baseline gap-3">
-                  <span className="text-xs font-bold text-primary/40 tracking-wider">{step.number}</span>
-                  <h3 className="text-lg font-semibold">{step.title}</h3>
-                </div>
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  {step.description}
-                </p>
+            <div key={step.number} className="space-y-3">
+              <div className="inline-flex items-center justify-center w-11 h-11 rounded-xl bg-primary/8 text-primary">
+                {step.icon}
               </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function SocialProofSection() {
-  const proofs = [
-    {
-      icon: <GraduationCap size={20} weight="duotone" />,
-      title: "CCXP methodology",
-      description: "Built on frameworks used by certified CX professionals worldwide.",
-    },
-    {
-      icon: <ShieldCheck size={20} weight="duotone" />,
-      title: "Industry benchmarks",
-      description: "Every recommendation is grounded in real performance data from your vertical.",
-    },
-    {
-      icon: <Users size={20} weight="duotone" />,
-      title: "Made for lean teams",
-      description: "Designed for startups and SMBs without a dedicated CX department.",
-    },
-  ];
-
-  return (
-    <section className="bg-background">
-      <div className="max-w-5xl mx-auto px-6 py-16">
-        <div className="grid sm:grid-cols-3 gap-8">
-          {proofs.map((proof) => (
-            <div key={proof.title} className="flex items-start gap-3">
-              <div className="shrink-0 w-10 h-10 rounded-xl bg-primary/8 text-primary flex items-center justify-center">
-                {proof.icon}
+              <div className="flex items-baseline gap-2">
+                <span className="text-xs font-bold text-primary/40 tracking-wider">{step.number}</span>
+                <h3 className="text-base font-semibold">{step.title}</h3>
               </div>
-              <div>
-                <h3 className="text-sm font-semibold text-foreground">{proof.title}</h3>
-                <p className="text-sm text-muted-foreground mt-1 leading-relaxed">{proof.description}</p>
-              </div>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                {step.description}
+              </p>
             </div>
           ))}
         </div>
@@ -169,55 +119,47 @@ function SocialProofSection() {
 function FeaturesSection() {
   const features = [
     {
-      title: "CX Intelligence Report",
-      description: "Honest gap analysis that shows what's really happening in your customer experience — the risks, the gaps, and the opportunities.",
-      badge: "Insights",
-      badgeColor: "bg-primary/8 text-primary border-primary/15",
+      title: "Where the real risks are hiding",
+      description: "The gaps your team doesn't see, quantified by revenue impact.",
+      badge: "CX Intelligence",
     },
     {
-      title: "Journey Map",
-      description: "A complete stage-by-stage journey with meaningful moments, emotional arcs, and severity ratings tailored to your business model.",
-      badge: "Visual",
-      badgeColor: "bg-primary/8 text-primary border-primary/15",
+      title: "Your whole journey, visualized",
+      description: "Every stage, every meaningful moment — mapped to your business model and maturity stage.",
+      badge: "Journey Map",
     },
     {
-      title: "Action Playbook",
-      description: "Prioritized recommendations with copy-paste templates, effort estimates, and ownership assignments. Not theory — execution.",
-      badge: "Actions",
-      badgeColor: "bg-primary/8 text-primary border-primary/15",
+      title: "What to do about it — this week",
+      description: "Prioritized actions with copy-paste templates. Not advice — execution.",
+      badge: "Action Playbook",
     },
     {
-      title: "Maturity Benchmarking",
-      description: "See where you stand compared to companies at your stage. Know exactly what to invest in now vs. later.",
-      badge: "Benchmark",
-      badgeColor: "bg-primary/8 text-primary border-primary/15",
+      title: "How you compare to companies like you",
+      description: "Benchmarked against companies at your exact stage. Invest in what matters now.",
+      badge: "Benchmarking",
     },
   ];
 
   return (
     <section className="bg-background">
-      <div className="max-w-5xl mx-auto px-6 py-20">
-        <div className="text-center mb-14">
+      <div className="max-w-5xl mx-auto px-6 py-16">
+        <div className="text-center mb-10">
           <p className="text-sm font-medium text-primary uppercase tracking-widest mb-3">What you get</p>
           <h2 className="text-3xl sm:text-4xl font-bold tracking-tight">
-            Everything you need to own your CX
+            From gut feel to clear direction.
           </h2>
-          <p className="text-muted-foreground mt-3 max-w-xl mx-auto">
-            Most startups fly blind on customer experience. CX Mate gives you
-            the analysis and actions that usually require a dedicated CX team.
-          </p>
         </div>
 
-        <div className="grid sm:grid-cols-2 gap-5">
+        <div className="grid sm:grid-cols-2 gap-4">
           {features.map((feature) => (
             <div
               key={feature.title}
-              className="group rounded-2xl border bg-white p-6 sm:p-8 hover:shadow-md transition-all duration-200"
+              className="rounded-2xl border bg-white p-6 hover:shadow-md transition-all duration-200"
             >
-              <span className={`inline-flex text-xs font-medium px-2.5 py-1 rounded-full border mb-4 ${feature.badgeColor}`}>
+              <span className="inline-flex text-xs font-medium px-2.5 py-1 rounded-full border bg-primary/8 text-primary border-primary/15 mb-3">
                 {feature.badge}
               </span>
-              <h3 className="text-lg font-semibold mb-2">{feature.title}</h3>
+              <h3 className="text-base font-semibold mb-1">{feature.title}</h3>
               <p className="text-sm text-muted-foreground leading-relaxed">
                 {feature.description}
               </p>
@@ -232,17 +174,16 @@ function FeaturesSection() {
 function BottomCTA() {
   return (
     <section className="bg-white border-t border-border/50">
-      <div className="max-w-3xl mx-auto px-6 py-20 text-center">
-        <h2 className="text-3xl sm:text-4xl font-bold tracking-tight mb-4">
+      <div className="max-w-2xl mx-auto px-6 py-16 text-center">
+        <h2 className="text-3xl sm:text-4xl font-bold tracking-tight mb-3">
           Stop guessing. Start mapping.
         </h2>
-        <p className="text-lg text-muted-foreground mb-8 max-w-xl mx-auto">
-          Your customers have a journey — whether you designed it or not.
-          Find out what it looks like and where to improve it.
+        <p className="text-muted-foreground mb-8">
+          Find out what your customers actually experience — and exactly what to fix first.
         </p>
         <Link href="/onboarding">
           <Button size="lg" className="rounded-xl px-8 py-6 text-base font-semibold shadow-lg hover:shadow-xl transition-all">
-            Map Your Customer Journey
+            Get Your Action Playbook
           </Button>
         </Link>
         <p className="text-xs text-muted-foreground mt-4">
@@ -264,7 +205,7 @@ function Footer() {
           <span className="text-sm font-bold tracking-tight text-foreground">CX Mate</span>
         </div>
         <p className="text-xs text-muted-foreground">
-          Like having a CX expert on your team — powered by AI
+          The CX foundation every B2B company needs — before they realize they need it.
         </p>
       </div>
     </footer>
@@ -274,7 +215,6 @@ function Footer() {
 export default function Home() {
   return (
     <main className="min-h-screen bg-background">
-      {/* Top nav bar for landing page */}
       <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-border/60">
         <div className="max-w-5xl mx-auto px-6 flex items-center justify-between h-14">
           <div className="flex items-center gap-2">
@@ -298,7 +238,6 @@ export default function Home() {
 
       <HeroSection />
       <HowItWorksSection />
-      <SocialProofSection />
       <FeaturesSection />
       <BottomCTA />
       <Footer />

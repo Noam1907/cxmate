@@ -120,6 +120,17 @@ Key validated stats for use in impact projections, prompts, and messaging (sourc
 
 ---
 
+### 2026-03-03 — Homepage Messaging Overhaul
+
+- **"Intentionality" is the universal ICP hook.** Options A ("you're losing customers") and B ("know where customers drop off") both exclude pre-launch founders with no customers yet. The angle that works across all 4 maturity stages is about whether the journey was *designed* or just *happened*. This tension exists at 0 customers and at 500+. Both Gemini and ChatGPT converged on this independently.
+- **Winning headline:** "Stop building your customer journey by accident." — imperative, confrontational, universal. Works for pre-launch ("I want to design it right") and scaling ("our journey became an accidental mess").
+- **"Get Your Action Playbook" beats "Map Your Journey" as CTA.** Mapping is the process; the playbook is the prize. Always name the outcome, not the process.
+- **CCXP in the pill badge is a feature, not a bug for scaling companies.** Initially flagged as jargon — but Gemini pointed out it signals authority to 600-person COOs who might otherwise see CX Mate as a "lite" startup tool. Keep it.
+- **When fixing copy, validate across ALL ICP stages.** The stage-based ICP (pre-launch → scaling) creates a constraint that most SaaS copy ignores. Before shipping any hero messaging, check: does this land for a founder with zero customers AND a COO with 500?
+- **Voice DNA is ahead of the product.** The "your customers have a journey whether you designed it or not" line was already in voice-dna.md. We wrote the right answer months ago and shipped the wrong headline. Read the brand documents before writing new copy.
+
+---
+
 ## Version History
 
 | Date | Update | By |
