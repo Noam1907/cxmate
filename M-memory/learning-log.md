@@ -112,6 +112,14 @@ Key validated stats for use in impact projections, prompts, and messaging (sourc
 
 ---
 
+### 2026-03-03 — Copy Integrity: Kill False Claims Early
+
+- **Never claim a specific minute count for time-to-value.** "5 minutes" was everywhere — landing page, project brief, knowledge base, dashboard — but generation alone takes ~4 min. Claiming 5 min total undermines trust with the exact founders who will time it. Replace with "in minutes, not months" (external copy) or "one conversation" (product-internal). The comparison that matters is weeks/months, not other minute counts.
+- **Agents should be proactive, not ask for permission on clear calls.** When the copywriter recommends an option and explains why, the COO should execute — not present 3 options and wait. The team can work alone. Make the call, update the files, move on. Escalate only when the decision is genuinely ambiguous or involves scope/cost.
+- **When fixing copy, grep the entire codebase.** A brand claim lives in more places than you think — landing page, dashboard empty state, knowledge base strings that feed AI prompts, agent skill files, core docs. One grep catches them all.
+
+---
+
 ## Version History
 
 | Date | Update | By |

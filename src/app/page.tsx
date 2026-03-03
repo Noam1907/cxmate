@@ -20,7 +20,7 @@ function HeroSection() {
           Map your customer{" "}
           <span className="text-primary">journey</span>
           <br className="hidden sm:block" />
-          in under 5 minutes
+          in minutes, not months
         </h1>
 
         {/* Subheadline */}
@@ -39,14 +39,14 @@ function HeroSection() {
           </Link>
         </div>
         <p className="text-sm text-muted-foreground mb-10">
-          Results in under 5 minutes. No setup required.
+          One conversation. No setup required.
         </p>
 
         {/* Quantified value strip */}
         <div className="flex items-center justify-center gap-8 sm:gap-12 py-6 px-8 rounded-2xl bg-slate-50 border max-w-lg mx-auto">
           <div className="text-center">
-            <div className="text-2xl font-bold text-foreground">5 min</div>
-            <div className="text-xs text-muted-foreground mt-0.5">Setup time</div>
+            <div className="text-2xl font-bold text-foreground">Minutes</div>
+            <div className="text-xs text-muted-foreground mt-0.5">Not months</div>
           </div>
           <div className="w-px h-8 bg-border" />
           <div className="text-center">
@@ -215,7 +215,7 @@ function BottomCTA() {
           </Button>
         </Link>
         <p className="text-xs text-muted-foreground mt-4">
-          5 minutes. No setup required.
+          One conversation. No setup required.
         </p>
       </div>
     </section>

@@ -4,7 +4,7 @@
 
 CX Mate is an AI-powered CX orchestration platform — like having a CCXP-certified CX expert on your team, powered by AI.
 
-It maps your entire customer journey, surfaces the moments that make or break your business, connects every insight back to your real data, and gives you a step-by-step playbook to act on — all in under 5 minutes.
+It maps your entire customer journey, surfaces the moments that make or break your business, connects every insight back to your real data, and gives you a step-by-step playbook to act on — all in minutes, not months.
 
 ## The Problem
 
@@ -78,7 +78,7 @@ CX Mate wins by being the **smartest path to a CX strategy**. Not the most power
 
 | Metric | Target |
 |--------|--------|
-| Time to first journey map | < 5 minutes |
+| Time to first journey map | < 10 minutes |
 | Journey relevance score | > 80% rated useful |
 | Recommendation actionability | > 40% implemented in 30 days |
 | Beta user retention | > 60% active after 30 days |

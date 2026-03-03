@@ -168,7 +168,7 @@ export const CX_OBSTACLES = {
     label: "Inconsistent executive buy-in",
     percent: 41,
     smbContext:
-      "At SMBs, the exec IS the founder. If they don't see value in 5 minutes, CX is dead.",
+      "At SMBs, the exec IS the founder. If they don't see value quickly, CX is dead.",
   },
   limitedBudget: {
     label: "Limited budget / resources",
@@ -266,7 +266,7 @@ export const CX_LEADERSHIP = {
     ceoVeryStrongly_leaders: 38,
     ceoVeryStrongly_laggards: 15,
     insight:
-      "CX leaders are 2.5x more likely to have strong CEO champions. For SMBs, the founder IS the CEO — if CX Mate can convince the founder in 5 minutes, the whole company aligns.",
+      "CX leaders are 2.5x more likely to have strong CEO champions. For SMBs, the founder IS the CEO — if CX Mate can convince the founder in one conversation, the whole company aligns.",
   },
   cxCoordination: {
     centralized: 28,
@@ -345,7 +345,7 @@ export const CX_MATE_THESIS = {
     They have no CX team, no CX budget, no CX tools, and no CX methodology.
 
     CX Mate is the AI co-pilot that gives SMBs enterprise-grade CX intelligence
-    in 5 minutes, for a fraction of the cost, with zero CX expertise required.
+    in minutes — not months — for a fraction of the cost, with zero CX expertise required.
 
     The market validates this: journey mapping software is projected to grow from
     $16.8B to $76.2B by 2035, with SMBs representing 56.8% of the market.

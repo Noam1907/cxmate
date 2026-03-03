@@ -218,7 +218,7 @@ Every user gets a "Open in NotebookLM" button alongside Export PDF. CX Mate expo
 
 ## Core Product Principles
 
-1. **5-minute onboarding** — Value in under 5 minutes, every time
+1. **Fast onboarding** — Value in minutes, not months
 2. **Journey-first** — Everything builds from the journey map
 3. **Evidence-based** — Every insight connects back to user input
 4. **Maturity-adaptive** — Map what matters now, at their level

@@ -104,7 +104,7 @@ export default function DashboardPage() {
         <div className="text-center space-y-5 max-w-md">
           <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest">Dashboard</p>
           <h1 className="text-3xl font-bold tracking-tight text-slate-900">Welcome to CX Mate</h1>
-          <p className="text-slate-500 leading-relaxed">Tell us about your business. In under 5 minutes, you&apos;ll have a complete CX journey map, intelligence report, and actionable playbook.</p>
+          <p className="text-slate-500 leading-relaxed">Tell us about your business. In minutes, you&apos;ll have a complete CX journey map, intelligence report, and actionable playbook.</p>
           <Link href="/onboarding">
             <Button size="lg" className="mt-2">Start Onboarding</Button>
           </Link>
