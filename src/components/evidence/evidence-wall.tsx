@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import type { EvidenceMap, PainPointMapping, CompetitorMapping } from "@/lib/evidence-matching";
+import type { EvidenceMap, PainPointMapping } from "@/lib/evidence-matching";
 
 // ============================================
 // Pain Point Card
@@ -111,66 +111,6 @@ function PainPointCard({ mapping }: { mapping: PainPointMapping }) {
 }
 
 // ============================================
-// Competitor Card
-// ============================================
-
-function CompetitorCard({ mapping }: { mapping: CompetitorMapping }) {
-  const [expanded, setExpanded] = useState(false);
-  const totalMentions = mapping.mentionedInInsights.length + mapping.differentiationMoments.length;
-
-  return (
-    <div
-      className={`rounded-lg border p-3 cursor-pointer transition-all hover:shadow-sm ${
-        totalMentions > 0 ? "border-orange-200 bg-orange-50/50" : "border-slate-200 bg-slate-50/50"
-      }`}
-      onClick={() => setExpanded(!expanded)}
-    >
-      <div className="flex items-start justify-between gap-2">
-        <div className="flex-1">
-          <span className="text-sm font-medium">{mapping.competitor}</span>
-          {totalMentions > 0 ? (
-            <p className="text-xs text-orange-600 mt-1">
-              {mapping.differentiationMoments.length} differentiation opportunity
-              {mapping.differentiationMoments.length !== 1 ? "s" : ""}
-            </p>
-          ) : (
-            <p className="text-xs text-slate-400 mt-1">Used as context for journey analysis</p>
-          )}
-        </div>
-        {totalMentions > 0 && (
-          <span className="text-xs text-muted-foreground shrink-0">
-            {expanded ? "\u2212" : "+"}
-          </span>
-        )}
-      </div>
-
-      {expanded && mapping.differentiationMoments.length > 0 && (
-        <div className="mt-3 pt-2 border-t border-orange-200/50">
-          <div className="text-xs font-semibold text-orange-700 uppercase tracking-wide mb-1">
-            Where you can win
-          </div>
-          <div className="space-y-1.5">
-            {mapping.differentiationMoments.map((m, i) => (
-              <div key={i} className="text-xs text-slate-600">
-                <div className="flex items-center gap-1.5">
-                  <span className="w-1 h-1 rounded-full bg-orange-400 shrink-0" />
-                  <span className="font-medium">{m.stage}</span>
-                  <span className="text-slate-400">&rarr;</span>
-                  <span>{m.moment}</span>
-                </div>
-                {m.context && (
-                  <p className="text-xs text-slate-500 ml-3 mt-0.5 italic">{m.context}</p>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
-// ============================================
 // Evidence Wall
 // ============================================
 
@@ -183,11 +123,10 @@ export function EvidenceWall({
   companyName: string;
   biggestChallenge?: string;
 }) {
-  const { painPointMappings, competitorMappings, biggestChallengeMapping, coverage } = evidenceMap;
+  const { painPointMappings, biggestChallengeMapping, coverage } = evidenceMap;
   const hasPainPoints = painPointMappings.length > 0;
-  const hasCompetitors = competitorMappings.length > 0;
 
-  if (!hasPainPoints && !hasCompetitors && !biggestChallenge) {
+  if (!hasPainPoints && !biggestChallenge) {
     return null;
   }
 
@@ -246,24 +185,9 @@ export function EvidenceWall({
         </div>
       )}
 
-      {/* Competitive intelligence — only show if actual insights exist */}
-      {hasCompetitors && coverage.competitorMentions > 0 && (
-        <div>
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="text-sm font-semibold">Competitive intelligence</h3>
-            <span className="text-xs text-orange-600">
-              {coverage.competitorMentions} insight{coverage.competitorMentions !== 1 ? "s" : ""}
-            </span>
-          </div>
-          <div className="grid gap-4 sm:grid-cols-2">
-            {competitorMappings
-              .filter((m) => m.mentionedInInsights.length > 0 || m.differentiationMoments.length > 0)
-              .map((mapping) => (
-                <CompetitorCard key={mapping.competitor} mapping={mapping} />
-              ))}
-          </div>
-        </div>
-      )}
+      {/* Competitive intelligence — removed for now. Shallow string matching
+         produced hollow insights. Will rebuild with real competitor CX analysis
+         as a Pro feature (Competitive CX Intelligence on roadmap). */}
     </div>
   );
 }
