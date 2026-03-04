@@ -74,7 +74,7 @@ export async function POST(request: Request) {
 
     const resend = new Resend(resendKey);
     const { error } = await resend.emails.send({
-      from: "CX Mate Alerts <alerts@cx-mate.com>",
+      from: "CX Mate Alerts <onboarding@resend.dev>",
       to: toEmail,
       subject,
       html,

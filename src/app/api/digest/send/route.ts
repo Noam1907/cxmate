@@ -47,7 +47,7 @@ export async function POST(request: Request) {
   // ─── Send via Resend ──────────────────────────────────────────────────────
   const resend = new Resend(resendKey);
   const { error } = await resend.emails.send({
-    from: "CX Mate Digest <digest@cx-mate.com>",
+    from: "CX Mate Digest <onboarding@resend.dev>",
     to: toEmail,
     subject: `CX Mate Daily Digest — ${today}`,
     html,
