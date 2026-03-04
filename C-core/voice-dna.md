@@ -162,6 +162,38 @@ Don't say "data-driven decisions." Say "train your instincts." SMB founders trus
 
 ---
 
+## How to Write About the AI Layer
+
+CX Mate is AI-powered — but *how* we describe that matters enormously. Wrong framing makes us sound like every other "AI-powered" SaaS. Right framing makes us sound like a CX expert who happened to bring their intelligence system.
+
+### What to say (the behind-the-scenes that earns trust)
+
+| Weak framing | Strong framing |
+|-------------|---------------|
+| "AI-generated recommendations" | "Reasoned from your specific journey and risks — not a template" |
+| "Personalized to your company" | "Built around the tools you already use, plus what you're missing" |
+| "Export your playbook" | "Open in NotebookLM — turn this into a board deck, onboarding doc, or QBR in minutes" |
+| "Powered by Claude" | Mention CCXP methodology and measurement baked in — the model is implementation detail |
+| "Templates included" | Never say "templates" — it reads as Word docs. Say "AI-generated assets" or "ready to extend with any AI tool" |
+
+### The 4 AI signals that create the aha moment
+
+When users ask "how is this different from Gemini?", they need to *feel* the answer in the product — not just read it. These 4 signals do that work:
+
+1. **"Wiring in: [their tool]"** — Showing the user's HubSpot/Intercom on the loading screen proves we read what they told us.
+2. **Measurement per stage** — NPS/CSAT/CES checkpoints aren't something you'd think to ask for. When they see it, they feel the methodology depth.
+3. **Evidence annotations** — "From your input: customers leaving without warning" tied to specific recommendations proves the journey is *theirs*, not generic.
+4. **NotebookLM/AI export** — This reframes CX Mate as an intelligence layer that feeds other AI tools, not a standalone SaaS.
+
+### Never write copy that sounds like a prompt
+
+Bad: "AI analyzes your business and generates a personalized customer journey map."
+Good: "We looked at [Company] before you answered a single question. Here's what we found — and here's where your journey has gaps."
+
+The AI should feel invisible until it surfaces something the founder didn't expect. Then it should feel like magic.
+
+---
+
 ## Anti-Patterns to Flag
 
 When reviewing copy, flag anything that:

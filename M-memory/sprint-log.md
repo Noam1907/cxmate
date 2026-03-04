@@ -325,6 +325,27 @@ Track sprint progress and status.
 
 ---
 
+## Session — 2026-03-04 (Design Sprint — Sage Background + Logo Mark)
+
+### Completed this session
+- **Sage background propagated to all inner pages** — Changed `--background` CSS variable in `globals.css` to sage (`oklch(0.928 0.013 148)` = `#E8EDE5`). Added `--color-sage` token. Removed explicit `bg-white` overrides from all page-level containers: confrontation, playbook, journey, pricing, dashboard. Cards stay white intentionally for depth/lift. Print CSS unchanged — still forces `background: white !important` for PDF export.
+- **Nav header updated** — `bg-white` → `bg-background` (picks up sage). Border softened to `border-slate-200/70`. Hover: `hover:bg-slate-100/60`.
+- **Shared LogoMark component** (`src/components/ui/logo-mark.tsx`) — Journey arc SVG, white on teal `#0D9488`, 3 size-progressive nodes. Sizes: `sm` (w-6/13px), `md` (w-8/18px), `lg` (w-10/22px). Replaces old "CX" text square everywhere.
+- **Dashboard empty state redesigned** — From flat centered text to headline + 3 output preview cards (Journey Map / CX Report / CX Sprint with custom SVG icons) + "Map my customer journey →" CTA.
+- **5-agent logo poll** — 3 Nano Banana generated logos reviewed. #3 (bold exponential arc + size-progressive nodes in teal rounded-square) won 4-1. Brand Expert dissented.
+- **LogoMark SVG finalized** — Exponential cubic bezier `d="M 4 18 C 4.5 13 13 7.5 18 4"`, nodes r=2.0 / r=2.8 / r=3.8, strokeWidth=2.2. Path first so nodes sit on top. Committed + pushed (`e7909fc`).
+
+### Files changed
+- `src/app/globals.css`, `src/components/nav-header.tsx`, `src/components/ui/logo-mark.tsx` (created), `src/app/page.tsx`, `src/app/dashboard/page.tsx`, `src/app/confrontation/page.tsx`, `src/app/playbook/page.tsx`, `src/app/journey/page.tsx`, `src/app/pricing/page.tsx`
+
+### Next session starts with
+- Revenue Protected counter on Dashboard (starts $0, grows with playbook completion — benchmark-based)
+- Playbook persistence to Supabase (Phase 4)
+- Full regression QA / gatekeeper audit before next demo
+- Journey health scoring (P1)
+
+---
+
 ## Session — 2026-03-02 (Strategic / Design Session)
 
 ### Completed this session

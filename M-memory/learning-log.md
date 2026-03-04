@@ -145,6 +145,31 @@ Key validated stats for use in impact projections, prompts, and messaging (sourc
 
 ---
 
+### 2026-03-04 — Competitive Positioning: The Gemini Question
+
+- **"Why can't I just use Gemini?" is the most important objection to be ready for.** Every beta user will ask it, consciously or not. The answer is NOT "our AI is better." The answer is: raw LLMs don't know which questions to ask about CX, don't have 33 structured intelligence fields as input, don't have CCXP methodology baked into the prompt, don't produce structured trackable output, and don't compound over time. The moat is the *input system*, not the model.
+- **The quality gap is entirely in the inputs, not the model.** A raw Gemini prompt gets a company name + vertical. CX Mate gets: maturity stage, pain points ranked, tech stack, existing processes, customer count, NPS history, competitors, goals — all structured. The AI does the same job with 10x better context.
+- **Structured output is itself a differentiator.** Gemini returns prose. CX Mate returns typed data (stages, moments with severity, insights with likelihood, recommendations with priority/effort/owner/timing). This structure powers: evidence matching, progress tracking, health scoring, revenue impact calculation. You cannot track a Google Doc.
+- **The copy should answer "why not Gemini?" implicitly, not explicitly.** The 4 aha-moment signals: (1) "Wiring in: [their tool]" on loading screen, (2) NPS/CSAT/CES checkpoints per stage, (3) Evidence annotations tied to their specific words, (4) NotebookLM export reframing CX Mate as an intelligence layer. Founders feel the answer before they ask the question.
+- **"Templates" is poison word.** "Email templates, scripts, and process docs" sounds like a Notion database from 2018. Replace with: "AI-generated assets, ready to extend in NotebookLM, Claude, or ChatGPT." The framing is *intelligence you can extend*, not *content you can copy*.
+- **NotebookLM export is a strategic framing move, not just a feature.** Positioning CX Mate as "intelligence that feeds other AI tools" means it becomes infrastructure, not a SaaS you can churn from. Once your journey data is in NotebookLM generating board decks, you don't leave.
+- **"The founder who can write a perfect CX prompt to Gemini already has a CX director."** This is the sharpest summary of the ICP — and it should be in every pitch. The entire market is everyone who doesn't know what they don't know about CX methodology.
+
+---
+
+### 2026-03-04 — Design System: Sage Background + Logo Mark Iteration
+
+- **CSS variables propagate everywhere — one change rules them all.** Changing `--background` in `:root` in `globals.css` is all it takes to shift every page in the app. Any `bg-white` override on a page-level container will fight the global variable and must be explicitly removed. Audit rule: grep for `bg-white` on `<main>` and outer `<div>` wrappers — cards staying white is intentional, page containers should not override.
+- **White cards on colored background = depth without complexity.** The sage `#E8EDE5` page background with white `bg-white` cards creates a clean two-tone hierarchy. The card appears to float. No shadows needed to create separation — color contrast does the work. Dark text stays readable, primary teal pops cleanly.
+- **Print CSS must be protected from global color changes.** `@media print` has `background: white !important` on body/main — this is intentional. Any change to `--background` will not affect PDF exports because the print override wins. Don't remove the `!important` or the PDF background will turn sage-colored.
+- **A shared SVG logo component beats inline definitions every time.** The old codebase had a `LogoMark` function defined inline in `page.tsx` and a separate "CX" text square in `nav-header.tsx`. Creating one shared `src/components/ui/logo-mark.tsx` with size variants (`sm`/`md`/`lg`) ensures every usage stays in sync. Rule: if a visual element appears in 2+ places, it becomes a component.
+- **Generative AI logo iteration needs a structured prompt, not a vibe.** The first logo prompt ("simple icon") produced generic output. The prompt that worked specified: exact container shape (rounded square, teal `#0D9488`), exact mark (3 nodes with size progression), exact curve behavior (exponential, NOT S-curve, single bezier), exact negatives (no texture, no text, no gradients, no letters), and named brand references (Linear, Loom, Pitch). Each rejected generation added one more constraint. Final prompt: 400+ words.
+- **Agent polling de-risks aesthetic decisions.** Running a 5-agent poll (COO, Design, Brand, Growth, Strategist) on 3 logo options turns a subjective call into a structured decision. Each agent brings a different lens: Growth asks "does it travel on dark backgrounds?", Design asks "is it geometric?", Brand asks "does it stand alone without text?". The vote surfaces genuine tradeoffs — not just "which one looks nice."
+- **SVG hand-coding: path first, circles second.** When SVG circles sit on a path, render order matters. If the path is rendered after the circles, it draws on top and occludes the nodes. Pattern: always put `<path>` before `<circle>` elements so nodes visually float above the arc.
+- **"Too simple / needs more soul" is a signal, not a request.** When Anat said "the result is too simple, something that has more soul" after seeing the flat sage dashboard, the right response was structural redesign (headline + 3 feature preview cards + CTA), not just adding visual polish. "Soul" means the page communicates product value through its structure, not just through color. Empty states are product pitches.
+
+---
+
 ## Version History
 
 | Date | Update | By |

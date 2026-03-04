@@ -139,42 +139,61 @@ export default function DashboardPage() {
 
           {/* Output preview cards */}
           <div className="grid grid-cols-3 gap-3 mb-10">
-            <div className="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-sm">
-              <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center mb-3">
-                <svg viewBox="0 0 20 20" width="18" height="18" fill="none">
-                  <circle cx="3" cy="16" r="2" fill="#0D9488" />
-                  <circle cx="10" cy="10" r="2" fill="#0D9488" />
-                  <circle cx="17" cy="4"  r="2" fill="#0D9488" />
-                  <path d="M3 16 C5.5 13.5 7.5 11.5 10 10 C12.5 8.5 14.5 6 17 4" stroke="#0D9488" strokeWidth="1.6" strokeLinecap="round" fill="none" />
-                </svg>
+
+            {/* Journey Map — teal */}
+            <div className="rounded-2xl border-2 p-5 shadow-lg" style={{ backgroundColor: "#E0F7F4", borderColor: "#0D9488" }}>
+              <div className="flex items-center gap-2 mb-3">
+                <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: "#99F6E4" }}>
+                  <svg viewBox="0 0 20 20" width="15" height="15" fill="none">
+                    <circle cx="3" cy="16" r="2" fill="#0D9488" />
+                    <circle cx="10" cy="10" r="2" fill="#0D9488" />
+                    <circle cx="17" cy="4"  r="2" fill="#0D9488" />
+                    <path d="M3 16 C5.5 13.5 7.5 11.5 10 10 C12.5 8.5 14.5 6 17 4" stroke="#0D9488" strokeWidth="1.6" strokeLinecap="round" fill="none" />
+                  </svg>
+                </div>
+                <span className="text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full" style={{ backgroundColor: "#99F6E4", color: "#134E4A" }}>Your Lifecycle</span>
               </div>
-              <p className="text-sm font-semibold text-slate-900 mb-1">Journey Map</p>
-              <p className="text-xs text-slate-500 leading-relaxed">Your full lifecycle, stage by stage — every moment that makes or breaks a customer</p>
+              <p className="text-sm font-bold text-slate-800 mb-1">Journey Map</p>
+              <p className="text-xs text-slate-600 leading-relaxed">Your full lifecycle, stage by stage — every moment that makes or breaks a customer</p>
+              <div className="mt-3 pt-2 border-t text-xs font-semibold" style={{ borderColor: "#0D9488", color: "#134E4A" }}>50+ meaningful moments</div>
             </div>
-            <div className="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-sm">
-              <div className="w-9 h-9 rounded-xl bg-rose-50 flex items-center justify-center mb-3">
-                <svg viewBox="0 0 20 20" width="18" height="18" fill="none">
-                  <rect x="3" y="10" width="3" height="8" rx="1.5" fill="#F43F5E" />
-                  <rect x="8.5" y="6" width="3" height="12" rx="1.5" fill="#F43F5E" />
-                  <rect x="14" y="2" width="3" height="16" rx="1.5" fill="#F43F5E" opacity="0.4" />
-                  <path d="M4 7 L9.5 4 L15 6" stroke="#F43F5E" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
+
+            {/* CX Report — rose */}
+            <div className="rounded-2xl border-2 p-5 shadow-lg" style={{ backgroundColor: "#FFF1F2", borderColor: "#F43F5E" }}>
+              <div className="flex items-center gap-2 mb-3">
+                <div className="w-8 h-8 rounded-lg bg-rose-100 flex items-center justify-center">
+                  <svg viewBox="0 0 20 20" width="15" height="15" fill="none">
+                    <rect x="3" y="10" width="3" height="8" rx="1.5" fill="#F43F5E" />
+                    <rect x="8.5" y="6" width="3" height="12" rx="1.5" fill="#F43F5E" />
+                    <rect x="14" y="2" width="3" height="16" rx="1.5" fill="#F43F5E" opacity="0.4" />
+                    <path d="M4 7 L9.5 4 L15 6" stroke="#F43F5E" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </div>
+                <span className="text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full" style={{ backgroundColor: "#FECDD3", color: "#881337" }}>Revenue Intel</span>
               </div>
-              <p className="text-sm font-semibold text-slate-900 mb-1">CX Report</p>
-              <p className="text-xs text-slate-500 leading-relaxed">Revenue at risk, failure patterns, and the 3 things most likely to kill your growth</p>
+              <p className="text-sm font-bold text-slate-800 mb-1">CX Report</p>
+              <p className="text-xs text-slate-600 leading-relaxed">Revenue at risk, failure patterns, and the 3 things most likely to kill your growth</p>
+              <div className="mt-3 pt-2 border-t border-rose-200 text-xs font-semibold text-rose-700">Quantified revenue impact</div>
             </div>
-            <div className="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-sm">
-              <div className="w-9 h-9 rounded-xl bg-amber-50 flex items-center justify-center mb-3">
-                <svg viewBox="0 0 20 20" width="18" height="18" fill="none">
-                  <rect x="3" y="2" width="14" height="16" rx="2" stroke="#D97706" strokeWidth="1.6" />
-                  <path d="M7 7h6M7 10h6M7 13h4" stroke="#D97706" strokeWidth="1.4" strokeLinecap="round" />
-                  <circle cx="15" cy="15" r="3.5" fill="#D97706" />
-                  <path d="M13.5 15l1 1 2-1.5" stroke="white" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
+
+            {/* CX Playbook — green */}
+            <div className="rounded-2xl border-2 p-5 shadow-lg" style={{ backgroundColor: "#DCFCE7", borderColor: "#16A34A" }}>
+              <div className="flex items-center gap-2 mb-3">
+                <div className="w-8 h-8 rounded-lg bg-green-100 flex items-center justify-center">
+                  <svg viewBox="0 0 20 20" width="15" height="15" fill="none">
+                    <rect x="3" y="2" width="14" height="16" rx="2" stroke="#16A34A" strokeWidth="1.6" />
+                    <path d="M7 7h6M7 10h6M7 13h4" stroke="#16A34A" strokeWidth="1.4" strokeLinecap="round" />
+                    <circle cx="15" cy="15" r="3.5" fill="#16A34A" />
+                    <path d="M13.5 15l1 1 2-1.5" stroke="white" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </div>
+                <span className="text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full" style={{ backgroundColor: "#BBF7D0", color: "#14532D" }}>Action Plan</span>
               </div>
-              <p className="text-sm font-semibold text-slate-900 mb-1">CX Playbook</p>
-              <p className="text-xs text-slate-500 leading-relaxed">AI-built action plan matched to your stack — with measurement checkpoints and assets you can extend in NotebookLM</p>
+              <p className="text-sm font-bold text-slate-800 mb-1">CX Playbook</p>
+              <p className="text-xs text-slate-600 leading-relaxed">AI-built, matched to your stack — measurement checkpoints and AI-ready exports for NotebookLM</p>
+              <div className="mt-3 pt-2 border-t border-green-200 text-xs font-semibold text-green-800">Week 1 quick wins ready</div>
             </div>
+
           </div>
 
           {/* CTA */}

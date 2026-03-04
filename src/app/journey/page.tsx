@@ -27,7 +27,7 @@ function JourneyContent() {
   const [companyName, setCompanyName] = useState<string>("");
   const [firstName, setFirstName] = useState<string>("");
   const [loading, setLoading] = useState(true);
-  const [viewMode, setViewMode] = useState<ViewMode>("cards");
+  const [viewMode, setViewMode] = useState<ViewMode>("visual");
 
   useEffect(() => {
     if (!loading && journey) {
@@ -141,18 +141,8 @@ function JourneyContent() {
       <SaveResultsBanner isPreview={templateId === "preview" || !templateId} companyName={companyName} />
 
       {/* View toggle */}
-      <div className="text-center mb-6 space-y-4">
+      <div className="flex items-center justify-between mb-6">
         <div className="inline-flex items-center rounded-lg border bg-secondary p-1 text-muted-foreground">
-          <button
-            onClick={() => setViewMode("cards")}
-            className={`inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition-all ${
-              viewMode === "cards"
-                ? "bg-background text-foreground shadow-sm"
-                : "hover:text-foreground"
-            }`}
-          >
-            <List size={16} weight="duotone" /> Detail View
-          </button>
           <button
             onClick={() => setViewMode("visual")}
             className={`inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition-all ${
@@ -161,9 +151,24 @@ function JourneyContent() {
                 : "hover:text-foreground"
             }`}
           >
-            <MapTrifold size={16} weight="duotone" /> Journey Map
+            <MapTrifold size={16} weight="duotone" /> Visual Timeline
+          </button>
+          <button
+            onClick={() => setViewMode("cards")}
+            className={`inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition-all ${
+              viewMode === "cards"
+                ? "bg-background text-foreground shadow-sm"
+                : "hover:text-foreground"
+            }`}
+          >
+            <List size={16} weight="duotone" /> Stage Details
           </button>
         </div>
+        {viewMode === "cards" && (
+          <p className="text-xs text-slate-400 italic">
+            Switch to <button onClick={() => setViewMode("visual")} className="text-primary underline underline-offset-2 hover:no-underline">Visual Timeline</button> to see the full journey flow
+          </p>
+        )}
       </div>
 
       {/* Content based on view mode */}
