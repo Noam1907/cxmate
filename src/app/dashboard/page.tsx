@@ -6,7 +6,6 @@ import Link from "next/link";
 import type { GeneratedJourney } from "@/lib/ai/journey-prompt";
 import type { GeneratedPlaybook } from "@/lib/ai/recommendation-prompt";
 import type { OnboardingInput } from "@/lib/validations/onboarding";
-import { buildEvidenceMap, getInsightAnnotations } from "@/lib/evidence-matching";
 import { track } from "@/lib/analytics";
 import { PageLoading } from "@/components/ui/page-loading";
 import { SaveResultsBanner } from "@/components/ui/save-results-banner";
@@ -45,32 +44,11 @@ function loadLocalDashboardData(): DashboardData {
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-function parseDollarValue(impact: string): number | null {
-  const match = impact.match(/\$[\d,.]+\s*[KkMmBb]?/);
-  if (!match) return null;
-  let raw = match[0].replace(/[$,]/g, "");
-  let multiplier = 1;
-  if (/[Kk]$/.test(raw)) { multiplier = 1000; raw = raw.replace(/[Kk]$/, ""); }
-  else if (/[Mm]$/.test(raw)) { multiplier = 1_000_000; raw = raw.replace(/[Mm]$/, ""); }
-  const num = parseFloat(raw);
-  return isNaN(num) ? null : num * multiplier;
-}
-
-function formatDollarCompact(value: number): string {
-  if (value >= 1_000_000) return `$${(value / 1_000_000).toFixed(1)}M`;
-  if (value >= 1_000) return `$${Math.round(value / 1_000)}K`;
-  return `$${Math.round(value)}`;
-}
-
 function computeJourneyStats(journey: GeneratedJourney) {
   const totalStages = journey.stages.length;
   const totalMoments = journey.stages.reduce((s, st) => s + st.meaningfulMoments.length, 0);
   const criticalMoments = journey.stages.reduce((s, st) => s + st.meaningfulMoments.filter((m) => m.severity === "critical").length, 0);
-  const highRiskInsights = (journey.confrontationInsights || []).filter((i) => i.likelihood === "high").length;
-  const projections = journey.impactProjections || [];
-  const values = projections.map((p) => parseDollarValue(p.potentialImpact)).filter((v): v is number => v !== null);
-  const totalImpact = values.reduce((s, v) => s + v, 0);
-  return { totalStages, totalMoments, criticalMoments, highRiskInsights, totalImpact, hasImpactData: values.length > 0 };
+  return { totalStages, totalMoments, criticalMoments };
 }
 
 function computePlaybookStats(playbook: GeneratedPlaybook, statuses: Record<string, string>) {
@@ -121,7 +99,6 @@ export default function DashboardPage() {
   const firstName = data.onboarding?.userName?.split(" ")[0] || "";
   const tid = data.templateId || "preview";
   const topInsights = (data.journey.confrontationInsights || []).filter((i) => i.likelihood === "high").slice(0, 3);
-  const evidenceMap = data.onboarding ? buildEvidenceMap(data.onboarding, data.journey) : null;
 
   return (
     <main className="min-h-screen bg-white">
@@ -131,129 +108,110 @@ export default function DashboardPage() {
         <div className="mb-10">
           {firstName && (
             <p className="text-sm text-primary font-medium mb-1">
-              Good to see you, {firstName}.
+              Welcome back, {firstName}.
             </p>
           )}
-          <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-2">Dashboard</p>
           <h1 className="text-4xl font-bold tracking-tight text-slate-800">{companyName}</h1>
+          <p className="text-sm text-slate-500 mt-2">
+            {jStats.totalStages} stages mapped · {jStats.totalMoments} moments identified · {jStats.criticalMoments > 0 ? `${jStats.criticalMoments} critical` : "no critical risks"}
+          </p>
         </div>
 
         {/* Save banner — anonymous users only */}
         <SaveResultsBanner isPreview={tid === "preview"} companyName={companyName} />
 
-        {/* Hero impact */}
-        {jStats.hasImpactData && (
-          <div className="rounded-2xl bg-gradient-to-br from-slate-800 to-teal-900 text-white p-8 mb-6">
-            <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-2">Estimated Annual CX Impact</p>
-            <div className="text-5xl font-bold tracking-tight">
-              {formatDollarCompact(Math.round(jStats.totalImpact * 0.7))} – {formatDollarCompact(Math.round(jStats.totalImpact * 1.3))}
-            </div>
-            <p className="text-sm text-slate-500 mt-1">per year</p>
-          </div>
-        )}
-
-        {/* Stat grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 divide-x divide-y border rounded-xl overflow-hidden bg-white mb-10">
-          {[
-            { label: "Journey Stages", value: jStats.totalStages },
-            { label: "Moments Mapped", value: jStats.totalMoments },
-            { label: "Critical Risks", value: jStats.criticalMoments },
-            { label: "High-Risk Patterns", value: jStats.highRiskInsights },
-          ].map(({ label, value }) => (
-            <div key={label} className="p-5">
-              <div className="text-3xl font-bold tracking-tight text-slate-900">{value}</div>
-              <div className="text-xs text-slate-500 mt-1">{label}</div>
-            </div>
-          ))}
-        </div>
-
-        {/* Playbook progress */}
+        {/* Playbook progress — the primary action center */}
         {pStats ? (
-          <div className="rounded-xl border bg-white p-6 mb-8">
+          <div className="rounded-2xl border-2 border-primary/20 bg-primary/5 p-6 mb-8">
             <div className="flex items-center justify-between mb-4">
               <div>
-                <h2 className="text-base font-semibold text-slate-900">Playbook Progress</h2>
-                <p className="text-xs text-slate-400 mt-0.5">
+                <h2 className="text-base font-semibold text-slate-900">Your Playbook</h2>
+                <p className="text-sm text-slate-600 mt-0.5">
                   {pStats.done} of {pStats.total} actions complete{pStats.inProgress > 0 ? ` · ${pStats.inProgress} in progress` : ""}
                 </p>
               </div>
               <div className="text-3xl font-bold text-slate-900">{pStats.pct}<span className="text-base text-slate-400">%</span></div>
             </div>
-            <div className="h-1.5 rounded-full bg-slate-100 overflow-hidden mb-4">
+            <div className="h-2 rounded-full bg-white overflow-hidden mb-4">
               <div className="h-full bg-primary rounded-full transition-all duration-500" style={{ width: `${pStats.pct}%` }} />
             </div>
             <div className="flex items-center justify-between">
-              <div className="flex gap-5 text-xs text-slate-500">
+              <div className="flex gap-5 text-sm text-slate-600">
                 <span><span className="font-semibold text-slate-900">{pStats.mustDo}</span> must-do</span>
                 <span><span className="font-semibold text-slate-900">{pStats.done}</span> completed</span>
               </div>
-              <Link href="/playbook"><Button variant="outline" size="sm">Go to Playbook</Button></Link>
+              <Link href="/playbook"><Button size="sm">Continue Playbook</Button></Link>
             </div>
           </div>
         ) : (
-          <div className="rounded-xl border border-dashed bg-white p-6 mb-8">
+          <div className="rounded-2xl border-2 border-dashed border-primary/30 bg-primary/5 p-6 mb-8">
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-base font-semibold text-slate-900">Playbook</h2>
-                <p className="text-xs text-slate-400 mt-0.5">Step-by-step actions, templates, and timelines.</p>
+                <h2 className="text-base font-semibold text-slate-900">Your Playbook</h2>
+                <p className="text-sm text-slate-600 mt-0.5">Step-by-step actions with templates and timelines based on your journey.</p>
               </div>
               <Link href="/playbook"><Button>Generate Playbook</Button></Link>
             </div>
           </div>
         )}
 
-        {/* Top risks */}
+        {/* What needs attention */}
         {topInsights.length > 0 && (
           <div className="rounded-xl border bg-white p-6 mb-8">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-base font-semibold text-slate-900">Top Risks</h2>
-              <span className="text-xs text-slate-400">{topInsights.length} high priority</span>
+              <div>
+                <h2 className="text-base font-semibold text-slate-900">What needs attention</h2>
+                <p className="text-sm text-slate-500 mt-0.5">Your highest-priority risks</p>
+              </div>
+              <span className="text-xs font-medium text-rose-600 bg-rose-50 px-2 py-1 rounded-full">{topInsights.length} urgent</span>
             </div>
             <div className="space-y-4">
-              {topInsights.map((insight, i) => {
-                const ann = evidenceMap ? getInsightAnnotations(insight.pattern, evidenceMap) : null;
-                return (
-                  <div key={i} className="flex items-start gap-3">
-                    <span className="text-xs font-bold text-slate-400 mt-0.5 w-4 shrink-0">{i + 1}</span>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-slate-800">{insight.pattern}</p>
-                      <p className="text-xs text-slate-500 mt-0.5">{insight.immediateAction}</p>
-                      {ann && ann.painPoints.length > 0 && (
-                        <div className="flex flex-wrap gap-1 mt-1.5">
-                          {ann.painPoints.map((pp, j) => (
-                            <span key={j} className="text-xs px-1.5 py-0.5 rounded bg-slate-100 text-slate-500 font-medium">
-                              {pp}
-                            </span>
-                          ))}
-                        </div>
-                      )}
-                    </div>
+              {topInsights.map((insight, i) => (
+                <div key={i} className="flex items-start gap-3">
+                  <div className="w-6 h-6 rounded-full bg-rose-100 flex items-center justify-center shrink-0 mt-0.5">
+                    <span className="text-xs font-bold text-rose-600">{i + 1}</span>
                   </div>
-                );
-              })}
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-slate-800">{insight.pattern}</p>
+                    <p className="text-sm text-slate-500 mt-0.5">{insight.immediateAction}</p>
+                  </div>
+                </div>
+              ))}
             </div>
             <div className="mt-4 pt-3 border-t">
               <Link href={`/confrontation?id=${tid}`}>
-                <Button variant="ghost" size="sm" className="text-xs text-slate-500">See full report →</Button>
+                <Button variant="ghost" size="sm" className="text-sm text-slate-600 hover:text-slate-900">See full CX Report →</Button>
               </Link>
             </div>
           </div>
         )}
 
-        {/* Quick nav */}
-        <div className="grid sm:grid-cols-3 gap-3">
-          {[
-            { href: `/confrontation?id=${tid}`, label: "CX Report", desc: "Intelligence insights and impact projections" },
-            { href: `/journey?id=${tid}`, label: "Journey Map", desc: "Stage-by-stage journey with moments of truth" },
-            { href: "/onboarding", label: "Re-run Analysis", desc: "Start fresh with updated company information", dashed: true },
-          ].map(({ href, label, desc, dashed }) => (
-            <Link key={label} href={href}>
-              <div className={`group rounded-xl border ${dashed ? "border-dashed" : ""} bg-white p-5 hover:border-slate-300 transition-colors cursor-pointer h-full`}>
-                <h3 className="text-sm font-semibold text-slate-900 mb-1 group-hover:text-slate-700">{label}</h3>
-                <p className="text-xs text-slate-400 leading-relaxed">{desc}</p>
+        {/* Your pages — clear differentiation */}
+        <div className="space-y-3">
+          <h2 className="text-sm font-semibold text-slate-500 uppercase tracking-widest">Explore your results</h2>
+          <div className="grid sm:grid-cols-2 gap-3">
+            <Link href={`/journey?id=${tid}`}>
+              <div className="group rounded-xl border bg-white p-5 hover:border-primary/30 hover:shadow-sm transition-all cursor-pointer h-full">
+                <h3 className="text-sm font-semibold text-slate-900 mb-1 group-hover:text-primary">Journey Map</h3>
+                <p className="text-sm text-slate-500 leading-relaxed">
+                  Your full customer lifecycle visualized stage by stage, with meaningful moments and risk areas.
+                </p>
               </div>
             </Link>
-          ))}
+            <Link href={`/confrontation?id=${tid}`}>
+              <div className="group rounded-xl border bg-white p-5 hover:border-primary/30 hover:shadow-sm transition-all cursor-pointer h-full">
+                <h3 className="text-sm font-semibold text-slate-900 mb-1 group-hover:text-primary">CX Report</h3>
+                <p className="text-sm text-slate-500 leading-relaxed">
+                  Revenue impact analysis, risk patterns, and intelligence insights based on your business data.
+                </p>
+              </div>
+            </Link>
+          </div>
+          <Link href="/onboarding">
+            <div className="group rounded-xl border border-dashed bg-white p-4 hover:border-slate-300 transition-colors cursor-pointer text-center mt-1">
+              <span className="text-sm text-slate-500 group-hover:text-slate-700">Re-run analysis with updated information</span>
+            </div>
+          </Link>
         </div>
 
       </div>

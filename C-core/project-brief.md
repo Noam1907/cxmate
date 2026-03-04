@@ -38,7 +38,7 @@ Pre-customer companies selecting "Full Lifecycle" are automatically guided to sa
 | Vertical | Any B2B (SaaS initial focus, expanding to services, agencies, FinTech, etc.) |
 | Buyer | Founder, COO, Head of CS, CRO, or anyone who owns the customer relationship |
 | Current Solution | Gut feel + spreadsheets + whatever CRM they have |
-| Budget | Free first taste → $99-499/month |
+| Budget | Free first taste → $79-199/month (or $1,200/yr premium) |
 | Maturity Levels | Pre-launch, First Customers, Growing, Scaling (adaptive onboarding) |
 
 ## Target User Personas
