@@ -85,6 +85,27 @@ function JourneyContent() {
       if (loadedJourney && loadedOnboarding) {
         setEvidenceMap(buildEvidenceMap(loadedOnboarding, loadedJourney));
       }
+
+      // Background playbook pre-generation — fire-and-forget after journey loads.
+      // Safe from the journey page: no navigation occurs here, so the fetch won't be cancelled.
+      if (loadedJourney && loadedOnboarding && !sessionStorage.getItem("cx-mate-playbook")) {
+        track("playbook_pregeneration_started");
+        fetch("/api/recommendations/generate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ journey: loadedJourney, onboardingData: loadedOnboarding }),
+        })
+          .then((res) => res.ok ? res.json() : null)
+          .then((data) => {
+            if (data?.playbook) {
+              sessionStorage.setItem("cx-mate-playbook", JSON.stringify(data.playbook));
+              track("playbook_pregeneration_succeeded");
+            }
+          })
+          .catch(() => {
+            // Non-fatal — playbook page will generate on demand if needed
+          });
+      }
     }
     load();
   }, [templateId]);

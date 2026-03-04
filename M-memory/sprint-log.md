@@ -138,20 +138,36 @@ Track sprint progress and status.
 | PDF export (playbook + journey map) | Frontend Dev | P0 | Pending |
 | "Save My Results" CTA for anonymous users | Frontend Dev | P0 | Pending |
 | Playbook persistence to Supabase (Phase 4) | Backend Dev | P0 | Pending |
-| PostHog analytics integration | DevOps Agent | P0 | Pending |
+| PostHog analytics integration | DevOps Agent | P0 | Done ✅ |
 | Stripe integration + pricing page | Backend Dev | P0 | Done ✅ |
-| Beta invite system | Growth Agent | P0 | Pending |
-| Full regression QA (gatekeeper audit) | QA Gatekeeper | P0 | Pending |
+| Beta invite system | Growth Agent | P0 | Done ✅ |
+| Full regression QA (gatekeeper audit) | QA Gatekeeper | P0 | Done ✅ |
 | Journey health scoring | AI Engineer | P1 | Pending |
 | Journey editing | Frontend Dev | P1 | Pending |
 | Security audit | Tech Lead | P1 | Pending |
 | Load testing | DevOps Agent | P2 | Pending |
 | MCP research pipeline spike | AI Engineer | P2 | Sprint 5 |
 | Curated email template library | CX Architect | P2 | Deferred |
+| **Domain purchase + Vercel custom domain** | Anat + DevOps | P0 | Pending (Anat) |
+| **Professional email** (Google Workspace or Resend) | Anat + Backend | P0 | Pending (Anat) |
+| **Privacy Policy + Terms pages** | Growth + Frontend | P0 | Done ✅ |
+| **Cookie consent banner** | Frontend Dev | P0 | Done ✅ |
+| **About page** (/about) | Copywriter + Frontend | P1 | Done ✅ |
+| **LinkedIn company page** | Growth Agent + Anat | P1 | Pending (Anat) |
+| **OG image + meta tags** | Design + Frontend | P1 | Done ✅ |
+| **Favicon + sitemap + robots.txt** | Frontend Dev | P1 | Done ✅ |
+| **Supabase custom SMTP** (auth emails from cxmate.io) | Backend Dev | P1 | Pending (needs domain) |
+| **Welcome + beta nurture emails** | Growth Agent | P1 | Pending |
 
 ### Sprint Notes
 - 2026-02-27: **Sprint 4 kickoff.** Agent system overhauled (17 agents, Strategic Decision Team added, all C-core files complete). Demo-critical fixes shipped: error boundaries on all routes, vercel.json updated, console.log cleaned. Build passes clean. First beta demo Sunday 2026-03-01.
 - 2026-02-27: **Next session should start with:** Full end-to-end demo run-through (anonymous preview flow). Then PDF export. Then "Save My Results" CTA. Keep gatekeeper running before every demo.
+- 2026-03-04: **Performance Regression Fix + Background Playbook Architecture + QA Gatekeeper 5/5 PASS.** Three major fixes this session:
+  **(1) Journey generation 7-minute regression fix:** Root cause was `max_tokens: 12000` in `generate-journey.ts` (had silently regressed from 8192) and model name `claude-sonnet-4-6` (inconsistent with rest of codebase). Fix: `max_tokens: 5000`, `model: "claude-sonnet-4-20250514"`, system prompt token guidance 8000→4000. Same fix applied to `generate-recommendations.ts`: `max_tokens: 4000`, same model name. Journey should now complete in ~1.4 min target window.
+  **(2) Playbook background generation architecture:** Previously onboarding-wizard.tsx was blocking navigation with a synchronous playbook fetch AFTER journey generation (added to avoid browser-cancellation-on-navigation). Fixed with a better pattern: removed blocking playbook call from onboarding wizard entirely, added fire-and-forget fetch trigger in `journey/page.tsx` after journey loads. Key insight: fetches from the destination page (journey) are NOT cancelled on subsequent navigation because no AbortController fires. Playbook page already polls sessionStorage every 2s for up to 30s — unchanged. Net result: user navigates to journey immediately after ~1.4 min, playbook generates in background.
+  **(3) QA Gatekeeper Full Audit — SHIP IT:** 5/5 categories passed. One P1 fixed mid-audit: `industry` field was collected in onboarding + validated in schema + filled by enrichment but NEVER forwarded to Claude prompts. Added to both `journey-prompt.ts` and `recommendation-prompt.ts`. P2 deferred: no security headers (CSP/X-Frame-Options) in next.config.ts — acceptable for beta, schedule for Sprint 5. Supabase migration 003 (beta waitlist tables) needs to be applied (`supabase db push` or manual). Build: 0 errors, 0 warnings.
+- 2026-03-04: **Launch Readiness Gap Analysis complete.** Full plan saved to `O-output/launch-readiness-plan.md`. 6 tiers identified: (1) Legal blockers — Privacy/Terms/cookie consent, (2) Domain + email infrastructure, (3) Brand presence — About page + LinkedIn, (4) SEO/social — OG image/meta/favicon/sitemap, (5) Product completeness — PostHog/beta invite/PDF/persistence, (6) Future — ProductHunt/Twitter. Added all new gaps to Sprint 4 task table. What Anat must do personally: buy domain (cxmate.io recommended), Google Workspace setup, LinkedIn page creation, Supabase SMTP config (Resend free tier). Design changes this session: dashboard cards redesigned to match homepage hero visual language (colored backgrounds, border-2, badges, stat lines), journey page default changed to visual timeline, toggle relabelled (Visual Timeline / Stage Details).
+- 2026-03-04: **Next session should start with:** (1) Commit all recent changes to git. (2) Apply Supabase migration 003: `supabase db push` (creates waitlist + invite_codes tables). (3) Then: PDF export (P0 — highest remaining product task). (4) Then: "Save My Results" CTA for anonymous users (P0). (5) Anat's manual tasks: domain purchase + Vercel custom domain + Google Workspace + LinkedIn company page. P2 deferred: add security headers (CSP, X-Frame-Options, X-Content-Type-Options) to next.config.ts.
 
 ---
 

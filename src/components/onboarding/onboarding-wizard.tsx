@@ -662,24 +662,6 @@ export function OnboardingWizard() {
       });
       sessionStorage.setItem("cx-mate-journey", JSON.stringify(result));
 
-      // Generate playbook synchronously — user waits once for both.
-      // Fire-and-forget was unreliable: browsers cancel in-flight fetches on navigation.
-      try {
-        track("playbook_pregeneration_started");
-        const playbookRes = await fetch("/api/recommendations/generate", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ journey: result.journey, onboardingData: result.onboardingData }),
-        });
-        if (playbookRes.ok) {
-          const playbookData = await playbookRes.json();
-          sessionStorage.setItem("cx-mate-playbook", JSON.stringify(playbookData.playbook));
-          track("playbook_pregeneration_succeeded");
-        }
-      } catch {
-        // Non-fatal — user can still generate manually from the playbook page
-      }
-
       // Push generated journey to sidebar context
       profileContext.setJourney(result.journey);
       profileContext.setTemplateId(result.templateId);

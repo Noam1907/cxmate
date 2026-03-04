@@ -14,7 +14,7 @@ function HeroCards() {
     <div className="relative w-full max-w-sm mx-auto lg:mx-0 flex flex-col gap-3 lg:gap-4">
       {/* Card 1 — Input: Pain Identified */}
       <div
-        className="rounded-2xl border-2 p-5 shadow-lg"
+        className="rounded-2xl border-2 p-5 shadow-lg flex flex-col"
         style={{ backgroundColor: "#FFF8E6", borderColor: "#F0C040" }}
       >
         <div className="flex items-center gap-2 mb-3">
@@ -24,7 +24,7 @@ function HeroCards() {
           </span>
         </div>
         <p className="text-sm font-bold text-slate-800 mb-2">Your Business</p>
-        <div className="flex flex-col gap-1.5">
+        <div className="flex flex-col gap-1.5 flex-1">
           <div className="flex justify-between text-xs">
             <span className="text-slate-500">Stage</span>
             <span className="font-semibold text-slate-700">Growing · B2B SaaS</span>
@@ -39,17 +39,17 @@ function HeroCards() {
           </div>
         </div>
         <div
-          className="mt-3 inline-flex items-center gap-1 text-[11px] font-bold px-2 py-1 rounded-full"
+          className="mt-3 inline-flex items-center gap-1.5 text-[11px] font-bold px-2.5 py-1 rounded-full self-start"
           style={{ backgroundColor: "#FDE68A", color: "#78350F" }}
         >
-          <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+          <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0" />
           Analyzing now
         </div>
       </div>
 
       {/* Card 2 — Process: Journey Mapped */}
       <div
-        className="rounded-2xl border-2 p-5 shadow-lg ml-4 lg:ml-8"
+        className="rounded-2xl border-2 p-5 shadow-lg ml-4 lg:ml-8 flex flex-col"
         style={{ backgroundColor: "#E0F7F4", borderColor: "#0D9488" }}
       >
         <div className="flex items-center gap-2 mb-3">
@@ -59,7 +59,7 @@ function HeroCards() {
           </span>
         </div>
         <p className="text-sm font-bold text-slate-800 mb-2">Journey Mapped</p>
-        <div className="flex flex-col gap-1.5">
+        <div className="flex flex-col gap-1.5 flex-1">
           <div className="flex justify-between text-xs">
             <span className="text-slate-500">Moments analyzed</span>
             <span className="font-semibold text-slate-700">52 touchpoints</span>
@@ -74,17 +74,17 @@ function HeroCards() {
           </div>
         </div>
         <div
-          className="mt-3 inline-flex items-center gap-1 text-[11px] font-bold px-2 py-1 rounded-full"
+          className="mt-3 inline-flex items-center gap-1.5 text-[11px] font-bold px-2.5 py-1 rounded-full self-start"
           style={{ backgroundColor: "#99F6E4", color: "#134E4A" }}
         >
-          <span className="w-1.5 h-1.5 rounded-full bg-teal-500" />
+          <span className="w-1.5 h-1.5 rounded-full bg-teal-500 shrink-0" />
           Complete
         </div>
       </div>
 
       {/* Card 3 — Output: Sprint Ready */}
       <div
-        className="rounded-2xl border-2 p-5 shadow-lg"
+        className="rounded-2xl border-2 p-5 shadow-lg flex flex-col"
         style={{ backgroundColor: "#DCFCE7", borderColor: "#16A34A" }}
       >
         <div className="flex items-center gap-2 mb-3">
@@ -94,7 +94,7 @@ function HeroCards() {
           </span>
         </div>
         <p className="text-sm font-bold text-slate-800 mb-2">Sprint Ready</p>
-        <div className="flex flex-col gap-1.5">
+        <div className="flex flex-col gap-1.5 flex-1">
           <div className="flex justify-between text-xs">
             <span className="text-slate-500">Actions prioritized</span>
             <span className="font-semibold text-slate-700">12 total</span>
@@ -109,10 +109,11 @@ function HeroCards() {
           </div>
         </div>
         <div
-          className="mt-3 inline-flex items-center gap-1 text-[11px] font-bold px-2 py-1 rounded-full"
+          className="mt-3 inline-flex items-center gap-1.5 text-[11px] font-bold px-2.5 py-1 rounded-full self-start"
           style={{ backgroundColor: "#BBF7D0", color: "#14532D" }}
         >
-          ✓ Generated for you
+          <span className="w-1.5 h-1.5 rounded-full bg-green-500 shrink-0" />
+          Generated for you
         </div>
       </div>
     </div>
@@ -423,14 +424,20 @@ function BottomCTA() {
 function Footer() {
   return (
     <footer className="border-t border-white/8 bg-slate-950">
-      <div className="max-w-5xl mx-auto px-6 py-8 flex items-center justify-between">
+      <div className="max-w-5xl mx-auto px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-4">
         <div className="flex items-center gap-2">
           <LogoMark />
           <span className="text-sm font-bold tracking-tight text-white">CX Mate</span>
         </div>
-        <p className="text-xs text-slate-500">
+        <p className="text-xs text-slate-500 hidden sm:block">
           The CX foundation every B2B company needs.
         </p>
+        <div className="flex items-center gap-5">
+          <Link href="/about" className="text-xs text-slate-500 hover:text-slate-300 transition-colors">About</Link>
+          <Link href="/pricing" className="text-xs text-slate-500 hover:text-slate-300 transition-colors">Pricing</Link>
+          <Link href="/privacy" className="text-xs text-slate-500 hover:text-slate-300 transition-colors">Privacy</Link>
+          <Link href="/terms" className="text-xs text-slate-500 hover:text-slate-300 transition-colors">Terms</Link>
+        </div>
       </div>
     </footer>
   );

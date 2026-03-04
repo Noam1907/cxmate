@@ -11,6 +11,9 @@ import Link from "next/link";
 import { track, identify } from "@/lib/analytics";
 import { notifyOwner } from "@/lib/notify";
 
+// Beta mode: shows invite code field on signup when true
+const BETA_MODE = process.env.NEXT_PUBLIC_BETA_MODE === "true";
+
 /**
  * Retry wrapper — retries on transient "Failed to fetch" errors.
  * Handles Supabase cold starts and brief network hiccups so users
@@ -27,13 +30,24 @@ async function withRetry<T extends { error: any }>(
     if (!result.error || result.error.message !== "Failed to fetch") {
       return result;
     }
-    // Transient network error — wait and retry
     if (attempt < maxRetries) {
       await new Promise((r) => setTimeout(r, delayMs * (attempt + 1)));
     }
   }
-  // All retries exhausted — return last result
   return fn();
+}
+
+async function validateInviteCode(code: string): Promise<{ valid: boolean; error?: string }> {
+  try {
+    const res = await fetch("/api/invite/validate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ code }),
+    });
+    return await res.json();
+  } catch {
+    return { valid: false, error: "Could not validate invite code" };
+  }
 }
 
 function AuthContent() {
@@ -46,11 +60,11 @@ function AuthContent() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [companyName, setCompanyName] = useState("");
+  const [inviteCode, setInviteCode] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(urlError === "auth_failed" ? "Authentication failed. Please try again." : "");
   const [message, setMessage] = useState("");
 
-  // Stable client — don't recreate on every render
   const supabase = useMemo(() => createClient(), []);
 
   async function handleLogin(e: React.FormEvent) {
@@ -88,6 +102,21 @@ function AuthContent() {
     setLoading(true);
     setError("");
 
+    // Validate invite code in beta mode
+    if (BETA_MODE) {
+      if (!inviteCode.trim()) {
+        setError("An invite code is required to sign up during beta.");
+        setLoading(false);
+        return;
+      }
+      const { valid, error: codeError } = await validateInviteCode(inviteCode.trim());
+      if (!valid) {
+        setError(codeError || "Invalid invite code. Check your invite email or request early access.");
+        setLoading(false);
+        return;
+      }
+    }
+
     const { error } = await withRetry(() =>
       supabase.auth.signUp({
         email,
@@ -95,6 +124,7 @@ function AuthContent() {
         options: {
           data: {
             company_name: companyName || "My Company",
+            ...(BETA_MODE && inviteCode ? { invite_code: inviteCode.trim().toUpperCase() } : {}),
           },
           emailRedirectTo: `${window.location.origin}/auth/callback?redirect=${redirectTo}`,
         },
@@ -127,7 +157,7 @@ function AuthContent() {
           </div>
           <h1 className="text-2xl font-bold tracking-tight text-foreground">CX Mate</h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Your AI CX co-pilot
+            {BETA_MODE && mode === "signup" ? "Beta access — invite code required" : "Your AI CX co-pilot"}
           </p>
         </div>
 
@@ -136,11 +166,7 @@ function AuthContent() {
           {/* Mode Toggle */}
           <div className="grid grid-cols-2 gap-1 bg-secondary rounded-xl p-1">
             <button
-              onClick={() => {
-                setMode("login");
-                setError("");
-                setMessage("");
-              }}
+              onClick={() => { setMode("login"); setError(""); setMessage(""); }}
               className={`text-sm py-2 rounded-lg font-medium transition-all duration-200 ${
                 mode === "login"
                   ? "bg-white shadow-sm text-foreground"
@@ -150,11 +176,7 @@ function AuthContent() {
               Log in
             </button>
             <button
-              onClick={() => {
-                setMode("signup");
-                setError("");
-                setMessage("");
-              }}
+              onClick={() => { setMode("signup"); setError(""); setMessage(""); }}
               className={`text-sm py-2 rounded-lg font-medium transition-all duration-200 ${
                 mode === "signup"
                   ? "bg-white shadow-sm text-foreground"
@@ -166,10 +188,7 @@ function AuthContent() {
           </div>
 
           {/* Form */}
-          <form
-            onSubmit={mode === "login" ? handleLogin : handleSignup}
-            className="space-y-4"
-          >
+          <form onSubmit={mode === "login" ? handleLogin : handleSignup} className="space-y-4">
             {mode === "signup" && (
               <div className="space-y-2">
                 <Label htmlFor="companyName">Company name</Label>
@@ -211,6 +230,29 @@ function AuthContent() {
               />
             </div>
 
+            {/* Invite code — beta mode only, signup only */}
+            {BETA_MODE && mode === "signup" && (
+              <div className="space-y-2">
+                <Label htmlFor="inviteCode">
+                  Invite code <span className="text-rose-500">*</span>
+                </Label>
+                <Input
+                  id="inviteCode"
+                  type="text"
+                  placeholder="e.g. CXBETA2026"
+                  value={inviteCode}
+                  onChange={(e) => setInviteCode(e.target.value.toUpperCase())}
+                  className="rounded-xl font-mono uppercase tracking-widest"
+                />
+                <p className="text-xs text-muted-foreground">
+                  Don&apos;t have one?{" "}
+                  <Link href="/waitlist" className="text-primary hover:underline">
+                    Request early access →
+                  </Link>
+                </p>
+              </div>
+            )}
+
             {error && (
               <p className="text-sm text-destructive bg-destructive/10 rounded-xl px-3 py-2">
                 {error}
@@ -249,9 +291,7 @@ function AuthContent() {
 
 export default function AuthPage() {
   return (
-    <Suspense
-      fallback={<PageLoading />}
-    >
+    <Suspense fallback={<PageLoading />}>
       <AuthContent />
     </Suspense>
   );

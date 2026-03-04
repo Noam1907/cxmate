@@ -1,0 +1,12 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /dashboard
+Disallow: /journey
+Disallow: /confrontation
+Disallow: /playbook
+Disallow: /onboarding
+Disallow: /billing
+Disallow: /reset
+
+Sitemap: https://cxmate.io/sitemap.xml

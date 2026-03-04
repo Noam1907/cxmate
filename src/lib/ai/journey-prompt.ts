@@ -503,6 +503,7 @@ ${input.userName || input.userRole ? `Use their name and role to personalize adv
 - Maturity stage: ${maturityStage} (${companyStage})
 - Has existing customers: ${input.hasExistingCustomers ? "Yes" : "No (pre-customer)"}
 ${input.hasExistingCustomers && input.customerCount ? `- Customer count: ${input.customerCount}` : ""}
+${input.industry ? `- Industry sector: ${input.industry}` : ""}
 ${verticalContext}
 - Journey type requested: ${input.journeyType}
 - Their customers: ${input.customerDescription}

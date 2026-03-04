@@ -33,6 +33,8 @@ export type AnalyticsEvent =
   // Auth
   | { name: "user_signed_up" }
   | { name: "user_logged_in" }
+  // Beta / waitlist
+  | { name: "waitlist_joined"; referral_source?: string; role?: string }
   // Export
   | { name: "pdf_exported"; page: "journey" | "cx_report" | "playbook" | "dashboard" };
 

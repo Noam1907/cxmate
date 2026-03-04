@@ -185,7 +185,7 @@ ${input.userRole ? `Tailor owner assignments and language to their role. If they
 ## Company Context
 - Company: ${input.companyName}
 - Size: ${input.companySize} employees (${companyStage} stage)
-- Vertical: ${input.vertical}
+- Vertical: ${input.vertical}${input.industry ? ` / ${input.industry}` : ""}
 - Has existing customers: ${input.hasExistingCustomers ? "Yes" : "No (pre-customer)"}
 - Customers: ${input.customerDescription} (${input.customerSize})
 - Main channel: ${input.mainChannel}

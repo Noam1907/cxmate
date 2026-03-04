@@ -61,9 +61,9 @@ export async function generateJourney(
   const prompt = buildJourneyPrompt(input);
 
   const requestBody = JSON.stringify({
-    model: "claude-sonnet-4-6",
-    max_tokens: 12000,
-    system: "You are a CX expert API. You MUST respond with ONLY a valid JSON object. No preamble, no explanation, no markdown fences, no text before or after the JSON. The very first character of your response must be { and the very last must be }. CRITICAL: Be extremely concise — every string field max 10 words, no elaboration, no lists inside strings. Keep total response under 8000 tokens.",
+    model: "claude-sonnet-4-20250514",
+    max_tokens: 5000,
+    system: "You are a CX expert API. You MUST respond with ONLY a valid JSON object. No preamble, no explanation, no markdown fences, no text before or after the JSON. The very first character of your response must be { and the very last must be }. CRITICAL: Be extremely concise — every string field max 10 words, no elaboration, no lists inside strings. Keep total response under 4000 tokens.",
     messages: [{ role: "user", content: prompt }],
   });
 
