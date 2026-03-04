@@ -6,7 +6,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "verify": "npx tsx scripts/verify-deploy.ts",
+    "verify:local": "npx tsx scripts/verify-deploy.ts http://localhost:3000",
+    "deploy": "vercel --prod --force && npx tsx scripts/verify-deploy.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.74.0",

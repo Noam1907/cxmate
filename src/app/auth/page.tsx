@@ -11,6 +11,31 @@ import Link from "next/link";
 import { track, identify } from "@/lib/analytics";
 import { notifyOwner } from "@/lib/notify";
 
+/**
+ * Retry wrapper — retries on transient "Failed to fetch" errors.
+ * Handles Supabase cold starts and brief network hiccups so users
+ * never see a "Connection error" on first try.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function withRetry<T extends { error: any }>(
+  fn: () => Promise<T>,
+  maxRetries = 2,
+  delayMs = 800,
+): Promise<T> {
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    const result = await fn();
+    if (!result.error || result.error.message !== "Failed to fetch") {
+      return result;
+    }
+    // Transient network error — wait and retry
+    if (attempt < maxRetries) {
+      await new Promise((r) => setTimeout(r, delayMs * (attempt + 1)));
+    }
+  }
+  // All retries exhausted — return last result
+  return fn();
+}
+
 function AuthContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -33,15 +58,14 @@ function AuthContent() {
     setLoading(true);
     setError("");
 
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    const { data, error } = await withRetry(() =>
+      supabase.auth.signInWithPassword({ email, password })
+    );
 
     if (error) {
       setError(
         error.message === "Failed to fetch"
-          ? "Connection error — please refresh the page and try again."
+          ? "Connection error — please check your internet and try again."
           : error.message === "Invalid login credentials"
             ? "Incorrect email or password."
             : error.message
@@ -64,21 +88,23 @@ function AuthContent() {
     setLoading(true);
     setError("");
 
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: {
-          company_name: companyName || "My Company",
+    const { error } = await withRetry(() =>
+      supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            company_name: companyName || "My Company",
+          },
+          emailRedirectTo: `${window.location.origin}/auth/callback?redirect=${redirectTo}`,
         },
-        emailRedirectTo: `${window.location.origin}/auth/callback?redirect=${redirectTo}`,
-      },
-    });
+      })
+    );
 
     if (error) {
       setError(
         error.message === "Failed to fetch"
-          ? "Connection error — please refresh the page and try again."
+          ? "Connection error — please check your internet and try again."
           : error.message
       );
       setLoading(false);
