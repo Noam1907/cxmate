@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useState } from "react";
+import { Suspense, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { PageLoading } from "@/components/ui/page-loading";
@@ -24,7 +24,8 @@ function AuthContent() {
   const [error, setError] = useState(urlError === "auth_failed" ? "Authentication failed. Please try again." : "");
   const [message, setMessage] = useState("");
 
-  const supabase = createClient();
+  // Stable client — don't recreate on every render
+  const supabase = useMemo(() => createClient(), []);
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
@@ -37,7 +38,13 @@ function AuthContent() {
     });
 
     if (error) {
-      setError(error.message);
+      setError(
+        error.message === "Failed to fetch"
+          ? "Connection error — please refresh the page and try again."
+          : error.message === "Invalid login credentials"
+            ? "Incorrect email or password."
+            : error.message
+      );
       setLoading(false);
       return;
     }
@@ -68,7 +75,11 @@ function AuthContent() {
     });
 
     if (error) {
-      setError(error.message);
+      setError(
+        error.message === "Failed to fetch"
+          ? "Connection error — please refresh the page and try again."
+          : error.message
+      );
       setLoading(false);
       return;
     }
