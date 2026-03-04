@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { track, identify } from "@/lib/analytics";
+import { notifyOwner } from "@/lib/notify";
 
 function AuthContent() {
   const router = useRouter();
@@ -85,6 +86,7 @@ function AuthContent() {
     }
 
     track("user_signed_up");
+    notifyOwner("user_signed_up", { email, companyName: companyName || undefined });
     setMessage("Check your email for a confirmation link.");
     setLoading(false);
   }

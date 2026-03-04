@@ -20,6 +20,7 @@ import { useCompanyEnrichment } from "@/hooks/use-company-enrichment";
 import { useOnboardingAutosave, loadOnboardingDraft, clearOnboardingDraft } from "@/hooks/use-onboarding-autosave";
 import type { EnrichedCompanyData } from "@/types/enrichment";
 import { track, identify } from "@/lib/analytics";
+import { notifyOwner } from "@/lib/notify";
 import { createClient } from "@/lib/supabase/client";
 
 type StepKey =
@@ -654,6 +655,11 @@ export function OnboardingWizard() {
         duration_seconds: Math.round((Date.now() - generationStartTime) / 1000),
         template_id: result.templateId,
       });
+      notifyOwner("journey_generation_succeeded", {
+        email: data.userEmail || undefined,
+        companyName: data.companyName || undefined,
+        details: `${result.journey?.stages?.length || "?"} stages generated in ${Math.round((Date.now() - generationStartTime) / 1000)}s`,
+      });
       sessionStorage.setItem("cx-mate-journey", JSON.stringify(result));
 
       // Generate playbook synchronously — user waits once for both.
@@ -716,6 +722,7 @@ export function OnboardingWizard() {
     return <IntroHero onStart={() => {
       setShowIntro(false);
       track("onboarding_started");
+      notifyOwner("onboarding_started");
     }} />;
   }
 

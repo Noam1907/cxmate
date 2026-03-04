@@ -42,6 +42,38 @@ function loadLocalDashboardData(): DashboardData {
   return data;
 }
 
+/** Try to load the user's persisted journey from Supabase via API. */
+async function loadPersistedDashboardData(): Promise<DashboardData | null> {
+  try {
+    const res = await fetch("/api/journey/default");
+    if (!res.ok) return null;
+    const json = await res.json();
+    if (!json.success || !json.journey) return null;
+
+    // Also try to load playbook and rec statuses from local storage
+    let playbook: GeneratedPlaybook | null = null;
+    let recStatuses: Record<string, string> = {};
+    try {
+      const raw = sessionStorage.getItem("cx-mate-playbook");
+      if (raw) playbook = JSON.parse(raw);
+    } catch { /* ignore */ }
+    try {
+      const raw = localStorage.getItem("cx-mate-rec-status");
+      if (raw) recStatuses = JSON.parse(raw);
+    } catch { /* ignore */ }
+
+    return {
+      journey: json.journey,
+      playbook,
+      onboarding: json.onboardingData || null,
+      recStatuses,
+      templateId: json.templateId,
+    };
+  } catch {
+    return null;
+  }
+}
+
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function computeJourneyStats(journey: GeneratedJourney) {
@@ -67,11 +99,23 @@ export default function DashboardPage() {
   const [data, setData] = useState<DashboardData | null>(null);
 
   useEffect(() => {
-    const loaded = loadLocalDashboardData();
-    setData(loaded);
-    if (loaded.journey) {
-      track("dashboard_viewed", { template_id: loaded.templateId || undefined });
+    async function load() {
+      // 1. Try loading persisted journey from Supabase (authenticated users)
+      const persisted = await loadPersistedDashboardData();
+      if (persisted?.journey) {
+        setData(persisted);
+        track("dashboard_viewed", { template_id: persisted.templateId || undefined });
+        return;
+      }
+
+      // 2. Fall back to sessionStorage (anonymous preview mode)
+      const local = loadLocalDashboardData();
+      setData(local);
+      if (local.journey) {
+        track("dashboard_viewed", { template_id: local.templateId || undefined });
+      }
     }
+    load();
   }, []);
 
   if (!data) {

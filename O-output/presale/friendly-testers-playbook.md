@@ -32,7 +32,21 @@ Keep it personal. No marketing voice. This is you asking a friend.
 >
 > Would you be up for trying it? Takes about 10 minutes. I'd love your honest take.
 >
-> [link]
+> ---
+>
+> **How to connect:**
+> 1. Go to: https://cx-mate.vercel.app
+> 2. Click **Log in** (top right)
+> 3. Enter your email + password and sign in (no account yet? Click **Sign up** — takes 10 seconds)
+>
+> **What to do inside:**
+> 1. Click **Start Onboarding** (or **Get Your Action Playbook**)
+> 2. Enter your company name and website — the system auto-enriches your data
+> 3. Answer the questions (about your company, customers, challenges) — the more specific, the better the output
+> 4. Wait 1-2 minutes while the AI generates everything
+> 5. Explore your results: **Journey Map** → **CX Report** → **Playbook**
+>
+> That's it! Once you're done, send me your thoughts.
 
 ### Version B — For someone less familiar with you
 
@@ -49,6 +63,51 @@ Keep it personal. No marketing voice. This is you asking a friend.
 > CX Mate generates a full journey map and playbook based on your company's specific situation — stage, pain points, competitors, the works. I want to know if the recommendations pass the "would I actually do this on Monday?" test.
 >
 > Would you be open to running your company through it? Takes about 10 minutes. Your feedback would be gold.
+>
+> [link]
+
+### Version A — בעברית, לחברים קרובים (מייסדים / אופרטורים)
+
+> היי [שם]! אני בונה כרגע כלי AI שאני ממש מתלהבת ממנו – הוא מדמה מומחה CX שתופר לך מפת מסע לקוח מלאה ותוכנית עבודה מדויקת תוך דקות.
+>
+> **המטרה היא להחליף תהליכי ייעוץ יקרים של חודשים בכלי נגיש שנותן תמונה ברורה:** הוא מאפשר לחברות צעירות (שבדרך כלל אין להן תקציב לייעוץ חיצוני) למפות את מסע הלקוח האופטימלי ולחסוך טעויות אסטרטגיות יקרות כבר מההתחלה. לחברות בצמיחה – שרצו מהר והמסע שלהן הפך ל'הדבקה' של המון חלקים – הוא נותן קריאת כיוון ומיישר קו אופרטיבי.
+>
+> אשמח להתנסות על החברה האמיתית שלכם ולשמוע מה שימושי, מה מבלבל, ומה חסר.
+>
+> לוקח בערך 10-15 דקות.
+> מתאים?
+>
+> ---
+>
+> **איך להתחבר:**
+> 1. נכנסים ללינק: https://cx-mate.vercel.app
+> 2. לוחצים **Log in** (למעלה מימין)
+> 3. מזינים אימייל + סיסמה ונכנסים (אם אין לכם חשבון — לוחצים **Sign up** ויוצרים תוך שנייה)
+>
+> **מה עושים בפנים:**
+> 1. לוחצים **Start Onboarding** (או **Get Your Action Playbook**)
+> 2. מזינים את שם החברה והאתר — המערכת מעשירה את הנתונים אוטומטית
+> 3. עונים על השאלות (על החברה, הלקוחות, האתגרים) — ככל שתהיו יותר ספציפיים, הפלט יהיה יותר מדויק
+> 4. מחכים דקה-שתיים ל-AI שמייצר הכל
+> 5. חוקרים את התוצאות: **מפת מסע** → **דו"ח CX** → **Playbook**
+>
+> זה הכל! אחרי שסיימתם, כתבו לי מה חשבתם.
+
+### Version B — בעברית, למישהו שפחות מכירים
+
+> היי [שם], אני בונה את CX Mate — כלי שממפה את מסע הלקוח המלא לחברות B2B ומייצר Playbook מותאם אישית. אני בשלב בטא מוקדם ומחפשת פידבק כנה מאנשים שמתמודדים עם אתגרי חוויית לקוח ביומיום.
+>
+> תהיה/י מוכן/ה להריץ את החברה שלך דרך המערכת ולשתף מה חשבת? זה בחינם, לוקח בערך 10 דקות, ואני באמת אעריך את הפרספקטיבה שלך.
+>
+> [link]
+
+### Version C — בעברית, לאנשי CS
+
+> היי [שם], אני יודעת שאת/ה חי/ה ונושם/ת Customer Success — אשמח לעין המקצועית שלך על משהו שאני בונה.
+>
+> CX Mate מייצר מפת מסע לקוח מלאה ו-Playbook על בסיס המצב הספציפי של החברה שלך — שלב, כאבים, מתחרים, הכל. אני רוצה לדעת אם ההמלצות עוברות את מבחן ה-"הייתי באמת עושה את זה ביום ראשון".
+>
+> מוכן/ה להריץ את החברה שלך? לוקח בערך 10 דקות. הפידבק שלך שווה זהב.
 >
 > [link]
 
@@ -72,6 +131,24 @@ Keep it personal. No marketing voice. This is you asking a friend.
 >
 > Here's the link: [link]
 
+### בעברית — הודעת הקשר
+
+> מעולה, תודה!
+>
+> ככה זה עובד:
+> 1. עונים על כמה שאלות על החברה (5-7 דקות)
+> 2. ה-AI מייצר מפת מסע לקוח + דו"ח CX + תוכנית פעולה (לוקח בערך דקה)
+> 3. חוקרים את התוצאות — מפת מסע, דו"ח אינטליגנציה, ו-Playbook
+>
+> כמה דברים:
+> - **תשתמש/י במידע אמיתי על החברה.** ככל שתהיו יותר ספציפיים, ככה הפלט יהיה יותר מדויק.
+> - **אל תחסכו בפידבק.** "זה בלבל אותי" או "זה הרגיש גנרי" עוזר הרבה יותר מ-"נראה טוב."
+> - **זה עדיין בטא** — יכולים להיות שוליים חספוסים. בדיוק בשביל זה אני צריכה אתכם.
+>
+> אני אעקוב בעוד יומיים לשמוע מה חשבת. או תכתבו לי בכל רגע אם משהו עולה תוך כדי שימוש.
+>
+> הנה הלינק: [link]
+
 ---
 
 ## Step 3: The Feedback Ask (2-3 days after they try it)
@@ -90,9 +167,25 @@ Don't send a form. Have a conversation.
 >
 > Even one sentence is super helpful. No pressure on a long reply.
 
+### בעברית — בקשת פידבק
+
+> היי [שם]! הספקת לנסות את CX Mate? אשמח לשמוע מה בלט — לטוב או לרע.
+>
+> אם יש לך 2 דקות, שלושה דברים שאני הכי סקרנית לגביהם:
+>
+> 1. **תגובה ראשונה** — כשראית את התוצאות, מה הייתה התחושה? ("זה אני" / "זה גנרי" / "לא הבנתי")
+> 2. **ה-Playbook** — יש המלצה אחת שהיית באמת מיישם/ת השבוע?
+> 3. **מה הרגיש לא בסדר** — משהו שבלבל, הרגיש לא נכון, או חסר?
+>
+> אפילו משפט אחד עוזר מאוד. בלי לחץ על תשובה ארוכה.
+
 ### If they didn't try it yet
 
 > Totally get it — whenever you have 10 minutes, it's there for you. No rush.
+
+### בעברית — אם עדיין לא ניסו
+
+> לגמרי מבינה — מתי שיש לך 10 דקות, זה שם מחכה. בלי לחץ.
 
 (Don't chase more than once. If they don't try it, they're not the right tester.)
 
@@ -125,6 +218,17 @@ After you get feedback, close the loop. This builds the relationship for later.
 > When we launch the next version, you'll be the first to see it. And if you know anyone else who deals with CX challenges — I'd love an intro.
 >
 > Really appreciate you taking the time.
+
+### בעברית — תודה וסגירת מעגל
+
+> [שם], תודה ענקית על הפידבק — זה כבר משפיע על מה שאנחנו בונים.
+>
+> עדכון קצר על מה אני עושה עם מה שאמרת:
+> - [דבר ספציפי שמתקנים/מוסיפים בעקבות הפידבק]
+>
+> כשנשיק את הגרסה הבאה, תהיה/י הראשונ/ה לראות. ואם יש מישהו שמתמודד עם אתגרי CX — אשמח להכרות.
+>
+> ממש מעריכה שלקחת את הזמן.
 
 ---
 
