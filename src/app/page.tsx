@@ -6,6 +6,31 @@ import { Button } from "@/components/ui/button";
 // ─── Sage background color (from Customerscore.io design pattern) ─────────────
 const SAGE = "#E8EDE5";
 
+// ─── Logo mark — journey arc with 3 nodes ─────────────────────────────────────
+function LogoMark({ className = "" }: { className?: string }) {
+  return (
+    <div
+      className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${className}`}
+      style={{ backgroundColor: "#0D9488" }}
+    >
+      <svg viewBox="0 0 22 22" width="18" height="18" fill="none">
+        {/* Three journey nodes: start → mid → destination */}
+        <circle cx="3"  cy="18" r="2.2" fill="white" />
+        <circle cx="11" cy="11" r="2.2" fill="white" />
+        <circle cx="19" cy="4"  r="2.2" fill="white" />
+        {/* Smooth ascending path */}
+        <path
+          d="M 3 18 C 6 15 8.5 12.5 11 11 C 13.5 9.5 16 6.5 19 4"
+          stroke="white"
+          strokeWidth="1.8"
+          strokeLinecap="round"
+          fill="none"
+        />
+      </svg>
+    </div>
+  );
+}
+
 // ─── Hero ─────────────────────────────────────────────────────────────────────
 
 function HeroCards() {
@@ -126,10 +151,15 @@ function HeroSection() {
 
           {/* Left — text */}
           <div className="flex-1 max-w-xl">
-            {/* Pill badge */}
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white border border-teal-200 mb-8 shadow-sm">
-              <span className="w-1.5 h-1.5 rounded-full bg-teal-500 animate-pulse" />
-              <span className="text-xs font-semibold text-teal-700">Built on certified CX methodology</span>
+            {/* Pill badges */}
+            <div className="flex flex-wrap gap-2 mb-8">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white border border-teal-200 shadow-sm">
+                <span className="w-1.5 h-1.5 rounded-full bg-teal-500 animate-pulse" />
+                <span className="text-xs font-semibold text-teal-700">Live AI · Generates fresh for every business</span>
+              </div>
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white border border-slate-200 shadow-sm">
+                <span className="text-xs font-semibold text-slate-500">CCXP Certified Methodology</span>
+              </div>
             </div>
 
             {/* Headline — big, confrontational */}
@@ -174,8 +204,11 @@ function HeroSection() {
               </div>
               <div className="w-px h-8 bg-slate-300" />
               <div>
-                <div className="text-2xl font-extrabold text-slate-900">CCXP</div>
-                <div className="text-xs text-slate-500 mt-0.5">Methodology</div>
+                <div className="flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-teal-500 animate-pulse" />
+                  <div className="text-2xl font-extrabold text-slate-900">Live AI</div>
+                </div>
+                <div className="text-xs text-slate-500 mt-0.5">No templates, ever</div>
               </div>
             </div>
           </div>
@@ -338,10 +371,10 @@ function FeaturesSection() {
       emoji: "⚡",
     },
     {
-      badge: "Benchmarking",
-      title: "How you compare to companies like you",
-      description: "Benchmarked against companies at your exact stage. Invest in what moves the needle now.",
-      emoji: "📊",
+      badge: "Live Intelligence",
+      title: "Fresh analysis. Every time.",
+      description: "No templates, no generic frameworks. Every journey is generated live by AI — specific to your stage, vertical, and the moment you're in.",
+      emoji: "⚡",
     },
   ];
 
@@ -416,9 +449,7 @@ function Footer() {
     <footer className="border-t border-white/8 bg-slate-950">
       <div className="max-w-5xl mx-auto px-6 py-8 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: "#0D9488" }}>
-            <span className="text-sm font-bold text-white">CX</span>
-          </div>
+          <LogoMark />
           <span className="text-sm font-bold tracking-tight text-white">CX Mate</span>
         </div>
         <p className="text-xs text-slate-500">
@@ -438,9 +469,7 @@ export default function Home() {
       <header className="sticky top-0 z-50 border-b border-slate-200/80" style={{ backgroundColor: SAGE }}>
         <div className="max-w-6xl mx-auto px-6 flex items-center justify-between h-14">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: "#0D9488" }}>
-              <span className="text-sm font-bold text-white">CX</span>
-            </div>
+            <LogoMark />
             <span className="text-sm font-bold tracking-tight text-slate-900">CX Mate</span>
           </div>
           <div className="flex items-center gap-4">
