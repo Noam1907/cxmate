@@ -124,14 +124,68 @@ export default function DashboardPage() {
 
   if (!data.journey) {
     return (
-      <main className="min-h-screen flex items-center justify-center p-8">
-        <div className="text-center space-y-5 max-w-md">
-          <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest">Dashboard</p>
-          <h1 className="text-3xl font-bold tracking-tight text-slate-900">Welcome to CX Mate</h1>
-          <p className="text-slate-500 leading-relaxed">Tell us about your business. In minutes, you&apos;ll have a complete CX journey map, intelligence report, and actionable playbook.</p>
-          <Link href="/onboarding">
-            <Button size="lg" className="mt-2">Start Onboarding</Button>
-          </Link>
+      <main className="min-h-screen">
+        <div className="max-w-2xl mx-auto px-6 pt-20 pb-24">
+          {/* Headline */}
+          <div className="mb-12">
+            <p className="text-xs font-semibold text-primary/70 uppercase tracking-widest mb-3">Your CX architecture</p>
+            <h1 className="text-4xl font-bold tracking-tight text-slate-900 leading-tight mb-4">
+              One conversation.<br />Your entire customer journey, mapped.
+            </h1>
+            <p className="text-slate-500 text-lg leading-relaxed max-w-lg">
+              Tell us about your business. CX Mate generates a complete picture — every stage, every risk, every action to take on Monday.
+            </p>
+          </div>
+
+          {/* Output preview cards */}
+          <div className="grid grid-cols-3 gap-3 mb-10">
+            <div className="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-sm">
+              <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center mb-3">
+                <svg viewBox="0 0 20 20" width="18" height="18" fill="none">
+                  <circle cx="3" cy="16" r="2" fill="#0D9488" />
+                  <circle cx="10" cy="10" r="2" fill="#0D9488" />
+                  <circle cx="17" cy="4"  r="2" fill="#0D9488" />
+                  <path d="M3 16 C5.5 13.5 7.5 11.5 10 10 C12.5 8.5 14.5 6 17 4" stroke="#0D9488" strokeWidth="1.6" strokeLinecap="round" fill="none" />
+                </svg>
+              </div>
+              <p className="text-sm font-semibold text-slate-900 mb-1">Journey Map</p>
+              <p className="text-xs text-slate-500 leading-relaxed">Your full lifecycle, stage by stage — every moment that makes or breaks a customer</p>
+            </div>
+            <div className="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-sm">
+              <div className="w-9 h-9 rounded-xl bg-rose-50 flex items-center justify-center mb-3">
+                <svg viewBox="0 0 20 20" width="18" height="18" fill="none">
+                  <rect x="3" y="10" width="3" height="8" rx="1.5" fill="#F43F5E" />
+                  <rect x="8.5" y="6" width="3" height="12" rx="1.5" fill="#F43F5E" />
+                  <rect x="14" y="2" width="3" height="16" rx="1.5" fill="#F43F5E" opacity="0.4" />
+                  <path d="M4 7 L9.5 4 L15 6" stroke="#F43F5E" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </div>
+              <p className="text-sm font-semibold text-slate-900 mb-1">CX Report</p>
+              <p className="text-xs text-slate-500 leading-relaxed">Revenue at risk, failure patterns, and the 3 things most likely to kill your growth</p>
+            </div>
+            <div className="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-sm">
+              <div className="w-9 h-9 rounded-xl bg-amber-50 flex items-center justify-center mb-3">
+                <svg viewBox="0 0 20 20" width="18" height="18" fill="none">
+                  <rect x="3" y="2" width="14" height="16" rx="2" stroke="#D97706" strokeWidth="1.6" />
+                  <path d="M7 7h6M7 10h6M7 13h4" stroke="#D97706" strokeWidth="1.4" strokeLinecap="round" />
+                  <circle cx="15" cy="15" r="3.5" fill="#D97706" />
+                  <path d="M13.5 15l1 1 2-1.5" stroke="white" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </div>
+              <p className="text-sm font-semibold text-slate-900 mb-1">CX Sprint</p>
+              <p className="text-xs text-slate-500 leading-relaxed">A prioritized action plan — what to fix first and exactly how to fix it</p>
+            </div>
+          </div>
+
+          {/* CTA */}
+          <div className="flex items-center gap-4">
+            <Link href="/onboarding">
+              <Button size="lg" className="font-semibold px-8">
+                Map my customer journey →
+              </Button>
+            </Link>
+            <p className="text-xs text-slate-400">Takes about 5 minutes</p>
+          </div>
         </div>
       </main>
     );
