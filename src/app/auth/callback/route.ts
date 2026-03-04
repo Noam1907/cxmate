@@ -50,8 +50,10 @@ export async function GET(request: Request) {
           // Continue anyway — they can still use preview mode
         }
 
-        // New user goes to onboarding
-        return NextResponse.redirect(`${origin}/onboarding`);
+        // New user — use redirect param if provided (e.g. magic link from onboarding),
+        // otherwise default to /onboarding for standard email+password signups
+        const newUserRedirect = searchParams.get("redirect") || "/onboarding";
+        return NextResponse.redirect(`${origin}${newUserRedirect}`);
       }
 
       // Existing user with org — go to dashboard or redirect target

@@ -101,7 +101,7 @@ export function StepWelcome({ data, onChange }: StepWelcomeProps) {
             className="h-12 rounded-xl border-border/60 text-sm"
           />
           <p className="text-xs text-muted-foreground">
-            So we can send you your results and follow up with insights
+            We&apos;ll create your account and send you a link to access your results anytime
           </p>
         </div>
 

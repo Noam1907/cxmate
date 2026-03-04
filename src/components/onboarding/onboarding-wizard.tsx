@@ -20,6 +20,7 @@ import { useCompanyEnrichment } from "@/hooks/use-company-enrichment";
 import { useOnboardingAutosave, loadOnboardingDraft, clearOnboardingDraft } from "@/hooks/use-onboarding-autosave";
 import type { EnrichedCompanyData } from "@/types/enrichment";
 import { track, identify } from "@/lib/analytics";
+import { createClient } from "@/lib/supabase/client";
 
 type StepKey =
   | "welcome"
@@ -562,16 +563,32 @@ export function OnboardingWizard() {
   }, []);
 
   const handleNext = () => {
-    // Trigger enrichment + identify user when leaving the welcome step
+    // Trigger enrichment + identify + sign-up when leaving the welcome step
     if (currentStep?.key === "welcome" && data.companyName) {
       enrich(data.companyName, data.companyWebsite);
-      // Identify in PostHog so we know who this session belongs to
+
       if (data.userEmail) {
+        // Identify in PostHog so we know who this session belongs to
         identify(data.userEmail, {
           name: data.userName || undefined,
           role: data.userRole || undefined,
           company: data.companyName,
         });
+
+        // Send magic link — creates account if new, sends sign-in link if existing.
+        // Fire-and-forget: never block onboarding for auth.
+        const supabase = createClient();
+        supabase.auth.signInWithOtp({
+          email: data.userEmail,
+          options: {
+            emailRedirectTo: `${window.location.origin}/auth/callback?redirect=/dashboard`,
+            shouldCreateUser: true,
+            data: {
+              company_name: data.companyName,
+              name: data.userName || undefined,
+            },
+          },
+        }).catch(() => {/* silent — auth should never break onboarding */});
       }
     }
 
