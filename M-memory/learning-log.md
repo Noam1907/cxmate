@@ -131,6 +131,20 @@ Key validated stats for use in impact projections, prompts, and messaging (sourc
 
 ---
 
+### 2026-03-04 — Production Reliability: PostHog Token + Auth Retry + Health System
+
+- **PostHog API key: character-by-character verification is mandatory.** PostHog returns `{"status":"Ok"}` even for wrong tokens — it doesn't validate the key on the decide endpoint. The only way to confirm a token is correct is to check character codes directly (`"phc_...".charCodeAt(i)`) or see events appear in the UI. Zero events in PostHog almost always means the token is wrong, not that tracking is broken. Specific chars: `O` (letter, charCode 79) vs `0` (zero, charCode 48) are visually identical in most fonts.
+- **Use `printf`, NEVER `echo` for Vercel env vars.** `echo 'value'` appends a `\n` newline. For `NEXT_PUBLIC_*` vars baked into the JS bundle at build time, this creates a token that's 1 character longer than it should be, causing silent failures. Always: `printf 'value' | npx vercel env add VAR_NAME production`. Verify with: `printf 'value' | wc -c` vs expected length.
+- **`NEXT_PUBLIC_*` vars require `vercel --prod --force` after change.** These vars are baked into the JS bundle at build time. Updating them in Vercel dashboard does nothing until a new build runs. Always use `--force` to trigger a full rebuild. This is documented in `deploy-checklist.md`.
+- **Auth "Failed to fetch" is transient — retry, don't panic.** Supabase Auth cold starts, brief DNS hiccups, and network blips all cause `supabase.auth.signInWithPassword()` to throw "Failed to fetch." The Supabase endpoint itself is fine (direct `curl` confirms 200 in <1s). Pattern: `withRetry<T extends { error: any }>(fn, maxRetries=2, delayMs=800)` — wraps any Supabase call, retries on "Failed to fetch" with 800ms/1600ms backoff. TypeScript generic constraint: must be `T extends { error: any }` not bare `<T>` to allow Supabase's varied return types.
+- **`AbortSignal.timeout(ms)` is cleaner than AbortController for service checks.** No need for `controller.abort()` cleanup. `fetch(url, { signal: AbortSignal.timeout(5000) })` auto-cancels after 5s and throws `TimeoutError`. Use 5s for external APIs, 15s for health-check-calling-health-check (avoids recursive timeouts).
+- **Proactive verification beats reactive debugging.** Three layers: (1) `/api/health` — always-on URL, can be bookmarked, used in monitoring. (2) `npm run verify` — gates every deploy before sharing with testers. (3) Morning Briefing — daily email catches overnight drift. Before this system, production bugs were found by users. After this system, they're found before users ever see them.
+- **`npm run deploy` = `vercel --prod --force && verify`**: The verification script runs automatically after every deploy. If it fails, the deploy is flagged immediately — before Slack, before DMs, before testers. This is the minimum viable production gate.
+- **Health endpoint must validate env var _format_, not just presence.** `NEXT_PUBLIC_POSTHOG_KEY` existing is not enough — it must start with `phc_` and contain no newlines/spaces. The PostHog health check now validates both format and connectivity. Other services: presence check is sufficient since bad values return non-200.
+- **Always run `npm run verify` before ending any session.** COO session-end protocol: (1) `npm run verify` — confirm production is healthy, (2) update sprint-log, (3) note any warnings. If anything is degraded, fix it before logging off.
+
+---
+
 ## Version History
 
 | Date | Update | By |

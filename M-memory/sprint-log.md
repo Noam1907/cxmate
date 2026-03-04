@@ -300,6 +300,31 @@ Track sprint progress and status.
 
 ---
 
+## Session — 2026-03-04 (Production Reliability + Proactive Verification)
+
+### Completed this session
+- **PostHog token O vs 0 bug fixed** — Token had number `0` in two positions where the real token has letter `O`. Removed old key from Vercel + `.env.local`, re-added correct one using `printf` (not `echo` — avoids trailing newline). Verified via PostHog MCP: events confirmed flowing (`$pageview`, `$pageleave`, `test_token_fix_verified`). Character confirmed via charCode check: 79 = letter O ✅
+- **Auth retry logic (`withRetry()`) added** — Intermittent "Connection error" on login mapped to "Failed to fetch" from `supabase.auth.signInWithPassword` (transient network/cold start). Added `withRetry<T extends { error: any }>()` wrapping both signIn and signUp: up to 2 retries, 800ms/1600ms exponential backoff before surfacing error. TypeScript generic needed `extends { error: any }` to satisfy Supabase's varied return types. Deployed.
+- **`/api/health` endpoint created** — `src/app/api/health/route.ts`. Server-side `GET` route that calls all 6 external services with real network requests: Supabase Auth (`/auth/v1/settings`), Supabase DB (live query on `organizations`), Claude API (minimal 1-token message), Resend (list API keys), PostHog (decide endpoint — validates `phc_` format + no newlines), App URL (env var check). Returns `{ status: "healthy"|"degraded"|"unhealthy", timestamp, summary, checks: [{service, status, message, latencyMs}] }`. HTTP 503 on failures, 200 on healthy/degraded. First run: 5/6 pass, `NEXT_PUBLIC_APP_URL` was localhost — fixed.
+- **`scripts/verify-deploy.ts` CLI verification script** — `npx tsx scripts/verify-deploy.ts [BASE_URL]`. 5 checks: Homepage loads + contains "CX Mate", Health endpoint (with per-service printout), Auth page loads (200 + Next.js shell — client-rendered, checks for `__next`/`_next`/`CX Mate`), Journey API 401, Notify API responds. Exit code 1 on failures. Last run: `🟢 ALL CHECKS PASSED — 5/5 services verified. Safe to share with testers.`
+- **npm scripts added** — `verify` (production check), `verify:local` (localhost check), `deploy` (force deploy + auto-verify).
+- **`T-tools/deploy-checklist.md` created** — Pre-deploy checklist (TypeScript, env var safety, required vars list), post-deploy automated + manual smoke test, "safe env var pattern" (printf not echo), lessons table from today's bugs, emergency fix commands, COO session-end protocol.
+- **Morning Briefing with system health** — Updated `src/app/api/digest/send/route.ts`: renamed from "Daily Digest" to "Morning Briefing", added System Health section (🟢/🟡/🔴 + per-service table), runs health check + stats in parallel, added Quick Links (PostHog, Supabase, Open App). Cron moved from `0 8 * * *` → `0 5 * * *` (5am UTC = 7am Israel). Committed `be812c2`.
+- **`NEXT_PUBLIC_APP_URL` fixed on Vercel** — Was `http://localhost:3000`, changed to `https://cx-mate.vercel.app` using `printf`.
+
+### What's now proactive (not reactive)
+- Every deploy: `npm run deploy` auto-runs `verify-deploy.ts` — catches broken services before testers hit them
+- Every morning at 7am IL: Morning Briefing email shows system health + stats
+- Always-on: `https://cx-mate.vercel.app/api/health` returns live service status in JSON
+
+### Next session starts with
+- Revenue Protected counter on Dashboard (starts $0, grows with playbook completion — benchmark-based)
+- Playbook persistence to Supabase (Phase 4)
+- Full regression QA / gatekeeper audit
+- Journey health scoring (P1)
+
+---
+
 ## Session — 2026-03-02 (Strategic / Design Session)
 
 ### Completed this session
