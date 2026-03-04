@@ -81,18 +81,18 @@ function HeroCards() {
         </div>
       </div>
 
-      {/* Card 3 — Output: Playbook Ready */}
+      {/* Card 3 — Output: Sprint Ready */}
       <div
         className="rounded-2xl border-2 p-5 shadow-lg"
         style={{ backgroundColor: "#DCFCE7", borderColor: "#16A34A" }}
       >
         <div className="flex items-center gap-2 mb-3">
-          <span className="text-lg">📋</span>
+          <span className="text-lg">⚡</span>
           <span className="text-xs font-bold uppercase tracking-widest text-green-700">
             Output
           </span>
         </div>
-        <p className="text-sm font-bold text-slate-800 mb-2">Playbook Ready</p>
+        <p className="text-sm font-bold text-slate-800 mb-2">Sprint Ready</p>
         <div className="flex flex-col gap-1.5">
           <div className="flex justify-between text-xs">
             <span className="text-slate-500">Actions prioritized</span>
@@ -134,14 +134,15 @@ function HeroSection() {
 
             {/* Headline — big, confrontational */}
             <h1 className="text-5xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-slate-900 leading-[1.04] mb-6">
-              Stop building your journey{" "}
-              <span style={{ color: "#0D9488" }}>by accident.</span>
+              Stop running your CX{" "}
+              <span style={{ color: "#0D9488" }}>on gut feel.</span>
             </h1>
 
             {/* Subheadline */}
             <p className="text-lg sm:text-xl text-slate-600 leading-relaxed mb-10 max-w-md">
-              Your customers have a journey, whether you designed it or not.
-              One conversation reveals where revenue is leaking — and exactly what to fix first.
+              Most B2B founders set their customer journey from instinct and templates — not data.
+              CX Mate maps 50+ meaningful moments against your exact stage and vertical.
+              One conversation. Evidence you can act on. This week.
             </p>
 
             {/* CTAs */}
@@ -152,7 +153,7 @@ function HeroSection() {
                   className="rounded-xl px-8 py-6 text-base font-bold shadow-md hover:shadow-xl transition-all"
                   style={{ backgroundColor: "#0D9488", color: "white" }}
                 >
-                  Get Your Action Playbook →
+                  Get Your Week 1 CX Sprint →
                 </Button>
               </Link>
               <p className="text-sm text-slate-500">
@@ -213,7 +214,7 @@ function DarkSection() {
             className="rounded-xl px-8 py-6 text-base font-bold"
             style={{ backgroundColor: "#0D9488", color: "white" }}
           >
-            Map Your Journey Now →
+            Get Your Week 1 CX Sprint →
           </Button>
         </Link>
       </div>
@@ -253,9 +254,9 @@ function HowItWorksSection() {
     },
     {
       number: "03",
-      label: "Playbook",
-      title: "You get a playbook",
-      description: "Prioritized actions with copy-paste templates and expected outcomes. Not advice. What to do this week.",
+      label: "Sprint",
+      title: "You get a sprint plan",
+      description: "Prioritized actions with copy-paste templates and expected outcomes. Not advice. What to ship this week.",
       trigger: "Gap analysis",
       action: "12 actions ranked",
       result: "Week 1: 3 quick wins",
@@ -331,10 +332,10 @@ function FeaturesSection() {
       emoji: "🗺️",
     },
     {
-      badge: "Action Playbook",
-      title: "What to do about it, this week",
-      description: "Prioritized actions with copy-paste templates. Not theory. Execution.",
-      emoji: "📋",
+      badge: "CX Sprint",
+      title: "What to ship this week",
+      description: "Prioritized actions with copy-paste templates and expected outcomes. Not theory. Execution. Starting Monday.",
+      emoji: "⚡",
     },
     {
       badge: "Benchmarking",
@@ -397,7 +398,7 @@ function BottomCTA() {
             className="rounded-xl px-10 py-7 text-base font-bold shadow-lg hover:shadow-xl transition-all"
             style={{ backgroundColor: "#0D9488", color: "white" }}
           >
-            Get Your Action Playbook →
+            Get Your Week 1 CX Sprint →
           </Button>
         </Link>
         <p className="text-xs text-slate-600 mt-4">
