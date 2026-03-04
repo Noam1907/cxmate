@@ -55,7 +55,7 @@ Works at any stage:
 
 | Tier | Price | What's Included |
 |------|-------|-----------------|
-| **Starter** | Results in 5 min, no account needed | Full journey map + CX Intelligence Report + Playbook + PDF export + NotebookLM export |
+| **Free** | No account needed | Full journey map + CX Intelligence Report + Playbook + PDF export + NotebookLM export |
 | **Starter (save + track)** | $79/month | Everything above, saved to your account + Revenue Protected counter + Monthly CX Score |
 | **Pro** | $199/month | Monthly Pulse (before/after tracking) + HubSpot/Intercom integration + Competitive CX monitoring |
 

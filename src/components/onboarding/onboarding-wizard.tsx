@@ -19,7 +19,7 @@ import { useCompanyProfile } from "@/contexts/company-profile-context";
 import { useCompanyEnrichment } from "@/hooks/use-company-enrichment";
 import { useOnboardingAutosave, loadOnboardingDraft, clearOnboardingDraft } from "@/hooks/use-onboarding-autosave";
 import type { EnrichedCompanyData } from "@/types/enrichment";
-import { track } from "@/lib/analytics";
+import { track, identify } from "@/lib/analytics";
 
 type StepKey =
   | "welcome"
@@ -39,7 +39,7 @@ interface StepDef {
 }
 
 const validationMap: Record<StepKey, (data: OnboardingData) => boolean> = {
-  welcome: (d) => !!d.companyName,
+  welcome: (d) => !!(d.companyName && d.userEmail),
   company: (d) => !!(d.vertical && d.companySize),
   maturity: (d) => !!d.companyMaturity,
   journey_exists: (d) => !!d.hasExistingJourney,
@@ -86,6 +86,7 @@ function buildSteps(data: OnboardingData): StepDef[] {
 
 const initialData: OnboardingData = {
   userName: "",
+  userEmail: "",
   userRole: "",
   companyName: "",
   companyWebsite: "",
@@ -561,9 +562,17 @@ export function OnboardingWizard() {
   }, []);
 
   const handleNext = () => {
-    // Trigger enrichment when leaving the welcome step
+    // Trigger enrichment + identify user when leaving the welcome step
     if (currentStep?.key === "welcome" && data.companyName) {
       enrich(data.companyName, data.companyWebsite);
+      // Identify in PostHog so we know who this session belongs to
+      if (data.userEmail) {
+        identify(data.userEmail, {
+          name: data.userName || undefined,
+          role: data.userRole || undefined,
+          company: data.companyName,
+        });
+      }
     }
 
     // Track step completion

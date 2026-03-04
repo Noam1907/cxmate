@@ -9,6 +9,7 @@ export type CompanyMaturity = "pre_launch" | "first_customers" | "growing" | "sc
 export interface OnboardingData {
   // Step 1: Welcome
   userName?: string;
+  userEmail?: string;
   userRole?: string;
   companyName: string;
   companyWebsite: string;

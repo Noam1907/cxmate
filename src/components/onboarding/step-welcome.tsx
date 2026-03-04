@@ -71,7 +71,7 @@ export function StepWelcome({ data, onChange }: StepWelcomeProps) {
         </p>
         <p>
           Let&apos;s figure out where you are and what you need.
-          This takes about 5 minutes.
+          This takes a few minutes — and the output is worth it.
         </p>
       </ChatBubble>
 
@@ -87,6 +87,22 @@ export function StepWelcome({ data, onChange }: StepWelcomeProps) {
             autoFocus
             className="h-12 rounded-xl border-border/60 text-sm"
           />
+        </div>
+
+        {/* Person's email */}
+        <div className="space-y-2">
+          <Label htmlFor="userEmail" className="text-sm font-semibold text-foreground">Your email</Label>
+          <Input
+            id="userEmail"
+            type="email"
+            placeholder="e.g. sarah@company.com"
+            value={data.userEmail || ""}
+            onChange={(e) => onChange({ userEmail: e.target.value })}
+            className="h-12 rounded-xl border-border/60 text-sm"
+          />
+          <p className="text-xs text-muted-foreground">
+            So we can send you your results and follow up with insights
+          </p>
         </div>
 
         {/* Person's role */}
