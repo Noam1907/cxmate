@@ -42,7 +42,7 @@ export function NavHeader() {
   ];
 
   return (
-    <header className="border-b border-slate-200 bg-white sticky top-0 z-50">
+    <header className="border-b border-slate-200/70 bg-background sticky top-0 z-50">
       <div className="max-w-full px-6 flex items-center justify-between h-14">
         <Link href={isOnboarding || isAuth ? "/" : "/dashboard"} className="flex items-center gap-2">
           <div className="w-7 h-7 rounded-lg bg-primary flex items-center justify-center shrink-0">

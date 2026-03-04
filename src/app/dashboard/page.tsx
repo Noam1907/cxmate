@@ -145,7 +145,7 @@ export default function DashboardPage() {
   const topInsights = (data.journey.confrontationInsights || []).filter((i) => i.likelihood === "high").slice(0, 3);
 
   return (
-    <main className="min-h-screen bg-white">
+    <main className="min-h-screen">
       <div className="max-w-3xl mx-auto px-6 py-16">
 
         {/* Header */}

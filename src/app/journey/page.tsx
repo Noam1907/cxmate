@@ -191,7 +191,7 @@ function JourneyContent() {
 
 export default function JourneyPage() {
   return (
-    <main className="min-h-screen py-12 px-4 bg-white">
+    <main className="min-h-screen py-12 px-4">
       <Suspense
         fallback={<PageLoading label="Loading..." />}
       >

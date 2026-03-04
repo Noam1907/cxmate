@@ -328,7 +328,7 @@ export default function PlaybookPage() {
   if (!playbook) {
     const isGenerating = loading || preparing;
     return (
-      <main className="min-h-screen bg-white py-16 px-6">
+      <main className="min-h-screen py-16 px-6">
         <div className="max-w-lg mx-auto space-y-8">
           {isGenerating ? (
             <>
@@ -392,7 +392,7 @@ export default function PlaybookPage() {
       }));
 
   return (
-    <main className="min-h-screen bg-white">
+    <main className="min-h-screen">
       {/* PDF cover page — invisible on screen, page 1 of exported PDF */}
       <PrintCover
         firstName={firstName || undefined}

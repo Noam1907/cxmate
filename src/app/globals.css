@@ -56,12 +56,13 @@
     --color-coral: #F97316;
     --color-coral-light: #FFF7ED;
     --color-warm-bg: #FAFAF8;
+    --color-sage: #E8EDE5;
 }
 
 :root {
     --radius: 0.75rem;
     /* Warm & Professional — Teal primary with warm accents */
-    --background: oklch(0.98 0.002 240);
+    --background: oklch(0.928 0.013 148); /* Sage #E8EDE5 */
     --foreground: oklch(0.15 0.02 240);
     --card: oklch(1 0 0);
     --card-foreground: oklch(0.20 0.03 240);

@@ -437,7 +437,7 @@ function ConfrontationContent() {
   const config = MODE_CONFIG[mode];
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen">
       {/* PDF cover page — invisible on screen, page 1 of exported PDF */}
       <PrintCover
         firstName={firstName || undefined}
