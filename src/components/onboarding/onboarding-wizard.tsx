@@ -202,7 +202,7 @@ function StepGenerate({
           ))}
         </ul>
         <p className="text-xs text-muted-foreground border-t border-border/40 pt-3 mt-1">
-          Takes about 5 minutes. Completely personalized to your business.
+          Completely personalized to your business.
         </p>
       </div>
 
@@ -386,7 +386,7 @@ function IntroHero({ onStart }: { onStart: () => void }) {
           Map my journey →
         </Button>
         <p className="text-sm text-muted-foreground">
-          Takes about 5 minutes. No account needed.
+          Free. No credit card needed.
         </p>
       </div>
 
