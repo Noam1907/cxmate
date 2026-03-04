@@ -126,9 +126,9 @@ function HeroImpactCard({ projections, delay }: { projections: ImpactProjection[
 
   return (
     <div className={`rounded-2xl bg-gradient-to-br from-slate-800 to-teal-900 text-white p-8 transition-all duration-700 ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
-      <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-3">Revenue leaving through CX gaps — annually</p>
+      <p className="text-xs font-semibold text-slate-300 uppercase tracking-widest mb-3">Potential revenue at risk annually</p>
       <div className="text-6xl font-bold tracking-tight">{lo} – {hi}</div>
-      <p className="text-sm text-slate-400 mt-3 leading-relaxed max-w-md">
+      <p className="text-sm text-slate-300 mt-3 leading-relaxed max-w-md">
         Based on your deal size, customer count, and industry benchmarks. Fix the issues below to recapture it.
       </p>
     </div>
@@ -144,9 +144,9 @@ function StatRow({ highRisk, critical, moments, delay }: { highRisk: number; cri
         <div className={`text-3xl font-bold tracking-tight ${highRisk > 0 ? "text-rose-600" : "text-slate-900"}`}>{highRisk}</div>
         <div className={`text-xs mt-1 font-medium ${highRisk > 0 ? "text-rose-500" : "text-slate-500"}`}>High-risk patterns</div>
       </div>
-      <div className={`rounded-xl p-5 ${critical > 0 ? "bg-amber-50 border border-amber-100" : "bg-white border border-slate-200"}`}>
-        <div className={`text-3xl font-bold tracking-tight ${critical > 0 ? "text-amber-700" : "text-slate-900"}`}>{critical}</div>
-        <div className={`text-xs mt-1 font-medium ${critical > 0 ? "text-amber-600" : "text-slate-500"}`}>Critical moments</div>
+      <div className={`rounded-xl p-5 ${critical > 0 ? "bg-rose-50 border border-rose-100" : "bg-white border border-slate-200"}`}>
+        <div className={`text-3xl font-bold tracking-tight ${critical > 0 ? "text-rose-700" : "text-slate-900"}`}>{critical}</div>
+        <div className={`text-xs mt-1 font-medium ${critical > 0 ? "text-rose-600" : "text-slate-500"}`}>Critical moments</div>
       </div>
       <div className="rounded-xl p-5 bg-white border border-slate-200">
         <div className="text-3xl font-bold tracking-tight text-slate-900">{moments}</div>
@@ -171,8 +171,8 @@ function ImpactBreakdown({ projections, delay }: { projections: ImpactProjection
     <FadeIn delay={delay}>
       <div className="rounded-xl border bg-white p-6">
         <div className="mb-5">
-          <h3 className="text-sm font-semibold text-slate-900">Where the risk is concentrated</h3>
-          <p className="text-xs text-slate-400 mt-1">Each area is estimated from your deal size × churn rate × industry benchmarks</p>
+          <h3 className="text-base font-semibold text-slate-900">Where the risk is concentrated</h3>
+          <p className="text-sm text-slate-500 mt-1">Estimated from your deal size, churn rate, and industry benchmarks</p>
         </div>
         <div className="space-y-5">
           {parsed.map((item, i) => {
@@ -187,8 +187,8 @@ function ImpactBreakdown({ projections, delay }: { projections: ImpactProjection
                   <div className="h-full rounded-full bg-slate-400 transition-all duration-1000 ease-out" style={{ width: `${pct}%` }} />
                 </div>
                 <div className="flex items-center justify-between mt-1.5">
-                  <span className="text-xs text-slate-400">{item.timeToRealize}</span>
-                  <span className="text-xs text-slate-400">{item.effort} effort · {item.dataSource === "user_provided" ? "your data" : "industry benchmark"}</span>
+                  <span className="text-xs text-slate-500">{item.timeToRealize}</span>
+                  <span className="text-xs text-slate-500">{item.effort} effort · {item.dataSource === "user_provided" ? "your data" : "industry benchmark"}</span>
                 </div>
               </div>
             );
@@ -305,24 +305,29 @@ function AssumptionsSection({ assumptions, projections, delay }: { assumptions: 
           onClick={() => setOpen(!open)}
           className="w-full flex items-center justify-between text-left"
         >
-          <span className="text-xs font-medium text-slate-500">How we calculated these numbers</span>
-          <span className="text-xs text-slate-400">{open ? "Hide ↑" : "Show ↓"}</span>
+          <span className="text-sm font-medium text-slate-600">How we calculated these numbers</span>
+          <span className="text-sm text-slate-500">{open ? "Hide ↑" : "Show ↓"}</span>
         </button>
         {open && (
           <div className="mt-4 pt-4 border-t border-slate-200 space-y-3">
             {projections.filter((p) => p.calculation).map((p, i) => (
               <div key={i}>
-                <p className="text-xs font-medium text-slate-600 mb-0.5">{p.area}</p>
-                <p className="text-xs text-slate-400 font-mono">{p.calculation}</p>
+                <p className="text-sm font-medium text-slate-700 mb-0.5">{p.area}</p>
+                <p className="text-xs text-slate-500 font-mono">{p.calculation}</p>
               </div>
             ))}
-            {assumptions.map((a, i) => (
-              <p key={i} className="text-xs text-slate-400 flex gap-2">
-                <span className="shrink-0">·</span>
-                <span>{a}</span>
-              </p>
-            ))}
-            <p className="text-xs text-slate-400 italic pt-2 border-t border-slate-200">These are directional estimates — not guarantees. They exist to help you prioritize.</p>
+            {assumptions.length > 0 && (
+              <div className="pt-2 border-t border-slate-200">
+                <p className="text-xs font-medium text-slate-600 mb-2">Key assumptions</p>
+                {assumptions.map((a, i) => (
+                  <p key={i} className="text-xs text-slate-500 flex gap-2 mb-1">
+                    <span className="shrink-0">·</span>
+                    <span>{a}</span>
+                  </p>
+                ))}
+              </div>
+            )}
+            <p className="text-xs text-slate-500 italic pt-2 border-t border-slate-200">These are directional estimates to help you prioritize, not guarantees.</p>
           </div>
         )}
       </div>
@@ -455,7 +460,7 @@ function ConfrontationContent() {
               <h1 className="text-4xl font-bold tracking-tight text-slate-800 mb-3 leading-tight">{config.headline(companyName)}</h1>
               <p className="text-base text-slate-500 leading-relaxed">{config.subtitle}</p>
             </div>
-            <ExportPdfButton page="cx_report" title={`${companyName || "CX Mate"} — CX Intelligence Report`} />
+            <ExportPdfButton page="cx_report" title={`${companyName || "CX Mate"} - CX Intelligence Report`} />
           </div>
         </div>
 
@@ -511,7 +516,7 @@ function ConfrontationContent() {
             <FadeIn delay={1700}>
               <div className="mb-6">
                 <h2 className="text-2xl font-bold text-slate-900">{config.insightsHeading(hasExistingCustomers)}</h2>
-                <p className="text-sm text-slate-400 mt-1.5">Click any issue to see what to do — ordered by urgency</p>
+                <p className="text-sm text-slate-500 mt-1.5">Click any issue to see what to do, ordered by urgency</p>
               </div>
             </FadeIn>
 

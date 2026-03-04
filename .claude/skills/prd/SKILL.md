@@ -247,6 +247,11 @@ Before shipping any document:
 - Label what's validated vs. hypothesized: `[VALIDATED]` / `[HYPOTHESIS]`
 - "So what?" after every analysis section — connect insights to decisions
 
-## Output Location
+## Integration with the System
 
-Save all product documents to: `P-prds/[feature-name].md`
+When using this skill:
+
+1. **Read from C-core** — project-brief, product-architecture, tech-stack before writing
+2. **Check M-memory** — learning-log and decisions for past patterns and constraints
+3. **Output to O-output** — save the document to `O-output/[feature-name].md`
+4. **Update M-memory** — log any new product decision patterns to `M-memory/learning-log.md` after

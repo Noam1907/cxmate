@@ -16,8 +16,8 @@ interface JourneyVisualProps {
 // ============================================
 
 const severityConfig = {
-  critical: { dot: "bg-rose-400", ring: "ring-rose-200", text: "text-rose-600", label: "Critical" },
-  high:     { dot: "bg-amber-400", ring: "ring-amber-200", text: "text-amber-600", label: "High" },
+  critical: { dot: "bg-rose-500", ring: "ring-rose-200", text: "text-rose-600", label: "Critical" },
+  high:     { dot: "bg-amber-500", ring: "ring-amber-200", text: "text-amber-700", label: "High" },
   medium:   { dot: "bg-slate-400", ring: "ring-slate-200", text: "text-slate-500", label: "Medium" },
   low:      { dot: "bg-slate-300", ring: "ring-slate-100", text: "text-slate-400", label: "Low" },
 };

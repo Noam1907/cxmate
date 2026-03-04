@@ -51,7 +51,7 @@ export function StepCompany({ data, onChange, enrichment, isEnriching }: StepCom
         ) : (
           <>
             <p>Nice to meet you{data.userName ? `, ${data.userName}` : ""}!</p>
-            <p>Tell me a bit about <strong>{data.companyName || "your company"}</strong> so I can tailor everything to your world.</p>
+            <p>This helps me tailor the journey to <strong>{data.companyName || "your company"}</strong> specifically.</p>
           </>
         )}
       </ChatBubble>
@@ -135,7 +135,7 @@ export function StepCompany({ data, onChange, enrichment, isEnriching }: StepCom
           {enrichment.confidence && !editingDescription && (
             <div className="flex items-center gap-2 text-xs text-muted-foreground pt-1">
               <span className={`w-2 h-2 rounded-full ${enrichment.confidence === "high" ? "bg-emerald-500" : enrichment.confidence === "medium" ? "bg-amber-500" : "bg-gray-400"}`} />
-              {enrichment.confidence === "high" ? "High confidence" : enrichment.confidence === "medium" ? "Medium confidence" : "Best guess"} — your corrections override this
+              {enrichment.confidence === "high" ? "High confidence" : enrichment.confidence === "medium" ? "Medium confidence" : "Best guess"}. Your corrections override this
             </div>
           )}
         </div>
@@ -187,7 +187,7 @@ export function StepCompany({ data, onChange, enrichment, isEnriching }: StepCom
       <div className="rounded-2xl border border-border/60 bg-white p-6 space-y-4 shadow-sm">
         <div>
           <Label className="text-sm font-semibold text-foreground">Which industry are you in? <span className="font-normal text-muted-foreground">(optional)</span></Label>
-          <p className="text-xs text-muted-foreground mt-1">Helps me tailor the journey — e.g. Fintech has compliance moments, Healthtech has procurement cycles</p>
+          <p className="text-xs text-muted-foreground mt-1">Helps me tailor the journey. For example, Fintech has compliance moments, Healthtech has procurement cycles</p>
         </div>
         <div className="flex flex-wrap gap-2">
           {INDUSTRY_VERTICALS.map((v) => (

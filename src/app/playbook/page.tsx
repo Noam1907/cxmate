@@ -328,31 +328,50 @@ export default function PlaybookPage() {
   if (!playbook) {
     const isGenerating = loading || preparing;
     return (
-      <main className="min-h-screen flex items-center justify-center p-8">
-        <div className="text-center space-y-5 max-w-md">
+      <main className="min-h-screen bg-white py-16 px-6">
+        <div className="max-w-lg mx-auto space-y-8">
           {isGenerating ? (
             <>
-              <h1 className="text-2xl font-bold text-slate-900">
-                {loading ? "Building your playbook" : "Preparing your playbook…"}
-              </h1>
-              <p className="text-slate-500">
-                {loading
-                  ? "Turning your journey map into a step-by-step action plan."
-                  : "Your playbook is being generated in the background. Won't be long."}
-              </p>
-              <div className="h-1 bg-slate-100 rounded-full overflow-hidden max-w-xs mx-auto">
-                <div className="h-full bg-primary rounded-full animate-pulse w-2/3" />
+              <div className="text-center space-y-3">
+                <h1 className="text-2xl font-bold text-slate-900">Building your playbook</h1>
+                <p className="text-slate-500">
+                  Turning your journey map into prioritized actions you can start this week.
+                </p>
+                <div className="h-1 bg-slate-100 rounded-full overflow-hidden max-w-xs mx-auto">
+                  <div className="h-full bg-primary rounded-full animate-pulse w-2/3" />
+                </div>
+              </div>
+
+              {/* What you'll get — shown during loading */}
+              <div className="rounded-xl border border-slate-200 bg-slate-50/50 p-5 space-y-4">
+                <p className="text-xs font-semibold text-slate-500 uppercase tracking-widest">What you&apos;ll get</p>
+                <div className="space-y-3">
+                  {[
+                    { title: "Week one checklist", desc: "The 3-5 highest-impact actions to start immediately" },
+                    { title: "Stage-by-stage actions", desc: "Specific tasks for every stage of your customer journey" },
+                    { title: "Copy-paste templates", desc: "Ready-to-use email templates, scripts, and process docs" },
+                    { title: "Progress tracking", desc: "Check off actions as you complete them" },
+                  ].map((item) => (
+                    <div key={item.title} className="flex items-start gap-3">
+                      <div className="w-1.5 h-1.5 rounded-full bg-primary mt-1.5 shrink-0" />
+                      <div>
+                        <p className="text-sm font-medium text-slate-700">{item.title}</p>
+                        <p className="text-xs text-slate-500">{item.desc}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             </>
           ) : (
-            <>
+            <div className="text-center space-y-5">
               <h1 className="text-2xl font-bold text-slate-900">Your CX Playbook</h1>
               <p className="text-slate-500">Turn your journey map into a step-by-step action plan with templates and timelines.</p>
               {error && <p className="text-sm text-red-600 bg-red-50 rounded-lg p-3 border border-red-100">{error}</p>}
               <Button onClick={handleGenerate} disabled={loading} size="lg">
                 Generate My Playbook
               </Button>
-            </>
+            </div>
           )}
         </div>
       </main>

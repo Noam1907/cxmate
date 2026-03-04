@@ -34,6 +34,8 @@ When starting ANY new conversation from this folder, ALWAYS:
 This is a multi-agent development project for CX Mate, an AI-powered CX orchestration platform.
 
 **Agents:**
+
+*Product & Execution*
 1. **Shoval (COO)** - Drives execution, tracks progress, keeps things moving without being asked
 2. Product Lead - Requirements, user stories, prioritization
 3. CX Architect - Journey methodology, CX best practices
@@ -42,11 +44,19 @@ This is a multi-agent development project for CX Mate, an AI-powered CX orchestr
 6. Backend Dev - APIs, database, integrations
 7. AI Engineer - LLM prompts, intelligence layer
 8. QA Agent - Testing, quality validation
-9. Design Agent - Visual design, UX polish, design system
-10. Brand Expert - External brand identity, marketing visuals
-11. Growth Agent - Messaging, content strategy, GTM
-12. DevOps Agent - Deployment, CI/CD, infrastructure
-13. QA Gatekeeper - Market-readiness audits
+9. QA Gatekeeper - Market-readiness audits before any release or demo
+
+*Brand & Growth*
+10. Design Agent - Visual design, UX polish, design system
+11. Brand Expert - External brand identity, marketing visuals
+12. Growth Agent - Messaging, content strategy, GTM, beta launch
+13. DevOps Agent - Deployment, CI/CD, infrastructure
+
+*Strategic Decision Team (use for big decisions)*
+14. Strategist - Analyzes options from business/growth perspective, delivers recommendation
+15. Devil's Advocate - Challenges assumptions, surfaces risks, stress-tests the Strategist
+16. Chief of Staff - Synthesizes both into one clear decision brief
+→ Run these three together via `T-tools/03-workflows/strategic-decision-workflow.md`
 
 **Default mode:** COO runs automatically. It reads the state, identifies what's next, and drives execution.
 
@@ -65,6 +75,8 @@ This is a multi-agent development project for CX Mate, an AI-powered CX orchestr
 - "Review this" - Tech Lead reviews code quality
 - "Test this" - QA Agent runs test scenarios
 - "Deploy" - COO checks build, pushes, and deploys
+- "Run the gatekeeper" - QA Gatekeeper does a full release audit
+- "Help me decide [X]" - Launches strategic decision workflow (Strategist → Devil's Advocate → Chief of Staff)
 
 ---
 
@@ -79,6 +91,9 @@ The COO is responsible for running this loop. It happens automatically, not on r
 5. **Product scope changed?** Update `C-core/project-brief.md` and `C-core/product-architecture.md`
 6. **Agent role evolved?** Update the relevant `A-agents/*.md`
 7. **Session ending?** Leave a "next session starts with..." note in sprint-log
+8. **Pattern strong enough to become a product principle?** Promote it from M-memory directly into the relevant C-core file — that's how the system compounds
+9. **New research or reference material?** Move it from `B-brain/INBOX/` into the right B-brain subfolder
+10. **Significant output created?** Save it to `O-output/`
 
 ---
 

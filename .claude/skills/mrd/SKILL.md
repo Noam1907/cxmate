@@ -201,6 +201,11 @@ CX Mate's three primary personas:
 - Write for a founder — clear, direct, no consulting jargon
 - End with a clear recommendation, not a hedge
 
-## Output Location
+## Integration with the System
 
-Save assessments to: `P-prds/opportunity-[name].md`
+When using this skill:
+
+1. **Read from C-core** — project-brief and product-architecture before researching
+2. **Check M-memory** — decisions and learning-log for past market and product choices
+3. **Output to O-output** — save the assessment to `O-output/opportunity-[name].md`
+4. **Update M-memory** — log any new market insights or validated hypotheses to `M-memory/learning-log.md` after

@@ -285,6 +285,21 @@ Track sprint progress and status.
 
 ---
 
+## Session — 2026-03-03
+
+### Completed this session
+- **Competitive intelligence agent update** — All 4 priority agents updated with competitive landscape data (Growth Agent: messaging angles + implementation speed comparison table; CX Architect: competitor journey methodology patterns + gaps we fill; Product Lead: competitive feature gap map + anti-patterns; AI Engineer: competitor AI capabilities + where we leapfrog). New central reference file: `B-brain/02-market-research/competitive-landscape.md`.
+- **Homepage messaging overhaul** — New headline "Stop building your customer journey by accident." Hero subheadline: "Your customers have a journey — whether you designed it or not." CTA: "Get Your Action Playbook". Removed SocialProofSection. Features heading: "From gut feel to clear direction." Bottom CTA: "Stop guessing. Start mapping." Page height halved. Cross-validated with Gemini + ChatGPT.
+- **"Save My Results" CTA** — New `SaveResultsBanner` component (amber, non-intrusive). Wired to all 4 output pages (dashboard, CX report, journey map, playbook). Shows only for anonymous/preview users. Links to /auth with company-aware copy. Build passes clean. Deployed (`96b12d0`).
+
+### Next session starts with
+- Revenue Protected counter on Dashboard (benchmark-based, starts $0, grows with playbook completion)
+- Playbook persistence to Supabase (Phase 4)
+- Full regression QA / gatekeeper audit before next demo
+- Journey health scoring (P1)
+
+---
+
 ## Session — 2026-03-02 (Strategic / Design Session)
 
 ### Completed this session

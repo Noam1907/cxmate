@@ -83,3 +83,6 @@ Every feature in CX Mate follows this 4-step workflow. No shortcuts.
 1. Update `M-memory/sprint-log.md` (mark task done)
 2. Log any decisions in `M-memory/decisions.md`
 3. Log any patterns in `M-memory/learning-log.md`
+4. **Pattern strong enough to become a product principle?** Promote it directly into the relevant `C-core/` file
+5. **New research or reference material?** Move from `B-brain/INBOX/` into the right B-brain subfolder
+6. **Significant output created?** Save to `O-output/`

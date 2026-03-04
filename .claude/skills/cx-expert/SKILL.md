@@ -425,3 +425,12 @@ When you need to look up CX knowledge, read these files:
 - `src/lib/ai/recommendation-prompt.ts` — How the playbook prompt is built
 - `C-core/project-brief.md` — Target customer, personas, positioning
 - `C-core/product-architecture.md` — Three-layer product design
+
+## Integration with the System
+
+When using this skill:
+
+1. **Read from C-core** — project-brief and product-architecture for product context
+2. **Check M-memory** — learning-log for past CX patterns and decisions
+3. **Output to O-output** — save any reviews, audits, or built journeys to `O-output/[name].md`
+4. **Update M-memory** — log any CX methodology insights or patterns to `M-memory/learning-log.md` after

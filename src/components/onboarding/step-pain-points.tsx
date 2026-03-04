@@ -32,14 +32,14 @@ export function StepPainPoints({ data, onChange }: StepPainPointsProps) {
       {/* Biggest Pain — plain language, no CX jargon */}
       <div className="rounded-2xl border border-border/60 bg-white p-6 space-y-3 shadow-sm">
         <Label htmlFor="biggestChallenge" className="text-sm font-semibold text-foreground">
-          In one sentence, what&apos;s the #1 thing you&apos;d fix about how customers experience your product?
+          If you could fix one thing about how customers experience your product, what would it be?
         </Label>
         <Textarea
           id="biggestChallenge"
           placeholder={
             data.companyMaturity === "pre_launch"
-              ? "e.g. We don't know how to structure our sales process to close our first deal"
-              : "e.g. We're losing 15% of customers in the first 90 days and we don't know why"
+              ? "e.g. Customers don't understand what we do from our website alone"
+              : "e.g. Customers get stuck during onboarding and never reach their first success moment"
           }
           value={data.biggestChallenge}
           onChange={(e) => onChange({ biggestChallenge: e.target.value })}
@@ -76,7 +76,7 @@ export function StepPainPoints({ data, onChange }: StepPainPointsProps) {
         </div>
         {(data.painPoints || []).length > 0 && (
           <p className="text-xs text-muted-foreground pt-1">
-            {(data.painPoints || []).length} selected — I&apos;ll prioritize your playbook around these
+            {(data.painPoints || []).length} selected. I&apos;ll prioritize your playbook around these
           </p>
         )}
       </div>

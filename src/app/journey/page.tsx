@@ -124,17 +124,17 @@ function JourneyContent() {
       {/* Page header */}
       <div className="mb-10 flex items-start justify-between gap-4">
         <div>
-          <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-2">
+          <p className="text-xs font-semibold text-primary uppercase tracking-widest mb-2">
             Journey Map
           </p>
           <h1 className="text-4xl font-bold tracking-tight text-slate-900">
-            {companyName || "Your Customer Journey"}
+            {companyName ? `${companyName}'s Customer Journey` : "Your Customer Journey"}
           </h1>
-          <p className="text-sm text-slate-500 mt-2">
-            {journey.stages.length} stages · {totalMoments} meaningful moments
+          <p className="text-sm text-slate-600 mt-2">
+            {journey.stages.length} stages with {totalMoments} meaningful moments mapped across your full customer lifecycle
           </p>
         </div>
-        <ExportPdfButton page="journey" title={`${companyName || "CX Mate"} — Journey Map`} />
+        <ExportPdfButton page="journey" title={`${companyName || "CX Mate"} - Journey Map`} />
       </div>
 
       {/* Save banner — anonymous users only */}

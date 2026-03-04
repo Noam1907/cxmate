@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { JOURNEY_EXISTS_OPTIONS, type OnboardingData } from "@/types/onboarding";
@@ -126,7 +127,7 @@ export function StepJourneyExists({ data, onChange }: StepJourneyExistsProps) {
       <h2 className="text-2xl font-bold tracking-tight text-foreground">What do you already have?</h2>
       <ChatBubble>
         <p>
-          Before I build something new, I want to understand what you have in place — an onboarding checklist, a training timeline, a sales pipeline, a Notion doc. Even informal processes count.
+          Before I build something new, I want to understand what you have in place: an onboarding checklist, a training timeline, a sales pipeline, a Notion doc. Even informal processes count.
         </p>
       </ChatBubble>
 
@@ -193,9 +194,9 @@ export function StepJourneyExists({ data, onChange }: StepJourneyExistsProps) {
         <div className="space-y-5 animate-in fade-in slide-in-from-top-2 duration-300">
           <ChatBubble>
             {data.hasExistingJourney === "yes" ? (
-              <p>Great — which processes do you have? Check what applies, and feel free to upload what you have.</p>
+              <p>Great! Which processes do you have? Check what applies, and feel free to upload what you have.</p>
             ) : (
-              <p>No worries — tell me what pieces exist. I&apos;ll build on what&apos;s working and fill the gaps.</p>
+              <p>No worries! Tell me what pieces exist. I&apos;ll build on what&apos;s working and fill the gaps.</p>
             )}
           </ChatBubble>
 
@@ -214,7 +215,7 @@ export function StepJourneyExists({ data, onChange }: StepJourneyExistsProps) {
             <div className="space-y-5">
               {JOURNEY_COMPONENT_GROUPS.map((group) => (
                 <div key={group.label} className="space-y-2">
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70 px-1">
+                  <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground/60 px-1">
                     {group.label}
                   </p>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -249,6 +250,19 @@ export function StepJourneyExists({ data, onChange }: StepJourneyExistsProps) {
                 </div>
               ))}
             </div>
+
+            {/* Other — freeform process */}
+            <div className="pt-2 border-t border-border/40">
+              <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground/60 px-1 mb-2">
+                Other
+              </p>
+              <Input
+                placeholder="Any other process not listed above..."
+                value={data.existingJourneyOther || ""}
+                onChange={(e) => onChange({ existingJourneyOther: e.target.value })}
+                className="h-11 rounded-xl border-border/50 text-sm"
+              />
+            </div>
           </div>
 
           {/* Upload existing CX doc */}
@@ -270,7 +284,7 @@ export function StepJourneyExists({ data, onChange }: StepJourneyExistsProps) {
               ) : (
                 <>
                   <p className="text-sm text-muted-foreground">
-                    Screenshot, PDF, image, or doc — anything helps
+                    Screenshot, PDF, image, or doc. Anything helps
                   </p>
                   <Button
                     type="button"
@@ -291,7 +305,7 @@ export function StepJourneyExists({ data, onChange }: StepJourneyExistsProps) {
                 className="hidden"
               />
               <p className="text-[11px] text-muted-foreground">
-                Training timeline, onboarding doc, process diagram — I&apos;ll use it to understand your current setup
+                Training timeline, onboarding doc, process diagram. I&apos;ll use it to understand your current setup
               </p>
             </div>
           </div>
@@ -323,7 +337,7 @@ export function StepJourneyExists({ data, onChange }: StepJourneyExistsProps) {
       {data.hasExistingJourney === "no" && (
         <div className="rounded-lg bg-primary/5 border border-primary/15 p-3 animate-in fade-in duration-300">
           <p className="text-sm text-foreground">
-            <strong>Perfect starting point.</strong> No legacy to work around — I&apos;ll build you a
+            <strong>Perfect starting point.</strong> No legacy to work around. I&apos;ll build you a
             clean, proven framework from scratch.
           </p>
         </div>

@@ -64,14 +64,14 @@ export function StepWelcome({ data, onChange }: StepWelcomeProps) {
     <div className="space-y-8">
       <h2 className="text-2xl font-bold tracking-tight text-foreground">Let&apos;s get started</h2>
       <ChatBubble>
-        <p className="font-medium">Hey! 👋 I&apos;m CX Mate — your CCXP-certified AI customer experience expert.</p>
+        <p className="font-medium">Hey! 👋 I&apos;m CX Mate, your CCXP-certified AI customer experience expert.</p>
         <p>
           I help companies map their customer journey, find the moments that
           matter, and build playbooks their team can actually execute.
         </p>
         <p>
           Let&apos;s figure out where you are and what you need.
-          This takes about 3 minutes.
+          This takes about 5 minutes.
         </p>
       </ChatBubble>
 
@@ -128,8 +128,8 @@ export function StepWelcome({ data, onChange }: StepWelcomeProps) {
           />
           <p className="text-xs text-muted-foreground">
             {websiteManuallyEdited
-              ? "Great — I'll use this to learn about your business"
-              : "Auto-suggested — feel free to edit"}
+              ? "Great, I'll use this to learn about your business"
+              : "Auto-suggested. Feel free to edit"}
           </p>
         </div>
       </div>

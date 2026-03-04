@@ -45,7 +45,7 @@ export function StepCustomerProfile({ data, onChange, enrichment }: StepCustomer
             <p>Even without customers yet, knowing your target helps me map the right sales journey.</p>
           </>
         ) : (
-          <p>Tell me about <strong>your customers</strong> — this helps me make the journey specific to them.</p>
+          <p>Tell me about <strong>your customers</strong>. This helps me make the journey specific to them.</p>
         )}
       </ChatBubble>
 
@@ -172,7 +172,7 @@ export function StepCustomerProfile({ data, onChange, enrichment }: StepCustomer
             What happens between a signed deal and a live customer?
           </Label>
           <p className="text-xs text-muted-foreground -mt-1">
-            Use your own words — installation, setup call, pilot, onboarding sprint, nothing formal...
+            Use your own words: installation, setup call, pilot, onboarding sprint, nothing formal...
           </p>
           <Textarea
             id="preLiveProcess"
@@ -183,7 +183,7 @@ export function StepCustomerProfile({ data, onChange, enrichment }: StepCustomer
             className="rounded-xl border-border/60"
           />
           <p className="text-xs text-muted-foreground">
-            This tells me what to call this phase in your journey — so I don&apos;t assume &ldquo;pilot&rdquo; if you call it something else.
+            This tells me what to call this phase in your journey, so I don&apos;t assume &ldquo;pilot&rdquo; if you call it something else.
           </p>
         </div>
       )}

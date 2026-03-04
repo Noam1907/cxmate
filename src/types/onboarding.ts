@@ -28,6 +28,7 @@ export interface OnboardingData {
   // Step 4: Journey Existence (growing/scaling only)
   hasExistingJourney: "yes" | "no" | "partial" | "";
   existingJourneyComponents?: string[];
+  existingJourneyOther?: string;
   existingJourneyDescription?: string;
   existingJourneyFileName?: string;
 

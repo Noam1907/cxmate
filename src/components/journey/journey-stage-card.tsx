@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { CaretDown, CaretUp } from "@phosphor-icons/react";
 import type { GeneratedStage, GeneratedMoment } from "@/lib/ai/journey-prompt";
 
 export interface MomentAnnotation {
@@ -15,13 +16,13 @@ interface JourneyStageCardProps {
   momentAnnotations?: Record<string, MomentAnnotation>;
 }
 
-// 2-tone severity: amber for critical/high, slate for everything else
+// Unified severity palette: critical = red, high = amber, rest = slate
 function getSeverityStyle(severity: string): { dot: string; row: string; label: string } {
   switch (severity) {
     case "critical":
-      return { dot: "bg-amber-500", row: "border-amber-200 bg-amber-50/60", label: "text-amber-700" };
+      return { dot: "bg-rose-500", row: "border-rose-200 bg-rose-50/50", label: "text-rose-700" };
     case "high":
-      return { dot: "bg-amber-400", row: "border-amber-100 bg-amber-50/40", label: "text-amber-600" };
+      return { dot: "bg-amber-500", row: "border-amber-200 bg-amber-50/40", label: "text-amber-700" };
     default:
       return { dot: "bg-slate-300", row: "border-slate-100 bg-white", label: "text-slate-500" };
   }
@@ -45,10 +46,10 @@ function MomentCard({ moment, annotation }: { moment: GeneratedMoment; annotatio
 
   return (
     <div
-      className={`rounded-xl border px-4 py-3 cursor-pointer transition-all hover:shadow-sm ${style.row}`}
+      className={`rounded-xl border px-4 py-3 cursor-pointer transition-all hover:shadow-md group ${style.row}`}
       onClick={() => setExpanded(!expanded)}
     >
-      {/* Row: dot + name + type pill + severity */}
+      {/* Row: dot + name + type pill + severity + chevron */}
       <div className="flex items-start gap-3">
         <div className={`w-2 h-2 rounded-full mt-1.5 shrink-0 ${style.dot}`} />
         <div className="flex-1 min-w-0">
@@ -61,6 +62,10 @@ function MomentCard({ moment, annotation }: { moment: GeneratedMoment; annotatio
                   {moment.severity}
                 </span>
               )}
+              {expanded
+                ? <CaretUp size={14} className="text-slate-400" />
+                : <CaretDown size={14} className="text-slate-300 group-hover:text-slate-500 transition-colors" />
+              }
             </div>
           </div>
           <div className="text-xs text-slate-500 mt-0.5 leading-relaxed">{moment.description}</div>
@@ -159,12 +164,12 @@ function MomentCard({ moment, annotation }: { moment: GeneratedMoment; annotatio
           {/* If you ignore this */}
           {moment.impactIfIgnored && (
             <div>
-              <div className="text-xs font-semibold text-amber-600 uppercase tracking-wide mb-1">If ignored</div>
-              <p className="text-xs text-amber-700 leading-relaxed">{moment.impactIfIgnored}</p>
+              <div className="text-xs font-semibold text-rose-600 uppercase tracking-wide mb-1">If ignored</div>
+              <p className="text-xs text-rose-700 leading-relaxed">{moment.impactIfIgnored}</p>
             </div>
           )}
 
-          <div className="text-xs text-slate-300 text-center pt-1">tap to collapse</div>
+          <div className="text-xs text-slate-300 text-center pt-1">click to collapse</div>
         </div>
       )}
     </div>
@@ -212,7 +217,7 @@ export function JourneyStageCard({
                   </span>
                 )}
                 {criticalCount > 0 && (
-                  <span className="text-xs font-semibold text-amber-700 bg-amber-50 border border-amber-200 px-2.5 py-1 rounded-full">
+                  <span className="text-xs font-semibold text-rose-700 bg-rose-50 border border-rose-200 px-2.5 py-1 rounded-full">
                     {criticalCount} at-risk {criticalCount === 1 ? "moment" : "moments"}
                   </span>
                 )}

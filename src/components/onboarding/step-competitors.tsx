@@ -33,7 +33,10 @@ export function StepCompetitors({ data, onChange, enrichment }: StepCompetitorsP
 
   const addCompetitor = () => {
     const trimmed = customCompetitor.trim();
-    if (trimmed && !competitorList.includes(trimmed)) {
+    const isDuplicate = competitorList.some(
+      (c) => c.toLowerCase() === trimmed.toLowerCase()
+    );
+    if (trimmed && !isDuplicate) {
       updateCompetitors([...competitorList, trimmed]);
       setCustomCompetitor("");
     }
@@ -117,7 +120,7 @@ export function StepCompetitors({ data, onChange, enrichment }: StepCompetitorsP
           </div>
 
           <p className="text-xs text-muted-foreground">
-            Optional — but it helps me find CX moments where you can stand out
+            Optional, but it helps me find moments where you can stand out
           </p>
         </div>
       </div>

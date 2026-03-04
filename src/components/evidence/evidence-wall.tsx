@@ -40,12 +40,11 @@ function PainPointCard({ mapping }: { mapping: PainPointMapping }) {
           {isMatched ? (
             <p className="text-xs text-primary mt-1">
               Found in your journey map
-              {mapping.matchedMoments.length > 0 && ` — ${mapping.matchedMoments.length} touchpoint${mapping.matchedMoments.length !== 1 ? "s" : ""}`}
+              {mapping.matchedMoments.length > 0 && `: ${mapping.matchedMoments.length} touchpoint${mapping.matchedMoments.length !== 1 ? "s" : ""}`}
               {mapping.matchedInsights.length > 0 && `, ${mapping.matchedInsights.length} action${mapping.matchedInsights.length !== 1 ? "s" : ""} recommended`}
-              {" ↓ tap to see"}
             </p>
           ) : (
-            <p className="text-xs text-slate-400 mt-1">Not directly mapped — mention in your biggest challenge for better coverage</p>
+            <p className="text-xs text-slate-400 mt-1">Not directly mapped yet</p>
           )}
         </div>
         {isMatched && (
@@ -60,7 +59,7 @@ function PainPointCard({ mapping }: { mapping: PainPointMapping }) {
           {mapping.matchedMoments.length > 0 && (
             <div>
               <div className="text-xs font-semibold text-primary uppercase tracking-wide mb-1">
-                Journey moments
+                Where this shows up in your journey
               </div>
               <div className="space-y-1">
                 {mapping.matchedMoments.map((m, i) => (
@@ -177,7 +176,7 @@ export function EvidenceWall({
               }}
             />
           </div>
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid gap-3">
             {painPointMappings.map((mapping) => (
               <PainPointCard key={mapping.painPointKey} mapping={mapping} />
             ))}

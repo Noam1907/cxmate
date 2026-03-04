@@ -46,12 +46,12 @@ export function StepGoals({ data, onChange }: StepGoalsProps) {
       <ChatBubble>
         {hasRelatedGoals ? (
           <>
-            <p>Based on the pains you mentioned — <strong>what does success look like?</strong></p>
+            <p>Based on the pains you mentioned{data.customPainPoint ? <>, including <strong>&ldquo;{data.customPainPoint}&rdquo;</strong></> : ""}: <strong>what does success look like?</strong></p>
             <p>I&apos;ve highlighted the goals most connected to your challenges. This shapes the entire playbook I&apos;ll build.</p>
           </>
         ) : (
           <>
-            <p>Almost there — <strong>what does success look like for you?</strong></p>
+            <p>Almost there{data.customPainPoint ? <>. I noted your challenge: <strong>&ldquo;{data.customPainPoint}&rdquo;</strong></> : ""}! <strong>What does success look like for you?</strong></p>
             <p>This shapes which parts of your journey I&apos;ll focus on and what actions I&apos;ll prioritize.</p>
           </>
         )}

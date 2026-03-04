@@ -180,7 +180,7 @@ function StepGenerate({
           {data.userName ? `${data.userName}, ready to build.` : "Ready to build."}
         </h2>
         <p className="text-muted-foreground mt-2">
-          I&apos;ll analyze <strong>{data.companyName || "your company"}</strong> against patterns from thousands of B2B teams at your stage — then build your playbook.
+          I&apos;ll analyze <strong>{data.companyName || "your company"}</strong> against patterns from thousands of B2B teams at your stage, then build your playbook.
         </p>
       </div>
 
@@ -189,9 +189,9 @@ function StepGenerate({
         <ul className="space-y-2.5">
           {[
             { icon: <MapTrifold size={18} weight="duotone" className="text-primary" />, label: `${journeyLabel.charAt(0).toUpperCase() + journeyLabel.slice(1)} journey map` },
-            { icon: <Lightning size={18} weight="duotone" className="text-primary" />, label: "Meaningful moments — scored by impact" },
-            { icon: <ChartBar size={18} weight="duotone" className="text-primary" />, label: "CX Intelligence Report with risk projections" },
-            { icon: <ClipboardText size={18} weight="duotone" className="text-primary" />, label: "Prioritized playbook with templates" },
+            { icon: <Lightning size={18} weight="duotone" className="text-primary" />, label: "Meaningful moments, scored by impact" },
+            { icon: <ChartBar size={18} weight="duotone" className="text-primary" />, label: "Revenue at risk analysis with dollar projections" },
+            { icon: <ClipboardText size={18} weight="duotone" className="text-primary" />, label: "Prioritized playbook with ready-to-use templates" },
           ].map((item) => (
             <li key={item.label} className="flex items-center gap-3 text-sm text-foreground">
               <span className="w-5 shrink-0">{item.icon}</span>
@@ -200,7 +200,7 @@ function StepGenerate({
           ))}
         </ul>
         <p className="text-xs text-muted-foreground border-t border-border/40 pt-3 mt-1">
-          Takes about 2–3 minutes. Completely personalized to your business.
+          Takes about 5 minutes. Completely personalized to your business.
         </p>
       </div>
 
@@ -242,7 +242,7 @@ function GeneratingExperience({ data }: { data: OnboardingData }) {
     return () => clearInterval(timer);
   }, []);
 
-  // Phase progression — staggered timing across full ~3 min generation window
+  // Phase progression — staggered timing across full ~5 min generation window
   useEffect(() => {
     const timings = [0, 15000, 35000, 60000, 90000, 115000];
     const timeouts = timings.map((ms, i) =>
@@ -258,20 +258,11 @@ function GeneratingExperience({ data }: { data: OnboardingData }) {
 
       {/* Header */}
       <div className="text-center space-y-3">
-        <div className="mx-auto w-12 h-12 flex items-center justify-center">
-          <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-12 h-12">
-            <circle cx="24" cy="24" r="20" stroke="#e2e8f0" strokeWidth="2" />
-            <path d="M14 24 C17 19 21 29 24 23 C27 17 31 27 34 22" stroke="#94a3b8" strokeWidth="2" strokeLinecap="round" strokeDasharray="3 2.5" />
-            <circle cx="14" cy="24" r="2.5" fill="#cbd5e1" />
-            <circle cx="24" cy="23" r="2.5" fill="#94a3b8" />
-            <circle cx="34" cy="22" r="2.5" fill="#64748b" />
-          </svg>
-        </div>
         <h2 className="text-2xl font-bold text-slate-800 tracking-tight">
-          Building your CX intelligence
+          Building your customer experience intelligence
         </h2>
         <p className="text-sm text-slate-400">
-          Building your full CX package — journey, report, and playbook
+          Your personalized journey, report, and playbook are on their way
         </p>
       </div>
 
@@ -287,7 +278,7 @@ function GeneratingExperience({ data }: { data: OnboardingData }) {
           <span className="text-[11px] text-slate-400 tabular-nums">
             {Math.floor(seconds / 60)}:{(seconds % 60).toString().padStart(2, "0")} elapsed
           </span>
-          <span className="text-[11px] text-slate-400">~3 min total</span>
+          <span className="text-[11px] text-slate-400">~5 min total</span>
         </div>
       </div>
 
@@ -331,17 +322,29 @@ function GeneratingExperience({ data }: { data: OnboardingData }) {
         })}
       </div>
 
-      {/* Insight line */}
-      <p className="text-xs text-slate-400 text-center leading-relaxed border-t border-slate-100 pt-5 italic">
-        {data.companyMaturity === "pre_launch"
-          ? "Companies that map their sales journey before launch close first deals 2× faster."
-          : data.companyMaturity === "first_customers"
-          ? "Early-stage teams that formalize CX see 40% higher retention in year one."
-          : data.companyMaturity === "growing"
-          ? "Growing companies that prioritize the right moments reduce churn by up to 30%."
-          : "Unified journey mapping drives 2× improvement in expansion revenue."
-        }
-      </p>
+      {/* Insight stat */}
+      <div className="border-t border-slate-100 pt-6 text-center space-y-1.5">
+        <p className="text-lg font-bold text-slate-700">
+          {data.companyMaturity === "pre_launch"
+            ? "2x faster first deals"
+            : data.companyMaturity === "first_customers"
+            ? "40% higher retention in year one"
+            : data.companyMaturity === "growing"
+            ? "Up to 30% churn reduction"
+            : "2x improvement in expansion revenue"
+          }
+        </p>
+        <p className="text-xs text-slate-400">
+          {data.companyMaturity === "pre_launch"
+            ? "Companies that map their sales journey before launch close first deals faster."
+            : data.companyMaturity === "first_customers"
+            ? "Early-stage teams that formalize customer experience see significantly higher retention."
+            : data.companyMaturity === "growing"
+            ? "Growing companies that prioritize the right moments see measurable churn reduction."
+            : "Unified journey mapping drives measurable improvement in expansion revenue."
+          }
+        </p>
+      </div>
     </div>
   );
 }
@@ -363,11 +366,11 @@ function IntroHero({ onStart }: { onStart: () => void }) {
           <span className="text-xl font-bold text-primary">CX</span>
         </div>
         <h1 className="text-4xl sm:text-5xl font-bold tracking-tight text-foreground leading-[1.1]">
-          Your AI CX expert is ready
+          Your AI customer experience expert is ready
         </h1>
         <p className="text-lg text-muted-foreground max-w-lg mx-auto leading-relaxed">
           Your customers have a journey whether you designed it or not.
-          In 3 minutes, we&apos;ll map it, find what&apos;s breaking, and tell you exactly what to fix.
+          In minutes, we&apos;ll map it, find what&apos;s breaking, and tell you exactly what to fix.
         </p>
       </div>
 
@@ -381,7 +384,7 @@ function IntroHero({ onStart }: { onStart: () => void }) {
           Map my journey →
         </Button>
         <p className="text-sm text-muted-foreground">
-          Takes about 3 minutes. No account needed.
+          Takes about 5 minutes. No account needed.
         </p>
       </div>
 
@@ -394,7 +397,7 @@ function IntroHero({ onStart }: { onStart: () => void }) {
             ring: "ring-primary/20",
             label: "text-primary",
             title: "Map your journey",
-            desc: "Every stage, every moment where customers decide to stay — or leave.",
+            desc: "Every stage, every moment where customers decide to stay or leave.",
           },
           {
             num: "02",
@@ -410,7 +413,7 @@ function IntroHero({ onStart }: { onStart: () => void }) {
             ring: "ring-amber-500/20",
             label: "text-amber-600",
             title: "Fix it this week",
-            desc: "A prioritized action plan with templates ready to execute — starting Monday.",
+            desc: "A prioritized action plan with templates ready to execute. Starting Monday.",
           },
         ].map((step, i, arr) => (
           <div key={step.num} className="flex gap-5">
@@ -662,7 +665,7 @@ export function OnboardingWizard() {
             return;
           }
           track("journey_generation_failed", { error_type: "timeout", retry_count: retryCount });
-          setSubmitError("Generation took a bit longer than usual. Please try again — your data is saved.");
+          setSubmitError("Generation took a bit longer than usual. Please try again, your data is saved.");
           setIsSubmitting(false);
         }
         // Otherwise it's a navigation abort — ignore

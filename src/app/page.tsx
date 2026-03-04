@@ -14,7 +14,7 @@ function HeroSection() {
         {/* Pill badge */}
         <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/8 border border-primary/15 mb-8">
           <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-          <span className="text-xs font-medium text-primary">Built on certified CX expert methodology</span>
+          <span className="text-xs font-medium text-primary">Built on certified customer experience methodology</span>
         </div>
 
         {/* Headline */}
@@ -27,7 +27,7 @@ function HeroSection() {
 
         {/* Subheadline — the copy the user loves, now in the hero */}
         <p className="text-lg sm:text-xl text-muted-foreground max-w-xl mx-auto leading-relaxed mb-10">
-          Your customers have a journey — whether you designed it or not.
+          Your customers have a journey, whether you designed it or not.
           Find out what it looks like and where to improve it.
         </p>
 
@@ -55,7 +55,7 @@ function HeroSection() {
           <div className="w-px h-7 bg-border" />
           <div className="text-center">
             <div className="text-xl font-bold text-foreground">Expert</div>
-            <div className="text-xs text-muted-foreground mt-0.5">CX methodology</div>
+            <div className="text-xs text-muted-foreground mt-0.5">Methodology</div>
           </div>
         </div>
       </div>
@@ -68,7 +68,7 @@ function HowItWorksSection() {
     {
       number: "01",
       title: "Tell us about your business",
-      description: "One conversation — your stage, your customers, your biggest challenges. CX Mate adapts to where you are.",
+      description: "One conversation: your stage, your customers, your biggest challenges. CX Mate adapts to where you are.",
       icon: <FileText size={24} weight="duotone" />,
     },
     {
@@ -80,7 +80,7 @@ function HowItWorksSection() {
     {
       number: "03",
       title: "You get a playbook",
-      description: "Prioritized actions with templates and expected outcomes. Not theory — what to do this week.",
+      description: "Prioritized actions with templates and expected outcomes. Not theory. What to do this week.",
       icon: <Lightning size={24} weight="duotone" />,
     },
   ];
@@ -125,12 +125,12 @@ function FeaturesSection() {
     },
     {
       title: "Your whole journey, visualized",
-      description: "Every stage, every meaningful moment — mapped to your business model and maturity stage.",
+      description: "Every stage, every meaningful moment, mapped to your business model and maturity stage.",
       badge: "Journey Map",
     },
     {
-      title: "What to do about it — this week",
-      description: "Prioritized actions with copy-paste templates. Not advice — execution.",
+      title: "What to do about it, this week",
+      description: "Prioritized actions with copy-paste templates. Not advice. Execution.",
       badge: "Action Playbook",
     },
     {
@@ -179,7 +179,7 @@ function BottomCTA() {
           Stop guessing. Start mapping.
         </h2>
         <p className="text-muted-foreground mb-8">
-          Find out what your customers actually experience — and exactly what to fix first.
+          Find out what your customers actually experience, and exactly what to fix first.
         </p>
         <Link href="/onboarding">
           <Button size="lg" className="rounded-xl px-8 py-6 text-base font-semibold shadow-lg hover:shadow-xl transition-all">
@@ -205,7 +205,7 @@ function Footer() {
           <span className="text-sm font-bold tracking-tight text-foreground">CX Mate</span>
         </div>
         <p className="text-xs text-muted-foreground">
-          The CX foundation every B2B company needs — before they realize they need it.
+          The customer experience foundation every B2B company needs.
         </p>
       </div>
     </footer>

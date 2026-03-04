@@ -22,7 +22,7 @@ export function StepBusinessData({ data, onChange }: StepBusinessDataProps) {
       <h2 className="text-2xl font-bold tracking-tight text-foreground">Let&apos;s talk numbers</h2>
       <ChatBubble>
         <p>
-          This grounds your playbook in <strong>real ROI projections</strong> — not hand-wavy estimates.
+          This grounds your playbook in <strong>real ROI projections</strong>, not hand-wavy estimates.
         </p>
       </ChatBubble>
 
@@ -114,7 +114,7 @@ export function StepBusinessData({ data, onChange }: StepBusinessDataProps) {
           className="h-12 rounded-xl border-border/60"
         />
         <p className="text-xs text-muted-foreground">
-          CRM, ERP, support, BI, communication — the more I know, the better I can recommend what to add or replace
+          CRM, ERP, support, BI, communication. The more I know, the better I can recommend what to add or replace
         </p>
       </div>
     </div>
