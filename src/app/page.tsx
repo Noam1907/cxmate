@@ -134,15 +134,15 @@ function HeroSection() {
 
             {/* Headline — big, confrontational */}
             <h1 className="text-5xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-slate-900 leading-[1.04] mb-6">
-              Stop running your CX{" "}
-              <span style={{ color: "#0D9488" }}>on gut feel.</span>
+              Your customer journey is either{" "}
+              <span style={{ color: "#0D9488" }}>designed or discovered.</span>
             </h1>
 
             {/* Subheadline */}
             <p className="text-lg sm:text-xl text-slate-600 leading-relaxed mb-10 max-w-md">
-              Most B2B founders set their customer journey from instinct and templates — not data.
-              CX Mate maps 50+ meaningful moments against your exact stage and vertical.
-              One conversation. Evidence you can act on. This week.
+              The companies that win at retention map their entire lifecycle before the gaps cost them.
+              One conversation. 50+ meaningful moments. Benchmarked against companies at your exact stage.
+              Know exactly where to invest — before your customers have to tell you.
             </p>
 
             {/* CTAs */}
@@ -351,7 +351,7 @@ function FeaturesSection() {
         <div className="text-center mb-10">
           <p className="text-xs font-bold uppercase tracking-widest text-teal-600 mb-3">What you get</p>
           <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900">
-            From gut feel to clear direction.
+            Everything you need to design it right.
           </h2>
         </div>
 
