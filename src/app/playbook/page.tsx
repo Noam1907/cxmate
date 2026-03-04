@@ -212,6 +212,7 @@ export default function PlaybookPage() {
   const [filter, setFilter] = useState<FilterMode>("all");
   const [evidenceMap, setEvidenceMap] = useState<EvidenceMap | null>(null);
   const [firstName, setFirstName] = useState<string>("");
+  const [currentTools, setCurrentTools] = useState<string>("");
   // true when background pre-generation is in flight (started during onboarding)
   const [preparing, setPreparing] = useState(false);
   const { statuses, setStatus } = useRecommendationStatus();
@@ -227,6 +228,8 @@ export default function PlaybookPage() {
           setEvidenceMap(buildEvidenceMap(parsed.onboardingData, parsed.journey));
           const name = parsed.onboardingData?.userName?.split(" ")[0] || "";
           if (name) setFirstName(name);
+          const tools = parsed.onboardingData?.currentTools || "";
+          if (tools) setCurrentTools(tools);
         }
       } catch { /* ignore */ }
       const storedPlaybook = sessionStorage.getItem("cx-mate-playbook");
@@ -342,21 +345,50 @@ export default function PlaybookPage() {
                 </div>
               </div>
 
-              {/* What you'll get — shown during loading */}
-              <div className="rounded-xl border border-slate-200 bg-slate-50/50 p-5 space-y-4">
-                <p className="text-xs font-semibold text-slate-500 uppercase tracking-widest">What you&apos;ll get</p>
-                <div className="space-y-3">
+              {/* What's being built — AI-first framing */}
+              <div className="rounded-xl border border-slate-200 bg-white p-5 space-y-4">
+                <div className="flex items-center justify-between">
+                  <p className="text-xs font-semibold text-slate-500 uppercase tracking-widest">What&apos;s being built</p>
+                  {currentTools && (
+                    <span className="text-xs text-primary font-medium bg-primary/8 px-2 py-0.5 rounded-full">
+                      Wiring in: {currentTools.split(",")[0].trim()}
+                    </span>
+                  )}
+                </div>
+                <div className="space-y-3.5">
                   {[
-                    { title: "Week one checklist", desc: "The 3-5 highest-impact actions to start immediately" },
-                    { title: "Stage-by-stage actions", desc: "Specific tasks for every stage of your customer journey" },
-                    { title: "Copy-paste templates", desc: "Ready-to-use email templates, scripts, and process docs" },
-                    { title: "Progress tracking", desc: "Check off actions as you complete them" },
+                    {
+                      color: "bg-teal-50 text-teal-600",
+                      icon: "⚡",
+                      title: "AI-reasoned, not templated",
+                      desc: "Every action is derived from the risks and moments we found in your specific journey — nothing generic",
+                    },
+                    {
+                      color: "bg-violet-50 text-violet-600",
+                      icon: "🔧",
+                      title: "Your stack, extended",
+                      desc: "Recommendations built around the tools you already use, plus AI-native additions you should add",
+                    },
+                    {
+                      color: "bg-amber-50 text-amber-600",
+                      icon: "📊",
+                      title: "Measurement per stage",
+                      desc: "NPS, CSAT, and CES checkpoints built in — you'll know what success looks like before you start",
+                    },
+                    {
+                      color: "bg-sky-50 text-sky-600",
+                      icon: "🤖",
+                      title: "Ready for AI asset creation",
+                      desc: "Export to NotebookLM, Claude, or ChatGPT — turn your playbook into board decks, onboarding docs, and QBRs in minutes",
+                    },
                   ].map((item) => (
                     <div key={item.title} className="flex items-start gap-3">
-                      <div className="w-1.5 h-1.5 rounded-full bg-primary mt-1.5 shrink-0" />
+                      <div className={`w-7 h-7 rounded-lg ${item.color} flex items-center justify-center shrink-0 text-sm`}>
+                        {item.icon}
+                      </div>
                       <div>
-                        <p className="text-sm font-medium text-slate-700">{item.title}</p>
-                        <p className="text-xs text-slate-500">{item.desc}</p>
+                        <p className="text-sm font-medium text-slate-800">{item.title}</p>
+                        <p className="text-xs text-slate-500 mt-0.5 leading-relaxed">{item.desc}</p>
                       </div>
                     </div>
                   ))}
@@ -366,7 +398,7 @@ export default function PlaybookPage() {
           ) : (
             <div className="text-center space-y-5">
               <h1 className="text-2xl font-bold text-slate-900">Your CX Playbook</h1>
-              <p className="text-slate-500">Turn your journey map into a step-by-step action plan with templates and timelines.</p>
+              <p className="text-slate-500">AI-built action plan, matched to your stack — with measurement checkpoints and assets you can extend with any AI tool.</p>
               {error && <p className="text-sm text-red-600 bg-red-50 rounded-lg p-3 border border-red-100">{error}</p>}
               <Button onClick={handleGenerate} disabled={loading} size="lg">
                 Generate My Playbook

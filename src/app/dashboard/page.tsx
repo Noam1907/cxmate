@@ -172,8 +172,8 @@ export default function DashboardPage() {
                   <path d="M13.5 15l1 1 2-1.5" stroke="white" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
               </div>
-              <p className="text-sm font-semibold text-slate-900 mb-1">CX Sprint</p>
-              <p className="text-xs text-slate-500 leading-relaxed">A prioritized action plan — what to fix first and exactly how to fix it</p>
+              <p className="text-sm font-semibold text-slate-900 mb-1">CX Playbook</p>
+              <p className="text-xs text-slate-500 leading-relaxed">AI-built action plan matched to your stack — with measurement checkpoints and assets you can extend in NotebookLM</p>
             </div>
           </div>
 
@@ -246,7 +246,7 @@ export default function DashboardPage() {
             <div className="flex items-center justify-between">
               <div>
                 <h2 className="text-base font-semibold text-slate-900">Your Playbook</h2>
-                <p className="text-sm text-slate-600 mt-0.5">Step-by-step actions with templates and timelines based on your journey.</p>
+                <p className="text-sm text-slate-600 mt-0.5">AI-built action plan — stack recommendations, measurement checkpoints, and AI-ready exports.</p>
               </div>
               <Link href="/playbook"><Button>Generate Playbook</Button></Link>
             </div>
