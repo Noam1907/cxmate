@@ -169,10 +169,10 @@ export function StepCustomerProfile({ data, onChange, enrichment }: StepCustomer
       {!isPreLaunch && (
         <div className="rounded-2xl border border-border/60 bg-white p-6 space-y-3 shadow-sm">
           <Label htmlFor="preLiveProcess" className="text-sm font-semibold text-foreground">
-            What happens between a signed deal and a live customer?
+            How does your onboarding process work?
           </Label>
           <p className="text-xs text-muted-foreground -mt-1">
-            Use your own words: installation, setup call, pilot, onboarding sprint, nothing formal...
+            From signed deal to fully up and running. Use your own terms: installation, setup, pilot, training, kickoff...
           </p>
           <Textarea
             id="preLiveProcess"

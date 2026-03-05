@@ -42,16 +42,16 @@ export function StepGoals({ data, onChange }: StepGoalsProps) {
 
   return (
     <div className="space-y-8">
-      <h2 className="text-2xl font-bold tracking-tight text-foreground">What does success look like?</h2>
+      <h2 className="text-2xl font-bold tracking-tight text-foreground">What&apos;s your #1 CX goal?</h2>
       <ChatBubble>
         {hasRelatedGoals ? (
           <>
-            <p>Based on the pains you mentioned{data.customPainPoint ? <>, including <strong>&ldquo;{data.customPainPoint}&rdquo;</strong></> : ""}: <strong>what does success look like?</strong></p>
+            <p>Based on the pains you mentioned{data.customPainPoint ? <>, including <strong>&ldquo;{data.customPainPoint}&rdquo;</strong></> : ""}: <strong>what does winning look like for your customer experience?</strong></p>
             <p>I&apos;ve highlighted the goals most connected to your challenges. This shapes the entire playbook I&apos;ll build.</p>
           </>
         ) : (
           <>
-            <p>Almost there{data.customPainPoint ? <>. I noted your challenge: <strong>&ldquo;{data.customPainPoint}&rdquo;</strong></> : ""}! <strong>What does success look like for you?</strong></p>
+            <p>Almost there{data.customPainPoint ? <>. I noted your challenge: <strong>&ldquo;{data.customPainPoint}&rdquo;</strong></> : ""}! <strong>What&apos;s your #1 customer experience goal?</strong></p>
             <p>This shapes which parts of your journey I&apos;ll focus on and what actions I&apos;ll prioritize.</p>
           </>
         )}

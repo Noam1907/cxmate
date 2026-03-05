@@ -210,7 +210,7 @@ export function StepCompany({ data, onChange, enrichment, isEnriching }: StepCom
       {/* Company Size */}
       <div className="rounded-2xl border border-border/60 bg-white p-6 space-y-4 shadow-sm">
         <div className="flex items-center gap-2">
-          <Label className="text-sm font-semibold text-foreground">How big is your team?</Label>
+          <Label className="text-sm font-semibold text-foreground">How many people work at your company?</Label>
           {sizeWasSuggested && <AiSuggestedBadge />}
         </div>
         <RadioGroup

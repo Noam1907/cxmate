@@ -26,7 +26,7 @@ export function StepPainPoints({ data, onChange }: StepPainPointsProps) {
     <div className="space-y-8">
       <h2 className="text-2xl font-bold tracking-tight text-foreground">What&apos;s keeping you up at night?</h2>
       <ChatBubble>
-        <p>This is where my CCXP expertise kicks in. Understanding your pains helps me prioritize the moments in your journey that will have the biggest impact.</p>
+        <p>This is where the CCXP framework kicks in (Certified Customer Experience Professional methodology, the gold standard for CX design). Your answers help me prioritize the moments that matter most.</p>
       </ChatBubble>
 
       {/* Biggest Pain — plain language, no CX jargon */}
@@ -47,7 +47,7 @@ export function StepPainPoints({ data, onChange }: StepPainPointsProps) {
           className="rounded-xl border-border/60"
         />
         <p className="text-xs text-muted-foreground">
-          This becomes the focal point of your journey map and playbook
+          I&apos;ll structure your journey map and action plan around solving this specifically
         </p>
       </div>
 

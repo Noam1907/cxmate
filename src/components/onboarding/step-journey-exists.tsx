@@ -56,7 +56,8 @@ const JOURNEY_COMPONENT_GROUPS: {
   {
     label: "Ongoing Success",
     items: [
-      { value: "cs_playbook", label: "CS playbook / QBR cadence", icon: <ClipboardText size={18} weight="duotone" /> },
+      { value: "cs_playbook", label: "CS playbook", icon: <ClipboardText size={18} weight="duotone" /> },
+      { value: "qbr_cadence", label: "QBR / executive review cadence", icon: <ArrowsClockwise size={18} weight="duotone" /> },
       { value: "health_scoring", label: "Customer health scoring", icon: <Heartbeat size={18} weight="duotone" /> },
       { value: "nps_csat", label: "NPS / CSAT / feedback loop", icon: <Star size={18} weight="duotone" /> },
       { value: "support_flow", label: "Support / escalation flow", icon: <Ticket size={18} weight="duotone" /> },

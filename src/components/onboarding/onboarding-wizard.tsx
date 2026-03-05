@@ -746,7 +746,7 @@ export function OnboardingWizard() {
             ))}
           </div>
           <p className="text-center text-xs text-muted-foreground font-medium">
-            Step {safeStep + 1} &middot; {currentStep?.label}
+            Step {safeStep + 1} of {steps.length}
           </p>
         </div>
       )}
