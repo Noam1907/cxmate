@@ -1,8 +1,8 @@
 /**
  * AI Engineer: Recommendation Generation Service
  *
- * Calls Claude API to generate playbook recommendations
- * based on a journey map and company context.
+ * Uses Claude tool use (function calling) to guarantee valid JSON output.
+ * Tool use means the API validates the schema — no JSON parsing, no repair logic.
  * Server-side only — never expose API keys to the client.
  */
 
@@ -13,6 +13,61 @@ import {
 import type { GeneratedJourney } from "./journey-prompt";
 import type { OnboardingInput } from "@/lib/validations/onboarding";
 import https from "node:https";
+
+// ─── Tool schema ──────────────────────────────────────────────────────────────
+// Mirrors GeneratedPlaybook / PlaybookRecommendation / StagePlaybook interfaces.
+// Claude must fill this in — the API validates it, so we get guaranteed JSON.
+
+const RECOMMENDATION_FIELD = {
+  type: "object",
+  properties: {
+    momentName:      { type: "string" },
+    stageName:       { type: "string" },
+    action:          { type: "string" },
+    type:            { type: "string", enum: ["email","call","internal_process","automation","measurement"] },
+    priority:        { type: "string", enum: ["must_do","should_do","nice_to_have"] },
+    owner:           { type: "string" },
+    timing:          { type: "string" },
+    template:        { type: "string" },
+    expectedOutcome: { type: "string" },
+    effort:          { type: "string", enum: ["15_min","1_hour","half_day","multi_day"] },
+    measureWith:     { type: "string" },
+  },
+  required: ["momentName","stageName","action","type","priority","owner","timing","expectedOutcome","effort","measureWith"],
+} as const;
+
+const PLAYBOOK_TOOL = {
+  name: "generate_playbook",
+  description: "Generate a complete CX playbook with stage-by-stage recommendations.",
+  input_schema: {
+    type: "object",
+    properties: {
+      companyName:          { type: "string" },
+      generatedAt:          { type: "string" },
+      totalRecommendations: { type: "number" },
+      mustDoCount:          { type: "number" },
+      stagePlaybooks: {
+        type: "array",
+        items: {
+          type: "object",
+          properties: {
+            stageName:       { type: "string" },
+            stageType:       { type: "string", enum: ["sales","customer"] },
+            topPriority:     { type: "string" },
+            measurementPlan: { type: "string" },
+            recommendations: { type: "array", items: RECOMMENDATION_FIELD },
+          },
+          required: ["stageName","stageType","topPriority","recommendations"],
+        },
+      },
+      quickWins:        { type: "array", items: RECOMMENDATION_FIELD },
+      weekOneChecklist: { type: "array", items: { type: "string" } },
+    },
+    required: ["companyName","generatedAt","totalRecommendations","mustDoCount","stagePlaybooks","quickWins","weekOneChecklist"],
+  },
+};
+
+// ─── HTTP helper ──────────────────────────────────────────────────────────────
 
 /** Call Anthropic API via node:https to avoid undici's default 5-min headers timeout */
 function anthropicRequest(apiKey: string, body: string): Promise<string> {
@@ -54,15 +109,15 @@ function anthropicRequest(apiKey: string, body: string): Promise<string> {
   });
 }
 
+// ─── Main export ──────────────────────────────────────────────────────────────
+
 export async function generateRecommendations(
   journey: GeneratedJourney,
   input: OnboardingInput
 ): Promise<GeneratedPlaybook> {
   const apiKey = process.env.CX_MATE_ANTHROPIC_API_KEY;
   if (!apiKey) {
-    throw new Error(
-      "CX_MATE_ANTHROPIC_API_KEY is not set in environment variables"
-    );
+    throw new Error("CX_MATE_ANTHROPIC_API_KEY is not set in environment variables");
   }
 
   const prompt = buildRecommendationPrompt(journey, input);
@@ -70,15 +125,18 @@ export async function generateRecommendations(
   const requestBody = JSON.stringify({
     model: "claude-sonnet-4-20250514",
     max_tokens: 8192,
-    system: "You are a CX expert API. You MUST respond with ONLY a valid JSON object. No preamble, no explanation, no markdown fences, no text before or after the JSON. The very first character of your response must be { and the very last must be }. All string values must be valid JSON — escape any double quotes inside strings with \\\".",
+    // Tool use: Claude MUST call generate_playbook — API validates the JSON schema.
+    // No freeform text, no parsing, no repair. This is the permanent fix.
+    tools: [PLAYBOOK_TOOL],
+    tool_choice: { type: "tool", name: "generate_playbook" },
     messages: [{ role: "user", content: prompt }],
   });
 
-  // Retry once on transient failures (API errors, JSON parse failures)
+  // Retry once on transient API failures
   let lastError: Error | null = null;
   for (let attempt = 0; attempt < 2; attempt++) {
     try {
-      return await _generateFromResponse(apiKey, requestBody);
+      return await _extractToolResult(apiKey, requestBody);
     } catch (err) {
       lastError = err instanceof Error ? err : new Error(String(err));
       if (attempt === 0) {
@@ -89,108 +147,27 @@ export async function generateRecommendations(
   throw lastError!;
 }
 
-async function _generateFromResponse(
+async function _extractToolResult(
   apiKey: string,
   requestBody: string
 ): Promise<GeneratedPlaybook> {
   const responseText = await anthropicRequest(apiKey, requestBody);
   const message = JSON.parse(responseText);
 
-  // Check for truncation
-  const stopReason = message.stop_reason;
-
-  const textBlock = message.content?.find(
-    (block: { type: string }) => block.type === "text"
+  // Tool use response: content block with type "tool_use" holds the validated input
+  const toolBlock = message.content?.find(
+    (block: { type: string }) => block.type === "tool_use"
   );
-  if (!textBlock) {
-    throw new Error("No text response from Claude");
+
+  if (!toolBlock) {
+    // If max_tokens hit mid-tool, content might be empty — surface a clear error
+    const stopReason = message.stop_reason;
+    throw new Error(
+      `No tool_use block in Claude response (stop_reason: ${stopReason}). ` +
+      `Consider reducing journey size or increasing max_tokens.`
+    );
   }
 
-  // Parse the JSON response
-  let raw = textBlock.text.trim();
-
-  // Strip markdown code fences
-  raw = raw.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
-
-  // Extract the JSON object
-  const jsonStart = raw.indexOf("{");
-  const jsonEnd = raw.lastIndexOf("}");
-  if (jsonStart === -1) {
-    throw new Error(`Claude response did not contain JSON. First 200 chars: ${raw.slice(0, 200)}`);
-  }
-
-  // Extract the JSON candidate — start from first {
-  const candidate = jsonEnd > jsonStart
-    ? raw.slice(jsonStart, jsonEnd + 1)
-    : raw.slice(jsonStart);
-
-  // Helper: clean control chars and trailing commas
-  const cleanJson = (s: string) =>
-    s
-      .replace(/,\s*([}\]])/g, "$1")
-      .replace(/[\x00-\x1f]/g, (ch: string) =>
-        ch === "\n" ? "\\n" : ch === "\t" ? "\\t" : ""
-      );
-
-  // Attempt 1: parse as-is
-  try { return JSON.parse(candidate) as GeneratedPlaybook; } catch { /* continue */ }
-
-  // Attempt 2: clean control chars + trailing commas
-  const cleaned = cleanJson(candidate);
-  try { return JSON.parse(cleaned) as GeneratedPlaybook; } catch { /* continue */ }
-
-  // Attempt 3: truncated? repair and retry
-  // Triggered by explicit max_tokens, missing closing brace, OR parse failures above
-  if (stopReason === "max_tokens" || jsonEnd <= jsonStart || !cleaned.trimEnd().endsWith("}")) {
-    console.warn("[generate-recommendations] Attempting truncation repair (stop_reason:", stopReason, ")");
-    const repaired = cleanJson(repairTruncatedJson(raw.slice(jsonStart)));
-    try { return JSON.parse(repaired) as GeneratedPlaybook; } catch { /* continue */ }
-  }
-
-  throw new Error(`Failed to parse recommendations JSON after all repair attempts. First 300 chars: ${raw.slice(0, 300)}`);
-}
-
-/**
- * Attempt to repair truncated JSON by closing open brackets/braces.
- * When Claude hits max_tokens, the JSON is cut mid-stream.
- */
-function repairTruncatedJson(raw: string): string {
-  let cleaned = raw;
-
-  // If we're in the middle of a string value, close it
-  const quoteCount = (cleaned.match(/(?<!\\)"/g) || []).length;
-  if (quoteCount % 2 !== 0) {
-    cleaned += '"';
-  }
-
-  // Remove trailing comma if present
-  cleaned = cleaned.replace(/,\s*$/, "");
-
-  // Count open vs close brackets/braces
-  let openBraces = 0;
-  let openBrackets = 0;
-  let inString = false;
-  let prevChar = "";
-
-  for (const char of cleaned) {
-    if (char === '"' && prevChar !== "\\") {
-      inString = !inString;
-    } else if (!inString) {
-      if (char === "{") openBraces++;
-      else if (char === "}") openBraces--;
-      else if (char === "[") openBrackets++;
-      else if (char === "]") openBrackets--;
-    }
-    prevChar = char;
-  }
-
-  // Close any open brackets then braces
-  for (let i = 0; i < openBrackets; i++) {
-    cleaned += "]";
-  }
-  for (let i = 0; i < openBraces; i++) {
-    cleaned += "}";
-  }
-
-  return cleaned;
+  // toolBlock.input is already a parsed JS object — the API validated it
+  return toolBlock.input as GeneratedPlaybook;
 }
