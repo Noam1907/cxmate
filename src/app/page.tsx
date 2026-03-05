@@ -1,5 +1,6 @@
 "use client";
 
+import { Fragment } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { LogoMark } from "@/components/ui/logo-mark";
@@ -275,12 +276,12 @@ function HowItWorksSection() {
           </h2>
         </div>
 
-        {/* Step flow — number circles + arrows */}
-        <div className="flex flex-col sm:flex-row items-stretch gap-4 sm:gap-0">
+        {/* Step flow — CSS grid ensures all cards are equal height */}
+        <div className="grid grid-cols-1 sm:grid-cols-[1fr_auto_1fr_auto_1fr] gap-4 sm:gap-0">
           {steps.map((step, i) => (
-            <>
+            <Fragment key={step.number}>
               {/* Card */}
-              <div key={step.number} className="flex-1 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm flex flex-col">
+              <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm flex flex-col">
                 {/* Number circle */}
                 <div
                   className="w-10 h-10 rounded-full flex items-center justify-center text-base font-black text-white mb-4 shrink-0"
@@ -301,11 +302,11 @@ function HowItWorksSection() {
 
               {/* Arrow between steps */}
               {i < steps.length - 1 && (
-                <div key={`arrow-${i}`} className="hidden sm:flex items-center justify-center px-4 text-slate-300 text-2xl font-light select-none shrink-0">
+                <div className="hidden sm:flex items-center justify-center px-4 text-slate-300 text-2xl font-light select-none">
                   →
                 </div>
               )}
-            </>
+            </Fragment>
           ))}
         </div>
       </div>
