@@ -192,6 +192,17 @@ Key validated stats for use in impact projections, prompts, and messaging (sourc
 
 ---
 
+### 2026-03-05 — 3-Tier Pricing + Content Gating Build
+
+- **Layered access architecture scales cleanly.** Five layers, each depends only on the one below: (1) `tier-access.ts` — pure logic, no I/O, (2) `/api/billing/plan-tier` — reads DB, (3) `usePlanTier()` — fetches API, (4) `UpgradeGate`/`LockedSection` — reusable UI, (5) per-page gating. Any new feature just needs a row in ACCESS_MATRIX and a gate component on the page.
+- **Blurred preview > hard lock for conversion.** UpgradeGate renders real children with `blur-[6px] opacity-50 pointer-events-none` and overlays a CTA. Users see *something* is there — much more compelling than a blank locked section. Use LockedSection only when the content itself would be confusing if partially visible.
+- **InsightCard locked state needs fake placeholder content.** When an InsightCard is locked and expanded, you can't just blur the real content (it hasn't loaded). Instead, render fake placeholder text that *looks* like an analysis, blur it, and overlay the CTA. The placeholder should be tantalizing but generic enough to work for any insight.
+- **Stripe Express ≠ Stripe Dashboard.** Users with Stripe Express accounts (created by platforms like Go Fractional) land at `connect.stripe.com`, not `dashboard.stripe.com`. Express accounts cannot create products or prices. A separate standard Stripe account is needed. For Israeli founders, Lemon Squeezy is a viable alternative if Stripe country registration is blocked.
+- **Price key naming should match the tier, not the product.** `full_analysis` and `pro_monthly` are better than `starter_onetime` and `starter_monthly` because the tier name IS the key. When tiers change, the key stays meaningful. The old naming (`starter_*`) broke as soon as the tier was renamed.
+- **"See it. Fix it. Track it." as pricing headline.** Each tier maps to one verb: Free = See it (journey + headlines), Full Analysis = Fix it (details + playbook), Pro = Track it (CX Score + re-runs). This creates a clear narrative progression that makes the upgrade path feel like a story, not a feature list.
+
+---
+
 ## Version History
 
 | Date | Update | By |
