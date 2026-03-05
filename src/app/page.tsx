@@ -277,7 +277,7 @@ function HowItWorksSection() {
         </div>
 
         {/* Step flow — CSS grid ensures all cards are equal height */}
-        <div className="grid grid-cols-1 sm:grid-cols-[1fr_auto_1fr_auto_1fr] gap-4 sm:gap-0">
+        <div className="grid grid-cols-1 sm:grid-cols-[1fr_auto_1fr_auto_1fr] [grid-auto-rows:1fr] gap-4 sm:gap-0">
           {steps.map((step, i) => (
             <Fragment key={step.number}>
               {/* Card */}
@@ -354,11 +354,11 @@ function FeaturesSection() {
           </h2>
         </div>
 
-        <div className="grid sm:grid-cols-2 gap-4 sm:[grid-auto-rows:1fr]">
+        <div className="grid sm:grid-cols-2 gap-4 [grid-auto-rows:1fr]">
           {features.map((feature) => (
             <div
               key={feature.title}
-              className="rounded-2xl border border-slate-200 bg-white p-6 hover:shadow-md transition-all duration-200"
+              className="rounded-2xl border border-slate-200 bg-white p-6 hover:shadow-md transition-all duration-200 flex flex-col"
             >
               <div className="flex items-center gap-3 mb-4">
                 <span className="text-2xl">{feature.emoji}</span>
@@ -367,7 +367,7 @@ function FeaturesSection() {
                 </span>
               </div>
               <h3 className="text-base font-bold text-slate-800 mb-1.5">{feature.title}</h3>
-              <p className="text-sm text-slate-500 leading-relaxed">
+              <p className="text-sm text-slate-500 leading-relaxed flex-1">
                 {feature.description}
               </p>
             </div>
