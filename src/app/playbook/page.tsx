@@ -219,25 +219,56 @@ export default function PlaybookPage() {
 
   useEffect(() => {
     async function init() {
-      const stored = sessionStorage.getItem("cx-mate-journey");
-      if (!stored) return;
-
-      setHasJourney(true);
       let tid = "preview";
-      try {
-        const parsed = JSON.parse(stored);
-        tid = parsed.templateId || "preview";
-        setTemplateId(tid);
-        if (parsed.journey && parsed.onboardingData) {
-          setEvidenceMap(buildEvidenceMap(parsed.onboardingData, parsed.journey));
-          const name = parsed.onboardingData?.userName?.split(" ")[0] || "";
-          if (name) setFirstName(name);
-          const tools = parsed.onboardingData?.currentTools || "";
-          if (tools) setCurrentTools(tools);
-        }
-      } catch { /* ignore */ }
+      let hasJourneyData = false;
 
-      // Try Supabase-persisted playbook first (authenticated users)
+      // 1. Try sessionStorage first (fastest — same-session data)
+      const stored = sessionStorage.getItem("cx-mate-journey");
+      if (stored) {
+        hasJourneyData = true;
+        try {
+          const parsed = JSON.parse(stored);
+          tid = parsed.templateId || "preview";
+          setTemplateId(tid);
+          if (parsed.journey && parsed.onboardingData) {
+            setEvidenceMap(buildEvidenceMap(parsed.onboardingData, parsed.journey));
+            const name = parsed.onboardingData?.userName?.split(" ")[0] || "";
+            if (name) setFirstName(name);
+            const tools = parsed.onboardingData?.currentTools || "";
+            if (tools) setCurrentTools(tools);
+          }
+        } catch { /* ignore */ }
+      }
+
+      // 2. If no sessionStorage, try loading from Supabase (authenticated users returning)
+      if (!hasJourneyData) {
+        try {
+          const res = await fetch("/api/journey/default");
+          if (res.ok) {
+            const data = await res.json();
+            if (data.journey && Array.isArray(data.journey.stages)) {
+              hasJourneyData = true;
+              tid = data.templateId || "preview";
+              setTemplateId(tid);
+              // Extract company name from journey name
+              const journeyName = (data.journey.name as string) || "";
+              const companyName = journeyName.replace(/ CX Journey$/i, "").trim();
+              if (companyName) setFirstName(""); // No user name available from DB
+              // Cache in sessionStorage for this session
+              sessionStorage.setItem("cx-mate-journey", JSON.stringify({
+                journey: data.journey,
+                templateId: tid,
+                onboardingData: companyName ? { companyName } : null,
+              }));
+            }
+          }
+        } catch { /* fall through */ }
+      }
+
+      if (!hasJourneyData) return;
+      setHasJourney(true);
+
+      // 3. Try Supabase-persisted playbook first (authenticated users)
       if (tid !== "preview") {
         try {
           const res = await fetch(`/api/playbook?templateId=${tid}`);
@@ -251,7 +282,7 @@ export default function PlaybookPage() {
         } catch { /* fall through to sessionStorage */ }
       }
 
-      // Fall back to sessionStorage (anonymous / not yet persisted)
+      // 4. Fall back to sessionStorage (anonymous / not yet persisted)
       const storedPlaybook = sessionStorage.getItem("cx-mate-playbook");
       if (storedPlaybook) {
         try { setPlaybook(JSON.parse(storedPlaybook)); } catch { /* ignore */ }
@@ -329,7 +360,7 @@ export default function PlaybookPage() {
     const current = statuses[key] || "not_started";
     const next = statusCycle(current);
     setStatus(key, next);
-    const allRecs = playbook?.stagePlaybooks.flatMap((s) => s.recommendations) ?? [];
+    const allRecs = (Array.isArray(playbook?.stagePlaybooks) ? playbook.stagePlaybooks : []).flatMap((s) => Array.isArray(s?.recommendations) ? s.recommendations : []);
     const rec = allRecs.find((r) => makeKey(r) === key);
     track("recommendation_status_changed", {
       status: next,
@@ -432,7 +463,8 @@ export default function PlaybookPage() {
     );
   }
 
-  const allRecs = playbook.stagePlaybooks.flatMap((s) => s.recommendations);
+  const stagePlaybooks = Array.isArray(playbook.stagePlaybooks) ? playbook.stagePlaybooks : [];
+  const allRecs = stagePlaybooks.flatMap((s) => Array.isArray(s?.recommendations) ? s.recommendations : []);
   const totalDone = allRecs.filter((r) => statuses[makeKey(r)] === "done").length;
   const totalInProgress = allRecs.filter((r) => statuses[makeKey(r)] === "in_progress").length;
   const pct = allRecs.length ? Math.round((totalDone / allRecs.length) * 100) : 0;
@@ -440,7 +472,7 @@ export default function PlaybookPage() {
 
   const filteredStages = filter === "quick_wins"
     ? []
-    : playbook.stagePlaybooks.map((sp) => ({
+    : stagePlaybooks.map((sp) => ({
         ...sp,
         recommendations: filter === "must_do" ? sp.recommendations.filter((r) => r.priority === "must_do") : sp.recommendations,
       }));
