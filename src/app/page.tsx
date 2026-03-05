@@ -12,7 +12,7 @@ const SAGE = "#E8EDE5";
 
 function HeroCards() {
   return (
-    <div className="relative w-full max-w-sm mx-auto lg:mx-0 flex flex-col gap-3 lg:gap-4">
+    <div className="relative w-full max-w-sm mx-auto lg:mx-0 grid gap-3 lg:gap-4 [grid-auto-rows:1fr]">
       {/* Card 1 — Input: Pain Identified */}
       <div
         className="rounded-2xl border-2 p-5 shadow-lg flex flex-col"
@@ -50,7 +50,7 @@ function HeroCards() {
 
       {/* Card 2 — Process: Journey Mapped */}
       <div
-        className="rounded-2xl border-2 p-5 shadow-lg ml-4 lg:ml-8 flex flex-col"
+        className="rounded-2xl border-2 p-5 shadow-lg flex flex-col"
         style={{ backgroundColor: "#E0F7F4", borderColor: "#0D9488" }}
       >
         <div className="flex items-center gap-2 mb-3">
