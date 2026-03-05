@@ -32,6 +32,8 @@ export interface OnboardingData {
   existingJourneyOther?: string;
   existingJourneyDescription?: string;
   existingJourneyFileName?: string;
+  existingJourneyFileNames?: string[];
+  existingJourneyPastedContent?: string;
 
   // Step 5: Customer Profile (adaptive)
   customerCount: string;
@@ -54,6 +56,7 @@ export interface OnboardingData {
 
   // Step 8: Goals (maturity-adaptive)
   primaryGoal: string;
+  secondaryGoals?: string[];
   customGoal?: string;
   timeframe: string;
   additionalContext?: string;

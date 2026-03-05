@@ -516,6 +516,7 @@ ${input.currentTools ? `- Current CX tools/stack: ${input.currentTools}` : ""}
 ${input.hasExistingJourney === "yes" || input.hasExistingJourney === "partial" ? `- Has existing journey processes: ${input.hasExistingJourney === "yes" ? "Yes (formal)" : "Partially"}` : "- No existing CX processes in place — building from scratch"}
 ${input.existingJourneyComponents && input.existingJourneyComponents.length > 0 ? `- What they already have: ${input.existingJourneyComponents.join(", ")}` : ""}
 ${input.existingJourneyDescription ? `- Their description: "${input.existingJourneyDescription}"` : ""}
+${input.existingJourneyPastedContent ? `- Pasted content from their existing docs:\n"""\n${input.existingJourneyPastedContent}\n"""` : ""}
 ${(input.hasExistingJourney === "yes" || input.hasExistingJourney === "partial") ? `When generating recommendations, BUILD ON what they already have. Don't recommend replacing working processes — extend and improve them. Acknowledge their existing work.` : ""}
 
 ## Competitive Landscape
@@ -534,7 +535,7 @@ Use this enrichment data to make your analysis more specific and personalized. I
 
 ## Their Goals
 - Primary goal: ${input.primaryGoal}${input.customGoal ? ` — "${input.customGoal}"` : ""}
-- Timeframe: ${input.timeframe}
+${input.secondaryGoals?.length ? `- Additional goals: ${input.secondaryGoals.join(", ")}` : ""}- Timeframe: ${input.timeframe}
 ${input.additionalContext ? `- Additional context: ${input.additionalContext}` : ""}
 
 ## Default Template

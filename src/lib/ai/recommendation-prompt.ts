@@ -205,7 +205,7 @@ IMPORTANT: Acknowledge and build on their existing work. Recommendations for sta
 - Biggest challenge: ${input.biggestChallenge}
 - Pain points: ${input.painPoints.join(", ")}${input.customPainPoint ? `, ${input.customPainPoint}` : ""}
 - Primary goal: ${input.primaryGoal}${input.customGoal ? ` (${input.customGoal})` : ""}
-- Timeframe: ${input.timeframe}
+${input.secondaryGoals?.length ? `- Additional goals: ${input.secondaryGoals.join(", ")}` : ""}- Timeframe: ${input.timeframe}
 ${input.additionalContext ? `- Additional context: ${input.additionalContext}` : ""}
 
 ## Stage Guidance

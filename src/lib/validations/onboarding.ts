@@ -19,6 +19,8 @@ export const onboardingSchema = z.object({
   existingJourneyComponents: z.array(z.string()).optional(),
   existingJourneyDescription: z.string().optional(),
   existingJourneyFileName: z.string().optional(),
+  existingJourneyFileNames: z.array(z.string()).optional(),
+  existingJourneyPastedContent: z.string().optional(),
 
   // Derived (backward compat — auto-set from maturity)
   journeyType: z.enum(["sales", "customer", "full_lifecycle"]),
@@ -51,6 +53,7 @@ export const onboardingSchema = z.object({
 
   // Goals (maturity-adaptive)
   primaryGoal: z.string().min(1, "Primary goal is required"),
+  secondaryGoals: z.array(z.string()).optional(),
   customGoal: z.string().optional(),
   timeframe: z.string().min(1, "Timeframe is required"),
   additionalContext: z.string().optional(),

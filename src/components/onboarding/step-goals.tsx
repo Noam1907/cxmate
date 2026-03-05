@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"; // used for timeframe
 import {
   getGoalsForPainAndMaturity,
   GOAL_TIMEFRAME_MAP,
@@ -12,6 +12,8 @@ import {
   type OnboardingData,
 } from "@/types/onboarding";
 import { ChatBubble } from "./chat-bubble";
+
+const MAX_GOALS = 3;
 
 interface StepGoalsProps {
   data: OnboardingData;
@@ -26,7 +28,35 @@ export function StepGoals({ data, onChange }: StepGoalsProps) {
 
   const hasRelatedGoals = goalOptions.some((g) => g.relatedToPain);
 
-  // Auto-suggest timeframe when goal changes
+  // All selected goals: primaryGoal + secondaryGoals
+  const selectedGoals = [
+    ...(data.primaryGoal ? [data.primaryGoal] : []),
+    ...(data.secondaryGoals || []),
+  ];
+
+  const toggleGoal = (value: string) => {
+    if (selectedGoals.includes(value)) {
+      // Deselect
+      const remaining = selectedGoals.filter((g) => g !== value);
+      onChange({
+        primaryGoal: remaining[0] || "",
+        secondaryGoals: remaining.slice(1),
+        customGoal: value === "something_else" ? undefined : data.customGoal,
+      });
+    } else {
+      // Select — cap at MAX_GOALS
+      if (selectedGoals.length >= MAX_GOALS) return;
+      const updated = [...selectedGoals, value];
+      const suggestion = GOAL_TIMEFRAME_MAP[updated[0]];
+      onChange({
+        primaryGoal: updated[0],
+        secondaryGoals: updated.slice(1),
+        timeframe: !data.timeframe && suggestion ? suggestion.timeframe : data.timeframe,
+      });
+    }
+  };
+
+  // Auto-suggest timeframe when primary goal changes
   useEffect(() => {
     if (!data.primaryGoal) return;
     const suggestion = GOAL_TIMEFRAME_MAP[data.primaryGoal];
@@ -42,7 +72,7 @@ export function StepGoals({ data, onChange }: StepGoalsProps) {
 
   return (
     <div className="space-y-8">
-      <h2 className="text-2xl font-bold tracking-tight text-foreground">What&apos;s your #1 CX goal?</h2>
+      <h2 className="text-2xl font-bold tracking-tight text-foreground">What are your top CX goals?</h2>
       <ChatBubble>
         {hasRelatedGoals ? (
           <>
@@ -51,50 +81,67 @@ export function StepGoals({ data, onChange }: StepGoalsProps) {
           </>
         ) : (
           <>
-            <p>Almost there{data.customPainPoint ? <>. I noted your challenge: <strong>&ldquo;{data.customPainPoint}&rdquo;</strong></> : ""}! <strong>What&apos;s your #1 customer experience goal?</strong></p>
+            <p>Almost there{data.customPainPoint ? <>. I noted your challenge: <strong>&ldquo;{data.customPainPoint}&rdquo;</strong></> : ""}! <strong>What are your top customer experience goals?</strong></p>
             <p>This shapes which parts of your journey I&apos;ll focus on and what actions I&apos;ll prioritize.</p>
           </>
         )}
       </ChatBubble>
 
-      {/* Primary Goal — Pain-Connected + Maturity-Adaptive */}
+      {/* Goals — multi-select, up to 3 */}
       <div className="rounded-2xl border border-border/60 bg-white p-6 space-y-4 shadow-sm">
-        <Label className="text-sm font-semibold text-foreground">What&apos;s your #1 goal?</Label>
-        <RadioGroup
-          value={data.primaryGoal}
-          onValueChange={(value) => {
-            const suggestion = GOAL_TIMEFRAME_MAP[value];
-            onChange({
-              primaryGoal: value,
-              customGoal: value === "something_else" ? data.customGoal : undefined,
-              timeframe: suggestion?.timeframe || data.timeframe,
-            });
-          }}
-          className="grid grid-cols-1 gap-2.5"
-        >
-          {goalOptions.map((goal) => (
-            <label
-              key={goal.value}
-              className={`flex items-center gap-3 rounded-xl border-2 px-4 py-3.5 cursor-pointer transition-all hover:shadow-sm ${
-                data.primaryGoal === goal.value
-                  ? "border-primary bg-primary/5 shadow-sm"
-                  : "border-border/50 hover:border-border"
-              }`}
-            >
-              <RadioGroupItem value={goal.value} />
-              <span className="text-sm font-medium">{goal.label}</span>
-              {goal.relatedToPain && (
-                <span className="ml-auto inline-flex items-center gap-1 text-[10px] font-semibold text-primary bg-primary/10 px-2.5 py-1 rounded-full">
-                  Related to your pains
-                </span>
-              )}
-            </label>
-          ))}
-        </RadioGroup>
+        <div className="flex items-center justify-between">
+          <Label className="text-sm font-semibold text-foreground">
+            Pick up to {MAX_GOALS} goals
+          </Label>
+          {selectedGoals.length > 0 && (
+            <span className="text-xs text-primary font-medium shrink-0">
+              {selectedGoals.length} of {MAX_GOALS} selected
+            </span>
+          )}
+        </div>
+        <div className="grid grid-cols-1 gap-2.5">
+          {goalOptions.map((goal) => {
+            const selected = selectedGoals.includes(goal.value);
+            const disabled = !selected && selectedGoals.length >= MAX_GOALS;
+            return (
+              <button
+                key={goal.value}
+                type="button"
+                onClick={() => toggleGoal(goal.value)}
+                disabled={disabled}
+                className={`flex items-center gap-3 rounded-xl border-2 px-4 py-3.5 cursor-pointer transition-all hover:shadow-sm text-left ${
+                  selected
+                    ? "border-primary bg-primary/5 shadow-sm"
+                    : disabled
+                    ? "border-border/30 opacity-40 cursor-not-allowed"
+                    : "border-border/50 hover:border-border"
+                }`}
+              >
+                <div className={`w-4 h-4 rounded-md border-2 flex items-center justify-center shrink-0 transition-all ${
+                  selected ? "border-primary bg-primary" : "border-border/60"
+                }`}>
+                  {selected && (
+                    <svg className="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 12 12" stroke="currentColor" strokeWidth={2.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M2 6l3 3 5-5" />
+                    </svg>
+                  )}
+                </div>
+                <span className="text-sm font-medium flex-1">{goal.label}</span>
+                <div className="ml-auto flex items-center gap-1.5 shrink-0">
+                  {goal.relatedToPain && (
+                    <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-primary bg-primary/10 px-2.5 py-1 rounded-full">
+                      Related to your pains
+                    </span>
+                  )}
+                </div>
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       {/* Custom goal text input — when "Something else" is selected */}
-      {data.primaryGoal === "something_else" && (
+      {selectedGoals.includes("something_else") && (
         <div className="space-y-2">
           <Label htmlFor="customGoal" className="text-sm font-semibold text-foreground">Tell me what you&apos;re aiming for</Label>
           <Input

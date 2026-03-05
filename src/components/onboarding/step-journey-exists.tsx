@@ -75,11 +75,16 @@ const JOURNEY_COMPONENT_GROUPS: {
 ];
 
 
+const MAX_FILES = 3;
+
 export function StepJourneyExists({ data, onChange }: StepJourneyExistsProps) {
   const showSubFlow = data.hasExistingJourney === "yes" || data.hasExistingJourney === "partial";
   const existingComponents = data.existingJourneyComponents || [];
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [uploadedFileName, setUploadedFileName] = useState<string>(data.existingJourneyFileName || "");
+  const [uploadedFileNames, setUploadedFileNames] = useState<string[]>(
+    data.existingJourneyFileNames || (data.existingJourneyFileName ? [data.existingJourneyFileName] : [])
+  );
+  const [uploadTab, setUploadTab] = useState<"files" | "paste">("files");
 
   const toggleComponent = (value: string) => {
     const updated = existingComponents.includes(value)
@@ -89,38 +94,53 @@ export function StepJourneyExists({ data, onChange }: StepJourneyExistsProps) {
   };
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+    const files = Array.from(e.target.files || []);
+    if (!files.length) return;
 
-    // For now, just capture the filename — we store it in state and sessionStorage
-    // Future: upload to Supabase Storage and pass to Claude for analysis
-    setUploadedFileName(file.name);
-    onChange({ existingJourneyFileName: file.name });
+    const newNames = [...uploadedFileNames];
+    const storedFiles: object[] = JSON.parse(
+      sessionStorage.getItem("cx-mate-existing-journey-files") || "[]"
+    );
 
-    // Read and store in sessionStorage for later use
-    const reader = new FileReader();
-    reader.onload = () => {
-      try {
-        sessionStorage.setItem("cx-mate-existing-journey-file", JSON.stringify({
-          name: file.name,
-          type: file.type,
-          size: file.size,
-          data: reader.result,
-        }));
-      } catch {
-        // sessionStorage full — that's okay, file is optional
-      }
-    };
-    reader.readAsDataURL(file);
+    files.forEach((file) => {
+      if (newNames.length >= MAX_FILES) return;
+      newNames.push(file.name);
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          storedFiles.push({ name: file.name, type: file.type, size: file.size, data: reader.result });
+          sessionStorage.setItem("cx-mate-existing-journey-files", JSON.stringify(storedFiles));
+        } catch {
+          // sessionStorage full — that's okay
+        }
+      };
+      reader.readAsDataURL(file);
+    });
+
+    setUploadedFileNames(newNames);
+    onChange({
+      existingJourneyFileNames: newNames,
+      existingJourneyFileName: newNames[0] || "",
+    });
+    if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
-  const handleRemoveFile = () => {
-    setUploadedFileName("");
-    onChange({ existingJourneyFileName: "" });
-    sessionStorage.removeItem("cx-mate-existing-journey-file");
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
-    }
+  const handleRemoveFile = (name: string) => {
+    const updated = uploadedFileNames.filter((n) => n !== name);
+    setUploadedFileNames(updated);
+    onChange({
+      existingJourneyFileNames: updated,
+      existingJourneyFileName: updated[0] || "",
+    });
+    try {
+      const stored: { name: string }[] = JSON.parse(
+        sessionStorage.getItem("cx-mate-existing-journey-files") || "[]"
+      );
+      sessionStorage.setItem(
+        "cx-mate-existing-journey-files",
+        JSON.stringify(stored.filter((f) => f.name !== name))
+      );
+    } catch { /* ignore */ }
   };
 
   return (
@@ -266,49 +286,93 @@ export function StepJourneyExists({ data, onChange }: StepJourneyExistsProps) {
             </div>
           </div>
 
-          {/* Upload existing CX doc */}
+          {/* Upload / Paste existing CX doc */}
           <div className="space-y-2">
-            <Label>Upload what you have (optional)</Label>
-            <div className="rounded-lg border-2 border-dashed border-border/70 p-4 text-center space-y-2 hover:border-primary/40 transition-colors">
-              {uploadedFileName ? (
-                <div className="flex items-center justify-center gap-2">
-                  <Paperclip size={16} weight="duotone" className="text-muted-foreground shrink-0" />
-                  <span className="text-sm font-medium text-foreground">{uploadedFileName}</span>
-                  <button
-                    type="button"
-                    onClick={handleRemoveFile}
-                    className="text-muted-foreground hover:text-red-500 transition-colors ml-1"
-                  >
-                    <X size={14} />
-                  </button>
-                </div>
-              ) : (
-                <>
-                  <p className="text-sm text-muted-foreground">
-                    Screenshot, PDF, image, or doc. Anything helps
-                  </p>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={() => fileInputRef.current?.click()}
-                    className="rounded-lg"
-                  >
-                    Choose file
-                  </Button>
-                </>
-              )}
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*,.pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt,.csv"
-                onChange={handleFileUpload}
-                className="hidden"
-              />
-              <p className="text-[11px] text-muted-foreground">
-                Training timeline, onboarding doc, process diagram. I&apos;ll use it to understand your current setup
-              </p>
+            <Label>Share what you have (optional)</Label>
+
+            {/* Tab switcher */}
+            <div className="flex gap-1 rounded-xl bg-slate-100 p-1 w-fit">
+              {(["files", "paste"] as const).map((tab) => (
+                <button
+                  key={tab}
+                  type="button"
+                  onClick={() => setUploadTab(tab)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                    uploadTab === tab
+                      ? "bg-white shadow-sm text-foreground"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  {tab === "files" ? "Upload files" : "Paste text"}
+                </button>
+              ))}
             </div>
+
+            {uploadTab === "files" ? (
+              <div className="space-y-2">
+                {/* Uploaded files list */}
+                {uploadedFileNames.length > 0 && (
+                  <div className="space-y-1.5">
+                    {uploadedFileNames.map((name) => (
+                      <div key={name} className="flex items-center gap-2 rounded-lg border border-border/50 bg-slate-50 px-3 py-2">
+                        <Paperclip size={14} weight="duotone" className="text-muted-foreground shrink-0" />
+                        <span className="text-sm font-medium text-foreground flex-1 truncate">{name}</span>
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveFile(name)}
+                          className="text-muted-foreground hover:text-red-500 transition-colors"
+                        >
+                          <X size={14} />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Drop zone */}
+                {uploadedFileNames.length < MAX_FILES && (
+                  <div className="rounded-lg border-2 border-dashed border-border/70 p-4 text-center space-y-2 hover:border-primary/40 transition-colors">
+                    <p className="text-sm text-muted-foreground">
+                      Screenshot, PDF, image, or doc. Up to {MAX_FILES} files
+                    </p>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => fileInputRef.current?.click()}
+                      className="rounded-lg"
+                    >
+                      {uploadedFileNames.length > 0 ? "Add another file" : "Choose file"}
+                    </Button>
+                    <p className="text-[11px] text-muted-foreground">
+                      Training timeline, onboarding doc, process diagram
+                    </p>
+                  </div>
+                )}
+
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*,.pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt,.csv"
+                  multiple
+                  onChange={handleFileUpload}
+                  className="hidden"
+                />
+              </div>
+            ) : (
+              <div className="space-y-1.5">
+                <Textarea
+                  placeholder="Paste content from your onboarding doc, Notion page, process notes, or anything that describes how you work..."
+                  value={data.existingJourneyPastedContent || ""}
+                  onChange={(e) => onChange({ existingJourneyPastedContent: e.target.value })}
+                  rows={5}
+                  className="rounded-xl border-border/60 text-sm"
+                />
+                <p className="text-[11px] text-muted-foreground">
+                  Copy-paste from Notion, Google Docs, Confluence — anything that describes your current process
+                </p>
+              </div>
+            )}
           </div>
 
           {/* Description textarea */}
