@@ -121,7 +121,7 @@ function StageNode({
         <div className="absolute top-1/2 left-0 right-0 h-px -translate-y-1/2 bg-slate-200" />
 
         {/* Card */}
-        <div className={`relative mx-auto w-[160px] rounded-2xl border bg-white p-4 text-center shadow-sm z-10 ${hasCritical ? "border-red-200" : "border-slate-200"}`}>
+        <div className={`relative mx-auto w-[160px] min-h-[150px] rounded-2xl border bg-white p-4 text-center shadow-sm z-10 flex flex-col ${hasCritical ? "border-red-200" : "border-slate-200"}`}>
           {/* Stage number */}
           <div className={`absolute -top-3 left-1/2 -translate-x-1/2 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shadow-sm text-white ${isCustomer ? "bg-slate-600" : "bg-slate-400"}`}>
             {index + 1}
@@ -132,11 +132,14 @@ function StageNode({
             {stage.stageType}
           </div>
 
-          <h3 className="text-sm font-semibold text-slate-800 leading-tight">{stage.name}</h3>
+          <h3 className="text-sm font-semibold text-slate-800 leading-tight line-clamp-2">{stage.name}</h3>
 
           <p className="text-xs text-slate-400 italic mt-1 leading-tight line-clamp-1">
             &ldquo;{stage.emotionalState}&rdquo;
           </p>
+
+          {/* Spacer to push bottom content down */}
+          <div className="flex-1" />
 
           {hasCritical && (
             <div className="mt-2 text-xs text-red-600 font-medium">
