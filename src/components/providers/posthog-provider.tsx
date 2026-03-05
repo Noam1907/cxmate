@@ -4,6 +4,7 @@ import posthog from "posthog-js";
 import { PostHogProvider as PHProvider } from "posthog-js/react";
 import { useEffect, Suspense } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
+import { useEnsureOrg } from "@/hooks/use-ensure-org";
 
 // ─── Page View Tracker ────────────────────────────────────────────────────────
 // Next.js App Router doesn't fire traditional page events on navigation.
@@ -27,6 +28,9 @@ function PageViewTracker() {
 // ─── PostHog Provider ────────────────────────────────────────────────────────
 
 export function PostHogProvider({ children }: { children: React.ReactNode }) {
+  // Repair users who slipped through auth without an org
+  useEnsureOrg();
+
   useEffect(() => {
     const key = process.env.NEXT_PUBLIC_POSTHOG_KEY;
     const host = process.env.NEXT_PUBLIC_POSTHOG_HOST ?? "https://us.i.posthog.com";

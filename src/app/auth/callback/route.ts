@@ -23,31 +23,41 @@ export async function GET(request: Request) {
 
       // New user — create organization + set org_id
       if (!orgId) {
-        try {
-          const admin = createAdminClient();
+        let orgCreated = false;
+        for (let attempt = 0; attempt < 2 && !orgCreated; attempt++) {
+          try {
+            const admin = createAdminClient();
 
-          // Create organization
-          const companyName =
-            user.user_metadata?.company_name || "My Company";
-          const { data: org, error: orgError } = await admin
-            .from("organizations")
-            .insert({
-              name: companyName,
-              vertical: "general",
-              size: "1-10",
-            })
-            .select("id")
-            .single();
+            // Create organization
+            const companyName =
+              user.user_metadata?.company_name || "My Company";
+            const { data: org, error: orgError } = await admin
+              .from("organizations")
+              .insert({
+                name: companyName,
+                vertical: "general",
+                size: "1-10",
+              })
+              .select("id")
+              .single();
 
-          if (orgError) throw orgError;
+            if (orgError) throw orgError;
 
-          // Set org_id in user's app_metadata
-          await admin.auth.admin.updateUserById(user.id, {
-            app_metadata: { org_id: org.id },
-          });
-        } catch (err) {
-          console.error("Org creation error:", err);
-          // Continue anyway — they can still use preview mode
+            // Set org_id in user's app_metadata
+            const { error: metaError } = await admin.auth.admin.updateUserById(user.id, {
+              app_metadata: { org_id: org.id },
+            });
+
+            if (metaError) {
+              console.error(`[auth-callback] Org ${org.id} created but failed to set metadata for ${user.email}:`, metaError);
+            } else {
+              console.log(`[auth-callback] Created org ${org.id} for ${user.email}`);
+            }
+            orgCreated = true;
+          } catch (err) {
+            console.error(`[auth-callback] Org creation attempt ${attempt + 1} failed for ${user.email}:`, err);
+            // The ensure-org hook on the client will retry as a safety net
+          }
         }
 
         // New user — use redirect param if provided (e.g. magic link from onboarding),
