@@ -48,7 +48,7 @@ async function loadPersistedDashboardData(): Promise<DashboardData | null> {
     const res = await fetch("/api/journey/default");
     if (!res.ok) return null;
     const json = await res.json();
-    if (!json.success || !json.journey) return null;
+    if (!json.success || !json.journey || !Array.isArray(json.journey.stages)) return null;
 
     // Also try to load playbook and rec statuses from local storage
     let playbook: GeneratedPlaybook | null = null;
@@ -62,10 +62,27 @@ async function loadPersistedDashboardData(): Promise<DashboardData | null> {
       if (raw) recStatuses = JSON.parse(raw);
     } catch { /* ignore */ }
 
+    // Extract company name from journey name if onboarding data isn't available
+    const onboarding = json.onboardingData || null;
+    if (!onboarding && json.journey?.name) {
+      // Journey name is typically "CompanyName CX Journey"
+      const journeyName = json.journey.name as string;
+      const companyName = journeyName.replace(/ CX Journey$/i, "").trim();
+      if (companyName) {
+        return {
+          journey: json.journey,
+          playbook,
+          onboarding: { companyName } as OnboardingInput,
+          recStatuses,
+          templateId: json.templateId,
+        };
+      }
+    }
+
     return {
       journey: json.journey,
       playbook,
-      onboarding: json.onboardingData || null,
+      onboarding,
       recStatuses,
       templateId: json.templateId,
     };
@@ -77,14 +94,16 @@ async function loadPersistedDashboardData(): Promise<DashboardData | null> {
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function computeJourneyStats(journey: GeneratedJourney) {
-  const totalStages = journey.stages.length;
-  const totalMoments = journey.stages.reduce((s, st) => s + st.meaningfulMoments.length, 0);
-  const criticalMoments = journey.stages.reduce((s, st) => s + st.meaningfulMoments.filter((m) => m.severity === "critical").length, 0);
+  const stages = Array.isArray(journey?.stages) ? journey.stages : [];
+  const totalStages = stages.length;
+  const totalMoments = stages.reduce((s, st) => s + (Array.isArray(st?.meaningfulMoments) ? st.meaningfulMoments.length : 0), 0);
+  const criticalMoments = stages.reduce((s, st) => s + (Array.isArray(st?.meaningfulMoments) ? st.meaningfulMoments.filter((m) => m.severity === "critical").length : 0), 0);
   return { totalStages, totalMoments, criticalMoments };
 }
 
 function computePlaybookStats(playbook: GeneratedPlaybook, statuses: Record<string, string>) {
-  const allRecs = playbook.stagePlaybooks.flatMap((s) => s.recommendations);
+  const stagePlaybooks = Array.isArray(playbook?.stagePlaybooks) ? playbook.stagePlaybooks : [];
+  const allRecs = stagePlaybooks.flatMap((s) => Array.isArray(s?.recommendations) ? s.recommendations : []);
   const total = allRecs.length;
   const done = Object.values(statuses).filter((s) => s === "done").length;
   const inProgress = Object.values(statuses).filter((s) => s === "in_progress").length;
@@ -122,7 +141,7 @@ export default function DashboardPage() {
     return <main className="min-h-screen"><PageLoading label="Loading your dashboard..." /></main>;
   }
 
-  if (!data.journey) {
+  if (!data.journey || !Array.isArray(data.journey.stages)) {
     return (
       <main className="min-h-screen">
         <div className="max-w-2xl mx-auto px-6 pt-20 pb-24">
