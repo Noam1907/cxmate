@@ -21,6 +21,8 @@ export const onboardingSchema = z.object({
   existingJourneyFileName: z.string().optional(),
   existingJourneyFileNames: z.array(z.string()).optional(),
   existingJourneyPastedContent: z.string().optional(),
+  existingJourneyWorking: z.array(z.string()).optional(),
+  existingJourneyBroken: z.array(z.string()).optional(),
 
   // Derived (backward compat — auto-set from maturity)
   journeyType: z.enum(["sales", "customer", "full_lifecycle"]),

@@ -75,6 +75,31 @@ const JOURNEY_COMPONENT_GROUPS: {
 ];
 
 
+// ─── What works / what needs fixing options (partial path only) ───────────────
+
+const WHAT_WORKS_OPTIONS = [
+  "Customers reach first value quickly",
+  "Sales → CS handoff is smooth",
+  "Onboarding is self-serve / low-touch",
+  "Support is fast and responsive",
+  "QBR / exec reviews land well",
+  "Renewal rates are strong",
+  "Customers refer us to others",
+  "Product adoption is high",
+];
+
+const WHAT_NEEDS_FIXING_OPTIONS = [
+  "Onboarding takes too long / too much CS time",
+  "Customers don't reach 'aha moment'",
+  "Sales → CS handoff drops context",
+  "Low product adoption after onboarding",
+  "Too many tickets for basic questions",
+  "Churn spikes at month 3–6",
+  "No early warning on at-risk accounts",
+  "Expansion is reactive, not proactive",
+  "No consistent way to measure CX",
+];
+
 const MAX_FILES = 3;
 
 export function StepJourneyExists({ data, onChange }: StepJourneyExistsProps) {
@@ -91,6 +116,22 @@ export function StepJourneyExists({ data, onChange }: StepJourneyExistsProps) {
       ? existingComponents.filter((c) => c !== value)
       : [...existingComponents, value];
     onChange({ existingJourneyComponents: updated });
+  };
+
+  const toggleWorking = (value: string) => {
+    const current = data.existingJourneyWorking || [];
+    const updated = current.includes(value)
+      ? current.filter((v) => v !== value)
+      : [...current, value];
+    onChange({ existingJourneyWorking: updated });
+  };
+
+  const toggleBroken = (value: string) => {
+    const current = data.existingJourneyBroken || [];
+    const updated = current.includes(value)
+      ? current.filter((v) => v !== value)
+      : [...current, value];
+    onChange({ existingJourneyBroken: updated });
   };
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -375,26 +416,99 @@ export function StepJourneyExists({ data, onChange }: StepJourneyExistsProps) {
             )}
           </div>
 
-          {/* Description textarea */}
-          <div className="space-y-2">
-            <Label htmlFor="existingJourneyDesc">
-              {data.hasExistingJourney === "yes"
-                ? "Anything else I should know? Where does this live?"
-                : "What works well? What needs fixing?"
-              }
-            </Label>
-            <Textarea
-              id="existingJourneyDesc"
-              placeholder={
-                data.hasExistingJourney === "yes"
-                  ? "e.g. Our onboarding is in Notion, sales pipeline in HubSpot, support runs through Zendesk..."
-                  : "e.g. Our onboarding checklist is solid but the handoff from sales is broken..."
-              }
-              value={data.existingJourneyDescription || ""}
-              onChange={(e) => onChange({ existingJourneyDescription: e.target.value })}
-              rows={2}
-            />
-          </div>
+          {/* Description — "yes" path: freeform where does this live */}
+          {data.hasExistingJourney === "yes" && (
+            <div className="space-y-2">
+              <Label htmlFor="existingJourneyDesc">Anything else I should know? Where does this live?</Label>
+              <Textarea
+                id="existingJourneyDesc"
+                placeholder="e.g. Our onboarding is in Notion, sales pipeline in HubSpot, support runs through Zendesk..."
+                value={data.existingJourneyDescription || ""}
+                onChange={(e) => onChange({ existingJourneyDescription: e.target.value })}
+                rows={2}
+              />
+            </div>
+          )}
+
+          {/* "partial" path: selectable what-works + what-needs-fixing chips */}
+          {data.hasExistingJourney === "partial" && (
+            <div className="space-y-4">
+              {/* What's working */}
+              <div className="rounded-xl border border-border/60 bg-white p-4 shadow-sm space-y-3">
+                <div className="flex items-center gap-2">
+                  <span className="text-base">✅</span>
+                  <p className="text-sm font-semibold text-foreground">What&apos;s working well?</p>
+                  {(data.existingJourneyWorking?.length ?? 0) > 0 && (
+                    <span className="text-xs text-primary font-medium ml-auto">{data.existingJourneyWorking!.length} selected</span>
+                  )}
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {WHAT_WORKS_OPTIONS.map((opt) => {
+                    const selected = (data.existingJourneyWorking || []).includes(opt);
+                    return (
+                      <button
+                        key={opt}
+                        type="button"
+                        onClick={() => toggleWorking(opt)}
+                        className={`text-xs font-medium px-3 py-1.5 rounded-full border transition-all ${
+                          selected
+                            ? "bg-emerald-50 border-emerald-400 text-emerald-800"
+                            : "bg-white border-border/50 text-muted-foreground hover:border-border"
+                        }`}
+                      >
+                        {opt}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* What needs fixing */}
+              <div className="rounded-xl border border-border/60 bg-white p-4 shadow-sm space-y-3">
+                <div className="flex items-center gap-2">
+                  <span className="text-base">🔧</span>
+                  <p className="text-sm font-semibold text-foreground">What needs fixing?</p>
+                  {(data.existingJourneyBroken?.length ?? 0) > 0 && (
+                    <span className="text-xs text-primary font-medium ml-auto">{data.existingJourneyBroken!.length} selected</span>
+                  )}
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {WHAT_NEEDS_FIXING_OPTIONS.map((opt) => {
+                    const selected = (data.existingJourneyBroken || []).includes(opt);
+                    return (
+                      <button
+                        key={opt}
+                        type="button"
+                        onClick={() => toggleBroken(opt)}
+                        className={`text-xs font-medium px-3 py-1.5 rounded-full border transition-all ${
+                          selected
+                            ? "bg-red-50 border-red-300 text-red-800"
+                            : "bg-white border-border/50 text-muted-foreground hover:border-border"
+                        }`}
+                      >
+                        {opt}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Optional freeform */}
+              <div className="space-y-1.5">
+                <Label htmlFor="existingJourneyDesc" className="text-xs text-muted-foreground font-normal">
+                  Anything else to add? (optional)
+                </Label>
+                <Textarea
+                  id="existingJourneyDesc"
+                  placeholder="e.g. Our onboarding checklist is solid but the handoff from sales drops context every time..."
+                  value={data.existingJourneyDescription || ""}
+                  onChange={(e) => onChange({ existingJourneyDescription: e.target.value })}
+                  rows={2}
+                  className="rounded-xl border-border/60 text-sm"
+                />
+              </div>
+            </div>
+          )}
         </div>
       )}
 

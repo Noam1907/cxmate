@@ -34,6 +34,8 @@ export interface OnboardingData {
   existingJourneyFileName?: string;
   existingJourneyFileNames?: string[];
   existingJourneyPastedContent?: string;
+  existingJourneyWorking?: string[];   // what's working well (partial path)
+  existingJourneyBroken?: string[];    // what needs fixing (partial path)
 
   // Step 5: Customer Profile (adaptive)
   customerCount: string;

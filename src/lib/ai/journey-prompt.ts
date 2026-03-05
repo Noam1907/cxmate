@@ -514,10 +514,12 @@ ${input.currentTools ? `- Current CX tools/stack: ${input.currentTools}` : ""}
 
 ## Existing CX Processes
 ${input.hasExistingJourney === "yes" || input.hasExistingJourney === "partial" ? `- Has existing journey processes: ${input.hasExistingJourney === "yes" ? "Yes (formal)" : "Partially"}` : "- No existing CX processes in place — building from scratch"}
-${input.existingJourneyComponents && input.existingJourneyComponents.length > 0 ? `- What they already have: ${input.existingJourneyComponents.join(", ")}` : ""}
-${input.existingJourneyDescription ? `- Their description: "${input.existingJourneyDescription}"` : ""}
+${input.existingJourneyComponents && input.existingJourneyComponents.length > 0 ? `- Processes they have in place: ${input.existingJourneyComponents.join(", ")}` : ""}
+${input.existingJourneyWorking && input.existingJourneyWorking.length > 0 ? `- What is working well: ${input.existingJourneyWorking.join("; ")}` : ""}
+${input.existingJourneyBroken && input.existingJourneyBroken.length > 0 ? `- What needs fixing: ${input.existingJourneyBroken.join("; ")}` : ""}
+${input.existingJourneyDescription ? `- Additional context: "${input.existingJourneyDescription}"` : ""}
 ${input.existingJourneyPastedContent ? `- Pasted content from their existing docs:\n"""\n${input.existingJourneyPastedContent}\n"""` : ""}
-${(input.hasExistingJourney === "yes" || input.hasExistingJourney === "partial") ? `When generating recommendations, BUILD ON what they already have. Don't recommend replacing working processes — extend and improve them. Acknowledge their existing work.` : ""}
+${(input.hasExistingJourney === "yes" || input.hasExistingJourney === "partial") ? `When generating recommendations, BUILD ON what they already have. Reinforce what is working. Focus gaps and improvements on what needs fixing. Don't recommend replacing working processes — extend and improve them.` : ""}
 
 ## Competitive Landscape
 ${input.competitors ? `- Known competitors/alternatives: ${input.competitors}` : "- No competitors specified — use industry knowledge to identify likely alternatives"}
