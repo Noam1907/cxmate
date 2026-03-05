@@ -218,12 +218,16 @@ export default function PlaybookPage() {
   const { statuses, setStatus } = useRecommendationStatus();
 
   useEffect(() => {
-    const stored = sessionStorage.getItem("cx-mate-journey");
-    if (stored) {
+    async function init() {
+      const stored = sessionStorage.getItem("cx-mate-journey");
+      if (!stored) return;
+
       setHasJourney(true);
+      let tid = "preview";
       try {
         const parsed = JSON.parse(stored);
-        setTemplateId(parsed.templateId || "preview");
+        tid = parsed.templateId || "preview";
+        setTemplateId(tid);
         if (parsed.journey && parsed.onboardingData) {
           setEvidenceMap(buildEvidenceMap(parsed.onboardingData, parsed.journey));
           const name = parsed.onboardingData?.userName?.split(" ")[0] || "";
@@ -232,6 +236,22 @@ export default function PlaybookPage() {
           if (tools) setCurrentTools(tools);
         }
       } catch { /* ignore */ }
+
+      // Try Supabase-persisted playbook first (authenticated users)
+      if (tid !== "preview") {
+        try {
+          const res = await fetch(`/api/playbook?templateId=${tid}`);
+          if (res.ok) {
+            const data = await res.json();
+            if (data.playbook) {
+              setPlaybook(data.playbook);
+              return;
+            }
+          }
+        } catch { /* fall through to sessionStorage */ }
+      }
+
+      // Fall back to sessionStorage (anonymous / not yet persisted)
       const storedPlaybook = sessionStorage.getItem("cx-mate-playbook");
       if (storedPlaybook) {
         try { setPlaybook(JSON.parse(storedPlaybook)); } catch { /* ignore */ }
@@ -240,6 +260,7 @@ export default function PlaybookPage() {
         setPreparing(true);
       }
     }
+    init();
   }, []);
 
   // Poll sessionStorage every 2s waiting for pre-generated playbook to land

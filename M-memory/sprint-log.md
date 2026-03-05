@@ -120,7 +120,28 @@ Track sprint progress and status.
 - 2026-02-22: **Next session should start with:** Run the app end-to-end with a customer watching. All visual changes are shipped. Remaining for Sprint 3: playbook persistence (Phase 4), "Save My Results" CTA (Phase 5), journey health scoring (P1). Then Sprint 4 (beta launch).
 - 2026-02-22: **LinkedIn Beta Recruitment Post — READY.** Full team stress test on beta recruitment post. COO drove content strategy, Product Lead validated ICP alignment, CX Architect confirmed messaging integrity, Tech Lead flagged demo readiness (Zoom-first, not self-serve), QA caught edge cases (follow-up message needed, "how many" for beta). Identified gap: no LinkedIn Content Expert agent — created ad-hoc review covering hook strength, format, hashtags, timing. Key decisions: (1) target is stage-based not size-based ("no CX expert yet" not "under 200 employees"), (2) hook uses real COO quote for authenticity, (3) CTA is "write אני" for low friction, (4) targeting founders/COOs/CX owners. Post approved for publish. **Action item:** prepare follow-up DM template for respondents.
 
-### Sprint 4: Beta Launch (Weeks 7-8) ← CURRENT
+### Sprint 5: Context Intelligence + Retention (Weeks 9-10) ← CURRENT
+
+**Goal:** Close data persistence gaps, fix landing page conversion, add context enrichment that makes AI output feel like it truly "knows" the user's world.
+
+| Task | Agent | Priority | Status |
+|------|-------|----------|--------|
+| Playbook persistence to Supabase | Backend Dev | P0 | In Progress |
+| "Save My Results" re-POST fix (anon→auth data claim) | Backend + Frontend | P1 | Pending |
+| Landing page step boxes visual (numbers/arrows, not pricing plan feel) | Frontend Dev | P1 | Pending |
+| Selectable pain options for what-works/what-needs-fixing (step-journey-exists) | Frontend Dev | P1 | Pending |
+| Context enrichment flywheel — G2/Capterra/X/Reddit review mining + tool stack signals | AI Engineer | P2 | Pending |
+| Journey health scoring | AI Engineer | P1 | Pending |
+| Journey editing | Frontend Dev | P1 | Pending |
+| Security headers (CSP, X-Frame-Options, X-Content-Type-Options) | DevOps | P2 | Pending |
+| Weekly service cost + credits monitoring | DevOps + COO | P0 | Ongoing — see M-memory/cost-tracker.md |
+
+### Sprint Notes
+- 2026-03-05: **Sprint 5 kickoff.** Three Sprint 4 P0s carried forward: playbook persistence, Save My Results persistence fix. All Sprint 4 code deployed (P0 copy fixes, P1 multi-select goals + multi-file upload, max_tokens 5k→8k fix). Noam (Orca AI) journey manually generated + persisted (template: 0102bea1-d9f1-481d-ab9c-0d585fe8d3d0). Added weekly service cost/credit monitoring — Anat received Vercel credits-running-low email. Created M-memory/cost-tracker.md. Starting with playbook persistence (P0 carryover).
+
+---
+
+### Sprint 4: Beta Launch (Weeks 7-8) — COMPLETE (shipped core goals)
 
 **Goal:** First beta users in the product, first paid conversions, demo-ready at all times.
 
@@ -148,6 +169,10 @@ Track sprint progress and status.
 | Load testing | DevOps Agent | P2 | Pending |
 | MCP research pipeline spike | AI Engineer | P2 | Sprint 5 |
 | Curated email template library | CX Architect | P2 | Deferred |
+| **"Save My Results" data loss** — anonymous users who onboard then sign up never get data persisted to Supabase (journey stays in sessionStorage only). Fix: after auth, detect sessionStorage data + re-POST to /api/onboarding with new session | Backend Dev + Frontend Dev | P1 | Sprint 5 |
+| **Context enrichment flywheel** — G2/Capterra/X/Reddit review mining + live tool stack signals from website/job postings | AI Engineer | P2 | Sprint 5 |
+| P1: Selectable pain options for what-works/what-needs-fixing (step-journey-exists.tsx) | Frontend Dev | P1 | Sprint 5 |
+| P1: Landing page step boxes visual — look like pricing plans, need numbers/arrows treatment | Frontend Dev | P1 | Sprint 5 |
 | **Domain purchase + Vercel custom domain** | Anat + DevOps | P0 | Pending (Anat) |
 | **Professional email** (Google Workspace or Resend) | Anat + Backend | P0 | Pending (Anat) |
 | **Privacy Policy + Terms pages** | Growth + Frontend | P0 | Done ✅ |

@@ -141,15 +141,29 @@ When starting a session (or when activated), run this:
 3. Read M-memory/learning-log.md — Any patterns or blockers noted?
 4. Check git status — Any uncommitted work? Any unpushed changes?
 5. Check deployment — Is the latest code deployed?
-6. Present STATUS REPORT:
+6. Check M-memory/cost-tracker.md — Any services near limits? Weekly cost review due?
+7. Present STATUS REPORT:
    - Done: [list]
    - In Progress: [list]
    - Blocked: [list with reason]
    - Next Up: [list with priority]
    - Deployment: [local only / pushed / deployed]
-7. Recommend: "Here's what I suggest we do this session: [plan]"
-8. Start executing (don't wait for permission on non-controversial tasks)
+   - Cost/Credits: [summary from cost-tracker.md]
+8. Recommend: "Here's what I suggest we do this session: [plan]"
+9. Start executing (don't wait for permission on non-controversial tasks)
 ```
+
+## Weekly Cost Review (every Monday session or first session of the week)
+
+Run this check and update `M-memory/cost-tracker.md`:
+- Vercel: check usage dashboard for bandwidth, function invocations, build minutes — flag if >70% of plan limit
+- Supabase: check database size, auth MAU, storage, edge function calls
+- Anthropic: check token usage + estimated spend for the week
+- Stripe: check any failed payments, disputes, or billing alerts
+- PostHog: check event volume vs plan limit
+- Any email provider (Resend/SendGrid): check email send volume
+
+**Escalate immediately to Anat if any service is >80% of quota or shows unexpected spike.**
 
 ## Your Status Report Format
 

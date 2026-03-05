@@ -34,6 +34,17 @@ Build a deployment pipeline that lets the team ship multiple times per day with 
 - Uptime monitoring — alert if the app goes down
 - Claude API usage tracking — monitor token consumption and costs
 
+### Service Credit & Cost Monitoring (Weekly)
+Update `M-memory/cost-tracker.md` every Monday (or first session of the week):
+- **Vercel**: bandwidth, serverless function invocations, build minutes vs plan limits. Anat received a credits-running-low email — this must be checked proactively.
+- **Supabase**: DB size, auth MAUs, storage GB, realtime connections, edge function calls
+- **Anthropic API**: token usage, estimated weekly spend, cost per journey generation
+- **Stripe**: MRR, failed payments, disputes
+- **PostHog**: event count vs plan limit
+- **Email provider** (Resend/SendGrid): send volume vs limit
+
+Flag to Anat immediately if any service hits 80% of quota or shows unexpected cost spike.
+
 ### Infrastructure
 - Vercel configuration (regions, edge functions, caching)
 - Supabase project configuration (connection pooling, RLS verification)

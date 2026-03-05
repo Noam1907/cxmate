@@ -56,6 +56,7 @@ export interface Database {
           journey_type: JourneyType;
           is_default: boolean;
           stages: Json;
+          playbook: Json | null;
           source: string;
           created_at: string;
           updated_at: string;
@@ -68,6 +69,7 @@ export interface Database {
           journey_type?: JourneyType;
           is_default?: boolean;
           stages?: Json;
+          playbook?: Json | null;
           source?: string;
           created_at?: string;
           updated_at?: string;
@@ -80,6 +82,7 @@ export interface Database {
           journey_type?: JourneyType;
           is_default?: boolean;
           stages?: Json;
+          playbook?: Json | null;
           source?: string;
           updated_at?: string;
         };
