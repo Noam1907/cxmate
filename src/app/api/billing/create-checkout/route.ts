@@ -77,7 +77,7 @@ export async function POST(req: Request) {
     }
 
     // ── Determine mode: subscription vs payment ───────────────────────────────
-    const isOneTime = priceKey === "starter_onetime";
+    const isOneTime = priceKey === "full_analysis";
 
     const sessionParams: Stripe.Checkout.SessionCreateParams = {
       customer: stripeCustomerId ?? undefined,

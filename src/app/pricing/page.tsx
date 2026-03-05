@@ -3,11 +3,11 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Check, CaretDown } from "@phosphor-icons/react";
+import { Check, CaretDown, Lightning, ArrowRight } from "@phosphor-icons/react";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
-type PriceKey = "starter_monthly" | "starter_onetime";
+type PriceKey = "full_analysis" | "pro_monthly";
 type LoadingKey = PriceKey | null;
 
 // ── Checkout helper ───────────────────────────────────────────────────────────
@@ -23,44 +23,87 @@ async function startCheckout(priceKey: PriceKey): Promise<string | null> {
   return data.url;
 }
 
-// ── Tier configs (only Free + Starter shown) ─────────────────────────────────
+// ── Tier configs ──────────────────────────────────────────────────────────────
 
-const TIERS = [
+interface TierConfig {
+  name: string;
+  tagline: string;
+  price: string;
+  period: string | null;
+  description: string;
+  highlight: boolean;
+  features: string[];
+  badge: string | null;
+  priceKey: PriceKey | null;
+  ctaLabel: string;
+  ctaHref: string | null; // null = checkout, string = nav link
+  ctaStyle: "primary" | "outline" | "subtle";
+}
+
+const TIERS: TierConfig[] = [
   {
     name: "Free",
-    idealFor: "Try CX Mate with zero commitment",
+    tagline: "See it",
     price: "$0",
-    period: "forever",
-    description: "Get your CX foundation in minutes. No signup required.",
+    period: "no account needed",
+    description:
+      "Map your entire customer journey and see where you're losing them. One conversation, zero commitment.",
     highlight: false,
     features: [
       "Complete journey map generation",
-      "CX Intelligence Report",
-      "Full playbook with templates",
-      "PDF export",
-      "Open in NotebookLM",
-      "One-time run (no saving)",
+      "CX Report — pattern names + severity",
+      "Revenue-at-risk estimate",
+      "Shareable journey visualization",
     ],
-    cta: { label: "Start for free", href: "/onboarding", external: false },
     badge: null,
+    priceKey: null,
+    ctaLabel: "Map Your Journey",
+    ctaHref: "/onboarding",
+    ctaStyle: "subtle",
   },
   {
-    name: "Starter",
-    idealFor: "For teams ready to track and improve CX",
-    price: null,
-    period: null,
-    description: "Track your CX health over time. Know if you're improving.",
+    name: "Full Analysis",
+    tagline: "Fix it",
+    price: "$149",
+    period: "one-time",
+    description:
+      "The full CX diagnosis — every detail, every recommendation, ready to act on Monday morning.",
     highlight: true,
     features: [
       "Everything in Free",
-      "Save & return to your results",
-      "Revenue Protected counter",
-      "Monthly CX Score (0–100)",
-      "Evidence Wall",
-      "Slack nudges + reminders",
+      "Full CX Report with detailed analysis",
+      "Prioritized action playbook",
+      "Evidence Wall — quotes & proof",
+      "PDF & NotebookLM export",
+      "Results saved permanently",
     ],
-    cta: null,
-    badge: "Most popular",
+    badge: "Best value",
+    priceKey: "full_analysis",
+    ctaLabel: "Get My Full Analysis",
+    ctaHref: null,
+    ctaStyle: "primary",
+  },
+  {
+    name: "Pro",
+    tagline: "Track it",
+    price: "$99",
+    period: "/month",
+    description:
+      "Ongoing CX intelligence. Know if you're improving — every month, automatically.",
+    highlight: false,
+    features: [
+      "Everything in Full Analysis",
+      "Monthly CX Score (0–100)",
+      "Unlimited journey re-runs",
+      "G2 & Capterra review mining",
+      "HubSpot / Intercom integration",
+      "Slack nudges & reminders",
+    ],
+    badge: null,
+    priceKey: "pro_monthly",
+    ctaLabel: "Go Pro",
+    ctaHref: null,
+    ctaStyle: "outline",
   },
 ];
 
@@ -68,24 +111,28 @@ const TIERS = [
 
 const FAQ_ITEMS = [
   {
-    q: "Do I need to create an account?",
-    a: "No. The Free tier works without any signup — just go through the onboarding and get your results instantly. You only need an account if you upgrade to Starter to save your progress.",
+    q: "Do I need an account to try CX Mate?",
+    a: "No. The free tier works instantly — go through the onboarding conversation and get your journey map and CX report without signing up. You only need an account when you purchase the Full Analysis or go Pro.",
   },
   {
-    q: "What happens to my data on the Free tier?",
-    a: "Your results are generated in real-time and available during your session. Since nothing is saved, you'll need to re-run the analysis if you close your browser. Upgrade to Starter to save everything.",
+    q: "What do I get on the free tier?",
+    a: "You get your complete journey map (20+ stages with meaningful moments and risk flags) plus the CX Report headlines — pattern names, severity levels, and your revenue-at-risk estimate. The full report details, playbook, and PDF export are part of the Full Analysis.",
   },
   {
-    q: "Can I cancel the Starter subscription?",
-    a: "Yes, anytime. Monthly subscriptions can be cancelled from your account settings. If you chose the one-time payment, there's nothing to cancel — you own it.",
+    q: "Why a one-time purchase instead of a subscription?",
+    a: "Because CX Mate delivers a complete analysis — like hiring a CX consultant for one intensive session. You get the full report, the playbook, and the PDF. It's yours forever. No monthly fee for something you might use once a quarter.",
+  },
+  {
+    q: "What does the Pro subscription add?",
+    a: "Pro is for teams that want to track whether their CX is improving. You get a monthly CX Score (0–100), unlimited re-runs as your product evolves, review mining from G2 and Capterra, and integrations with your existing tools.",
+  },
+  {
+    q: "Can I upgrade from Full Analysis to Pro later?",
+    a: "Yes. If you start with the Full Analysis and decide you want ongoing tracking, you can upgrade to Pro anytime. Your existing analysis and data carry over.",
   },
   {
     q: "What payment methods do you accept?",
-    a: "We use Stripe for secure payments. All major credit and debit cards are accepted.",
-  },
-  {
-    q: "How is the CX Score calculated?",
-    a: "Your CX Score (0–100) is based on journey coverage, risk severity, moment quality, and improvement over time. It gives you a single number to track whether your customer experience is getting better.",
+    a: "All major credit and debit cards, processed securely through Stripe.",
   },
 ];
 
@@ -136,7 +183,7 @@ export default function PricingPage() {
 
   return (
     <div className="min-h-screen">
-      <div className="max-w-3xl mx-auto px-6 py-20">
+      <div className="max-w-5xl mx-auto px-6 py-20">
 
         {/* Header */}
         <div className="text-center mb-16">
@@ -144,11 +191,11 @@ export default function PricingPage() {
             Pricing
           </p>
           <h1 className="text-4xl font-bold text-slate-900 mb-4 tracking-tight">
-            Start free. Upgrade when it clicks.
+            See it. Fix it. Track it.
           </h1>
-          <p className="text-base text-slate-500 max-w-xl mx-auto">
-            CX Mate gives you a complete journey map, CX report, and playbook for free — no account needed.
-            Upgrade to track whether you&apos;re actually improving.
+          <p className="text-base text-slate-500 max-w-2xl mx-auto leading-relaxed">
+            One conversation reveals where you&apos;re losing customers.
+            Go deeper when you&apos;re ready — no subscription required.
           </p>
         </div>
 
@@ -159,8 +206,8 @@ export default function PricingPage() {
           </div>
         )}
 
-        {/* Tier cards — 2 columns */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 items-start mb-16">
+        {/* Tier cards — 3 columns */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 items-start mb-20">
           {TIERS.map((tier) => (
             <div
               key={tier.name}
@@ -172,35 +219,25 @@ export default function PricingPage() {
             >
               {/* Badge */}
               {tier.badge && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full text-xs font-semibold bg-primary text-white">
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full text-xs font-semibold bg-primary text-white whitespace-nowrap">
                   {tier.badge}
                 </div>
               )}
 
-              {/* Name + price */}
+              {/* Name + tagline */}
               <div className="mb-5">
-                <h2 className="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-1">
+                <h2 className="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-0.5">
                   {tier.name}
                 </h2>
-                <p className="text-xs text-primary font-medium mb-3">{tier.idealFor}</p>
+                <p className="text-xs text-primary font-medium mb-4">{tier.tagline}</p>
 
-                {/* Starter: two price options */}
-                {tier.name === "Starter" ? (
-                  <div className="space-y-1">
-                    <div className="flex items-baseline gap-1">
-                      <span className="text-3xl font-bold text-slate-900">$79</span>
-                      <span className="text-sm text-slate-400">/month</span>
-                    </div>
-                    <p className="text-xs text-slate-400">or $149 one-time payment</p>
-                  </div>
-                ) : (
-                  <div className="flex items-baseline gap-1">
-                    <span className="text-3xl font-bold text-slate-900">{tier.price}</span>
-                    {tier.period && (
-                      <span className="text-sm text-slate-400">{tier.period}</span>
-                    )}
-                  </div>
-                )}
+                {/* Price */}
+                <div className="flex items-baseline gap-1">
+                  <span className="text-3xl font-bold text-slate-900">{tier.price}</span>
+                  {tier.period && (
+                    <span className="text-sm text-slate-400">{tier.period}</span>
+                  )}
+                </div>
 
                 <p className="text-xs text-slate-500 mt-2 leading-relaxed">
                   {tier.description}
@@ -209,40 +246,42 @@ export default function PricingPage() {
 
               {/* CTA */}
               <div className="mb-6">
-                {tier.name === "Starter" && (
-                  <div className="space-y-2">
-                    <button
-                      onClick={() => handleCheckout("starter_monthly")}
-                      disabled={loading !== null}
-                      className="w-full bg-primary hover:bg-primary/90 disabled:opacity-60 text-white text-sm font-semibold py-2.5 px-4 rounded-xl transition-colors"
-                    >
-                      {loading === "starter_monthly" ? "Redirecting…" : "Subscribe monthly — $79/mo"}
-                    </button>
-                    <button
-                      onClick={() => handleCheckout("starter_onetime")}
-                      disabled={loading !== null}
-                      className="w-full bg-white hover:bg-slate-50 disabled:opacity-60 text-primary border border-primary/30 text-sm font-semibold py-2.5 px-4 rounded-xl transition-colors"
-                    >
-                      {loading === "starter_onetime" ? "Redirecting…" : "Pay once — $149"}
-                    </button>
-                    <p className="text-center text-xs text-slate-400 pt-1">
-                      Not sure? Monthly includes cancel anytime.
-                    </p>
-                  </div>
-                )}
-
-                {tier.cta && !tier.name.includes("Starter") && (
+                {tier.ctaHref ? (
                   <Link
-                    href={tier.cta.href}
-                    className="block text-center text-sm font-semibold py-2.5 px-4 rounded-xl transition-colors bg-slate-100 hover:bg-slate-200 text-slate-700"
+                    href={tier.ctaHref}
+                    className={`flex items-center justify-center gap-2 w-full text-sm font-semibold py-2.5 px-4 rounded-xl transition-colors ${
+                      tier.ctaStyle === "subtle"
+                        ? "bg-slate-100 hover:bg-slate-200 text-slate-700"
+                        : "bg-primary hover:bg-primary/90 text-white"
+                    }`}
                   >
-                    {tier.cta.label}
+                    {tier.ctaLabel}
+                    <ArrowRight size={14} weight="bold" />
                   </Link>
+                ) : (
+                  <button
+                    onClick={() => handleCheckout(tier.priceKey!)}
+                    disabled={loading !== null}
+                    className={`flex items-center justify-center gap-2 w-full disabled:opacity-60 text-sm font-semibold py-2.5 px-4 rounded-xl transition-colors ${
+                      tier.ctaStyle === "primary"
+                        ? "bg-primary hover:bg-primary/90 text-white"
+                        : "bg-white hover:bg-slate-50 text-primary border border-primary/30"
+                    }`}
+                  >
+                    {loading === tier.priceKey ? (
+                      "Redirecting…"
+                    ) : (
+                      <>
+                        {tier.ctaStyle === "primary" && <Lightning size={14} weight="fill" />}
+                        {tier.ctaLabel}
+                      </>
+                    )}
+                  </button>
                 )}
               </div>
 
               {/* Features */}
-              <ul className="space-y-2 flex-1">
+              <ul className="space-y-2.5 flex-1">
                 {tier.features.map((feature) => (
                   <li key={feature} className="flex items-start gap-2 text-sm text-slate-600">
                     <Check size={16} weight="bold" className="text-primary mt-0.5 shrink-0" />
@@ -254,10 +293,28 @@ export default function PricingPage() {
           ))}
         </div>
 
+        {/* Social proof / trust strip */}
+        <div className="text-center mb-20">
+          <div className="inline-flex items-center gap-6 text-xs text-slate-400">
+            <span className="flex items-center gap-1.5">
+              <Lightning size={14} weight="fill" className="text-primary" />
+              Results in minutes, not months
+            </span>
+            <span className="hidden sm:inline text-slate-200">|</span>
+            <span className="hidden sm:flex items-center gap-1.5">
+              No implementation required
+            </span>
+            <span className="hidden sm:inline text-slate-200">|</span>
+            <span className="hidden sm:flex items-center gap-1.5">
+              Built for B2B startups
+            </span>
+          </div>
+        </div>
+
         {/* FAQ Section */}
         <div className="max-w-xl mx-auto">
           <h2 className="text-xl font-semibold text-slate-900 mb-6 text-center">
-            Frequently asked questions
+            Common questions
           </h2>
           <div className="rounded-2xl border border-slate-200 bg-white px-6">
             {FAQ_ITEMS.map((item) => (
@@ -275,7 +332,7 @@ export default function PricingPage() {
             </a>
           </p>
           <p className="text-xs text-slate-400">
-            All payments processed securely by Stripe. Cancel monthly anytime from your account.
+            Secure payments by Stripe · Cancel Pro anytime · Full Analysis is yours forever
           </p>
         </div>
 

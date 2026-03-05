@@ -30,23 +30,22 @@ export const stripe = new Proxy({} as Stripe, {
 });
 
 // ── Price IDs (set in Stripe Dashboard → Products) ──────────────────────────
-// Create two prices under a "CX Mate Starter" product:
-//   1. Recurring: $79/month
-//   2. One-time:  $149
+// Two products, three price objects:
+//   1. "Full Analysis" — one-time $149
+//   2. "CX Mate Pro"  — recurring $99/month
 export const STRIPE_PRICES = {
-  starter_monthly: process.env.STRIPE_STARTER_MONTHLY_PRICE_ID ?? "",
-  starter_onetime: process.env.STRIPE_STARTER_ONETIME_PRICE_ID ?? "",
+  full_analysis: process.env.STRIPE_FULL_ANALYSIS_PRICE_ID ?? "",
+  pro_monthly:   process.env.STRIPE_PRO_MONTHLY_PRICE_ID ?? "",
 } as const;
 
 export type StripePriceKey = keyof typeof STRIPE_PRICES;
 
 // ── Plan tier mapping ────────────────────────────────────────────────────────
-// Maps a Stripe price ID back to our internal plan tier name.
-export function planTierFromPriceId(priceId: string): string {
-  const starters = [
-    STRIPE_PRICES.starter_monthly,
-    STRIPE_PRICES.starter_onetime,
-  ];
-  if (starters.includes(priceId)) return "starter";
+// Maps a Stripe price ID back to our internal PlanTier.
+import type { PlanTier } from "@/lib/tier-access";
+
+export function planTierFromPriceId(priceId: string): PlanTier {
+  if (priceId === STRIPE_PRICES.full_analysis) return "full_analysis";
+  if (priceId === STRIPE_PRICES.pro_monthly)   return "pro";
   return "free";
 }

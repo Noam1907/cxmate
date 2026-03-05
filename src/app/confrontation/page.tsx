@@ -17,6 +17,8 @@ import { ExportPdfButton } from "@/components/ui/export-pdf-button";
 import { PrintCover } from "@/components/pdf/print-cover";
 import { PageLoading } from "@/components/ui/page-loading";
 import { SaveResultsBanner } from "@/components/ui/save-results-banner";
+import { usePlanTier } from "@/hooks/use-plan-tier";
+import { UpgradeGate, LockedSection } from "@/components/ui/upgrade-gate";
 
 // ─── Confrontation Modes ────────────────────────────────────────────────────
 
@@ -201,7 +203,7 @@ function ImpactBreakdown({ projections, delay }: { projections: ImpactProjection
 
 // ─── Insight Card ─────────────────────────────────────────────────────────────
 
-function InsightCard({ insight, index }: { insight: ConfrontationInsight; index: number }) {
+function InsightCard({ insight, index, locked = false }: { insight: ConfrontationInsight; index: number; locked?: boolean }) {
   const [expanded, setExpanded] = useState(false);
 
   const isHigh = insight.likelihood === "high";
@@ -246,7 +248,7 @@ function InsightCard({ insight, index }: { insight: ConfrontationInsight; index:
         </div>
 
         {/* Expanded detail */}
-        {expanded && (
+        {expanded && !locked && (
           <div className={`px-5 pb-5 space-y-4 border-t pt-4 ${isHigh ? "border-rose-100" : isMedium ? "border-amber-100" : "border-slate-100"}`}>
 
             <p className="text-sm text-slate-600 leading-relaxed">{insight.description}</p>
@@ -285,6 +287,30 @@ function InsightCard({ insight, index }: { insight: ConfrontationInsight; index:
                 <p className="text-sm text-slate-500 italic">&ldquo;{insight.companionAdvice}&rdquo;</p>
               </div>
             )}
+          </div>
+        )}
+
+        {/* Locked teaser — free users see blurred hint */}
+        {expanded && locked && (
+          <div className={`px-5 pb-5 border-t pt-4 ${isHigh ? "border-rose-100" : isMedium ? "border-amber-100" : "border-slate-100"}`}>
+            <div className="relative">
+              <div className="blur-[5px] pointer-events-none select-none opacity-40 space-y-3" aria-hidden="true">
+                <p className="text-sm text-slate-600">This pattern is costing companies at your stage significant revenue. The full analysis explains exactly why and gives you a concrete action plan.</p>
+                <div className="rounded-lg p-4 bg-slate-50 border border-slate-200">
+                  <p className="text-xs font-bold uppercase text-slate-500 mb-1">Next action</p>
+                  <p className="text-sm text-slate-700">Implement a structured approach to address this specific gap in your customer journey.</p>
+                </div>
+              </div>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <Link
+                  href="/pricing"
+                  className="bg-white/95 backdrop-blur-sm border border-slate-200 rounded-xl shadow-md px-5 py-3 text-center hover:shadow-lg transition-shadow"
+                >
+                  <p className="text-sm font-semibold text-slate-900">See the full analysis</p>
+                  <p className="text-xs text-primary font-medium mt-0.5">Get My Full Analysis — $149</p>
+                </Link>
+              </div>
+            </div>
           </div>
         )}
       </div>
@@ -340,6 +366,9 @@ function AssumptionsSection({ assumptions, projections, delay }: { assumptions: 
 function ConfrontationContent() {
   const searchParams = useSearchParams();
   const templateId = searchParams.get("id");
+  const { canAccess } = usePlanTier();
+  const canSeeDetails = canAccess("report_details");
+  const canSeeEvidence = canAccess("evidence_wall");
   const [journey, setJourney] = useState<GeneratedJourney | null>(null);
   const [onboardingData, setOnboardingData] = useState<Partial<OnboardingData> | null>(null);
   const [companyName, setCompanyName] = useState<string>("");
@@ -460,7 +489,9 @@ function ConfrontationContent() {
               <h1 className="text-4xl font-bold tracking-tight text-slate-800 mb-3 leading-tight">{config.headline(companyName)}</h1>
               <p className="text-base text-slate-500 leading-relaxed">{config.subtitle}</p>
             </div>
-            <ExportPdfButton page="cx_report" title={`${companyName || "CX Mate"} - CX Intelligence Report`} />
+            {canAccess("pdf_export") && (
+              <ExportPdfButton page="cx_report" title={`${companyName || "CX Mate"} - CX Intelligence Report`} />
+            )}
           </div>
         </div>
 
@@ -479,24 +510,31 @@ function ConfrontationContent() {
           </div>
         )}
 
-        {/* Impact breakdown */}
+        {/* Impact breakdown — gated for free users */}
         {projections.length > 0 && (
           <div className="mb-8">
-            <ImpactBreakdown projections={projections} delay={1000} />
+            <UpgradeGate hasAccess={canSeeDetails} feature="report_details" hiddenCount={`${projections.length} risk areas analyzed`}>
+              <ImpactBreakdown projections={projections} delay={1000} />
+            </UpgradeGate>
           </div>
         )}
 
-        {/* Assumptions */}
-        {(journey.assumptions?.length || projections.some((p) => p.calculation)) && (
+        {/* Assumptions — gated */}
+        {canSeeDetails && (journey.assumptions?.length || projections.some((p) => p.calculation)) && (
           <div className="mb-12">
             <AssumptionsSection assumptions={journey.assumptions || []} projections={projections} delay={1300} />
           </div>
         )}
 
-        {/* Evidence */}
-        {evidenceMap && (
+        {/* Evidence — gated */}
+        {evidenceMap && canSeeEvidence && (
           <FadeIn delay={1500} className="mb-12">
             <EvidenceWall evidenceMap={evidenceMap} companyName={companyName} biggestChallenge={onboardingData?.biggestChallenge} />
+          </FadeIn>
+        )}
+        {evidenceMap && !canSeeEvidence && (
+          <FadeIn delay={1500} className="mb-12">
+            <LockedSection feature="evidence_wall" message="Your Evidence Wall maps every pain point back to your journey. See exactly which moments address your biggest challenges." />
           </FadeIn>
         )}
 
@@ -530,7 +568,7 @@ function ConfrontationContent() {
                 </div>
                 <div className="space-y-2">
                   {insights.filter((i) => i.likelihood === "high").map((insight, i) => (
-                    <InsightCard key={i} insight={insight} index={i} />
+                    <InsightCard key={i} insight={insight} index={i} locked={!canSeeDetails} />
                   ))}
                 </div>
               </FadeIn>
@@ -603,9 +641,17 @@ function ConfrontationContent() {
             <Link href={`/journey?id=${templateId}`}>
               <Button size="lg" className="w-full sm:w-auto">See Your Full Journey Map</Button>
             </Link>
-            <Link href="/playbook">
-              <Button size="lg" variant="outline" className="w-full sm:w-auto">Get Your Playbook</Button>
-            </Link>
+            {canAccess("playbook") ? (
+              <Link href="/playbook">
+                <Button size="lg" variant="outline" className="w-full sm:w-auto">Get Your Playbook</Button>
+              </Link>
+            ) : (
+              <Link href="/pricing">
+                <Button size="lg" variant="outline" className="w-full sm:w-auto bg-primary/5 border-primary/20 text-primary hover:bg-primary/10">
+                  Get My Full Analysis — $149
+                </Button>
+              </Link>
+            )}
           </div>
         </FadeIn>
 

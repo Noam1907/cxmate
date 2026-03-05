@@ -12,6 +12,7 @@ import { Check, ChartBar } from "@phosphor-icons/react";
 import { ExportPdfButton } from "@/components/ui/export-pdf-button";
 import { PrintCover } from "@/components/pdf/print-cover";
 import { SaveResultsBanner } from "@/components/ui/save-results-banner";
+import { usePlanTier } from "@/hooks/use-plan-tier";
 
 // ─── Status ───────────────────────────────────────────────────────────────────
 
@@ -204,6 +205,7 @@ type FilterMode = "all" | "must_do" | "quick_wins";
 // ─── Main Page ────────────────────────────────────────────────────────────────
 
 export default function PlaybookPage() {
+  const { canAccess, loading: tierLoading } = usePlanTier();
   const [playbook, setPlaybook] = useState<GeneratedPlaybook | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -216,6 +218,33 @@ export default function PlaybookPage() {
   // true when background pre-generation is in flight (started during onboarding)
   const [preparing, setPreparing] = useState(false);
   const { statuses, setStatus } = useRecommendationStatus();
+
+  // ── Tier gate: playbook is locked for free users ──
+  if (!tierLoading && !canAccess("playbook")) {
+    return (
+      <main className="min-h-screen flex items-center justify-center p-8">
+        <div className="text-center space-y-6 max-w-md">
+          <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto">
+            <span className="text-2xl">📋</span>
+          </div>
+          <div className="space-y-2">
+            <h1 className="text-2xl font-bold text-slate-900">Your playbook is ready</h1>
+            <p className="text-slate-500 leading-relaxed">
+              We built a prioritized action plan for your business — with templates, timelines, and measurement checkpoints. Get the full analysis to access it.
+            </p>
+          </div>
+          <Link href="/pricing">
+            <Button size="lg" className="w-full sm:w-auto">
+              Get My Full Analysis — $149
+            </Button>
+          </Link>
+          <p className="text-xs text-slate-400">
+            Includes full CX Report details, playbook, and PDF export
+          </p>
+        </div>
+      </main>
+    );
+  }
 
   useEffect(() => {
     async function init() {
@@ -511,7 +540,9 @@ export default function PlaybookPage() {
             <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-2">CX Playbook</p>
             <h1 className="text-4xl font-bold tracking-tight text-slate-800">{playbook.companyName}</h1>
           </div>
-          <ExportPdfButton page="playbook" title={`${playbook.companyName} — CX Playbook`} />
+          {canAccess("pdf_export") && (
+            <ExportPdfButton page="playbook" title={`${playbook.companyName} — CX Playbook`} />
+          )}
         </div>
 
         {/* Save banner — anonymous users only */}
