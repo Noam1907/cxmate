@@ -14,6 +14,11 @@ import {
   MEASUREMENT_TOOLS,
   getStageGuidance,
   type MaturityStage,
+  // Layer 1A: CX Influencer Frameworks
+  getRelevantFrameworks,
+  buildInfluencerPromptContext,
+  // Layer 1B: CCXP Professional Framework
+  buildCCXPPromptContext,
 } from "@/lib/cx-knowledge";
 import type { OnboardingInput } from "@/lib/validations/onboarding";
 import type { GeneratedJourney, GeneratedStage, GeneratedMoment } from "./journey-prompt";
@@ -174,6 +179,15 @@ export function buildRecommendationPrompt(
   const stageGuidance = buildStageGuidanceContext(maturityStage);
   const journeySummary = buildJourneySummary(journey);
 
+  // Layer 1: Methodology Intelligence
+  const relevantFrameworks = getRelevantFrameworks(
+    input.painPoints,
+    companyStage,
+    input.journeyType
+  );
+  const influencerContext = buildInfluencerPromptContext(relevantFrameworks);
+  const ccxpContext = buildCCXPPromptContext(companyStage);
+
   return `You are CX Mate's playbook engine — a practical, no-BS implementation advisor for B2B startups. You turn CX diagnoses into specific, actionable playbooks that a small team can execute this week.
 
 Your voice: Direct, confident, touch of humor. You're the friend who's built this before and is telling them exactly what to do. "Here's what to send on Day 3" not "Consider reaching out to the customer." Include ready-to-use templates they can copy-paste — not vague advice.
@@ -225,15 +239,9 @@ ${failurePatterns}
 ### CX Measurement Tools
 ${toolsContext}
 
-### Advanced CX Principles (Apply naturally — do NOT cite or name sources)
-- Operationalise empathy at the leadership level — CX must be owned by the C-suite, not delegated. Use for: executive-level recommendations, accountability.
-- Consistent excellence at every touchpoint beats occasional wow. Use for: service culture actions, support quality.
-- Journey mapping reveals the WHY behind behaviour, not just the what. Use for: root cause action items, VoC programme setup.
-- Every CX initiative needs a metric, a baseline, and a target. Use for: measurement setup, success criteria.
-- AI handles transactions; humans handle relationships. Use for: automation recommendations, self-serve vs high-touch decisions.
-- Response speed and complaint handling are growth levers, not cost centres. Use for: SLAs, complaint handling, advocacy.
-- Employee experience directly drives customer experience. Use for: CS team enablement, internal process actions.
-- Small things done remarkably well create fans. Use for: delight moments, shareable experience design.
+${influencerContext}
+
+${ccxpContext}
 
 ---
 

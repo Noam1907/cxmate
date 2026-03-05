@@ -130,3 +130,27 @@ export {
   type StageGuidance,
   type MaturityStage,
 } from "./best-practice-foundations";
+
+// ============================================
+// CX Influencer Frameworks (Layer 1A)
+// ============================================
+export {
+  CX_FRAMEWORKS,
+  getFrameworksByContext,
+  getFrameworksByStage,
+  getRelevantFrameworks,
+  buildInfluencerPromptContext,
+  type InfluencerFramework,
+  type FrameworkContext,
+} from "./cx-influencer-frameworks";
+
+// ============================================
+// CCXP Professional Framework (Layer 1B)
+// ============================================
+export {
+  CCXP_COMPETENCIES,
+  getCompetenciesForMaturity,
+  getCompetenciesForStageType,
+  buildCCXPPromptContext,
+  type CCXPCompetency,
+} from "./ccxp-framework";

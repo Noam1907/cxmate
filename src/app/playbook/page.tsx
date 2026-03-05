@@ -333,11 +333,15 @@ export default function PlaybookPage() {
       const data = JSON.parse(stored);
       const journey: GeneratedJourney = data.journey;
       const onboardingData: OnboardingInput = data.onboardingData;
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 290_000); // 290s — slightly under Vercel's 300s
       const response = await fetch("/api/recommendations/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ journey, onboardingData }),
+        signal: controller.signal,
       });
+      clearTimeout(timeout);
       if (!response.ok) {
         let errMsg = "Failed to generate recommendations";
         try {

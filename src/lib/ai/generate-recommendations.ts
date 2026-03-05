@@ -132,15 +132,33 @@ export async function generateRecommendations(
     messages: [{ role: "user", content: prompt }],
   });
 
-  // Retry once on transient API failures
+  // Time-aware retry: Vercel kills at 300s. Each Claude call takes ~2-3 min.
+  // Only retry if we have enough time budget left (> 120s remaining).
+  const startTime = Date.now();
+  const VERCEL_BUDGET_MS = 270_000; // 270s — leave 30s margin before 300s kill
+
   let lastError: Error | null = null;
   for (let attempt = 0; attempt < 2; attempt++) {
     try {
       return await _extractToolResult(apiKey, requestBody);
     } catch (err) {
       lastError = err instanceof Error ? err : new Error(String(err));
-      if (attempt === 0) {
-        console.warn(`[generate-recommendations] Attempt 1 failed: ${lastError.message}. Retrying...`);
+      const elapsed = Date.now() - startTime;
+      const remaining = VERCEL_BUDGET_MS - elapsed;
+
+      if (attempt === 0 && remaining > 120_000) {
+        // Enough time for a retry (> 2 min left)
+        console.warn(
+          `[generate-recommendations] Attempt 1 failed after ${Math.round(elapsed / 1000)}s: ${lastError.message}. ` +
+          `${Math.round(remaining / 1000)}s remaining — retrying...`
+        );
+      } else {
+        // Not enough time to retry — throw immediately
+        console.error(
+          `[generate-recommendations] Attempt ${attempt + 1} failed after ${Math.round(elapsed / 1000)}s: ${lastError.message}. ` +
+          `${Math.round(remaining / 1000)}s remaining — no time for retry.`
+        );
+        break;
       }
     }
   }

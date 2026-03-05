@@ -182,6 +182,16 @@ Key validated stats for use in impact projections, prompts, and messaging (sourc
 
 ---
 
+### 2026-03-05 — Layer 1 Intelligence: Named Citations + CCXP Framework
+
+- **CX influencer frameworks as structured TypeScript data, not markdown docs.** B-brain markdown (`cx-influencers-2026.md`) is great for reference but doesn't flow into prompts. Converting to TypeScript (`cx-influencer-frameworks.ts`) with typed fields (`applyWhen`, `stageRelevance`, `citationExample`) enables programmatic selection — only inject the 6-8 most relevant frameworks per prompt, not all 14. Keeps token usage manageable while making output feel expert-level.
+- **Dynamic framework selection by pain points + maturity + journey type.** `getRelevantFrameworks()` maps user pain points to framework contexts (e.g., "churn" → `["churn_prevention", "retention", "measurement"]`), then filters by stage relevance. Early-stage companies get simplification + onboarding frameworks; growing companies get leadership + EX frameworks. This prevents generic advice — a 10-person startup doesn't need Jeanne Bliss's CCO model.
+- **Named citations > anonymous principles.** The previous "Advanced CX Expertise" section told Claude to "apply naturally — do NOT name or cite sources." This was wrong. Named citations ("Following Matt Dixon's Effortless Experience research...") make output feel like it came from a domain expert, not a generic AI. The credibility lift is massive. Changed to "cite by name when genuinely relevant."
+- **CCXP competency blocks with maturity-gated guidance.** Each of the 6 CCXP competencies has early/growing/established variants. The prompt only injects the current stage's guidance — an early-stage company sees "start with ONE metric" (Metrics competency), while established sees "build a CX measurement framework." Quick wins are stage-appropriate too.
+- **Prompt template strings with `${variable}` require careful placement.** When replacing hardcoded prompt sections with `${influencerContext}` and `${ccxpContext}`, they must be inside the template literal returned by `buildJourneyPrompt()`. Placing them outside the return statement silently drops them.
+
+---
+
 ## Version History
 
 | Date | Update | By |

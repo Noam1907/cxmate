@@ -32,6 +32,11 @@ import {
   getFoundationsForStage,
   getStageGuidance,
   type MaturityStage,
+  // Layer 1A: CX Influencer Frameworks
+  getRelevantFrameworks,
+  buildInfluencerPromptContext,
+  // Layer 1B: CCXP Professional Framework
+  buildCCXPPromptContext,
 } from "@/lib/cx-knowledge";
 import { buildProfileFromOnboarding } from "@/lib/cx-knowledge/impact-models/impact-calculator";
 import type { OnboardingInput } from "@/lib/validations/onboarding";
@@ -485,6 +490,15 @@ Key moments for this vertical: ${vertical.keyMoments.join(", ") || "varies"}`
   const businessDataContext = buildBusinessDataContext(input);
   const analysisModeContext = buildAnalysisModeContext(input);
 
+  // v4: Layer 1 — Methodology Intelligence
+  const relevantFrameworks = getRelevantFrameworks(
+    input.painPoints,
+    companyStage,
+    effectiveJourneyType
+  );
+  const influencerContext = buildInfluencerPromptContext(relevantFrameworks);
+  const ccxpContext = buildCCXPPromptContext(companyStage);
+
   return `You are CX Mate — a knowledgeable CX companion for B2B startups. Think of yourself as a trusted peer advisor who's been in the trenches, seen what works and what doesn't, and is now whispering smart advice in the founder's ear.
 
 ## Your Persona
@@ -579,20 +593,9 @@ ${foundationsContext}
 
 ---
 
-## Advanced CX Expertise (Apply these principles — do NOT name or cite sources)
+${influencerContext}
 
-Apply these proven CX frameworks and principles throughout your analysis. Integrate them naturally into your insights and recommendations as if they are your own expert knowledge. Never attribute them to named individuals.
-
-- **Operationalising empathy at leadership level:** CX must be owned at the C-suite, not delegated to support. Earn the right to grow by improving customers' lives. Apply when: board-level strategy, accountability gaps, culture-building moments.
-- **Consistent excellence over occasional wow:** Every touchpoint is a chance to deliver — consistency beats sporadic delight. Apply when: identifying service culture gaps, support quality, delight moments.
-- **Journey mapping reveals the WHY:** Don't just map what customers do — understand why they do it. Root cause analysis behind journey behaviour. Apply when: diagnosing churn, mapping pain points, VoC connections.
-- **Measurable, sustainable CX strategy:** Every CX initiative needs a metric, a baseline, and a target. Apply when: defining success criteria, measurement frameworks, maturity assessments.
-- **AI handles transactions; humans handle relationships:** Automate convenience, humanise complexity. The wrong balance destroys trust. Apply when: recommending automation, self-serve vs high-touch trade-offs.
-- **Technology + human touch balance:** AI handles the routine; humans handle the emotional. Apply when: chatbot recommendations, self-serve onboarding, escalation design.
-- **Experience IS marketing:** Response speed and complaint handling are growth levers, not cost centres. Apply when: advocacy strategy, response time recommendations, turning detractors.
-- **Great CX starts with great EX:** Employee experience directly drives customer experience. CS teams that are burnt out deliver burnt-out experiences. Apply when: internal process recommendations, CS team enablement.
-- **Small things done remarkably well create fans:** Delight doesn't require grand gestures — it requires consistent, thoughtful details. Apply when: designing shareable moments, advocacy triggers.
-- **Simplicity over complexity:** Cut the noise, focus on human-to-human basics. More process ≠ better CX. Apply when: early-stage advice, warning against over-engineering.
+${ccxpContext}
 
 ---
 
