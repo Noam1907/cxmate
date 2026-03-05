@@ -126,7 +126,7 @@ Track sprint progress and status.
 
 | Task | Agent | Priority | Status |
 |------|-------|----------|--------|
-| Playbook persistence to Supabase | Backend Dev | P0 | In Progress |
+| Playbook persistence to Supabase | Backend Dev | P0 | ✅ Done |
 | "Save My Results" re-POST fix (anon→auth data claim) | Backend + Frontend | P1 | Pending |
 | Landing page step boxes visual (numbers/arrows, not pricing plan feel) | Frontend Dev | P1 | Pending |
 | Selectable pain options for what-works/what-needs-fixing (step-journey-exists) | Frontend Dev | P1 | Pending |
@@ -138,6 +138,7 @@ Track sprint progress and status.
 
 ### Sprint Notes
 - 2026-03-05: **Sprint 5 kickoff.** Three Sprint 4 P0s carried forward: playbook persistence, Save My Results persistence fix. All Sprint 4 code deployed (P0 copy fixes, P1 multi-select goals + multi-file upload, max_tokens 5k→8k fix). Noam (Orca AI) journey manually generated + persisted (template: 0102bea1-d9f1-481d-ab9c-0d585fe8d3d0). Added weekly service cost/credit monitoring — Anat received Vercel credits-running-low email. Created M-memory/cost-tracker.md. Starting with playbook persistence (P0 carryover).
+- 2026-03-05: **Playbook persistence — COMPLETE.** Added `playbook JSONB` column to `journey_templates` (migration 004, applied manually in Supabase Dashboard). Updated `database.ts` types. `/api/recommendations/generate` now persists playbook after generation for authenticated users. New `GET /api/playbook` endpoint loads persisted playbook. `playbook/page.tsx` tries Supabase first on load, falls back to sessionStorage for anonymous users. Build passes. Deployed. Next: landing page step boxes visual (P1).
 
 ---
 

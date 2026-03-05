@@ -237,43 +237,31 @@ function DarkSection() {
 function HowItWorksSection() {
   const steps = [
     {
-      number: "01",
+      number: 1,
       label: "Conversation",
       title: "Tell us about your business",
       description: "Your stage, your customers, your biggest pain. CX Mate adapts to where you are — not a generic template.",
-      trigger: "Your inputs",
-      action: "AI builds your profile",
-      result: "Personalized context ready",
-      bg: "#FFF8E6",
-      border: "#F0C040",
-      badgeBg: "#FDE68A",
-      badgeText: "#78350F",
+      detail: "5 minutes · No setup required",
+      accent: "#F0C040",
+      accentDark: "#92400E",
     },
     {
-      number: "02",
+      number: 2,
       label: "Analysis",
       title: "We map everything",
-      description: "50+ meaningful moments across your lifecycle, benchmarked against companies at your exact stage and vertical.",
-      trigger: "Your context",
-      action: "52 moments analyzed",
-      result: "Critical gaps identified",
-      bg: "#E0F7F4",
-      border: "#0D9488",
-      badgeBg: "#99F6E4",
-      badgeText: "#134E4A",
+      description: "50+ meaningful moments, benchmarked against companies at your exact stage and vertical. Every gap, quantified.",
+      detail: "~2 minutes · Runs while you watch",
+      accent: "#0D9488",
+      accentDark: "#134E4A",
     },
     {
-      number: "03",
-      label: "Sprint",
+      number: 3,
+      label: "Your Sprint",
       title: "You get a sprint plan",
-      description: "Prioritized actions with copy-paste templates and expected outcomes. Not advice. What to ship this week.",
-      trigger: "Gap analysis",
-      action: "12 actions ranked",
-      result: "Week 1: 3 quick wins",
-      bg: "#DCFCE7",
-      border: "#16A34A",
-      badgeBg: "#BBF7D0",
-      badgeText: "#14532D",
+      description: "Prioritized actions with copy-paste templates. Not theory. What to ship this week — starting Monday.",
+      detail: "Instant · PDF export included",
+      accent: "#16A34A",
+      accentDark: "#14532D",
     },
   ];
 
@@ -287,37 +275,37 @@ function HowItWorksSection() {
           </h2>
         </div>
 
-        <div className="grid sm:grid-cols-3 gap-5 sm:[grid-auto-rows:1fr]">
-          {steps.map((step) => (
-            <div
-              key={step.number}
-              className="rounded-2xl border-2 p-6 shadow-sm"
-              style={{ backgroundColor: step.bg, borderColor: step.border }}
-            >
-              <div className="flex items-baseline gap-2 mb-4">
-                <span className="text-4xl font-black text-slate-200">{step.number}</span>
+        {/* Step flow — number circles + arrows */}
+        <div className="flex flex-col sm:flex-row items-stretch gap-4 sm:gap-0">
+          {steps.map((step, i) => (
+            <>
+              {/* Card */}
+              <div key={step.number} className="flex-1 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm flex flex-col">
+                {/* Number circle */}
+                <div
+                  className="w-10 h-10 rounded-full flex items-center justify-center text-base font-black text-white mb-4 shrink-0"
+                  style={{ backgroundColor: step.accent }}
+                >
+                  {step.number}
+                </div>
                 <span
-                  className="text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full"
-                  style={{ backgroundColor: step.badgeBg, color: step.badgeText }}
+                  className="text-[10px] font-bold uppercase tracking-widest px-2.5 py-0.5 rounded-full self-start mb-3"
+                  style={{ backgroundColor: step.accent + "22", color: step.accentDark }}
                 >
                   {step.label}
                 </span>
+                <h3 className="text-base font-bold text-slate-800 mb-2">{step.title}</h3>
+                <p className="text-sm text-slate-500 leading-relaxed flex-1">{step.description}</p>
+                <p className="text-xs text-slate-400 font-medium mt-4 pt-4 border-t border-slate-100">{step.detail}</p>
               </div>
-              <h3 className="text-base font-bold text-slate-800 mb-2">{step.title}</h3>
-              <p className="text-sm text-slate-600 leading-relaxed mb-4">{step.description}</p>
-              <div className="space-y-1.5 pt-3 border-t border-black/8">
-                {[
-                  { pill: "TRIGGER", text: step.trigger },
-                  { pill: "ACTION", text: step.action },
-                  { pill: "RESULT", text: step.result },
-                ].map(({ pill, text }) => (
-                  <div key={pill} className="flex items-center gap-2 text-xs">
-                    <span className="font-bold text-[10px] tracking-wider text-slate-400 w-12 shrink-0">{pill}</span>
-                    <span className="text-slate-700 font-medium">{text}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
+
+              {/* Arrow between steps */}
+              {i < steps.length - 1 && (
+                <div key={`arrow-${i}`} className="hidden sm:flex items-center justify-center px-4 text-slate-300 text-2xl font-light select-none shrink-0">
+                  →
+                </div>
+              )}
+            </>
           ))}
         </div>
       </div>
