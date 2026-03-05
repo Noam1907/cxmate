@@ -124,7 +124,7 @@ export async function generateRecommendations(
 
   const requestBody = JSON.stringify({
     model: "claude-sonnet-4-20250514",
-    max_tokens: 8192,
+    max_tokens: 16384,
     // Tool use: Claude MUST call generate_playbook — API validates the JSON schema.
     // No freeform text, no parsing, no repair. This is the permanent fix.
     tools: [PLAYBOOK_TOOL],
@@ -168,6 +168,25 @@ async function _extractToolResult(
     );
   }
 
-  // toolBlock.input is already a parsed JS object — the API validated it
-  return toolBlock.input as GeneratedPlaybook;
+  // Detect truncation: stop_reason "max_tokens" means the tool_use was cut off
+  // The input may exist but be partially filled (empty arrays, missing fields)
+  if (message.stop_reason === "max_tokens") {
+    console.warn("[generate-recommendations] Response truncated (max_tokens hit). Tool input may be incomplete.");
+  }
+
+  const playbook = toolBlock.input as GeneratedPlaybook;
+
+  // Validate the playbook has actual content — reject empty/truncated results
+  const totalRecs = Array.isArray(playbook.stagePlaybooks)
+    ? playbook.stagePlaybooks.reduce((sum, sp) => sum + (Array.isArray(sp?.recommendations) ? sp.recommendations.length : 0), 0)
+    : 0;
+
+  if (totalRecs === 0) {
+    throw new Error(
+      `Playbook generated with 0 recommendations (stop_reason: ${message.stop_reason}). ` +
+      `Likely truncated by max_tokens. Retrying...`
+    );
+  }
+
+  return playbook;
 }
