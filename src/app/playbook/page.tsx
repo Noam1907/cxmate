@@ -283,6 +283,7 @@ export default function PlaybookPage() {
         try {
           const errBody = await response.json();
           if (errBody?.details) errMsg = `Validation error: ${JSON.stringify(errBody.details).slice(0, 200)}`;
+          else if (errBody?.detail) errMsg = errBody.detail;
           else if (errBody?.error) errMsg = errBody.error;
         } catch { /* ignore parse error */ }
         throw new Error(errMsg);

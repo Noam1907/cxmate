@@ -44,9 +44,10 @@ export async function POST(request: Request) {
       playbook,
     });
   } catch (error) {
-    console.error("Recommendation generation error:", error);
+    const message = error instanceof Error ? error.message : "Unknown error";
+    console.error("Recommendation generation error:", message, error);
     return NextResponse.json(
-      { error: "Failed to generate recommendations" },
+      { error: "Failed to generate recommendations", detail: message },
       { status: 500 }
     );
   }

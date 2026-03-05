@@ -74,6 +74,25 @@ export async function generateRecommendations(
     messages: [{ role: "user", content: prompt }],
   });
 
+  // Retry once on transient failures (API errors, JSON parse failures)
+  let lastError: Error | null = null;
+  for (let attempt = 0; attempt < 2; attempt++) {
+    try {
+      return await _generateFromResponse(apiKey, requestBody);
+    } catch (err) {
+      lastError = err instanceof Error ? err : new Error(String(err));
+      if (attempt === 0) {
+        console.warn(`[generate-recommendations] Attempt 1 failed: ${lastError.message}. Retrying...`);
+      }
+    }
+  }
+  throw lastError!;
+}
+
+async function _generateFromResponse(
+  apiKey: string,
+  requestBody: string
+): Promise<GeneratedPlaybook> {
   const responseText = await anthropicRequest(apiKey, requestBody);
   const message = JSON.parse(responseText);
 

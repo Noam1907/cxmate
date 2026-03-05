@@ -287,7 +287,7 @@ function HowItWorksSection() {
           </h2>
         </div>
 
-        <div className="grid sm:grid-cols-3 gap-5">
+        <div className="grid sm:grid-cols-3 gap-5 sm:[grid-auto-rows:1fr]">
           {steps.map((step) => (
             <div
               key={step.number}
@@ -365,7 +365,7 @@ function FeaturesSection() {
           </h2>
         </div>
 
-        <div className="grid sm:grid-cols-2 gap-4">
+        <div className="grid sm:grid-cols-2 gap-4 sm:[grid-auto-rows:1fr]">
           {features.map((feature) => (
             <div
               key={feature.title}

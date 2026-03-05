@@ -95,15 +95,22 @@ function JourneyContent() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ journey: loadedJourney, onboardingData: loadedOnboarding }),
         })
-          .then((res) => res.ok ? res.json() : null)
+          .then(async (res) => {
+            if (!res.ok) {
+              const body = await res.json().catch(() => ({}));
+              track("playbook_pregeneration_failed", { error: body?.detail || body?.error || `HTTP ${res.status}` });
+              return null;
+            }
+            return res.json();
+          })
           .then((data) => {
             if (data?.playbook) {
               sessionStorage.setItem("cx-mate-playbook", JSON.stringify(data.playbook));
               track("playbook_pregeneration_succeeded");
             }
           })
-          .catch(() => {
-            // Non-fatal — playbook page will generate on demand if needed
+          .catch((err) => {
+            track("playbook_pregeneration_failed", { error: err?.message || "Network error" });
           });
       }
     }

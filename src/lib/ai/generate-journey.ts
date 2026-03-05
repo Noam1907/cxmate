@@ -67,6 +67,25 @@ export async function generateJourney(
     messages: [{ role: "user", content: prompt }],
   });
 
+  // Retry once on transient failures
+  let lastError: Error | null = null;
+  for (let attempt = 0; attempt < 2; attempt++) {
+    try {
+      return await _parseJourneyResponse(apiKey, requestBody);
+    } catch (err) {
+      lastError = err instanceof Error ? err : new Error(String(err));
+      if (attempt === 0) {
+        console.warn(`[generate-journey] Attempt 1 failed: ${lastError.message}. Retrying...`);
+      }
+    }
+  }
+  throw lastError!;
+}
+
+async function _parseJourneyResponse(
+  apiKey: string,
+  requestBody: string
+): Promise<GeneratedJourney> {
   const responseText = await anthropicRequest(apiKey, requestBody);
   const message = JSON.parse(responseText);
 

@@ -38,7 +38,7 @@ export function PostHogProvider({ children }: { children: React.ReactNode }) {
 
     posthog.init(key, {
       api_host: host,
-      person_profiles: "identified_only", // Only create profiles for logged-in users
+      person_profiles: "always",           // Create profiles for anonymous users too — needed for funnel merge on identify()
       capture_pageview: false,            // We handle pageviews manually above
       capture_pageleave: true,            // Track when users leave
       autocapture: false,                 // We track events explicitly — no noise
