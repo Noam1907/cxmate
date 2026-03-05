@@ -170,6 +170,18 @@ Key validated stats for use in impact projections, prompts, and messaging (sourc
 
 ---
 
+### 2026-03-05 — Equal-Height Cards, Tool Use JSON Fix, Demo Doc Sync
+
+- **CSS Grid guarantees equal-height cells in the same row; flex does not.** `grid-cols-[1fr_auto_1fr_auto_1fr]` on a row container makes all cells equal height by CSS specification. Flex `items-stretch` sounds right but is unreliable when sibling elements (arrows, separators) have different intrinsic sizes — they fight the stretch. Rule: any time you need "all cards same height regardless of content," use grid.
+- **React Fragment key: use `<Fragment key={...}>`, not `<>` shorthand.** The `<>` shorthand doesn't accept props including `key`. Keys placed on inner children inside an anonymous fragment generate React warnings. Fix: `import { Fragment } from "react"` and use `<Fragment key={step.number}>`. This is a common gotcha when mapping arrays that need fragment wrappers.
+- **Claude tool use = API validates JSON schema; `toolBlock.input` is a pre-parsed JS object.** When using `tool_choice: { type: "tool", name: "..." }`, Claude MUST call the tool and the Anthropic API validates the `input_schema` before returning. `message.content.find(b => b.type === "tool_use").input` is already a parsed JS object — no `JSON.parse`, no repair. This pattern eliminates the entire class of JSON parsing/truncation/repair bugs permanently. Apply to any endpoint that generates structured output.
+- **`lastIndexOf("}")` is a broken truncation detector.** When Claude generates an array of objects (recommendations, stage playbooks) and truncates mid-stream, `lastIndexOf("}")` finds the closing `}` of an earlier *completed* object — not the truncation point. This means `jsonEnd > jsonStart` evaluates to `true` even on a truncated response, and the repair branch is never entered. Better: also trigger repair when `JSON.parse` itself throws (truncation always causes a parse error). Best: use tool use and never parse at all.
+- **Contradictory system prompt + user prompt = silent quality degradation.** Had `system: "max 10 words per field"` and `user prompt: "include ready-to-use templates with full email text"`. Claude can't satisfy both — it silently compromised, producing either truncated templates or violating the word limit. When prompts conflict, the model doesn't error; it degrades quietly. Always audit system vs user prompt for contradictions before blaming token limits.
+- **Demo account setup docs must stay in sync with actual wizard step order.** `O-output/presale/demo-account-setup.md` was 9 steps out of order (Maturity before Company, Business Data before Journey Exists, etc.). The wizard step order is determined by `buildSteps()` in `onboarding-wizard.tsx` — that's the source of truth. When wizard steps change, update the demo doc in the same commit. Add this to the sprint-end checklist.
+- **`demo@cxmate.app` is not a real email — magic link + email reset won't work.** For the demo account, the only way to reset the password is SQL: `UPDATE auth.users SET encrypted_password = crypt('NewPass!', gen_salt('bf')) WHERE email = 'demo@cxmate.app';` via Supabase Dashboard SQL Editor. Documented directly in `demo-account-setup.md` so it's never lost again.
+
+---
+
 ## Version History
 
 | Date | Update | By |

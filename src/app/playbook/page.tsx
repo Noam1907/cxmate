@@ -275,8 +275,16 @@ export default function PlaybookPage() {
           if (res.ok) {
             const data = await res.json();
             if (data.playbook) {
-              setPlaybook(data.playbook);
-              return;
+              // Guard against stale empty playbooks (generated before max_tokens fix)
+              const hasRecs = Array.isArray(data.playbook.stagePlaybooks) &&
+                data.playbook.stagePlaybooks.some(
+                  (s: StagePlaybook) => Array.isArray(s?.recommendations) && s.recommendations.length > 0
+                );
+              if (hasRecs) {
+                setPlaybook(data.playbook);
+                return;
+              }
+              // Empty playbook — fall through to show regeneration UI
             }
           }
         } catch { /* fall through to sessionStorage */ }

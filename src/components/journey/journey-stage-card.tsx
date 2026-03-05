@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { CaretDown, CaretUp } from "@phosphor-icons/react";
 import type { GeneratedStage, GeneratedMoment } from "@/lib/ai/journey-prompt";
+import { getToolLogoUrl, getToolInitial } from "@/lib/tool-logos";
 
 export interface MomentAnnotation {
   painPoints: string[];
@@ -37,6 +38,32 @@ function getMomentTypeLabel(type: string): string {
     case "handoff": return "Handoff";
     default: return type;
   }
+}
+
+function ToolBadge({ name, domain }: { name: string; domain?: string }) {
+  const [imgError, setImgError] = useState(false);
+  const logoUrl = getToolLogoUrl(name, domain);
+
+  return (
+    <span className="inline-flex items-center gap-1.5 text-xs px-2 py-0.5 rounded-full bg-teal-50 text-teal-700 border border-teal-200 font-medium">
+      {!imgError ? (
+        /* eslint-disable-next-line @next/next/no-img-element */
+        <img
+          src={logoUrl}
+          alt={`${name} logo`}
+          width={14}
+          height={14}
+          className="rounded-sm"
+          onError={() => setImgError(true)}
+        />
+      ) : (
+        <span className="w-3.5 h-3.5 rounded-sm bg-teal-200 text-teal-700 text-[9px] font-bold flex items-center justify-center">
+          {getToolInitial(name)}
+        </span>
+      )}
+      {name}
+    </span>
+  );
 }
 
 function MomentCard({ moment, annotation }: { moment: GeneratedMoment; annotation?: MomentAnnotation }) {
@@ -220,6 +247,13 @@ export function JourneyStageCard({
                   <span className="text-xs font-semibold text-rose-700 bg-rose-50 border border-rose-200 px-2.5 py-1 rounded-full">
                     {criticalCount} at-risk {criticalCount === 1 ? "moment" : "moments"}
                   </span>
+                )}
+                {stage.existingTools && stage.existingTools.length > 0 && (
+                  <>
+                    {stage.existingTools.map((tool, i) => (
+                      <ToolBadge key={`tool-${i}`} name={tool.name} domain={tool.domain} />
+                    ))}
+                  </>
                 )}
               </div>
             </div>

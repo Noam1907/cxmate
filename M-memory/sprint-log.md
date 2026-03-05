@@ -128,8 +128,10 @@ Track sprint progress and status.
 |------|-------|----------|--------|
 | Playbook persistence to Supabase | Backend Dev | P0 | ✅ Done |
 | "Save My Results" re-POST fix (anon→auth data claim) | Backend + Frontend | P1 | Pending |
-| Landing page step boxes visual (numbers/arrows, not pricing plan feel) | Frontend Dev | P1 | Pending |
-| Selectable pain options for what-works/what-needs-fixing (step-journey-exists) | Frontend Dev | P1 | Pending |
+| Landing page step boxes visual (numbers/arrows, not pricing plan feel) | Frontend Dev | P1 | ✅ Done |
+| Selectable pain options for what-works/what-needs-fixing (step-journey-exists) | Frontend Dev | P1 | ✅ Done |
+| Playbook JSON parse failure — permanent fix via Claude tool use | AI Engineer | P0 | ✅ Done |
+| Demo account setup doc (demo-account-setup.md) — reorder to match actual wizard | COO | P1 | ✅ Done |
 | Context enrichment flywheel — G2/Capterra/X/Reddit review mining + tool stack signals | AI Engineer | P2 | Pending |
 | Journey health scoring | AI Engineer | P1 | Pending |
 | Journey editing | Frontend Dev | P1 | Pending |
@@ -139,6 +141,11 @@ Track sprint progress and status.
 ### Sprint Notes
 - 2026-03-05: **Sprint 5 kickoff.** Three Sprint 4 P0s carried forward: playbook persistence, Save My Results persistence fix. All Sprint 4 code deployed (P0 copy fixes, P1 multi-select goals + multi-file upload, max_tokens 5k→8k fix). Noam (Orca AI) journey manually generated + persisted (template: 0102bea1-d9f1-481d-ab9c-0d585fe8d3d0). Added weekly service cost/credit monitoring — Anat received Vercel credits-running-low email. Created M-memory/cost-tracker.md. Starting with playbook persistence (P0 carryover).
 - 2026-03-05: **Playbook persistence — COMPLETE.** Added `playbook JSONB` column to `journey_templates` (migration 004, applied manually in Supabase Dashboard). Updated `database.ts` types. `/api/recommendations/generate` now persists playbook after generation for authenticated users. New `GET /api/playbook` endpoint loads persisted playbook. `playbook/page.tsx` tries Supabase first on load, falls back to sessionStorage for anonymous users. Build passes. Deployed. Next: landing page step boxes visual (P1).
+- 2026-03-05: **Landing page equal-height step cards — DONE.** `HowItWorksSection` in `src/app/page.tsx` switched from flex layout to CSS grid (`grid-cols-[1fr_auto_1fr_auto_1fr]`). CSS grid guarantees all cells in the same row are equal height — flex `items-stretch` was unreliable in practice. Also fixed React Fragment key placement: key now on `<Fragment>` import wrapper, not on inner divs. Commit: `443954f`.
+- 2026-03-05: **Selectable pain chips in step-journey-exists — DONE.** Added two chip selector groups: `WHAT_WORKS_OPTIONS` (8 emerald green chips for what's working) and `WHAT_NEEDS_FIXING_OPTIONS` (9 red chips for what needs fixing). Wired to new `whatWorksSelections` + `whatNeedsFixingSelections` fields in OnboardingData. Both selections passed through to journey + recommendation prompts. Commit in same session.
+- 2026-03-05: **Demo account setup doc (O-output/presale/demo-account-setup.md) — fully rewritten.** Was completely out of order vs actual wizard. Now correct 10-step order (Welcome → Company → Stage → Journey Exists → Customer Profile → Competitors → Business Numbers → Pain Points → Goals → Generate). Added `userEmail: demo@cxmate.app` to Welcome step (was missing). Updated Journey Exists section with new chip UI documentation. Added SQL password reset tip for `demo@cxmate.app` (not a real email — magic link flow won't work). Specific Flowdesk demo story preserved throughout.
+- 2026-03-05: **Playbook JSON parse failure — PERMANENT FIX via Claude tool use.** Root cause: `max_tokens: 4000` too small for 18 recommendations + email templates (~5,000–7,000 tokens needed). Secondary bug: `lastIndexOf("}")` truncation detection found stale `}` from earlier completed recommendation objects, bypassing repair branch entirely. Third issue: contradictory system prompt ("10 words max") vs user prompt ("include full templates"). Permanent fix: rewrote `generate-recommendations.ts` to use Claude tool use (function calling). API validates JSON schema internally — `toolBlock.input` arrives as a pre-parsed JS object. Zero `JSON.parse` on our side, zero repair logic, zero truncation bugs. Removed entire `repairTruncatedJson()` function (40 lines). `max_tokens` stays at 8192. Retry logic (2 attempts) preserved for transient API failures. Commit: `8028151`.
+- 2026-03-05: **Next session should start with:** Save My Results re-POST fix (P1) — after auth, detect sessionStorage data + re-POST to `/api/onboarding` to claim anonymous journey. Then context enrichment flywheel (P2). Journey health scoring (P1) continues in backlog.
 
 ---
 

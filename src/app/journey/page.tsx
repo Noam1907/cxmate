@@ -203,7 +203,15 @@ function JourneyContent() {
       {viewMode === "cards" ? (
         <JourneyMap journey={journey} evidenceMap={evidenceMap} />
       ) : (
-        <JourneyVisual journey={journey} />
+        <>
+          <div data-print-hide-visual>
+            <JourneyVisual journey={journey} />
+          </div>
+          {/* Print fallback: always render card view for PDF export (visual timeline overflows A4) */}
+          <div className="hidden" data-print-show-cards>
+            <JourneyMap journey={journey} evidenceMap={evidenceMap} />
+          </div>
+        </>
       )}
 
       {/* CTA → CX Report */}

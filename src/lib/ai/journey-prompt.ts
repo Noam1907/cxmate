@@ -65,6 +65,7 @@ export interface GeneratedStage {
   topFailureRisk?: string;
   successPattern?: string;
   benchmarkContext?: string;
+  existingTools?: { name: string; domain: string }[];
 }
 
 export interface ConfrontationInsight {
@@ -511,6 +512,8 @@ ${verticalContext}
 - Main acquisition channel: ${input.mainChannel}
 ${input.preLiveProcess ? `- Pre-live / implementation process: ${input.preLiveProcess}` : ""}
 ${input.currentTools ? `- Current CX tools/stack: ${input.currentTools}` : ""}
+${input.currentTools ? `
+EXISTING TOOL MAPPING: For each stage, identify which of the user's current tools (${input.currentTools}) are relevant and output them in the stage's "existingTools" array as {"name": "ToolName", "domain": "tool-domain.com"}. Only include tools genuinely relevant to that stage. Common domains: Salesforce=salesforce.com, HubSpot=hubspot.com, Zendesk=zendesk.com, Intercom=intercom.com, Jira=atlassian.com, Slack=slack.com, Gainsight=gainsight.com, ChurnZero=churnzero.com, Mixpanel=mixpanel.com, Amplitude=amplitude.com, Segment=segment.com, Freshdesk=freshdesk.com, Monday=monday.com, Notion=notion.so, Asana=asana.com, Pipedrive=pipedrive.com, Gong=gong.io, Outreach=outreach.io, Stripe=stripe.com, Pendo=pendo.io, Fullstory=fullstory.com, Hotjar=hotjar.com, Typeform=typeform.com, Zoho=zoho.com, Drift=drift.com.` : ""}
 
 ## Existing CX Processes
 ${input.hasExistingJourney === "yes" || input.hasExistingJourney === "partial" ? `- Has existing journey processes: ${input.hasExistingJourney === "yes" ? "Yes (formal)" : "Partially"}` : "- No existing CX processes in place — building from scratch"}
@@ -640,6 +643,7 @@ Return a JSON object with this exact structure:
       "topFailureRisk": "The most likely CX failure pattern at this stage",
       "successPattern": "The highest-impact success intervention for this stage",
       "benchmarkContext": "How similar companies perform at this stage",
+      "existingTools": [{"name": "Salesforce", "domain": "salesforce.com"}],
       "meaningfulMoments": [
         {
           "name": "Moment Name",

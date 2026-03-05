@@ -6,6 +6,7 @@ import type {
   GeneratedStage,
   GeneratedMoment,
 } from "@/lib/ai/journey-prompt";
+import { getToolLogoUrl } from "@/lib/tool-logos";
 
 interface JourneyVisualProps {
   journey: GeneratedJourney;
@@ -16,9 +17,9 @@ interface JourneyVisualProps {
 // ============================================
 
 const severityConfig = {
-  critical: { dot: "bg-rose-500", ring: "ring-rose-200", text: "text-rose-600", label: "Critical" },
-  high:     { dot: "bg-amber-500", ring: "ring-amber-200", text: "text-amber-700", label: "High" },
-  medium:   { dot: "bg-slate-400", ring: "ring-slate-200", text: "text-slate-500", label: "Medium" },
+  critical: { dot: "bg-red-600", ring: "ring-red-200", text: "text-red-600", label: "Critical" },
+  high:     { dot: "bg-orange-500", ring: "ring-orange-200", text: "text-orange-700", label: "High" },
+  medium:   { dot: "bg-sky-400", ring: "ring-sky-200", text: "text-sky-600", label: "Medium" },
   low:      { dot: "bg-slate-300", ring: "ring-slate-100", text: "text-slate-400", label: "Low" },
 };
 
@@ -120,7 +121,7 @@ function StageNode({
         <div className="absolute top-1/2 left-0 right-0 h-px -translate-y-1/2 bg-slate-200" />
 
         {/* Card */}
-        <div className={`relative mx-auto w-[160px] rounded-2xl border bg-white p-4 text-center shadow-sm z-10 ${hasCritical ? "border-rose-200" : "border-slate-200"}`}>
+        <div className={`relative mx-auto w-[160px] rounded-2xl border bg-white p-4 text-center shadow-sm z-10 ${hasCritical ? "border-red-200" : "border-slate-200"}`}>
           {/* Stage number */}
           <div className={`absolute -top-3 left-1/2 -translate-x-1/2 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shadow-sm text-white ${isCustomer ? "bg-slate-600" : "bg-slate-400"}`}>
             {index + 1}
@@ -138,8 +139,29 @@ function StageNode({
           </p>
 
           {hasCritical && (
-            <div className="mt-2 text-xs text-rose-500 font-medium">
+            <div className="mt-2 text-xs text-red-600 font-medium">
               ⚠ risk
+            </div>
+          )}
+
+          {/* Existing tool logos */}
+          {stage.existingTools && stage.existingTools.length > 0 && (
+            <div className="flex items-center justify-center gap-1 mt-2">
+              {stage.existingTools.slice(0, 3).map((tool, i) => (
+                /* eslint-disable-next-line @next/next/no-img-element */
+                <img
+                  key={i}
+                  src={getToolLogoUrl(tool.name, tool.domain)}
+                  alt={tool.name}
+                  width={16}
+                  height={16}
+                  className="rounded-sm"
+                  title={tool.name}
+                />
+              ))}
+              {stage.existingTools.length > 3 && (
+                <span className="text-[10px] text-slate-400">+{stage.existingTools.length - 3}</span>
+              )}
             </div>
           )}
         </div>
@@ -300,7 +322,7 @@ function JourneySummary({ journey }: { journey: GeneratedJourney }) {
       <span className="text-slate-200">|</span>
       <span>{totalMoments} moments mapped</span>
       {criticalMoments > 0 && (
-        <span className="text-rose-400 font-medium">{criticalMoments} critical</span>
+        <span className="text-red-500 font-medium">{criticalMoments} critical</span>
       )}
       <span className="text-slate-300 italic">Click any dot to explore</span>
     </div>

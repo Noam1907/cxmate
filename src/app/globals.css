@@ -202,6 +202,16 @@
     background: white !important;
   }
 
+  /* ── Visual timeline: hide in print (overflows A4, use card view instead) ── */
+  [data-print-hide-visual] {
+    display: none !important;
+  }
+
+  /* ── Cards view: always show in print ── */
+  [data-print-show-cards] {
+    display: block !important;
+  }
+
   /* ── Cards ── */
   [data-print-card] {
     border: 1px solid #e2e8f0 !important;

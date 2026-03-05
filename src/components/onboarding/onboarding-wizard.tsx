@@ -228,13 +228,14 @@ function GeneratingExperience({ data }: { data: OnboardingData }) {
   const [phase, setPhase] = useState(0);
   const [seconds, setSeconds] = useState(0);
 
+  const companyName = data.companyName || "your company";
   const phases = [
-    { title: "Analyzing your company profile", detail: `Mapping ${data.companyName || "your company"}'s stage, customers, and business model` },
-    { title: "Building your journey stages", detail: `Structuring a ${data.companyMaturity === "pre_launch" ? "sales" : "full lifecycle"} map tailored to your vertical` },
-    { title: "Identifying meaningful moments", detail: "Finding the interactions that make or break customer relationships" },
-    { title: "Scoring priorities", detail: "Connecting your pains to specific, actionable improvements" },
-    { title: "Generating your intelligence report", detail: "Mapping risk areas, impact projections, and your personalised action items" },
-    { title: "Building your action playbook", detail: "Turning every insight into a step-by-step action with templates and timelines" },
+    { title: "Reading your company profile", detail: `Cross-referencing ${companyName}'s stage, vertical, and business model against B2B benchmarks` },
+    { title: "Mapping the full lifecycle", detail: `Building a ${data.companyMaturity === "pre_launch" ? "sales" : "full lifecycle"} journey — every stage, every handoff, every risk` },
+    { title: "Scoring meaningful moments", detail: "Identifying the 10-15 interactions where customers decide to stay or leave" },
+    { title: "Running risk analysis", detail: `Calculating revenue at risk based on ${companyName}'s real numbers — not guesswork` },
+    { title: "Writing your CX intelligence report", detail: "Surfacing the patterns your team won't tell you about — backed by data" },
+    { title: "Building your action playbook", detail: "Every insight becomes a prioritized action with templates, timelines, and owners" },
   ];
 
   // Timer
@@ -245,16 +246,16 @@ function GeneratingExperience({ data }: { data: OnboardingData }) {
     return () => clearInterval(timer);
   }, []);
 
-  // Phase progression — staggered timing across full ~5 min generation window
+  // Phase progression — tighter timing, matches actual ~90-150s generation
   useEffect(() => {
-    const timings = [0, 15000, 35000, 60000, 90000, 115000];
+    const timings = [0, 10000, 25000, 45000, 65000, 85000];
     const timeouts = timings.map((ms, i) =>
       setTimeout(() => setPhase(i), ms)
     );
     return () => timeouts.forEach(clearTimeout);
   }, []);
 
-  const progress = Math.min((seconds / 180) * 100, 95);
+  const progress = Math.min((seconds / 120) * 100, 95);
 
   return (
     <div className="rounded-2xl border border-slate-200 bg-white p-8 space-y-8">
@@ -262,10 +263,11 @@ function GeneratingExperience({ data }: { data: OnboardingData }) {
       {/* Header */}
       <div className="text-center space-y-3">
         <h2 className="text-2xl font-bold text-slate-800 tracking-tight">
-          Building your customer experience intelligence
+          Building {companyName}&apos;s CX playbook
         </h2>
-        <p className="text-sm text-slate-400">
-          Your personalized journey, report, and playbook are on their way
+        <p className="text-sm text-slate-500">
+          A certified CX expert needs 3-4 hours for this.{" "}
+          <span className="font-medium text-primary">You&apos;ll have it in minutes.</span>
         </p>
       </div>
 
@@ -281,7 +283,9 @@ function GeneratingExperience({ data }: { data: OnboardingData }) {
           <span className="text-[11px] text-slate-400 tabular-nums">
             {Math.floor(seconds / 60)}:{(seconds % 60).toString().padStart(2, "0")} elapsed
           </span>
-          <span className="text-[11px] text-slate-400">~5 min total</span>
+          <span className="text-[11px] text-slate-400">
+            {seconds < 60 ? "Analyzing..." : seconds < 90 ? "Almost there..." : "Finalizing..."}
+          </span>
         </div>
       </div>
 
@@ -325,28 +329,20 @@ function GeneratingExperience({ data }: { data: OnboardingData }) {
         })}
       </div>
 
-      {/* Insight stat */}
-      <div className="border-t border-slate-100 pt-6 text-center space-y-1.5">
-        <p className="text-lg font-bold text-slate-700">
-          {data.companyMaturity === "pre_launch"
-            ? "2x faster first deals"
-            : data.companyMaturity === "first_customers"
-            ? "40% higher retention in year one"
-            : data.companyMaturity === "growing"
-            ? "Up to 30% churn reduction"
-            : "2x improvement in expansion revenue"
-          }
-        </p>
-        <p className="text-xs text-slate-400">
-          {data.companyMaturity === "pre_launch"
-            ? "Companies that map their sales journey before launch close first deals faster."
-            : data.companyMaturity === "first_customers"
-            ? "Early-stage teams that formalize customer experience see significantly higher retention."
-            : data.companyMaturity === "growing"
-            ? "Growing companies that prioritize the right moments see measurable churn reduction."
-            : "Unified journey mapping drives measurable improvement in expansion revenue."
-          }
-        </p>
+      {/* Value comparison */}
+      <div className="border-t border-slate-100 pt-6">
+        <div className="grid grid-cols-2 gap-4 text-center">
+          <div className="space-y-1">
+            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide">CX consultant</p>
+            <p className="text-lg font-bold text-slate-300">3-4 hours</p>
+            <p className="text-[11px] text-slate-300">$200-400/hr typical</p>
+          </div>
+          <div className="space-y-1">
+            <p className="text-xs font-semibold text-primary uppercase tracking-wide">CX Mate</p>
+            <p className="text-lg font-bold text-primary">~2 minutes</p>
+            <p className="text-[11px] text-slate-500">Same methodology, your data</p>
+          </div>
+        </div>
       </div>
     </div>
   );
