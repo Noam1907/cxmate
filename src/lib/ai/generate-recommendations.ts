@@ -69,8 +69,8 @@ export async function generateRecommendations(
 
   const requestBody = JSON.stringify({
     model: "claude-sonnet-4-20250514",
-    max_tokens: 4000,
-    system: "You are a CX expert API. You MUST respond with ONLY a valid JSON object. No preamble, no explanation, no markdown fences, no text before or after the JSON. The very first character of your response must be { and the very last must be }. CRITICAL: Be extremely concise — every string field max 10 words, no elaboration, no lists inside strings. Keep total response under 3500 tokens.",
+    max_tokens: 8192,
+    system: "You are a CX expert API. You MUST respond with ONLY a valid JSON object. No preamble, no explanation, no markdown fences, no text before or after the JSON. The very first character of your response must be { and the very last must be }. All string values must be valid JSON — escape any double quotes inside strings with \\\".",
     messages: [{ role: "user", content: prompt }],
   });
 
@@ -119,42 +119,32 @@ async function _generateFromResponse(
     throw new Error(`Claude response did not contain JSON. First 200 chars: ${raw.slice(0, 200)}`);
   }
 
-  // If truncated (max_tokens), try to repair the incomplete JSON
-  if (stopReason === "max_tokens" || jsonEnd <= jsonStart) {
-    console.warn("[generate-recommendations] Response was truncated (stop_reason: max_tokens). Attempting repair...");
-    raw = repairTruncatedJson(raw.slice(jsonStart));
-  } else {
-    raw = raw.slice(jsonStart, jsonEnd + 1);
-  }
+  // Extract the JSON candidate — start from first {
+  const candidate = jsonEnd > jsonStart
+    ? raw.slice(jsonStart, jsonEnd + 1)
+    : raw.slice(jsonStart);
 
-  // Attempt parsing with progressive repair
-  const attempts = [
-    () => JSON.parse(raw),
-    () => {
-      const repaired = raw
-        .replace(/,\s*([}\]])/g, "$1")
-        .replace(/[\x00-\x1f]/g, (ch: string) =>
-          ch === "\n" ? "\\n" : ch === "\t" ? "\\t" : ""
-        );
-      return JSON.parse(repaired);
-    },
-    () => {
-      const repaired = raw
-        .replace(/,\s*([}\]])/g, "$1")
-        .replace(/[\x00-\x1f]/g, (ch: string) =>
-          ch === "\n" ? "\\n" : ch === "\t" ? "\\t" : ""
-        )
-        .replace(/:\s*"([^"]*?)(?<!\\)"([^"]*?)"/g, ': "$1\\"$2"');
-      return JSON.parse(repaired);
-    },
-  ];
+  // Helper: clean control chars and trailing commas
+  const cleanJson = (s: string) =>
+    s
+      .replace(/,\s*([}\]])/g, "$1")
+      .replace(/[\x00-\x1f]/g, (ch: string) =>
+        ch === "\n" ? "\\n" : ch === "\t" ? "\\t" : ""
+      );
 
-  for (const attempt of attempts) {
-    try {
-      return attempt() as GeneratedPlaybook;
-    } catch {
-      continue;
-    }
+  // Attempt 1: parse as-is
+  try { return JSON.parse(candidate) as GeneratedPlaybook; } catch { /* continue */ }
+
+  // Attempt 2: clean control chars + trailing commas
+  const cleaned = cleanJson(candidate);
+  try { return JSON.parse(cleaned) as GeneratedPlaybook; } catch { /* continue */ }
+
+  // Attempt 3: truncated? repair and retry
+  // Triggered by explicit max_tokens, missing closing brace, OR parse failures above
+  if (stopReason === "max_tokens" || jsonEnd <= jsonStart || !cleaned.trimEnd().endsWith("}")) {
+    console.warn("[generate-recommendations] Attempting truncation repair (stop_reason:", stopReason, ")");
+    const repaired = cleanJson(repairTruncatedJson(raw.slice(jsonStart)));
+    try { return JSON.parse(repaired) as GeneratedPlaybook; } catch { /* continue */ }
   }
 
   throw new Error(`Failed to parse recommendations JSON after all repair attempts. First 300 chars: ${raw.slice(0, 300)}`);
