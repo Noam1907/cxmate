@@ -57,10 +57,35 @@ const FIELD_LABELS: Record<string, string> = {
 // Insights shown after specific fields are extracted (appear inline in chat)
 // Kept short and non-disruptive — they flow naturally with the conversation
 const FIELD_INSIGHTS: Record<string, string> = {
+  // Stage + vertical — fire early, anchor the personalization frame
   companyMaturity:
-    "Playbook calibrated to your stage. We'll focus on what actually moves the needle right now.",
+    "Playbook calibrated to your stage. We'll zero in on what actually moves the needle right now — not what works a year from now.",
   vertical:
-    "We've mapped hundreds of CX journeys in your vertical. Your benchmarks will reflect what top performers do differently.",
+    "Benchmarks locked in. Your playbook will show you what top performers in your space do differently — and exactly where you sit relative to them.",
+
+  // Customer scale — signals what kind of patterns are detectable
+  customerSize:
+    "At this customer scale, the patterns are already forming in your data. Most companies don't see them until they've already cost them. Your playbook surfaces them before that.",
+
+  // Goal — shapes the whole output
+  primaryGoal:
+    "Every recommendation in your playbook will be ranked by how directly it drives this outcome. No generic best practices — just what moves your specific number.",
+
+  // Pain — validates and reframes the problem space
+  painPoints:
+    "The friction points you described are responsible for the majority of preventable churn at your stage. Your playbook will sequence the interventions — highest impact first.",
+
+  // CX setup — diagnoses the operational gap
+  cxSetup:
+    "Teams operating at this CX maturity level typically spend 70% of their capacity reacting to problems that were predictable. Your playbook shows you how to flip that ratio.",
+
+  // Biggest challenge — connects problem to cost
+  biggestChallenge:
+    "Left unsystematized, this type of challenge costs B2B companies an average of 15–20% of ARR annually — in preventable churn and stalled expansion. That's exactly what we're building the fix for.",
+
+  // Differentiator — connects product identity to CX strategy
+  competitorDifferentiator:
+    "The companies that win long-term don't just deliver a product — they deliver the context that makes it irreplaceable. We're codifying that into every touchpoint of your journey.",
 };
 
 // ─────────────────────────────────────────────
@@ -105,19 +130,19 @@ function buildStageMessage(
       return {
         headline: "First 50 customers: the make-or-break phase.",
         body:
-          `Companies at this stage lose 40% of early users before they ever see real value. Your playbook will close that gap.${benchmarkSuffix}`,
+          `Companies at this stage lose 40% of early users before they ever see real value — usually within the first 30 days. In about 5 minutes, you'll have the playbook to close that gap.${benchmarkSuffix}`,
       };
     case "growing":
       return {
-        headline: "50-500 customers: where manual CS hits a wall.",
+        headline: "50–500 customers: where manual CS hits a wall.",
         body:
-          `Growth companies at this stage become reactive: tickets pile up, onboarding slips, churn creeps in silently. Your playbook fixes the system before it breaks.${benchmarkSuffix}`,
+          `At this stage, teams go reactive: tickets pile up, onboarding slips, churn creeps in silently. In about 5 minutes, you'll have a system to fix it before it breaks.${benchmarkSuffix}`,
       };
     case "scaling":
       return {
         headline: "500+ customers: invisible patterns compound fast.",
         body:
-          `Micro-churns, delayed expansions, at-risk accounts your team hasn't spotted yet. Your playbook gives you the intelligence to stay ahead.${benchmarkSuffix}`,
+          `Micro-churns, delayed expansions, at-risk accounts your team hasn't spotted yet. In about 5 minutes, you'll have the intelligence layer to stay ahead of all of it.${benchmarkSuffix}`,
       };
   }
 }
