@@ -297,7 +297,7 @@ export async function POST(request: Request) {
       },
       body: JSON.stringify({
         model: "claude-sonnet-4-20250514",
-        max_tokens: 512,
+        max_tokens: 1024,
         system: systemPrompt,
         messages,
       }),
@@ -320,15 +320,28 @@ export async function POST(request: Request) {
     };
 
     try {
+      // 1. Strip markdown fences (```json ... ```)
       const clean = rawText
         .replace(/^```(?:json)?\s*/i, "")
         .replace(/\s*```\s*$/i, "")
         .trim();
       parsed = JSON.parse(clean);
     } catch {
-      console.error("[onboarding/chat] Failed to parse Claude JSON:", rawText);
-      // Fallback: treat the whole text as the reply
-      parsed = { reply: rawText || "Could you say that again?", extractedFields: {}, isComplete: false };
+      // 2. Claude sometimes prepends preamble text before the JSON object.
+      //    Extract the outermost {...} block and try again.
+      const jsonMatch = rawText.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        try {
+          parsed = JSON.parse(jsonMatch[0]);
+        } catch {
+          // 3. Last resort — show generic retry message (don't dump raw JSON to user)
+          console.error("[onboarding/chat] Failed to parse Claude JSON:", rawText);
+          parsed = { reply: "I didn't quite catch that — could you say that again?", extractedFields: {}, isComplete: false };
+        }
+      } else {
+        console.error("[onboarding/chat] No JSON found in Claude response:", rawText);
+        parsed = { reply: "I didn't quite catch that — could you say that again?", extractedFields: {}, isComplete: false };
+      }
     }
 
     // Merge: client sends the current state, API returns new fields, we merge and send back
