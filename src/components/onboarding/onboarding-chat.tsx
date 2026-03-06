@@ -502,7 +502,7 @@ function ChatHeader({ extractedFields }: { extractedFields: Fields }) {
           : "Let's build your CX playbook"}
       </h1>
       <p className="text-sm text-muted-foreground">
-        A short conversation that replaces hours of CX strategy work
+        A 5-minute conversation that replaces hours of CX strategy work
       </p>
     </div>
   );
