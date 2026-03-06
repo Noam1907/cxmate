@@ -335,6 +335,14 @@ export async function POST(request: Request) {
 
     const systemPrompt = buildSystemPrompt(extractedFields, enrichmentData);
 
+    // Prefill the assistant turn with "{" — this forces Claude to continue from an
+    // opening brace, guaranteeing the response is always valid JSON with no preamble,
+    // no markdown fences, and no "here is the JSON:" wrapper text.
+    const messagesWithPrefill = [
+      ...messages,
+      { role: "assistant" as const, content: "{" },
+    ];
+
     const response = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
       headers: {
@@ -346,7 +354,7 @@ export async function POST(request: Request) {
         model: "claude-sonnet-4-20250514",
         max_tokens: 1024,
         system: systemPrompt,
-        messages,
+        messages: messagesWithPrefill,
       }),
     });
 
@@ -357,9 +365,12 @@ export async function POST(request: Request) {
     }
 
     const aiResponse = await response.json();
-    const rawText: string = aiResponse.content?.[0]?.text ?? "";
+    // Claude's response does NOT include the prefilled "{" — we prepend it to reconstruct valid JSON.
+    const rawText: string = "{" + (aiResponse.content?.[0]?.text ?? "");
 
-    // Parse Claude's JSON response (strip any accidental markdown fences)
+    // Parse Claude's JSON response.
+    // Prefill forces the response to start with "{" so this should almost always succeed.
+    // Fallback chain handles any edge cases.
     let parsed: {
       reply: string;
       extractedFields: Record<string, unknown>;
@@ -367,21 +378,16 @@ export async function POST(request: Request) {
     };
 
     try {
-      // 1. Strip markdown fences (```json ... ```)
-      const clean = rawText
-        .replace(/^```(?:json)?\s*/i, "")
-        .replace(/\s*```\s*$/i, "")
-        .trim();
-      parsed = JSON.parse(clean);
+      // Primary: direct parse (prefill guarantees it starts with "{")
+      parsed = JSON.parse(rawText);
     } catch {
-      // 2. Claude sometimes prepends preamble text before the JSON object.
-      //    Extract the outermost {...} block and try again.
+      // Fallback 1: extract the outermost {...} block (handles rare trailing garbage)
       const jsonMatch = rawText.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
         try {
           parsed = JSON.parse(jsonMatch[0]);
         } catch {
-          // 3. Last resort — show generic retry message (don't dump raw JSON to user)
+          // Fallback 2: last resort — don't dump raw JSON to user
           console.error("[onboarding/chat] Failed to parse Claude JSON:", rawText);
           parsed = { reply: "I didn't quite catch that — could you say that again?", extractedFields: {}, isComplete: false };
         }

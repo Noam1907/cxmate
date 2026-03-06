@@ -352,9 +352,11 @@ function parseInline(text: string): React.ReactNode {
 }
 
 function renderAIContent(content: string): React.ReactNode {
-  // Safety: strip any JSON response blocks that leaked through (defense-in-depth).
-  // Claude sometimes outputs preamble text + then the full JSON object — we only want the text.
+  // Safety: strip any JSON that leaked through (defense-in-depth against prefill edge cases).
   const safeContent = content
+    // Strip markdown JSON code blocks (```json ... ```)
+    .replace(/```(?:json)?\s*[\s\S]*?```/g, "")
+    // Strip raw JSON objects containing isComplete
     .replace(/\{[\s\S]*?"isComplete"\s*:\s*(true|false)[\s\S]*?\}/g, "")
     .trim() || content;
 
