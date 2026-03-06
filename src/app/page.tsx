@@ -233,6 +233,84 @@ function DarkSection() {
   );
 }
 
+// ─── Comparison: Expert vs CX Mate ───────────────────────────────────────────
+
+function ComparisonSection() {
+  return (
+    <section style={{ backgroundColor: SAGE }} className="border-b border-slate-200/60">
+      <div className="max-w-5xl mx-auto px-6 py-20">
+        <div className="text-center mb-14">
+          <p className="text-xs font-bold uppercase tracking-widest text-teal-600 mb-3">
+            Set your expectations
+          </p>
+          <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900">
+            What used to take a consultant 6 weeks
+          </h2>
+          <p className="text-base text-slate-500 mt-3 max-w-xl mx-auto">
+            CX Mate delivers in one conversation. Here&apos;s the honest comparison.
+          </p>
+        </div>
+
+        <div className="grid sm:grid-cols-2 gap-5 max-w-3xl mx-auto">
+          {/* Old way */}
+          <div className="rounded-2xl border border-slate-300 bg-white p-6">
+            <div className="flex items-center gap-2 mb-5">
+              <span className="text-lg">👤</span>
+              <span className="text-xs font-bold uppercase tracking-widest text-slate-400">
+                Traditional CX Consultant
+              </span>
+            </div>
+            <ul className="space-y-3">
+              {[
+                { label: "Timeline", value: "4–6 weeks" },
+                { label: "Cost", value: "$15,000–$50,000" },
+                { label: "Requires", value: "Team interviews, stakeholder workshops" },
+                { label: "Deliverable", value: "PDF report + presentation" },
+                { label: "Methodology", value: "Varies by consultant" },
+              ].map((row) => (
+                <li key={row.label} className="flex justify-between text-sm gap-3">
+                  <span className="text-slate-400 shrink-0">{row.label}</span>
+                  <span className="text-slate-600 font-medium text-right">{row.value}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* CX Mate */}
+          <div className="rounded-2xl border-2 p-6" style={{ borderColor: "#0D9488", backgroundColor: "#E0F7F4" }}>
+            <div className="flex items-center gap-2 mb-5">
+              <LogoMark size="sm" />
+              <span className="text-xs font-bold uppercase tracking-widest text-teal-700">
+                CX Mate
+              </span>
+            </div>
+            <ul className="space-y-3">
+              {[
+                { label: "Timeline", value: "Under 10 minutes", bold: true },
+                { label: "Cost", value: "Free preview · $149 full analysis", bold: true },
+                { label: "Requires", value: "One conversation about your business" },
+                { label: "Deliverable", value: "Journey map + report + sprint playbook" },
+                { label: "Methodology", value: "CCXP-certified, benchmarked to your stage" },
+              ].map((row) => (
+                <li key={row.label} className="flex justify-between text-sm gap-3">
+                  <span className="text-teal-600 shrink-0">{row.label}</span>
+                  <span className={`text-right ${row.bold ? "font-bold text-teal-800" : "font-medium text-teal-700"}`}>
+                    {row.value}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+
+        <p className="text-center text-xs text-slate-400 mt-8 max-w-md mx-auto">
+          CX Mate isn&apos;t replacing your CX team — it&apos;s giving you the foundation so they can focus on what matters.
+        </p>
+      </div>
+    </section>
+  );
+}
+
 // ─── How it works ─────────────────────────────────────────────────────────────
 
 function HowItWorksSection() {
@@ -463,6 +541,7 @@ export default function Home() {
 
       <HeroSection />
       <DarkSection />
+      <ComparisonSection />
       <HowItWorksSection />
       <FeaturesSection />
       <BottomCTA />
