@@ -1,16 +1,15 @@
 // Onboarding entry point.
-// Currently using the conversational chat flow (OnboardingChat).
-// The original step-based wizard (OnboardingWizard) is preserved in
-// src/components/onboarding/onboarding-wizard.tsx — swap the import below to revert.
+// Production: using OnboardingWizard (stable).
+// Chat flow (OnboardingChat) is in preview — swap imports below when ready to ship.
 
-import { OnboardingChat } from "@/components/onboarding/onboarding-chat";
-// import { OnboardingWizard } from "@/components/onboarding/onboarding-wizard";
+// import { OnboardingChat } from "@/components/onboarding/onboarding-chat";
+import { OnboardingWizard } from "@/components/onboarding/onboarding-wizard";
 
 export default function OnboardingPage() {
   return (
     <div className="flex flex-col items-center px-8 py-12 min-h-[calc(100vh-3.5rem)]">
-      <OnboardingChat />
-      {/* <OnboardingWizard /> */}
+      {/* <OnboardingChat /> */}
+      <OnboardingWizard />
     </div>
   );
 }
