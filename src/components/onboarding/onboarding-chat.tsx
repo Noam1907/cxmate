@@ -152,68 +152,155 @@ function buildStageMessage(
 // Maps last AI message keywords → preset option chips
 // ─────────────────────────────────────────────
 
-function getSuggestionChips(lastMessage: string): string[] | null {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function getSuggestionChips(lastMessage: string, fields: Record<string, any>): string[] | null {
   if (!lastMessage) return null;
   const lower = lastMessage.toLowerCase();
+  const maturity = (fields.companyMaturity as string | undefined) ?? "";
 
-  // CX setup / tools — only when asking about tools/processes (closed-ish set)
+  // ── Stage / maturity ─────────────────────────────────────────────────
+  if (
+    lower.includes("your journey") ||
+    (lower.includes("pre-launch") && lower.includes("growing")) ||
+    lower.includes("where are you on your journey")
+  ) {
+    return [
+      "🚀 Pre-launch — no customers yet",
+      "🌱 First customers (1-50)",
+      "📈 Growing (50-500 customers)",
+      "🏢 Scaling (500+ customers)",
+    ];
+  }
+
+  // ── Role ─────────────────────────────────────────────────────────────
+  if (lower.includes("your role") || lower.includes("what role")) {
+    return ["Founder / CEO", "Head of CS", "Head of CX", "VP CS", "CSM", "CX Manager", "Other"];
+  }
+
+  // ── Journey documented ────────────────────────────────────────────────
+  if (
+    lower.includes("journey documented") ||
+    lower.includes("even informally") ||
+    lower.includes("customer journey")
+  ) {
+    return ["Yes — documented", "Partially — some things written down", "Not yet — in our heads"];
+  }
+
+  // ── CX setup (tools / processes) ─────────────────────────────────────
   if (
     lower.includes("cx setup") ||
-    lower.includes("what tools") ||
-    lower.includes("your setup")
+    lower.includes("tools, team, processes") ||
+    lower.includes("what tools")
   ) {
     return [
       "Mostly manual / spreadsheets",
-      "Intercom or similar helpdesk",
+      "Helpdesk (Intercom, Zendesk)",
       "Dedicated CSM team",
-      "Gainsight / ChurnZero",
+      "CS Platform (Gainsight, ChurnZero)",
       "Nothing formal yet",
     ];
   }
 
-  // What's working / what's broken — only on that explicit follow-up turn
+  // ── What's working / broken ───────────────────────────────────────────
   if (
     lower.includes("what's working") ||
-    lower.includes("what's broken") ||
-    lower.includes("what's not working") ||
-    lower.includes("broken or missing")
+    lower.includes("broken or missing") ||
+    lower.includes("what's not working")
   ) {
     return [
       "Onboarding is too slow",
-      "No visibility into health",
+      "No visibility into customer health",
       "Team is reactive, not proactive",
-      "High ticket volume",
-      "Expansion is ad hoc",
+      "High support / ticket volume",
+      "Missing expansion opportunities",
     ];
   }
 
-  // Goal — only on direct goal question
+  // ── Pain points — maturity-aware ──────────────────────────────────────
   if (
-    lower.includes("what are you trying to") ||
-    lower.includes("what's your goal") ||
-    lower.includes("what do you want cx mate")
+    lower.includes("biggest cx challenge") ||
+    lower.includes("biggest challenge right now")
   ) {
-    return [
-      "Reduce churn",
-      "Scale CS without hiring",
-      "Improve onboarding",
-      "Expand existing accounts",
-    ];
+    if (maturity === "pre_launch") {
+      return [
+        "No structured sales process",
+        "Can't explain our value clearly",
+        "Losing deals without knowing why",
+        "No go-to-market plan",
+      ];
+    }
+    if (maturity === "first_customers") {
+      return [
+        "Onboarding is messy",
+        "Customers not seeing value fast enough",
+        "Every customer handled differently",
+        "Too much time on support",
+      ];
+    }
+    if (maturity === "growing") {
+      return [
+        "Customers leaving without warning",
+        "No visibility into at-risk accounts",
+        "Always firefighting",
+        "No consistent playbook",
+        "Missing expansion revenue",
+      ];
+    }
+    if (maturity === "scaling") {
+      return [
+        "Can't identify at-risk accounts early",
+        "CX is inconsistent across the team",
+        "No unified customer view",
+        "Onboarding doesn't scale",
+        "Missing expansion revenue",
+      ];
+    }
+    // Generic fallback
+    return ["High churn", "No playbook", "Manual processes", "No health visibility"];
   }
 
-  // Industry
+  // ── ARR / Revenue ─────────────────────────────────────────────────────
   if (
-    lower.includes("industry") ||
-    lower.includes("vertical") ||
-    lower.includes("what space")
+    lower.includes("approximate arr") ||
+    lower.includes("your arr") ||
+    (lower.includes("arr") && lower.includes("pre-revenue"))
   ) {
-    return [
-      "Fintech",
-      "HR / People tech",
-      "DevTools / Infra",
-      "Healthcare tech",
-      "Other B2B SaaS",
-    ];
+    return ["Pre-revenue", "Under $100K ARR", "$100K-$500K ARR", "$500K-$1M ARR", "$1M-$5M ARR", "$5M+ ARR"];
+  }
+
+  // ── Deal size ─────────────────────────────────────────────────────────
+  if (lower.includes("deal size") || lower.includes("typical deal")) {
+    return ["Under $5K/yr", "$5K-$20K/yr", "$20K-$50K/yr", "$50K-$100K/yr", "$100K+/yr"];
+  }
+
+  // ── Goal — maturity-aware ─────────────────────────────────────────────
+  if (
+    lower.includes("hoping cx mate") ||
+    lower.includes("help you achieve") ||
+    lower.includes("what are you hoping")
+  ) {
+    if (maturity === "pre_launch") {
+      return ["Map my sales process", "Understand buyer journey", "Get a GTM playbook", "Stand out from competitors"];
+    }
+    if (maturity === "first_customers") {
+      return ["Build repeatable onboarding", "Make early customers succeed", "Create my first CX playbook", "Reduce support burden"];
+    }
+    if (maturity === "growing") {
+      return ["Reduce churn", "Build a team playbook", "Move from reactive to proactive CX", "Fix onboarding", "Close sales-CS gaps"];
+    }
+    if (maturity === "scaling") {
+      return ["Unify sales and CS journey", "Implement health scoring", "Scale CX without headcount", "Systematize expansion revenue"];
+    }
+    return ["Reduce churn", "Scale CS without hiring", "Improve onboarding", "Expand existing accounts"];
+  }
+
+  // ── Timeframe ─────────────────────────────────────────────────────────
+  if (
+    lower.includes("timeframe") ||
+    lower.includes("seeing results") ||
+    lower.includes("within 1 month")
+  ) {
+    return ["Within 1 month", "Within 3 months", "Within 6 months", "Just exploring"];
   }
 
   return null;
@@ -265,14 +352,21 @@ function parseInline(text: string): React.ReactNode {
 }
 
 function renderAIContent(content: string): React.ReactNode {
-  const paragraphs = content.split("\n\n");
+  // Safety: strip any JSON response blocks that leaked through (defense-in-depth).
+  // Claude sometimes outputs preamble text + then the full JSON object — we only want the text.
+  const safeContent = content
+    .replace(/\{[\s\S]*?"isComplete"\s*:\s*(true|false)[\s\S]*?\}/g, "")
+    .trim() || content;
+
+  const paragraphs = safeContent.split("\n\n");
   return paragraphs.map((para, i) => {
     const hasMarkdown = para.includes("**");
     const isPlainQuestion = !hasMarkdown && para.trimEnd().endsWith("?");
     return (
+      // whitespace-pre-line renders single \n as line breaks (for option lists)
       <p
         key={i}
-        className={`leading-relaxed ${isPlainQuestion ? "font-semibold text-foreground" : ""}`}
+        className={`leading-relaxed whitespace-pre-line ${isPlainQuestion ? "font-semibold text-foreground" : ""}`}
       >
         {isPlainQuestion ? para : parseInline(para)}
       </p>
@@ -1113,11 +1207,11 @@ export function OnboardingChat() {
   const stageMsg = _stage ? buildStageMessage(_stage, enrichment) : null;
   const greeting = _userName ?? null;
 
-  // ── Suggestion chips (based on last AI question) ─────────────────────
+  // ── Suggestion chips (based on last AI question + current field state) ─
   const lastAIMsg = [...messages].reverse().find((m) => m.role === "assistant");
   const suggestionChips =
     lastAIMsg && !isThinking && !pendingFields
-      ? getSuggestionChips(lastAIMsg.content)
+      ? getSuggestionChips(lastAIMsg.content, extractedFields)
       : null;
 
   // ── Render: generating screen ─────────────────────────────────────────
