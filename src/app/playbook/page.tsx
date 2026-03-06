@@ -219,32 +219,7 @@ export default function PlaybookPage() {
   const [preparing, setPreparing] = useState(false);
   const { statuses, setStatus } = useRecommendationStatus();
 
-  // ── Tier gate: playbook is locked for free users ──
-  if (!tierLoading && !canAccess("playbook")) {
-    return (
-      <main className="min-h-screen flex items-center justify-center p-8">
-        <div className="text-center space-y-6 max-w-md">
-          <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto">
-            <span className="text-2xl">📋</span>
-          </div>
-          <div className="space-y-2">
-            <h1 className="text-2xl font-bold text-slate-900">Your playbook is ready</h1>
-            <p className="text-slate-500 leading-relaxed">
-              We built a prioritized action plan for your business — with templates, timelines, and measurement checkpoints. Get the full analysis to access it.
-            </p>
-          </div>
-          <Link href="/pricing">
-            <Button size="lg" className="w-full sm:w-auto">
-              Get My Full Analysis — $149
-            </Button>
-          </Link>
-          <p className="text-xs text-slate-400">
-            Includes full CX Report details, playbook, and PDF export
-          </p>
-        </div>
-      </main>
-    );
-  }
+  // ── NOTE: Tier gate moved AFTER all useEffect calls (Rules of Hooks) ──
 
   useEffect(() => {
     async function init() {
@@ -351,6 +326,34 @@ export default function PlaybookPage() {
     }, 30 * 1000);
     return () => { clearInterval(poll); clearTimeout(giveUp); };
   }, [preparing, playbook]);
+
+  // ── Tier gate: playbook is locked for free users ──
+  // Must be AFTER all hook calls (Rules of Hooks — no early return before useEffect)
+  if (!tierLoading && !canAccess("playbook")) {
+    return (
+      <main className="min-h-screen flex items-center justify-center p-8">
+        <div className="text-center space-y-6 max-w-md">
+          <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto">
+            <span className="text-2xl">📋</span>
+          </div>
+          <div className="space-y-2">
+            <h1 className="text-2xl font-bold text-slate-900">Your playbook is ready</h1>
+            <p className="text-slate-500 leading-relaxed">
+              We built a prioritized action plan for your business — with templates, timelines, and measurement checkpoints. Get the full analysis to access it.
+            </p>
+          </div>
+          <Link href="/pricing">
+            <Button size="lg" className="w-full sm:w-auto">
+              Get My Full Analysis — $149
+            </Button>
+          </Link>
+          <p className="text-xs text-slate-400">
+            Includes full CX Report details, playbook, and PDF export
+          </p>
+        </div>
+      </main>
+    );
+  }
 
   const handleGenerate = async () => {
     setLoading(true);
