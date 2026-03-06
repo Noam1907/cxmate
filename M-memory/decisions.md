@@ -22,6 +22,8 @@ Track key technical and product decisions and why they were made.
 | 2026-02-16 | Zod for runtime validation | Type-safe schema validation on all API inputs | Active |
 | 2026-02-16 | journey_type field on templates | Supports 'sales', 'customer', 'full_lifecycle' journey types | Active |
 | 2026-02-16 | stage_type field on stages | Distinguishes 'sales' vs 'customer' stages within a journey | Active |
+| 2026-03-06 | **Freemius over Stripe** for payments | Stripe doesn't operate in Israel (no BOI clearing license). Freemius is Israeli-founded MoR, handles global tax/VAT/compliance, 4.7% fees. Evaluated: Lemon Squeezy, Paddle, PayPal, Stripe-via-US-LLC | Active |
+| 2026-03-06 | Freemius JS overlay checkout (client-side) | No server-side session creation needed. Smoother UX than Stripe redirect. Fallback to hosted URL if JS fails | Active |
 
 ## Product Decisions
 

@@ -421,7 +421,35 @@ Track sprint progress and status.
 
 ### Next session starts with
 - Address the measurement gap: add NPS/CSAT/CES/event-triggered poll suggestions to recommendation engine + playbook templates
-- Stripe integration (Starter tier first: $79/mo + $149 one-time, two Stripe products)
+- ~~Stripe integration~~ → DONE (Freemius, see 2026-03-06 session)
 - Revenue Protected counter on Dashboard (benchmark-based, starts $0, grows with playbook completion)
 - "Save My Results" CTA for anonymous users
+- Full regression QA (gatekeeper audit)
+
+---
+
+## Session — 2026-03-05 / 2026-03-06 (Pricing + Freemius)
+
+### Completed this session
+- **3-tier pricing + content gating** — Built complete tier access system. Free/Full Analysis ($149 one-time)/Pro ($99/mo). `tier-access.ts` (ACCESS_MATRIX), `use-plan-tier.ts` (client hook), `upgrade-gate.tsx` (UpgradeGate + LockedSection). Gating applied to: playbook (limited for free), PDF export (pro only), journey editing (paid), API routes check tier. Pricing page with FAQ. Committed `7d1f04c`.
+- **Stripe → Freemius swap (COMPLETE)** — Stripe doesn't operate in Israel (no Bank of Israel clearing license). Evaluated Lemon Squeezy, Paddle, PayPal, Stripe-via-US-LLC. Chose **Freemius** — Israeli-founded Merchant of Record, handles global tax/VAT/compliance, 4.7% fees. Complete code swap across 13 files:
+  - NEW `src/lib/freemius.ts` (config, HMAC verification, API helpers, plan tier mapping)
+  - DELETED `src/lib/stripe.ts` + uninstalled stripe npm package
+  - Rewrote: webhook, create-checkout, verify-session, portal API routes
+  - Pricing page: Freemius JS overlay checkout (client-side, no redirect)
+  - Updated terms/privacy (Stripe → Freemius references)
+  - Updated billing success page
+  - Freemius plan IDs: Full Analysis = 42170, Pro = 42172
+  - Build passes clean, pricing page verified in dev preview. Committed `50d4c33`.
+
+### Remaining setup (Anat needs to do in Freemius Dashboard)
+1. Register webhook URL: Integrations → Webhooks → `https://cxmate.io/api/billing/webhook`
+2. Add env vars to Vercel: `NEXT_PUBLIC_FREEMIUS_PRODUCT_ID`, `NEXT_PUBLIC_FREEMIUS_PUBLIC_KEY`, `FREEMIUS_SECRET_KEY`
+3. Add DB columns to organizations table: `freemius_license_id`, `freemius_plan_id`, `freemius_subscription_id`
+
+### Next session starts with
+- Complete Freemius setup (webhook URL, Vercel env vars, DB migration)
+- Revenue Protected counter on Dashboard
+- "Save My Results" CTA for anonymous users
+- Measurement gap: NPS/CSAT/CES suggestions in recommendations
 - Full regression QA (gatekeeper audit)
