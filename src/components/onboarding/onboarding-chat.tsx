@@ -156,13 +156,10 @@ function getSuggestionChips(lastMessage: string): string[] | null {
   if (!lastMessage) return null;
   const lower = lastMessage.toLowerCase();
 
-  // CX setup / tools question
+  // CX setup / tools — only when asking about tools/processes (closed-ish set)
   if (
     lower.includes("cx setup") ||
-    lower.includes("what do you have") ||
     lower.includes("what tools") ||
-    lower.includes("currently use") ||
-    lower.includes("what are you using") ||
     lower.includes("your setup")
   ) {
     return [
@@ -174,87 +171,33 @@ function getSuggestionChips(lastMessage: string): string[] | null {
     ];
   }
 
-  // What's working / what's not
+  // What's working / what's broken — only on that explicit follow-up turn
   if (
     lower.includes("what's working") ||
-    lower.includes("what works") ||
-    lower.includes("what isn't working") ||
     lower.includes("what's broken") ||
-    lower.includes("what breaks") ||
-    lower.includes("what's not working")
+    lower.includes("what's not working") ||
+    lower.includes("broken or missing")
   ) {
     return [
       "Onboarding is too slow",
       "No visibility into health",
       "Team is reactive, not proactive",
-      "High ticket volume, low resolution speed",
-      "Expansion / upsell is ad hoc",
+      "High ticket volume",
+      "Expansion is ad hoc",
     ];
   }
 
-  // Challenge / pain point
+  // Goal — only on direct goal question
   if (
-    lower.includes("biggest cx challenge") ||
-    lower.includes("biggest challenge") ||
-    lower.includes("main challenge") ||
-    lower.includes("pain point") ||
-    lower.includes("biggest pain")
-  ) {
-    return [
-      "Onboarding drop-off",
-      "High churn",
-      "Ticket overload",
-      "No visibility into customer health",
-      "Manual processes slowing us down",
-    ];
-  }
-
-  // Goal
-  if (
-    lower.includes("primary goal") ||
-    lower.includes("main goal") ||
-    lower.includes("biggest goal") ||
     lower.includes("what are you trying to") ||
-    lower.includes("what's your goal")
+    lower.includes("what's your goal") ||
+    lower.includes("what do you want cx mate")
   ) {
     return [
       "Reduce churn",
       "Scale CS without hiring",
       "Improve onboarding",
       "Expand existing accounts",
-    ];
-  }
-
-  // Channel
-  if (
-    lower.includes("sales channel") ||
-    lower.includes("product-led") ||
-    (lower.includes("self-serve") && lower.includes("sales-led")) ||
-    lower.includes("how do your customers find") ||
-    lower.includes("how do customers come")
-  ) {
-    return [
-      "Self-serve / product-led",
-      "Sales-led",
-      "Partner / channel",
-      "Mix of both",
-    ];
-  }
-
-  // Customer size
-  if (
-    lower.includes("customer size") ||
-    lower.includes("what size compan") ||
-    lower.includes("who are your customer") ||
-    lower.includes("customer segment") ||
-    lower.includes("who do you sell") ||
-    (lower.includes("enterprise") && lower.includes("smb"))
-  ) {
-    return [
-      "SMB (under 50 employees)",
-      "Mid-market (50-500)",
-      "Enterprise (500+)",
-      "Mixed sizes",
     ];
   }
 
@@ -581,7 +524,7 @@ function SuggestionChips({
   disabled: boolean;
 }) {
   return (
-    <div className="flex flex-wrap gap-2 mb-3">
+    <div className="flex flex-wrap gap-1.5 pb-2.5 mb-2.5 border-b border-slate-200/80">
       {chips.map((chip) => {
         const isSelected = selected.includes(chip);
         return (
@@ -1253,16 +1196,17 @@ export function OnboardingChat() {
 
         {/* Input bar */}
         <div className="sticky bottom-0 pb-6 pt-4">
-          {/* Suggestion chips — multi-select; send via the ↑ button */}
-          {suggestionChips && (
-            <SuggestionChips
-              chips={suggestionChips}
-              selected={selectedChips}
-              onToggle={toggleChip}
-              disabled={isThinking || !!pendingFields}
-            />
-          )}
-          <div className="bg-slate-100 rounded-2xl flex gap-2 items-end px-4 py-3">
+          <div className="bg-slate-100 rounded-2xl px-4 pt-3 pb-3">
+            {/* Suggestion chips — inside the input box, above textarea */}
+            {suggestionChips && (
+              <SuggestionChips
+                chips={suggestionChips}
+                selected={selectedChips}
+                onToggle={toggleChip}
+                disabled={isThinking || !!pendingFields}
+              />
+            )}
+          <div className="flex gap-2 items-end">
             <textarea
               ref={inputRef}
               value={inputValue}
@@ -1316,6 +1260,7 @@ export function OnboardingChat() {
               )}
             </button>
           </div>
+          </div>{/* end gray input box */}
           <p className="text-center text-[11px] text-muted-foreground mt-2">
             Enter to send · Shift+Enter for new line
           </p>
