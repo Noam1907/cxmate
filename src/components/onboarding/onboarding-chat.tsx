@@ -618,7 +618,7 @@ function SuggestionChips({
   disabled: boolean;
 }) {
   return (
-    <div className="flex flex-wrap gap-1.5 pb-2.5 mb-2.5 border-b border-slate-200/80">
+    <div className="flex flex-wrap gap-2">
       {chips.map((chip) => {
         const isSelected = selected.includes(chip);
         return (
@@ -627,10 +627,10 @@ function SuggestionChips({
             type="button"
             disabled={disabled}
             onClick={() => onToggle(chip)}
-            className={`text-xs font-medium px-3 py-1.5 rounded-full border transition-all duration-150 disabled:opacity-30 disabled:cursor-not-allowed ${
+            className={`text-sm font-medium px-4 py-2 rounded-2xl border-2 transition-all duration-150 disabled:opacity-30 disabled:cursor-not-allowed ${
               isSelected
-                ? "bg-primary text-primary-foreground border-primary shadow-sm scale-105"
-                : "border-primary/25 bg-primary/5 text-primary hover:bg-primary/15 hover:border-primary/40"
+                ? "bg-primary text-primary-foreground border-primary shadow-sm scale-[1.02]"
+                : "border-primary/30 bg-white text-primary hover:bg-primary/10 hover:border-primary/60 shadow-sm"
             }`}
           >
             {chip}
@@ -1290,16 +1290,18 @@ export function OnboardingChat() {
 
         {/* Input bar */}
         <div className="sticky bottom-0 pb-6 pt-4">
-          <div className="bg-slate-100 rounded-2xl px-4 pt-3 pb-3">
-            {/* Suggestion chips — inside the input box, above textarea */}
-            {suggestionChips && (
+          {/* Suggestion chips — own zone between chat and input, with real visual weight */}
+          {suggestionChips && (
+            <div className="mb-3">
               <SuggestionChips
                 chips={suggestionChips}
                 selected={selectedChips}
                 onToggle={toggleChip}
                 disabled={isThinking || !!pendingFields}
               />
-            )}
+            </div>
+          )}
+          <div className="bg-slate-100 rounded-2xl px-4 pt-3 pb-3">
           <div className="flex gap-2 items-end">
             <textarea
               ref={inputRef}
