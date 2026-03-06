@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, Suspense, type ReactNode } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
   FloppyDisk, ChartBar, Shield, SquaresFour, Bell,
@@ -41,44 +41,36 @@ const STARTER_FEATURES: { icon: ReactNode; title: string; description: string }[
 // ── Component ─────────────────────────────────────────────────────────────
 
 function BillingSuccessContent() {
-  const searchParams = useSearchParams();
   const router = useRouter();
-  const sessionId = searchParams.get("session_id");
-
   const [status, setStatus] = useState<"loading" | "success" | "error">("loading");
-  const [planLabel, setPlanLabel] = useState("Starter");
+  const [planLabel, setPlanLabel] = useState("Full Analysis");
 
   useEffect(() => {
-    if (!sessionId) {
-      setStatus("error");
-      return;
-    }
-
-    // Verify the session and activate the plan via our webhook
-    // (webhook already updated the DB; this just confirms the UI state)
+    // Verify the plan was activated (webhook or client POST already updated DB)
     const verify = async () => {
       try {
-        const res = await fetch(`/api/billing/verify-session?session_id=${sessionId}`);
+        const res = await fetch("/api/billing/verify-session");
         if (res.ok) {
           const data = await res.json();
-          if (data.planTier) {
-            setPlanLabel(
-              data.planTier.charAt(0).toUpperCase() + data.planTier.slice(1)
-            );
+          if (data.planTier && data.planTier !== "free") {
+            const label = data.planTier === "full_analysis"
+              ? "Full Analysis"
+              : data.planTier.charAt(0).toUpperCase() + data.planTier.slice(1);
+            setPlanLabel(label);
           }
           setStatus("success");
         } else {
-          // Even if verify fails, show success — webhook handled the DB update
+          // Even if verify fails, show success — webhook is the source of truth
           setStatus("success");
         }
       } catch {
-        // Network error — still show success (webhook is the source of truth)
+        // Network error — still show success
         setStatus("success");
       }
     };
 
     verify();
-  }, [sessionId]);
+  }, []);
 
   if (status === "loading") {
     return (
@@ -179,7 +171,7 @@ function BillingSuccessContent() {
         {/* Reassurance footer */}
         <div className="mt-14 text-center space-y-2">
           <p className="text-xs text-slate-400">
-            A receipt has been sent to your email by Stripe.
+            A receipt has been sent to your email.
           </p>
           <p className="text-xs text-slate-400">
             Questions?{" "}

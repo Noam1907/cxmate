@@ -1,108 +1,72 @@
 /**
  * POST /api/billing/create-checkout
  *
- * Creates a Stripe Checkout session for the selected price.
- * Returns { url } — redirect the browser there.
+ * Returns a Freemius hosted checkout URL for the selected plan.
+ * The pricing page can use this as a fallback if the JS overlay doesn't load,
+ * or for direct link sharing.
  *
- * Body: { priceKey: "starter_monthly" | "starter_onetime" }
+ * Body: { priceKey: "full_analysis" | "pro_monthly" }
  */
 
 import { NextResponse } from "next/server";
-import type Stripe from "stripe";
-import { stripe, STRIPE_PRICES, type StripePriceKey } from "@/lib/stripe";
-import { createAdminClient } from "@/lib/supabase/admin";
-import { getUser, getOrgId } from "@/lib/supabase/auth";
+import { FREEMIUS_CONFIG } from "@/lib/freemius";
+import { getUser } from "@/lib/supabase/auth";
 
-export const maxDuration = 30;
+export const maxDuration = 15;
+
+type PriceKey = "full_analysis" | "pro_monthly";
 
 export async function POST(req: Request) {
   try {
-    // ── Auth ──────────────────────────────────────────────────────────────────
-    const user = await getUser();
-    if (!user) {
-      return NextResponse.json({ error: "Unauthenticated" }, { status: 401 });
-    }
-    const orgId = await getOrgId();
-    if (!orgId) {
-      return NextResponse.json({ error: "No organisation found" }, { status: 400 });
-    }
-
-    // ── Price key ─────────────────────────────────────────────────────────────
     const body = await req.json();
-    const priceKey = body.priceKey as StripePriceKey;
-    const priceId = STRIPE_PRICES[priceKey];
+    const priceKey = body.priceKey as PriceKey;
 
-    if (!priceId) {
+    // Map priceKey to Freemius plan
+    const planMap: Record<PriceKey, { planId: string; billing_cycle?: string }> =
+      {
+        full_analysis: {
+          planId: FREEMIUS_CONFIG.plans.full_analysis.planId,
+          billing_cycle: "lifetime",
+        },
+        pro_monthly: {
+          planId: FREEMIUS_CONFIG.plans.pro.planId,
+          billing_cycle: "monthly",
+        },
+      };
+
+    const plan = planMap[priceKey];
+    if (!plan) {
       return NextResponse.json(
-        { error: `Unknown price key: ${priceKey}. Check STRIPE_PRICES and env vars.` },
+        { error: `Unknown price key: ${priceKey}` },
         { status: 400 }
       );
     }
 
+    // Pre-fill email if user is authenticated
+    const user = await getUser().catch(() => null);
+    const email = user?.email ?? "";
+
     const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
 
-    // ── Find or create Stripe customer ────────────────────────────────────────
-    const adminClient = createAdminClient();
-
-    // Cast to include billing columns added in migration 002
-    // (Supabase types regenerate after `supabase db push` is run)
-    type OrgRow = { id: string; name: string | null; stripe_customer_id: string | null };
-
-    const { data: org, error: orgError } = await adminClient
-      .from("organizations")
-      .select("id, name, stripe_customer_id")
-      .eq("id", orgId)
-      .single() as unknown as { data: OrgRow | null; error: unknown };
-
-    if (orgError || !org) {
-      return NextResponse.json({ error: "Organisation not found" }, { status: 404 });
-    }
-
-    let stripeCustomerId = org.stripe_customer_id;
-
-    if (!stripeCustomerId) {
-      const customer = await stripe.customers.create({
-        email: user.email,
-        name: org.name || undefined,
-        metadata: { org_id: orgId, user_id: user.id },
-      });
-      stripeCustomerId = customer.id;
-
-      // Save to DB immediately so we don't create duplicates
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      await adminClient
-        .from("organizations")
-        .update({ stripe_customer_id: stripeCustomerId } as any)
-        .eq("id", orgId);
-    }
-
-    // ── Determine mode: subscription vs payment ───────────────────────────────
-    const isOneTime = priceKey === "full_analysis";
-
-    const sessionParams: Stripe.Checkout.SessionCreateParams = {
-      customer: stripeCustomerId ?? undefined,
-      line_items: [{ price: priceId, quantity: 1 }],
-      mode: isOneTime ? "payment" : "subscription",
-      success_url: `${appUrl}/billing/success?session_id={CHECKOUT_SESSION_ID}`,
+    // Build Freemius hosted checkout URL
+    const params = new URLSearchParams({
+      plan_id: plan.planId,
+      ...(plan.billing_cycle && { billing_cycle: plan.billing_cycle }),
+      ...(email && {
+        user_email: email,
+        readonly_user: "true",
+      }),
+      success_url: `${appUrl}/billing/success`,
       cancel_url: `${appUrl}/pricing`,
-      metadata: { org_id: orgId },
-      allow_promotion_codes: true,
-    };
+    });
 
-    // For subscriptions, pass org metadata on subscription object
-    if (!isOneTime) {
-      sessionParams.subscription_data = {
-        metadata: { org_id: orgId },
-      };
-    }
+    const checkoutUrl = `https://checkout.freemius.com/product/${FREEMIUS_CONFIG.productId}/?${params.toString()}`;
 
-    const session = await stripe.checkout.sessions.create(sessionParams);
-
-    return NextResponse.json({ url: session.url });
+    return NextResponse.json({ url: checkoutUrl });
   } catch (err) {
     console.error("[create-checkout] error:", err);
     return NextResponse.json(
-      { error: "Failed to create checkout session" },
+      { error: "Failed to create checkout URL" },
       { status: 500 }
     );
   }

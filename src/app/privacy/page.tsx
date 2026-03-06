@@ -77,7 +77,7 @@ export default function PrivacyPage() {
           <Section title="3. Sharing Your Information">
             <p>We do not sell your personal information. We share your information only in the following circumstances:</p>
             <ul>
-              <li><strong>Service providers:</strong> We share data with third-party vendors who help us operate our services (Supabase for database, Resend for email, Anthropic for AI, PostHog for analytics, Stripe for payments). Each is bound by data processing agreements.</li>
+              <li><strong>Service providers:</strong> We share data with third-party vendors who help us operate our services (Supabase for database, Resend for email, Anthropic for AI, PostHog for analytics, Freemius for payments). Each is bound by data processing agreements.</li>
               <li><strong>Legal requirements:</strong> We may disclose information if required by law, regulation, or legal process.</li>
               <li><strong>Business transfers:</strong> If CX Mate is acquired or merged, your information may be transferred as part of that transaction.</li>
             </ul>

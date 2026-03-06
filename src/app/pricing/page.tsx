@@ -1,27 +1,24 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Script from "next/script";
 import { Check, CaretDown, Lightning, ArrowRight } from "@phosphor-icons/react";
 
-// ── Types ─────────────────────────────────────────────────────────────────────
+// ── Freemius config (public, safe for client) ────────────────────────────────
 
-type PriceKey = "full_analysis" | "pro_monthly";
-type LoadingKey = PriceKey | null;
+const FS_PRODUCT_ID =
+  process.env.NEXT_PUBLIC_FREEMIUS_PRODUCT_ID ?? "25475";
+const FS_PUBLIC_KEY =
+  process.env.NEXT_PUBLIC_FREEMIUS_PUBLIC_KEY ?? "pk_5c190a759e3cae05ddc73d9ab0610";
 
-// ── Checkout helper ───────────────────────────────────────────────────────────
+const PLANS = {
+  full_analysis: { planId: 42170, billingCycle: "lifetime" },
+  pro_monthly: { planId: 42172, billingCycle: "monthly" },
+} as const;
 
-async function startCheckout(priceKey: PriceKey): Promise<string | null> {
-  const res = await fetch("/api/billing/create-checkout", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ priceKey }),
-  });
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.error ?? "Checkout failed");
-  return data.url;
-}
+type PriceKey = keyof typeof PLANS;
 
 // ── Tier configs ──────────────────────────────────────────────────────────────
 
@@ -132,7 +129,7 @@ const FAQ_ITEMS = [
   },
   {
     q: "What payment methods do you accept?",
-    a: "All major credit and debit cards, processed securely through Stripe.",
+    a: "All major credit and debit cards, plus PayPal. Payments are processed securely through Freemius, our certified payment partner.",
   },
 ];
 
@@ -160,31 +157,121 @@ function FaqItem({ q, a }: { q: string; a: string }) {
   );
 }
 
+// ── Freemius checkout type declarations ──────────────────────────────────────
+
+declare global {
+  interface Window {
+    FS?: {
+      Checkout: {
+        configure(opts: Record<string, unknown>): {
+          open(opts: Record<string, unknown>): void;
+          close(): void;
+        };
+      };
+    };
+  }
+}
+
 // ── Component ─────────────────────────────────────────────────────────────────
 
 export default function PricingPage() {
   const router = useRouter();
-  const [loading, setLoading] = useState<LoadingKey>(null);
+  const [loading, setLoading] = useState<PriceKey | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [fsReady, setFsReady] = useState(false);
 
-  async function handleCheckout(priceKey: PriceKey) {
+  // Initialize Freemius checkout handler
+  const openCheckout = useCallback(
+    (priceKey: PriceKey) => {
+      if (!window.FS) {
+        // Fallback: redirect to hosted checkout via our API
+        fallbackCheckout(priceKey);
+        return;
+      }
+
+      const plan = PLANS[priceKey];
+
+      const handler = window.FS.Checkout.configure({
+        product_id: FS_PRODUCT_ID,
+        plan_id: plan.planId,
+        public_key: FS_PUBLIC_KEY,
+      });
+
+      setLoading(priceKey);
+      setError(null);
+
+      handler.open({
+        billing_cycle: plan.billingCycle,
+        // Success: user completed purchase
+        purchaseCompleted: (data: {
+          user?: { email?: string };
+          purchase?: {
+            license_id?: number;
+            plan_id?: number;
+            subscription_id?: number;
+          };
+        }) => {
+          // Store purchase info server-side
+          fetch("/api/billing/verify-session", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              license_id: data.purchase?.license_id,
+              plan_id: data.purchase?.plan_id,
+              subscription_id: data.purchase?.subscription_id,
+            }),
+          })
+            .then(() => {
+              router.push("/billing/success");
+            })
+            .catch(() => {
+              // Webhook will handle it — just redirect
+              router.push("/billing/success");
+            });
+        },
+        success: () => {
+          // Confirmation dialog closed — redirect
+          setLoading(null);
+          router.push("/billing/success");
+        },
+        cancel: () => {
+          setLoading(null);
+        },
+      });
+    },
+    [router]
+  );
+
+  async function fallbackCheckout(priceKey: PriceKey) {
     setLoading(priceKey);
     setError(null);
     try {
-      const url = await startCheckout(priceKey);
-      if (url) {
-        window.location.href = url;
-      }
+      const res = await fetch("/api/billing/create-checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ priceKey }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? "Checkout failed");
+      if (data.url) window.location.href = data.url;
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong. Please try again.");
+      setError(
+        err instanceof Error ? err.message : "Something went wrong. Please try again."
+      );
       setLoading(null);
     }
   }
 
   return (
     <div className="min-h-screen">
-      <div className="max-w-5xl mx-auto px-6 py-20">
+      {/* Load Freemius Checkout JS */}
+      <Script
+        src="https://checkout.freemius.com/checkout.min.js"
+        strategy="afterInteractive"
+        onLoad={() => setFsReady(true)}
+      />
 
+      <div className="max-w-5xl mx-auto px-6 py-20">
         {/* Header */}
         <div className="text-center mb-16">
           <p className="text-xs font-semibold text-primary uppercase tracking-widest mb-3">
@@ -260,7 +347,7 @@ export default function PricingPage() {
                   </Link>
                 ) : (
                   <button
-                    onClick={() => handleCheckout(tier.priceKey!)}
+                    onClick={() => openCheckout(tier.priceKey!)}
                     disabled={loading !== null}
                     className={`flex items-center justify-center gap-2 w-full disabled:opacity-60 text-sm font-semibold py-2.5 px-4 rounded-xl transition-colors ${
                       tier.ctaStyle === "primary"
@@ -269,10 +356,12 @@ export default function PricingPage() {
                     }`}
                   >
                     {loading === tier.priceKey ? (
-                      "Redirecting…"
+                      "Opening checkout…"
                     ) : (
                       <>
-                        {tier.ctaStyle === "primary" && <Lightning size={14} weight="fill" />}
+                        {tier.ctaStyle === "primary" && (
+                          <Lightning size={14} weight="fill" />
+                        )}
                         {tier.ctaLabel}
                       </>
                     )}
@@ -332,7 +421,7 @@ export default function PricingPage() {
             </a>
           </p>
           <p className="text-xs text-slate-400">
-            Secure payments by Stripe · Cancel Pro anytime · Full Analysis is yours forever
+            Secure payments by Freemius · Cancel Pro anytime · Full Analysis is yours forever
           </p>
         </div>
 
@@ -345,7 +434,6 @@ export default function PricingPage() {
             ← Back
           </button>
         </div>
-
       </div>
     </div>
   );

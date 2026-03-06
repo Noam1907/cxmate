@@ -104,9 +104,9 @@ export default function TermsPage() {
             <li><strong>Price changes:</strong> We will provide 30 days&rsquo; notice of any price changes.</li>
           </ul>
           <p>
-            Payments are processed by Stripe. By providing payment information, you agree to{" "}
-            <a href="https://stripe.com/legal/ssa" target="_blank" rel="noopener noreferrer" className="text-teal-600 hover:underline">
-              Stripe&rsquo;s terms
+            Payments are processed by Freemius, our Merchant of Record. By providing payment information, you agree to{" "}
+            <a href="https://freemius.com/terms/" target="_blank" rel="noopener noreferrer" className="text-teal-600 hover:underline">
+              Freemius&rsquo;s terms
             </a>.
           </p>
         </Section>

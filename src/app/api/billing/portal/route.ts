@@ -1,48 +1,58 @@
 /**
  * POST /api/billing/portal
  *
- * Creates a Stripe Customer Portal session.
- * The portal lets subscribers manage billing: cancel, update card, view invoices.
+ * Redirects to the Freemius customer portal where users can
+ * manage subscriptions, view invoices, and update payment methods.
  *
- * Returns { url } — redirect the browser there.
+ * Freemius doesn't have a server-generated portal URL like Stripe.
+ * Instead, we link to the Freemius customer dashboard.
  */
 
 import { NextResponse } from "next/server";
-import { stripe } from "@/lib/stripe";
+import { FREEMIUS_CONFIG } from "@/lib/freemius";
+import { getUser, getOrgId } from "@/lib/supabase/auth";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { getOrgId } from "@/lib/supabase/auth";
 
 export const maxDuration = 15;
 
 export async function POST() {
   try {
-    const orgId = await getOrgId();
-    if (!orgId) {
+    const user = await getUser();
+    if (!user) {
       return NextResponse.json({ error: "Unauthenticated" }, { status: 401 });
     }
 
-    const adminClient = createAdminClient();
-    type OrgRow = { stripe_customer_id: string | null };
-    const { data: org } = await adminClient
-      .from("organizations")
-      .select("stripe_customer_id")
-      .eq("id", orgId)
-      .single() as unknown as { data: OrgRow | null };
-
-    if (!org?.stripe_customer_id) {
-      return NextResponse.json({ error: "No Stripe customer found" }, { status: 404 });
+    const orgId = await getOrgId();
+    if (!orgId) {
+      return NextResponse.json({ error: "No org found" }, { status: 401 });
     }
 
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+    // Check if user has a Freemius license
+    const adminClient = createAdminClient();
+    type OrgRow = { freemius_license_id: string | null };
+    const { data: org } = (await adminClient
+      .from("organizations")
+      .select("freemius_license_id")
+      .eq("id", orgId)
+      .single()) as unknown as { data: OrgRow | null };
 
-    const portalSession = await stripe.billingPortal.sessions.create({
-      customer: org.stripe_customer_id,
-      return_url: `${appUrl}/dashboard`,
-    });
+    if (!org?.freemius_license_id) {
+      return NextResponse.json(
+        { error: "No active license found" },
+        { status: 404 }
+      );
+    }
 
-    return NextResponse.json({ url: portalSession.url });
+    // Freemius customer portal URL
+    // Users manage their subscription through the Freemius-hosted portal
+    const portalUrl = `https://users.freemius.com/store/${FREEMIUS_CONFIG.productId}`;
+
+    return NextResponse.json({ url: portalUrl });
   } catch (err) {
     console.error("[portal] error:", err);
-    return NextResponse.json({ error: "Failed to create portal session" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to get portal URL" },
+      { status: 500 }
+    );
   }
 }

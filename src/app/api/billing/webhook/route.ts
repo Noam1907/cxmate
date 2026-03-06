@@ -1,134 +1,147 @@
 /**
  * POST /api/billing/webhook
  *
- * Stripe webhook handler. Listens for payment/subscription events
+ * Freemius webhook handler. Listens for license/subscription events
  * and updates the organization's plan tier in Supabase.
  *
- * Stripe sends events here; verify signature, then update DB.
+ * Register this URL in Freemius Dashboard → Integrations → Webhooks.
  *
  * Events handled:
- *   checkout.session.completed     → activate plan
- *   customer.subscription.updated  → sync status changes
- *   customer.subscription.deleted  → downgrade to free
+ *   license.created          → activate plan (one-time or subscription)
+ *   subscription.cancelled   → downgrade to free (when period ends)
+ *   subscription.expired     → downgrade to free
+ *   license.plan.changed     → sync plan changes (upgrade/downgrade)
  */
 
 import { NextResponse } from "next/server";
-import type Stripe from "stripe";
-import { stripe, planTierFromPriceId } from "@/lib/stripe";
+import {
+  verifyWebhookSignature,
+  planTierFromFreemiusPlanId,
+} from "@/lib/freemius";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 export const maxDuration = 30;
 
-// Stripe requires raw body for signature verification
 export async function POST(req: Request) {
   const body = await req.text();
-  const sig = req.headers.get("stripe-signature");
+  const signature = req.headers.get("x-signature") ?? "";
 
-  if (!sig) {
-    return NextResponse.json({ error: "Missing stripe-signature header" }, { status: 400 });
+  if (!signature) {
+    return NextResponse.json(
+      { error: "Missing x-signature header" },
+      { status: 400 }
+    );
   }
 
-  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
-  if (!webhookSecret) {
-    console.error("[webhook] STRIPE_WEBHOOK_SECRET not configured");
-    return NextResponse.json({ error: "Webhook not configured" }, { status: 500 });
-  }
-
-  // ── Verify signature ───────────────────────────────────────────────────────
-  let event: Stripe.Event;
-  try {
-    event = stripe.webhooks.constructEvent(body, sig, webhookSecret);
-  } catch (err) {
-    console.error("[webhook] Signature verification failed:", err);
+  // ── Verify HMAC-SHA256 signature ──────────────────────────────────────────
+  const isValid = verifyWebhookSignature(body, signature);
+  if (!isValid) {
+    console.error("[freemius-webhook] Signature verification failed");
     return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
   }
 
+  let event: Record<string, unknown>;
+  try {
+    event = JSON.parse(body);
+  } catch {
+    return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
+  }
+
+  const eventType = event.type as string;
   const adminClient = createAdminClient();
 
-  // ── Handle events ──────────────────────────────────────────────────────────
   try {
-    switch (event.type) {
+    // Freemius webhooks include the user's email — we use that to find the org
+    const userEmail = (event.user_email ?? event.email ?? "") as string;
+    const planId = event.plan_id as number | undefined;
+    const licenseId = event.license_id as number | undefined;
+    const subscriptionId = event.subscription_id as number | undefined;
 
-      case "checkout.session.completed": {
-        const session = event.data.object as Stripe.Checkout.Session;
-        const orgId = session.metadata?.org_id;
-        if (!orgId) break;
+    // Find org by the email used during checkout
+    // (We match via the user who owns the org in Supabase Auth)
+    const orgId = await findOrgByEmail(adminClient, userEmail);
 
-        // Get the price from the line items
-        const lineItems = await stripe.checkout.sessions.listLineItems(session.id, { limit: 1 });
-        const priceId = lineItems.data[0]?.price?.id ?? "";
-        const planTier = planTierFromPriceId(priceId);
+    if (!orgId) {
+      console.warn(
+        `[freemius-webhook] No org found for email: ${userEmail}, event: ${eventType}`
+      );
+      // Return 200 so Freemius doesn't retry — we'll reconcile manually
+      return NextResponse.json({ received: true, matched: false });
+    }
 
-        // Build update — different for subscription vs one-time
-        const update: Record<string, unknown> = {
-          plan_tier: planTier,
-          stripe_price_id: priceId,
-          stripe_customer_id: session.customer as string,
-        };
+    switch (eventType) {
+      case "license.created":
+      case "license.plan.changed": {
+        if (!planId) break;
 
-        if (session.mode === "subscription" && session.subscription) {
-          update.stripe_subscription_id = session.subscription as string;
-          // subscription status will be synced by customer.subscription.created event
-        }
+        const planTier = planTierFromFreemiusPlanId(planId);
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        await adminClient.from("organizations").update(update as any).eq("id", orgId);
-        console.log(`[webhook] checkout.session.completed: org ${orgId} → ${planTier}`);
+        await adminClient
+          .from("organizations")
+          .update({
+            plan_tier: planTier,
+            freemius_license_id: licenseId ? String(licenseId) : null,
+            freemius_subscription_id: subscriptionId
+              ? String(subscriptionId)
+              : null,
+            freemius_plan_id: String(planId),
+          } as any)
+          .eq("id", orgId);
+
+        console.log(
+          `[freemius-webhook] ${eventType}: org ${orgId} → ${planTier}`
+        );
         break;
       }
 
-      case "customer.subscription.created":
-      case "customer.subscription.updated": {
-        const subscription = event.data.object as Stripe.Subscription;
-        const orgId = subscription.metadata?.org_id;
-        if (!orgId) break;
-
-        const priceId = subscription.items.data[0]?.price?.id ?? "";
-        const planTier = planTierFromPriceId(priceId);
-        // current_period_end moved in newer Stripe API versions — access via items or cast
+      case "subscription.cancelled":
+      case "subscription.expired": {
+        // Downgrade to free
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const periodEnd = (subscription as any).current_period_end as number | undefined;
-        const currentPeriodEnd = periodEnd ? new Date(periodEnd * 1000).toISOString() : null;
+        await adminClient
+          .from("organizations")
+          .update({
+            plan_tier: "free",
+            freemius_subscription_id: null,
+          } as any)
+          .eq("id", orgId);
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        await adminClient.from("organizations").update({
-          plan_tier: subscription.status === "active" ? planTier : "free",
-          stripe_subscription_id: subscription.id,
-          stripe_subscription_status: subscription.status,
-          stripe_price_id: priceId,
-          subscription_current_period_end: currentPeriodEnd,
-        } as any).eq("id", orgId);
-
-        console.log(`[webhook] subscription ${event.type}: org ${orgId} → ${subscription.status}`);
-        break;
-      }
-
-      case "customer.subscription.deleted": {
-        const subscription = event.data.object as Stripe.Subscription;
-        const orgId = subscription.metadata?.org_id;
-        if (!orgId) break;
-
-        // Downgrade to free when subscription cancels
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        await adminClient.from("organizations").update({
-          plan_tier: "free",
-          stripe_subscription_status: "canceled",
-          subscription_current_period_end: null,
-        } as any).eq("id", orgId);
-
-        console.log(`[webhook] subscription.deleted: org ${orgId} → free`);
+        console.log(
+          `[freemius-webhook] ${eventType}: org ${orgId} → free`
+        );
         break;
       }
 
       default:
-        // Ignore unhandled events
-        console.log(`[webhook] Unhandled event: ${event.type}`);
+        console.log(`[freemius-webhook] Unhandled event: ${eventType}`);
     }
   } catch (err) {
-    console.error(`[webhook] Error handling ${event.type}:`, err);
-    // Return 200 to Stripe — don't retry (we'll fix in DB manually)
+    console.error(`[freemius-webhook] Error handling ${eventType}:`, err);
+    // Return 200 — don't make Freemius retry on our internal errors
     return NextResponse.json({ received: true, error: "Internal handler error" });
   }
 
   return NextResponse.json({ received: true });
+}
+
+// ── Helper: find org by user email ──────────────────────────────────────────
+
+async function findOrgByEmail(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  adminClient: any,
+  email: string
+): Promise<string | null> {
+  if (!email) return null;
+
+  // Look up the Supabase Auth user by email, then get their org_id
+  const { data: authData } = await adminClient.auth.admin.listUsers();
+  const user = authData?.users?.find(
+    (u: { email?: string }) =>
+      u.email?.toLowerCase() === email.toLowerCase()
+  );
+
+  if (!user) return null;
+
+  return (user.app_metadata?.org_id as string) ?? null;
 }
