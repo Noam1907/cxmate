@@ -189,11 +189,29 @@ After auditing all pages, deliver a **Brand Punch List**:
 - Don't recommend generic SaaS patterns. CX Mate is a CX product — the design IS the product experience.
 - Don't forget mobile. Many founders check products on their phone.
 
+## Available Skills
+
+- `/copywriter` — UX copy review, tone alignment, messaging consistency
+
+## Context Integrity Rules (MANDATORY)
+
+Before auditing or recommending any design changes:
+
+1. **Read the current code.** Don't audit from screenshots alone — read the component source to understand what's intentional.
+2. **Check learning-log.md and decisions.md.** Past design choices are documented there for a reason.
+3. **Recommendations must be implementable in our stack.** Tailwind v4 + shadcn/ui. Don't suggest things that require framework changes.
+4. **Don't recommend a complete redesign.** We're polishing, not rebuilding.
+5. **Respect the color system.** All colors come from `globals.css` tokens. Don't introduce new hex values.
+
+## Workflows
+
+- `T-tools/03-workflows/context-integrity-workflow.md` — Applies to any design system changes
+
 ## Required Reading
 
 - `C-core/project-brief.md` (personas, positioning, price points)
-- `C-core/product-architecture.md` (three-layer product, user flow)
+- `C-core/product-architecture.md` (three-layer product, user flow) → "Critical Constraints" section
 - `M-memory/learning-log.md` (UX patterns and decisions)
 - `M-memory/decisions.md` (why things are built the way they are)
-- `src/app/globals.css` (current design tokens)
+- `src/app/globals.css` (current design tokens — source of truth)
 - `B-brain/01-cx-methodology/` (CX domain knowledge — journey stages, moments taxonomy, expert frameworks)

@@ -258,9 +258,30 @@ The rule: **the illustrated style lives in the emotional moments, not the data m
 
 ---
 
+## Available Skills
+
+- `/copywriter` — UX copy review, microcopy, empty state text, CTA labels
+
+## Context Integrity Rules (MANDATORY)
+
+Before modifying any design, component, or visual pattern:
+
+1. **Read the current implementation.** Don't redesign based on assumptions — read the component code and `globals.css`.
+2. **Don't introduce new colors.** Every color must come from the token system in `globals.css`. No hardcoded hex values.
+3. **Don't change the card hierarchy or spacing system without updating this file.** The design system is documented here.
+4. **Check learning-log.md for design decisions.** Past choices (palette changes, typography, component patterns) are logged there.
+5. **Build on what exists.** The design system has been iterated over multiple sprints. Polish, don't rebuild.
+
+## Workflows
+
+- `T-tools/03-workflows/feature-development-workflow.md` — Frontend build step references design system
+- `T-tools/03-workflows/context-integrity-workflow.md` — Applies to design token and component changes
+
 ## Required Reading
 
 - `C-core/project-brief.md` (personas, positioning, success metrics)
 - `C-core/product-architecture.md` (product layers, user flow)
-- `M-memory/learning-log.md` (UX patterns discovered)
+- `M-memory/learning-log.md` (UX patterns discovered, design decisions)
+- `M-memory/decisions.md` (architectural decisions affecting UI)
+- `src/app/globals.css` (current design tokens — source of truth for colors)
 - `B-brain/01-cx-methodology/` (CX domain knowledge — journey stages, moments taxonomy, expert frameworks)

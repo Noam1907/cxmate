@@ -147,8 +147,32 @@ Based on the Vitally test (`O-output/competitor-intel-test-vitally.md`), we can 
 - **Revenue integration signals:** When generating playbooks, always include an explicit revenue impact estimate — this is the gap 83% of enterprises can't fill, and it's our strongest differentiator
 - **Agentic AI benchmarks to include in prompts:** AI agents resolve 80% of FAQs, reduce churn 20% via predictive scoring, 4x sales win rate improvement — use these as benchmark references in recommendations
 
+## Context Integrity Rules (MANDATORY)
+
+Before writing or modifying any prompt or AI logic:
+
+1. **Read what feeds your prompt AND what displays your output.** If you're changing the journey prompt, read the onboarding types to know what data you'll receive. Read the journey page to know how your output is displayed.
+2. **Never assume available fields.** Always check `src/types/onboarding.ts` for the canonical `OnboardingData` type. If a field isn't there, the onboarding doesn't collect it.
+3. **Never change the output schema without updating the frontend.** If you add fields to the prompt output, the frontend components need to render them.
+4. **Respect the field contract.** The onboarding collects 33+ fields specifically because this prompt uses them. If you need a new field, add it to the onboarding first. If you remove a field dependency, document why.
+5. **The moat is in the inputs, not the model.** CX Mate's competitive advantage is the structured intelligence data collected during onboarding. Every field exists for a reason. Dropping fields = dropping quality.
+
+**The chat regression lesson:** A new onboarding chat was built collecting only 10 fields instead of 33+. Nobody read the journey prompt before deciding what to collect. The AI output quality dropped dramatically because the prompt lost 70% of its context.
+
+## Available Skills
+
+- `/cx-expert` — CX methodology validation, journey quality review
+
+## Workflows
+
+- `T-tools/03-workflows/feature-development-workflow.md` — Step 3: BUILD (your primary role for AI/prompt work)
+- `T-tools/03-workflows/context-integrity-workflow.md` — Pre-build verification gate
+
 ## Required Reading
 - `C-core/tech-stack.md`
+- `C-core/product-architecture.md` → "Critical Constraints" section
 - `B-brain/01-cx-methodology/`
 - `src/lib/cx-knowledge/enterprise-cx-maturity.ts`
+- `src/types/onboarding.ts` (OnboardingData type — the input contract)
+- `src/lib/validations/onboarding.ts` (Zod schema — the validation contract)
 - `B-brain/02-market-research/competitive-landscape.md` (competitor AI capabilities, positioning vs our intelligence layer)

@@ -71,7 +71,30 @@ You are the Frontend Developer for CX Mate. You build the user interface and int
 - Generating state: phased progress bar, expert insights, completed phases checklist
 - `scrollIntoView` via `useRef` + `useEffect` (not `window.scrollTo`)
 
+## Context Integrity Rules (MANDATORY)
+
+Before writing or modifying any code:
+
+1. **Read what you're changing AND what consumes it.** If you're building an onboarding component, read `journey-prompt.ts` to understand what fields it needs. If you're building a dashboard, read the API that feeds it.
+2. **Never invent field names or props.** Always check `src/types/onboarding.ts`, `src/lib/validations/onboarding.ts`, and the relevant API route.
+3. **Never assume step counts, field counts, or UI structure.** Read the current code.
+4. **Build on what exists.** Search for existing components before creating new ones. Read the decisions log to understand why things were built a certain way.
+5. **If replacing a component, read the old one first.** Understand every field it collects, every prop it passes, every API it calls. The new version must cover everything the old one did.
+
+**The chat regression lesson:** A new onboarding chat was built without reading that the journey prompt needs 33+ fields. It only collected 10. The result was dramatically worse AI output. This is the kind of mistake these rules prevent.
+
+## Available Skills
+
+- `/copywriter` — UX copy, microcopy, empty state text, CTA labels
+
+## Workflows
+
+- `T-tools/03-workflows/feature-development-workflow.md` — Step 3: BUILD (your primary role)
+- `T-tools/03-workflows/context-integrity-workflow.md` — Pre-build verification gate
+
 ## Required Reading
 - `C-core/tech-stack.md`
 - `C-core/product-architecture.md`
+- `C-core/product-architecture.md` → "Critical Constraints" section
 - `B-brain/01-cx-methodology/` (CX domain knowledge — journey stages, moments taxonomy, expert frameworks)
+- **If touching onboarding:** `src/lib/ai/journey-prompt.ts`, `src/lib/validations/onboarding.ts`, `src/types/onboarding.ts`

@@ -86,12 +86,52 @@ async function fetchWebsiteContent(url: string): Promise<string | null> {
 }
 
 // ============================================
+// Website Auto-Discovery
+// ============================================
+
+/**
+ * When no website is explicitly provided, try common domain patterns
+ * derived from the company name. Returns the first one that yields content.
+ * This prevents Claude from hallucinating from training knowledge alone.
+ */
+async function tryDiscoverWebsite(companyName: string): Promise<{ url: string; content: string } | null> {
+  // Build a slug: lowercase, strip punctuation, spaces → hyphens
+  const slug = companyName
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, "")   // strip punctuation
+    .trim()
+    .replace(/\s+/g, "-");          // spaces → hyphens
+
+  // Also try a no-hyphen version (e.g. "meshpayments")
+  const slugNoHyphen = slug.replace(/-/g, "");
+
+  const candidates = [
+    `${slug}.com`,
+    `${slug}.io`,
+    `${slug}.ai`,
+    `${slug}.co`,
+    `${slugNoHyphen}.com`,
+    `${slugNoHyphen}.io`,
+  ];
+
+  for (const domain of candidates) {
+    const content = await fetchWebsiteContent(`https://${domain}`);
+    // Require at least 200 chars — avoids domain-squatter pages
+    if (content && content.length > 200) {
+      return { url: domain, content };
+    }
+  }
+  return null;
+}
+
+// ============================================
 // Claude Enrichment Prompt
 // ============================================
 
 function buildEnrichmentPrompt(
   companyName: string,
-  websiteContent: string | null
+  websiteContent: string | null,
+  discoveredUrl?: string | null
 ): string {
   // Business model — HOW the company sells (must match BUSINESS_MODELS in the UI)
   const verticalOptions = [
@@ -122,16 +162,24 @@ function buildEnrichmentPrompt(
   const customerSizeOptions = ["smb", "mid_market", "enterprise", "mixed"];
   const channelOptions = ["self_serve", "sales_led", "partner", "mixed"];
 
+  const websiteContext = websiteContent
+    ? discoveredUrl
+      ? `\n## Website Content (auto-discovered from ${discoveredUrl})\nNote: This URL was inferred from the company name, not provided by the user. Use it as a strong signal but set confidence to "medium" unless other signals confirm it.\n\n${websiteContent}`
+      : `\n## Website Content (from their official site)\n${websiteContent}`
+    : "\nNo website content available. Do NOT guess or hallucinate facts. Set confidence to \"low\" and only extract what is clearly observable from the company name itself.";
+
   return `You are a business research assistant for CX Mate, an AI-powered CX platform. Your job is to analyze a company and return structured data about them.
 
 ## Company to Analyze
 Name: ${companyName}
-${websiteContent ? `\n## Website Content (extracted from their site)\n${websiteContent}` : "\nNo website content available — use your training knowledge only."}
+${websiteContext}
 
 ## Task
 Analyze this company and return a JSON object with these fields. Use the website content AND your training knowledge. If you recognize the company, use what you know. If you don't recognize them, make reasonable inferences from the website content and company name.
 
 ## Required Output Fields
+
+- **officialCompanyName**: The official, properly-capitalized company name as used on their website (e.g. "Orca Security", not "orca" or "orca ai"). This is the ground truth that corrects what the user may have typed. Include this whenever website content is available. If you're not confident, use the name as provided.
 
 - **suggestedVertical**: One of: ${JSON.stringify(verticalOptions)}
   This is the BUSINESS MODEL — HOW they sell, not what industry they're in.
@@ -201,13 +249,24 @@ export async function POST(request: Request) {
       );
     }
 
-    // Fetch website content (non-blocking failure)
-    const websiteContent = companyWebsite
-      ? await fetchWebsiteContent(companyWebsite)
-      : null;
+    // 1. Try the explicitly provided website first
+    // 2. If none given, auto-discover from company name (prevents hallucination)
+    // 3. Only fall back to training knowledge as last resort (confidence = "low")
+    let websiteContent: string | null = null;
+    let discoveredUrl: string | null = null;
+
+    if (companyWebsite) {
+      websiteContent = await fetchWebsiteContent(companyWebsite);
+    } else {
+      const discovered = await tryDiscoverWebsite(companyName);
+      if (discovered) {
+        websiteContent = discovered.content;
+        discoveredUrl = discovered.url;
+      }
+    }
 
     // Build prompt and call Claude
-    const prompt = buildEnrichmentPrompt(companyName, websiteContent);
+    const prompt = buildEnrichmentPrompt(companyName, websiteContent, discoveredUrl);
 
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 12000); // 12s for Claude call
@@ -265,6 +324,11 @@ export async function POST(request: Request) {
           ch === "\n" ? "\\n" : ch === "\t" ? "\\t" : ""
         );
       enrichedData = JSON.parse(repaired);
+    }
+
+    // Attach the discovered URL so the client can use it for logos / display
+    if (discoveredUrl) {
+      enrichedData.discoveredWebsite = discoveredUrl;
     }
 
     return NextResponse.json({

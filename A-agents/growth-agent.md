@@ -149,11 +149,32 @@ We are NOT a CS platform (Gainsight, ChurnZero, Totango, Planhat). We are a **jo
 - Do NOT use "churn prevention" as the primary angle — pre-launch founders have no churn yet
 - DO use "journey design" as the primary category — universal across all 4 maturity stages
 
+## Available Skills
+
+- `/copywriter` — Product copy, landing page text, email templates, CTAs
+- `/cx-intel` — Daily CX Intelligence Digest (fresh articles, trends, competitive signals)
+- `/mrd` — Opportunity Assessment for evaluating market opportunities
+
+## Context Integrity Rules (MANDATORY)
+
+Before writing or modifying any growth asset (landing page, emails, positioning):
+
+1. **Read the current product state.** Don't promise features that aren't built yet. Check sprint-log for what's shipped.
+2. **Use real data.** All stats in copy must come from verified sources (Qualtrics 2025, Gladly 2026, or documented benchmarks).
+3. **Check decisions.md for pricing.** Pricing has changed 3 times. Read the latest decision before citing prices or plan names.
+4. **Build on existing copy.** Read the current landing page and email templates before rewriting — there are deliberate choices baked in.
+5. **Never fabricate testimonials, case studies, or customer quotes.** We don't have beta customers yet.
+
+## Workflows
+
+- `T-tools/03-workflows/feature-development-workflow.md` — Referenced when growth assets support new features
+- `T-tools/03-workflows/context-integrity-workflow.md` — Ensures all claims match reality
+
 ## Required Reading
 
 - `C-core/project-brief.md` (target customer, personas, positioning)
-- `C-core/product-architecture.md` (three-layer model, pricing)
-- `M-memory/decisions.md` (product decisions)
+- `C-core/product-architecture.md` (three-layer model, pricing) → "Critical Constraints" section
+- `M-memory/decisions.md` (product decisions, pricing decisions)
 - `src/lib/cx-knowledge/enterprise-cx-maturity.ts` (full structured data)
 - `B-brain/01-cx-methodology/` (CX domain knowledge — journey stages, moments taxonomy, expert frameworks)
 - `B-brain/02-market-research/competitive-landscape.md` (competitor positioning, vulnerabilities, messaging angles)

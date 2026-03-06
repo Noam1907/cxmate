@@ -95,9 +95,25 @@ Flag to Anat immediately if any service hits 80% of quota or shows unexpected co
 - Don't create complex infra. Vercel + Supabase should handle everything for MVP.
 - Don't optimize infra before there's traffic. Premature scaling is waste.
 
+## Context Integrity Rules (MANDATORY)
+
+Before deploying or modifying infrastructure:
+
+1. **Check the build locally first.** Never deploy without a passing `next build`. TypeScript errors in production kill trust.
+2. **Verify environment variables.** Every new feature may require new env vars. Check `src/lib/` for any new `process.env.*` references.
+3. **Read sprint-log for what's changed.** Know what code is shipping. Don't deploy blind.
+4. **Check decisions.md for infra decisions.** Past choices (Vercel regions, Supabase config, timeout values) are documented for a reason.
+5. **Don't break the data chain.** If deploying API route changes, verify the onboarding → journey generation → display pipeline still works end-to-end.
+
+**Critical constraint:** `vercel.json` has `maxDuration: 300` on onboarding and recommendations routes (journey generation takes ~1.4 min). Don't change these without understanding why.
+
+## Workflows
+
+- `T-tools/03-workflows/context-integrity-workflow.md` — Applies to any infrastructure or deployment changes
+
 ## Required Reading
 
 - `C-core/tech-stack.md` (technology decisions)
 - `M-memory/decisions.md` (architecture decisions)
 - `M-memory/sprint-log.md` (what's been built and what's deployed)
-- `B-brain/01-cx-methodology/` (CX domain knowledge — journey stages, moments taxonomy, expert frameworks)
+- `M-memory/learning-log.md` (deployment gotchas, env var patterns)

@@ -24,14 +24,14 @@ Before synthesizing ANY decision brief, read these files:
    - `devils-advocate-review.md` in the same folder
    - You must understand BOTH perspectives before synthesizing.
 
-2. **Brand Foundation (from C-core):**
-   - `C-core/project-brief.md` - What we do, who we serve
-   - `C-core/voice-dna.md` - How the brand communicates
-   - `C-core/icp-profile.md` - Who we're building for
+2. **Product Foundation (from C-core):**
+   - `C-core/project-brief.md` — What CX Mate is, who it's for
+   - `C-core/product-architecture.md` — Product layers, critical constraints
 
 3. **System Memory (from M-memory):**
-   - `M-memory/decisions.md` - Past strategic choices and their outcomes
-   - `M-memory/learning-log.md` - Patterns from previous work
+   - `M-memory/decisions.md` — Past strategic choices and their outcomes
+   - `M-memory/learning-log.md` — Patterns from previous work
+   - `M-memory/sprint-log.md` — Current build state (what's real vs planned)
 
 ---
 
@@ -228,10 +228,19 @@ After the brief is delivered:
 
 ---
 
+## Context Integrity Rules (MANDATORY)
+
+Before delivering any decision brief:
+
+1. **Read both the Strategist and Devil's Advocate work fully.** Don't synthesize from summaries — read the complete analysis and challenge.
+2. **Check decisions.md for precedent.** If a similar decision was made before, reference the outcome.
+3. **Ground recommendations in the current product state.** Read sprint-log to know what's built, what's deferred, and what resources are available.
+4. **Frame for the actual decision-maker.** Anat is a solo founder with a small team. "Hire a PM" is not a valid next step.
+5. **Make next steps actionable.** Every action must have a who, what, and when — not vague directions.
+
+## Workflows
+
+- `T-tools/03-workflows/strategic-decision-workflow.md` — Your primary workflow (Step 3: Synthesize)
+- `T-tools/03-workflows/context-integrity-workflow.md` — Applies to product-impacting recommendations
+
 What perspectives would you like me to synthesize?
-
----
-
-> **© Tom Even**
-> Workshops & future dates: [www.getagents.today](https://www.getagents.today)
-> Newsletter: [www.agentsandme.com](https://www.agentsandme.com)

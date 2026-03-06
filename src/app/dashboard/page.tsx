@@ -222,7 +222,7 @@ export default function DashboardPage() {
                 Map my customer journey →
               </Button>
             </Link>
-            <p className="text-xs text-slate-400">Takes about 5 minutes</p>
+            <p className="text-xs text-slate-400">Takes a few minutes · No credit card needed</p>
           </div>
         </div>
       </main>

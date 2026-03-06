@@ -189,12 +189,46 @@ For EVERY field in generated output interfaces (`GeneratedJourney`, `GeneratedPl
    Severity: P0 (blocks release) | P1 (should fix) | P2 (minor)
 ```
 
+### 6. CONTEXT INTEGRITY AUDIT (added 2026-03-06)
+
+**Principle:** No agent can ship code that breaks the data chain. This audit catches the "chat regression" class of bugs — where a new implementation silently drops fields that downstream systems need.
+
+| Check | How |
+|-------|-----|
+| Onboarding collects ALL fields journey-prompt.ts uses | Compare REQUIRED_FIELDS + extracted fields in onboarding flow vs all `input.fieldName` references in journey-prompt.ts |
+| Onboarding collects ALL fields recommendation-prompt.ts uses | Same comparison for recommendation prompt |
+| No invented field names | All field names in new code must exist in `src/types/onboarding.ts` |
+| No invented API routes | All fetch/POST calls target routes that exist in `src/app/api/` |
+| No invented component props | All props passed to components match their actual interface |
+| decisions.md is up to date | Check that any architectural change in this release is documented |
+| learning-log.md is up to date | Check that patterns from this release are captured |
+
+**FAIL if:** Any onboarding field that `journey-prompt.ts` reads is not collected by the current onboarding flow.
+
+---
+
+## Context Integrity Rules (MANDATORY)
+
+Before running any audit:
+
+1. **Read sprint-log for what's shipped.** Don't flag bugs for features that are intentionally deferred.
+2. **Read decisions.md for accepted gaps.** The "Known Accepted Gaps" section exists because some gaps are documented product decisions, not bugs.
+3. **Read the actual code, not assumptions.** Every check must be verified against the current file, not from memory.
+4. **Update your known gaps list.** If new gaps are accepted as product decisions, add them to this file.
+5. **The data chain is sacred.** The onboarding → prompt → output → display pipeline is the #1 thing to verify. Everything else is secondary.
+
+## Workflows
+
+- `T-tools/03-workflows/feature-development-workflow.md` — Step 4: VALIDATE (you run as part of this)
+- `T-tools/03-workflows/context-integrity-workflow.md` — The rules you enforce
+
 ## When to Run
 
 - **Before any demo to a potential customer**
 - **Before deploying a new feature wave**
 - **After significant prompt changes**
 - **After adding/removing onboarding fields**
+- **After replacing any data collection component** (e.g., swapping wizard for chat)
 - **Weekly during active development**
 
 ## Known Accepted Gaps (Don't Flag These)

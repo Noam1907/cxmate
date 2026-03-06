@@ -115,6 +115,74 @@ Every agent — whether it's the COO, a dev agent, or any specialist — MUST re
 - An agent that hasn't read the core files will make incorrect assumptions (e.g., thinking we have a 5-step wizard when it's 7-9 steps, or using the wrong color scheme).
 - The COO runs "The Loop" at session end to keep files updated — every agent benefits from reading them at session start.
 
+## Context Integrity Protocol (MANDATORY — ALL AGENTS)
+
+This protocol exists because we learned the hard way: an agent that builds without context destroys months of compounded work. These rules are non-negotiable.
+
+### Rule 1: No Building Without Reading the Consumer
+
+Before modifying ANY system, you MUST read both:
+- **The files you're changing** (obvious)
+- **The files that CONSUME what you're changing** (the ones you'll break if you don't understand them)
+
+| If you're changing... | You MUST also read... |
+|----------------------|----------------------|
+| Onboarding (wizard or chat) | `src/lib/ai/journey-prompt.ts`, `src/lib/validations/onboarding.ts`, `src/types/onboarding.ts` |
+| Journey generation prompt | `src/types/onboarding.ts`, the current onboarding component |
+| Recommendations / Playbook | `src/lib/ai/recommendation-prompt.ts`, `src/lib/ai/journey-prompt.ts` |
+| Pricing / Billing | `src/lib/freemius.ts`, `M-memory/decisions.md` |
+| Auth / Database | `src/lib/supabase/` (all files), `src/middleware.ts` |
+| UI design / colors | `src/app/globals.css`, learning-log.md design entries |
+
+### Rule 2: No Fabrication
+
+Agents MUST NOT:
+- **Invent field names** that don't exist in the types/schema — always check `src/types/onboarding.ts` and `src/lib/validations/onboarding.ts`
+- **Invent API endpoints** — always check `src/app/api/` for existing routes
+- **Invent component props** — always read the component file before passing props
+- **Assume step counts, field counts, or UI structure** — always read the current code
+- **Guess pricing tiers, plan names, or feature access rules** — always read `M-memory/decisions.md`
+- **Assume what Claude model, parameters, or patterns we use** — always read `C-core/tech-stack.md`
+
+If you don't know something, READ THE FILE. Never guess. Never "make up something reasonable."
+
+### Rule 3: Build On What Exists
+
+Before creating ANYTHING new:
+1. **Search for existing implementations** — `Glob` and `Grep` before `Write`
+2. **Read what was built before** — understand the WHY, not just the WHAT
+3. **Extend, don't replace** — months of iteration are baked into existing code
+4. **If the existing approach seems wrong, check decisions.md** — there may be a documented reason
+
+Replacing without understanding destroys compounded value. The chat regression happened because someone built a 10-field chat without reading that the journey prompt needs 33 fields. That's months of work ignored.
+
+### Rule 4: Verify Before Shipping
+
+Before marking any task as complete:
+1. **Does the output page still get all the data it needs?** (check the data flow end-to-end)
+2. **Did you break any existing functionality?** (run the app, check the flow)
+3. **Does the change align with product-architecture.md?** (principles, constraints, data flow)
+4. **Would this change pass the QA Gatekeeper?** (no dead buttons, no lost data, no placeholders)
+
+### Rule 5: Document What You Change
+
+Every significant change must be reflected in:
+- `M-memory/sprint-log.md` — what was done
+- `M-memory/decisions.md` — if an architectural choice was made
+- `M-memory/learning-log.md` — if a pattern was discovered
+- The relevant `C-core/` file — if architecture or product scope changed
+
+If you changed it but didn't log it, the next session will repeat your mistakes or undo your work.
+
+---
+
+## Workflows
+
+- `T-tools/03-workflows/session-start-workflow.md` — How every session begins
+- `T-tools/03-workflows/context-integrity-workflow.md` — Pre-build verification gate (detailed version of rules above)
+- `T-tools/03-workflows/feature-development-workflow.md` — Define → Design → Build → Validate cycle with context gates
+- `T-tools/03-workflows/strategic-decision-workflow.md` — Strategist → Devil's Advocate → Chief of Staff
+
 ## Communication Rules
 - Each agent prefixes output with [AGENT_NAME]:
 - Handoffs include explicit context and expected output

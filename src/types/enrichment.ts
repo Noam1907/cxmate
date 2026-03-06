@@ -6,6 +6,12 @@
  */
 
 export interface EnrichedCompanyData {
+  /**
+   * Official company name as determined from the website — corrects user-typed
+   * abbreviations, typos, or ambiguous names. Only set when a website was available.
+   * Used to override extractedFields.companyName when enrichment fires with a URL.
+   */
+  officialCompanyName?: string | null;
   /** Mapped to BUSINESS_MODELS ids: b2b_saas, professional_services, marketplace, ecommerce_b2b, other */
   suggestedVertical: string;
   /** Optional industry tag: fintech, healthtech, hrtech, etc. Maps to INDUSTRY_VERTICALS */
@@ -24,6 +30,11 @@ export interface EnrichedCompanyData {
   confidence: "high" | "medium" | "low";
   /** Brief explanation of how Claude determined this */
   reasoning: string;
+  /**
+   * Website URL used for enrichment — populated when auto-discovery found a site
+   * and no explicit companyWebsite was provided. Use as fallback domain for logos.
+   */
+  discoveredWebsite?: string | null;
 }
 
 export interface EnrichmentResponse {

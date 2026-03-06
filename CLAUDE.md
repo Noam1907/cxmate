@@ -27,6 +27,25 @@ When starting ANY new conversation from this folder, ALWAYS:
 
 **Why this matters:** The product evolves daily. An agent that skips reading will make wrong assumptions (wrong step count, wrong color scheme, wrong architecture). Read first, build second.
 
+### Task-Specific Must-Reads (MANDATORY)
+
+Before touching any of these systems, you MUST also read the listed files. General Tier 1-3 reading is not enough — these are the files that contain the constraints you'll violate if you skip them.
+
+| If you're modifying... | You MUST also read... | Why |
+|------------------------|----------------------|-----|
+| **Onboarding (wizard or chat)** | `src/lib/ai/journey-prompt.ts`, `src/lib/validations/onboarding.ts`, `src/types/onboarding.ts` | The onboarding collects data for the journey prompt. The prompt uses 33+ fields. Drop a field = degraded output. |
+| **Journey generation prompt** | `src/types/onboarding.ts`, `src/components/onboarding/` (current onboarding component) | The prompt consumes onboarding data. Changes to the prompt may require new onboarding fields. |
+| **Recommendations / Playbook** | `src/lib/ai/recommendation-prompt.ts`, `src/lib/ai/journey-prompt.ts` | Recommendations build on journey output. The chain must be consistent. |
+| **Pricing / Billing** | `src/lib/freemius.ts`, `M-memory/decisions.md` (pricing decisions) | Pricing has changed 3 times. Read the latest decision before assuming plan IDs or tier names. |
+| **Auth / Database** | `src/lib/supabase/` (all files), `src/middleware.ts` | Auth, RLS, and dual-mode architecture are tightly coupled. |
+| **UI design / colors** | `src/app/globals.css`, `M-memory/learning-log.md` (design entries) | Design system decisions are documented. Don't introduce new colors or patterns without reading what exists. |
+
+### Core Principle: Never Rebuild Without Understanding
+
+**Build on what exists.** Read what was built, understand why it was built that way, then extend. Months of iteration are baked into existing code. Replacing without understanding destroys compounded value. If you don't know why something has 33 fields, don't ship a version with 10.
+
+**Eat our own cooking.** CX Mate must deliver the best possible customer experience to its own users. Every screen, flow, and interaction is a CX moment. If we wouldn't recommend it to a client, we don't ship it.
+
 ---
 
 ## How This Works

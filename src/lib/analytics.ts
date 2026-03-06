@@ -34,6 +34,9 @@ export type AnalyticsEvent =
   // Auth
   | { name: "user_signed_up" }
   | { name: "user_logged_in" }
+  // Chat onboarding
+  | { name: "onboarding_chat_message"; turn: number; is_complete: boolean; company?: string }
+  | { name: "onboarding_chat_completed"; company?: string }
   // Beta / waitlist
   | { name: "waitlist_joined"; referral_source?: string; role?: string }
   // Export

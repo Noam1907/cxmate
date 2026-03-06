@@ -447,6 +447,12 @@ Track sprint progress and status.
 2. Add env vars to Vercel: `NEXT_PUBLIC_FREEMIUS_PRODUCT_ID`, `NEXT_PUBLIC_FREEMIUS_PUBLIC_KEY`, `FREEMIUS_SECRET_KEY`
 3. Add DB columns to organizations table: `freemius_license_id`, `freemius_plan_id`, `freemius_subscription_id`
 
+- **Pro tier locked as "Coming Soon"** — Pro features (CX Score, review mining, integrations, Slack) aren't built. Card dimmed, grey badge, CTA → "Notify Me" mailto. Full Analysis is now the clear action. Committed `acb864c`.
+- **Homepage: Comparison section added** — "Why now, not later" section with side-by-side consultant vs CX Mate cards + company stage timeline (Pre-launch → Enterprise). Respectful positioning: consultants are for Series B+, CX Mate starts from day one. Validates founder instincts. Committed `5389b29`.
+
+### Design tasks (queued, not started)
+- **Homepage comparison placement** — "You don't need to wait until Series B" message is too far down the page (below hero + dark section). Design Agent should rethink placement — this is a key differentiator that should hit earlier. Consider: integrating into hero, moving above dark section, or teaser/hook in hero linking down. Also needs to be part of the marketing campaign narrative.
+
 ### Next session starts with
 - Complete Freemius setup (webhook URL, Vercel env vars, DB migration)
 - Revenue Protected counter on Dashboard

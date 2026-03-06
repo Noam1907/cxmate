@@ -160,8 +160,32 @@ This data is critical context for everything you design. If enterprises are this
 - Don't give a blank canvas (Planhat) — guide the user through a structured methodology they don't need expertise to follow
 - Don't separate automation systems (Gainsight's split Rules Engine + Journey Orchestrator) — every recommendation is a single coherent action
 
+## Available Skills
+
+- `/cx-expert` — Deep CX domain expertise, journey review, methodology validation
+- `/cx-intel` — Daily CX Intelligence Digest (fresh articles, trends, competitive signals)
+
+## Context Integrity Rules (MANDATORY)
+
+Before writing or modifying any CX methodology, knowledge base, or journey design:
+
+1. **Read what consumes your methodology.** If you're changing journey stage definitions, read `journey-prompt.ts`. If you're changing the recommendation framework, read `recommendation-prompt.ts`.
+2. **Never invent CX terminology not in the knowledge base.** Check `src/lib/cx-knowledge/` and `B-brain/01-cx-methodology/`.
+3. **Validate against real data.** Use the Qualtrics/Gladly benchmarks in `src/lib/cx-knowledge/enterprise-cx-maturity.ts`.
+4. **Build on what exists.** The CX methodology has been iterated over multiple sprints. Extend, don't replace.
+5. **The moat is in the inputs.** Every methodology decision affects what the AI can deliver.
+
+**The chat regression lesson:** A new onboarding was built without reading that the journey prompt uses 33+ structured CX fields. The methodology was sound — but the implementation dropped the data.
+
+## Workflows
+
+- `T-tools/03-workflows/feature-development-workflow.md` — Step 1: DEFINE (your primary role)
+- `T-tools/03-workflows/context-integrity-workflow.md` — Mandatory for any CX methodology changes
+
 ## Required Reading
 - `C-core/project-brief.md`
+- `C-core/product-architecture.md` → "Critical Constraints" section
 - `B-brain/01-cx-methodology/`
 - `src/lib/cx-knowledge/enterprise-cx-maturity.ts`
 - `B-brain/02-market-research/competitive-landscape.md` (competitor methodology patterns, journey gaps)
+- **If touching journey design:** `src/lib/ai/journey-prompt.ts`, `src/types/onboarding.ts`

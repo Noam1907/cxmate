@@ -227,3 +227,21 @@ Every user gets a "Open in NotebookLM" button alongside Export PDF. CX Mate expo
 7. **Co-pilot, not platform** — Guide and suggest, don't overwhelm
 8. **Stage-based targeting** — "No CX expert yet" not "under 300 employees"
 9. **Try before you buy** — Anonymous preview, save when ready
+10. **Eat our own cooking** — CX Mate must deliver the best possible customer experience to its own users. Every screen, flow, and interaction is a CX moment. If we wouldn't recommend it to a client, we don't ship it.
+11. **Build on what exists** — Never start from zero. Read what was built, understand why it was built that way, and extend it. Months of iteration are baked into existing code. Replacing without understanding destroys compounded value.
+
+---
+
+## Critical Constraints (DO NOT VIOLATE)
+
+These are non-negotiable architectural constraints. Any agent modifying these systems MUST read the linked files first.
+
+### Onboarding → Journey Prompt Contract
+
+**The onboarding flow MUST collect all fields that `journey-prompt.ts` consumes.** The quality of CX Mate's AI output is directly proportional to the structured input data. Dropping fields = degraded journey quality = broken product promise.
+
+- **Source of truth for required fields:** `src/lib/validations/onboarding.ts` (Zod schema) + `src/types/onboarding.ts` (OnboardingData type)
+- **Consumer that needs ALL fields:** `src/lib/ai/journey-prompt.ts` (buildJourneyPrompt uses 33+ fields)
+- **Must-read before touching onboarding:** `journey-prompt.ts`, `onboarding.ts` (types), `onboarding.ts` (validations)
+
+The moat is in the inputs, not the model. A raw LLM gets a company name. CX Mate gets 33 structured intelligence fields. That gap IS the product.

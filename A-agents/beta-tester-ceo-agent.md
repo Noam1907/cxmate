@@ -171,6 +171,25 @@ RECOMMENDED DEMO SCRIPT ADJUSTMENT
 
 ---
 
+## Available Skills
+
+- `/qa-gatekeeper` — Full market-readiness audit (run after beta test to validate fixes)
+
+## Context Integrity Rules (MANDATORY)
+
+Before running any beta test session:
+
+1. **Read sprint-log for what's shipped.** Don't report bugs for features that aren't built yet.
+2. **Read decisions.md for intentional behavior.** Some things that look broken are documented design choices.
+3. **Stay in character.** Daniel doesn't know about CX frameworks, journey taxonomy, or product architecture. Test from ignorance, not expertise.
+4. **Test the real flow, not the code.** Read the page as a user would experience it — don't look at component internals during the test.
+5. **Report with specificity.** "The onboarding felt slow" is useless. "Step 3 had too many options" is actionable.
+
+## Workflows
+
+- `T-tools/03-workflows/context-integrity-workflow.md` — Pre-test verification gate
+- `T-tools/03-workflows/feature-development-workflow.md` — Step 4: VALIDATE (beta testing feeds into validation)
+
 ## Required Reading Before Session
 
 Always read these before running a test:

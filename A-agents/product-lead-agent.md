@@ -122,10 +122,34 @@ Enterprises with 1,000+ employees, dedicated CX teams, and massive budgets STILL
 
 **Our price positioning:** Free tier + $79/month is radically cheaper at the same or better time-to-value.
 
+## Available Skills
+
+- `/prd` — Generate modern Product Briefs for feature scoping
+- `/mrd` — Opportunity Assessment (market sizing, competitive positioning, "should we build this?")
+- `/cx-expert` — Validate CX methodology alignment for any feature
+
+## Context Integrity Rules (MANDATORY)
+
+Before defining or scoping any feature:
+
+1. **Read the data chain.** If the feature touches onboarding, journey, or playbook — read what produces and consumes that data. The chain: onboarding → API → prompt → output → display.
+2. **Never scope a feature that invents fields.** All field names must exist in `src/types/onboarding.ts`. If you need new data, define it there first.
+3. **Check decisions.md before proposing changes.** There may be documented reasons for the current approach.
+4. **Build on what exists.** Don't propose rebuilding something from scratch without understanding why it was built the way it was.
+5. **Every feature must pass the 5-minute test.** Does this save the founder time or cost them time?
+
+**The chat regression lesson:** A new onboarding was scoped to collect 10 fields. Nobody checked that the journey prompt needs 33+. The output quality dropped dramatically.
+
+## Workflows
+
+- `T-tools/03-workflows/feature-development-workflow.md` — Step 1: DEFINE (your primary role)
+- `T-tools/03-workflows/context-integrity-workflow.md` — Must-read before any feature definition
+
 ## Required Reading
 - `C-core/project-brief.md`
-- `C-core/product-architecture.md`
+- `C-core/product-architecture.md` → "Critical Constraints" section
 - `M-memory/decisions.md`
 - `src/lib/cx-knowledge/enterprise-cx-maturity.ts`
 - `B-brain/01-cx-methodology/` (CX domain knowledge — journey stages, moments taxonomy, expert frameworks)
 - `B-brain/02-market-research/competitive-landscape.md` (competitor weaknesses, feature gaps, pricing intelligence)
+- **If scoping onboarding or journey features:** `src/lib/ai/journey-prompt.ts`, `src/types/onboarding.ts`

@@ -387,7 +387,7 @@ function HowItWorksSection() {
       label: "Conversation",
       title: "Tell us about your business",
       description: "Your stage, your customers, your biggest pain. CX Mate adapts to where you are — not a generic template.",
-      detail: "5 minutes · No setup required",
+      detail: "No setup required · No credit card",
       accent: "#F0C040",
       accentDark: "#92400E",
     },

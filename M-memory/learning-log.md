@@ -203,6 +203,22 @@ Key validated stats for use in impact projections, prompts, and messaging (sourc
 
 ---
 
+### 2026-03-06 — The Chat Regression: Never Rebuild Without Reading the Consumer
+
+- **Root cause:** The conversational onboarding chat was built without reading `journey-prompt.ts`. It collected ~10 fields instead of the 33+ the journey generation prompt actually uses. The result: dramatically worse AI output quality.
+- **Why the memory system didn't catch it:** The critical dependency (onboarding MUST feed all journey prompt fields) was implicit in the architecture but never stated as an explicit constraint in decisions.md or CLAUDE.md. A new session building the chat saw "build a nice conversational flow" but didn't know the downstream contract.
+- **The lesson has three parts:**
+  1. **Never rebuild a data collection layer without reading what consumes the data.** The onboarding → journey prompt → AI output chain is the entire product. Breaking any link in this chain breaks the product.
+  2. **"Read first, build second" needs to be specific.** Generic "read the core files" isn't enough. Task-specific must-read lists now exist in CLAUDE.md. If you're touching onboarding, you MUST read the journey prompt.
+  3. **Critical constraints must be documented as constraints, not just architecture.** Added a "Critical Constraints" section to both `decisions.md` and `product-architecture.md` that explicitly states: "the onboarding MUST collect all fields that journey-prompt.ts consumes."
+- **Process fixes applied:**
+  - Added task-specific must-read table to CLAUDE.md
+  - Added "Critical Constraints" section to decisions.md
+  - Added principles #10 (eat our own cooking) and #11 (build on what exists) to product-architecture.md
+  - The moat is in the inputs, not the model. This principle was already in the project brief — but it wasn't enforced as a constraint. Now it is.
+
+---
+
 ## Version History
 
 | Date | Update | By |

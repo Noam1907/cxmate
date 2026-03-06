@@ -92,6 +92,16 @@ Track key technical and product decisions and why they were made.
 | 2026-03-05 | **Claude tool use for all structured JSON generation (permanent pattern)** | When Claude MUST return a structured object, use tool use (`tools` + `tool_choice: { type: "tool", name: "..." }`). The Anthropic API validates the JSON schema internally — `toolBlock.input` arrives as a pre-parsed JS object. This eliminates: JSON.parse failures, truncation bugs, repair logic, preamble stripping, trailing comma repair, control char cleanup. Applied first to `generate-recommendations.ts`. Any future generation endpoints (journey, health scoring) should follow this pattern. The only remaining failure mode is hitting `max_tokens` mid-tool, which produces a clear error rather than silent corruption. | Active |
 | 2026-03-05 | **Layer 1 Intelligence: Named CX expert citations + CCXP framework** | Replaced anonymous "Advanced CX Expertise" section in both journey-prompt.ts and recommendation-prompt.ts with two new structured knowledge modules: (1) `cx-influencer-frameworks.ts` — 14 named frameworks from Jeanne Bliss, Shep Hyken, Annette Franz, Ian Golding, Blake Morgan, Matt Dixon, etc. Selected dynamically by company pain points + maturity + journey type (max 8 per prompt). AI now cites experts by name in output. (2) `ccxp-framework.ts` — 6 CCXP competency blocks with maturity-appropriate guidance (early/growing/established), quick wins, and common mistakes. Both injected via `getRelevantFrameworks()` and `buildCCXPPromptContext()`. This is Layer 1A + 1B from the Intelligence Layers Roadmap. | Active |
 
+## Critical Constraints (Non-Negotiable)
+
+These are architectural invariants. Violating them breaks the product.
+
+| Constraint | Rule | Must-Read Files |
+|-----------|------|-----------------|
+| **Onboarding → Journey contract** | The onboarding flow (wizard OR chat) MUST collect ALL fields that `journey-prompt.ts` consumes. Dropping fields = degraded AI output = broken product. Currently 33+ fields. | `src/lib/ai/journey-prompt.ts`, `src/lib/validations/onboarding.ts`, `src/types/onboarding.ts` |
+| **Never rebuild without reading the consumer** | Before changing any data collection layer, read what consumes that data. Before changing any AI prompt, read what feeds it. | The upstream AND downstream files for whatever you're modifying |
+| **Build on what exists** | Never start from zero. Read what was built, understand why, then extend. Months of iteration are baked into existing code — replacing without understanding destroys compounded value. | Sprint log, decisions log, learning log |
+
 ---
 
 *Decisions age. Context helps them age well.*

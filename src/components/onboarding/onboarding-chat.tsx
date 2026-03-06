@@ -1,0 +1,1324 @@
+"use client";
+
+/**
+ * OnboardingChat — Conversational onboarding (replaces the wizard).
+ *
+ * Flow:
+ *  1. AI opens with a greeting + first question (hardcoded, no API call)
+ *  2. User types → POST /api/onboarding/chat → AI replies + extracts fields
+ *  3. Company profile panel slides in on the right when company name is extracted
+ *  4. Insight callout bubbles appear inline for contextual benchmarks
+ *  5. Enrichment fires after company name, surfaces inferences naturally
+ *  6. When isComplete=true, 1.2s pause → GeneratingExperience → POST /api/onboarding
+ *
+ * Old wizard (onboarding-wizard.tsx) is preserved — this lives alongside it.
+ */
+
+import { useState, useRef, useEffect, useCallback } from "react";
+import { useRouter } from "next/navigation";
+import { ArrowRight, Sparkle, Microphone } from "@phosphor-icons/react";
+import { Button } from "@/components/ui/button";
+import { LogoMark } from "@/components/ui/logo-mark";
+import { useCompanyEnrichment } from "@/hooks/use-company-enrichment";
+import { deriveFromMaturity } from "@/types/onboarding";
+import type { EnrichedCompanyData } from "@/types/enrichment";
+import { track, identify } from "@/lib/analytics";
+import { notifyOwner } from "@/lib/notify";
+import { createClient } from "@/lib/supabase/client";
+
+// ─────────────────────────────────────────────
+// Types
+// ─────────────────────────────────────────────
+
+type ChatMessage =
+  | { role: "user"; content: string }
+  | { role: "assistant"; content: string }
+  | { role: "insight"; content: string };
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type Fields = Record<string, any>;
+
+// ─────────────────────────────────────────────
+// Config
+// ─────────────────────────────────────────────
+
+const FIELD_LABELS: Record<string, string> = {
+  vertical: "Industry",
+  companySize: "Team Size",
+  companyMaturity: "Stage",
+  customerDescription: "Customer Type",
+  customerSize: "Customer Count",
+  mainChannel: "Sales Channel",
+  primaryGoal: "Main Goal",
+  timeframe: "Timeline",
+};
+
+
+// Insights shown after specific fields are extracted (appear inline in chat)
+// Kept short and non-disruptive — they flow naturally with the conversation
+const FIELD_INSIGHTS: Record<string, string> = {
+  companyMaturity:
+    "Playbook calibrated to your stage. We'll focus on what actually moves the needle right now.",
+  vertical:
+    "We've mapped hundreds of CX journeys in your vertical. Your benchmarks will reflect what top performers do differently.",
+};
+
+// ─────────────────────────────────────────────
+// Stage inference from enrichment company size
+// ─────────────────────────────────────────────
+
+function inferStageFromSize(companySize: string): "early" | "growing" | "scaling" | null {
+  if (companySize === "1-10" || companySize === "11-50") return "early";
+  if (companySize === "51-150" || companySize === "151-300") return "growing";
+  if (companySize === "300+") return "scaling";
+  return null;
+}
+
+function inferStageFromMaturity(maturity: string): "early" | "growing" | "scaling" | null {
+  if (maturity === "pre_launch" || maturity === "first_customers") return "early";
+  if (maturity === "growing") return "growing";
+  if (maturity === "scaling") return "scaling";
+  return null;
+}
+
+interface StageMessage {
+  headline: string;
+  body: string;
+}
+
+function buildStageMessage(
+  stage: "early" | "growing" | "scaling",
+  enrichment: EnrichedCompanyData | null
+): StageMessage {
+  const competitors = enrichment?.suggestedCompetitors ?? [];
+  const hasCompetitors = competitors.length >= 2;
+  const competitorList = hasCompetitors
+    ? competitors.slice(0, 3).join(", ")
+    : null;
+
+  const benchmarkSuffix = competitorList
+    ? ` Benchmarked against ${competitorList} and others in your space.`
+    : "";
+
+  switch (stage) {
+    case "early":
+      return {
+        headline: "First 50 customers: the make-or-break phase.",
+        body:
+          `Companies at this stage lose 40% of early users before they ever see real value. Your playbook will close that gap.${benchmarkSuffix}`,
+      };
+    case "growing":
+      return {
+        headline: "50-500 customers: where manual CS hits a wall.",
+        body:
+          `Growth companies at this stage become reactive: tickets pile up, onboarding slips, churn creeps in silently. Your playbook fixes the system before it breaks.${benchmarkSuffix}`,
+      };
+    case "scaling":
+      return {
+        headline: "500+ customers: invisible patterns compound fast.",
+        body:
+          `Micro-churns, delayed expansions, at-risk accounts your team hasn't spotted yet. Your playbook gives you the intelligence to stay ahead.${benchmarkSuffix}`,
+      };
+  }
+}
+
+// ─────────────────────────────────────────────
+// Suggestion chips — shown when AI asks a question we can pre-answer
+// Maps last AI message keywords → preset option chips
+// ─────────────────────────────────────────────
+
+function getSuggestionChips(lastMessage: string): string[] | null {
+  if (!lastMessage) return null;
+  const lower = lastMessage.toLowerCase();
+
+  // CX setup / tools question
+  if (
+    lower.includes("cx setup") ||
+    lower.includes("what do you have") ||
+    lower.includes("what tools") ||
+    lower.includes("currently use") ||
+    lower.includes("what are you using") ||
+    lower.includes("your setup")
+  ) {
+    return [
+      "Mostly manual / spreadsheets",
+      "Intercom or similar helpdesk",
+      "Dedicated CSM team",
+      "Gainsight / ChurnZero",
+      "Nothing formal yet",
+    ];
+  }
+
+  // What's working / what's not
+  if (
+    lower.includes("what's working") ||
+    lower.includes("what works") ||
+    lower.includes("what isn't working") ||
+    lower.includes("what's broken") ||
+    lower.includes("what breaks") ||
+    lower.includes("what's not working")
+  ) {
+    return [
+      "Onboarding is too slow",
+      "No visibility into health",
+      "Team is reactive, not proactive",
+      "High ticket volume, low resolution speed",
+      "Expansion / upsell is ad hoc",
+    ];
+  }
+
+  // Challenge / pain point
+  if (
+    lower.includes("biggest cx challenge") ||
+    lower.includes("biggest challenge") ||
+    lower.includes("main challenge") ||
+    lower.includes("pain point") ||
+    lower.includes("biggest pain")
+  ) {
+    return [
+      "Onboarding drop-off",
+      "High churn",
+      "Ticket overload",
+      "No visibility into customer health",
+      "Manual processes slowing us down",
+    ];
+  }
+
+  // Goal
+  if (
+    lower.includes("primary goal") ||
+    lower.includes("main goal") ||
+    lower.includes("biggest goal") ||
+    lower.includes("what are you trying to") ||
+    lower.includes("what's your goal")
+  ) {
+    return [
+      "Reduce churn",
+      "Scale CS without hiring",
+      "Improve onboarding",
+      "Expand existing accounts",
+    ];
+  }
+
+  // Channel
+  if (
+    lower.includes("sales channel") ||
+    lower.includes("product-led") ||
+    (lower.includes("self-serve") && lower.includes("sales-led")) ||
+    lower.includes("how do your customers find") ||
+    lower.includes("how do customers come")
+  ) {
+    return [
+      "Self-serve / product-led",
+      "Sales-led",
+      "Partner / channel",
+      "Mix of both",
+    ];
+  }
+
+  // Customer size
+  if (
+    lower.includes("customer size") ||
+    lower.includes("what size compan") ||
+    lower.includes("who are your customer") ||
+    lower.includes("customer segment") ||
+    lower.includes("who do you sell") ||
+    (lower.includes("enterprise") && lower.includes("smb"))
+  ) {
+    return [
+      "SMB (under 50 employees)",
+      "Mid-market (50-500)",
+      "Enterprise (500+)",
+      "Mixed sizes",
+    ];
+  }
+
+  // Industry
+  if (
+    lower.includes("industry") ||
+    lower.includes("vertical") ||
+    lower.includes("what space")
+  ) {
+    return [
+      "Fintech",
+      "HR / People tech",
+      "DevTools / Infra",
+      "Healthcare tech",
+      "Other B2B SaaS",
+    ];
+  }
+
+  return null;
+}
+
+// ─────────────────────────────────────────────
+// Opening message
+// ─────────────────────────────────────────────
+
+const OPENING_MESSAGE =
+  "Hey! I'm your CX Mate advisor. I'm going to ask you a few sharp questions and turn your answers into a personalized CX playbook.\n\n**What's your name, and which company do you work for?** Drop your website too if you have one and I'll pull up what I know about you before we start.";
+
+// ─────────────────────────────────────────────
+// Helpers
+// ─────────────────────────────────────────────
+
+function extractDomain(url: string | undefined): string | null {
+  if (!url) return null;
+  try {
+    const withProtocol = url.startsWith("http") ? url : `https://${url}`;
+    return new URL(withProtocol).hostname.replace(/^www\./, "");
+  } catch {
+    return (
+      url
+        .replace(/^https?:\/\//, "")
+        .replace(/^www\./, "")
+        .split("/")[0]
+        .split("?")[0] || null
+    );
+  }
+}
+
+// ─────────────────────────────────────────────
+// Markdown-aware content renderer
+// Parses **bold** and detects plain question paragraphs
+// ─────────────────────────────────────────────
+
+function parseInline(text: string): React.ReactNode {
+  const parts = text.split(/(\*\*[^*]+\*\*)/g);
+  return parts.map((part, i) =>
+    part.startsWith("**") && part.endsWith("**") ? (
+      <strong key={i} className="font-semibold text-foreground">
+        {part.slice(2, -2)}
+      </strong>
+    ) : (
+      <span key={i}>{part}</span>
+    )
+  );
+}
+
+function renderAIContent(content: string): React.ReactNode {
+  const paragraphs = content.split("\n\n");
+  return paragraphs.map((para, i) => {
+    const hasMarkdown = para.includes("**");
+    const isPlainQuestion = !hasMarkdown && para.trimEnd().endsWith("?");
+    return (
+      <p
+        key={i}
+        className={`leading-relaxed ${isPlainQuestion ? "font-semibold text-foreground" : ""}`}
+      >
+        {isPlainQuestion ? para : parseInline(para)}
+      </p>
+    );
+  });
+}
+
+// ─────────────────────────────────────────────
+// Company logo with two-level fallback:
+//   1. Clearbit (higher quality when available)
+//   2. Google S2 favicon (reliable fallback)
+//   3. Initials (final fallback)
+// ─────────────────────────────────────────────
+
+function CompanyLogo({
+  primaryUrl,
+  fallbackUrl,
+  companyName,
+  initials,
+}: {
+  primaryUrl: string;
+  fallbackUrl: string;
+  companyName: string;
+  initials: string;
+}) {
+  const [src, setSrc] = useState(primaryUrl);
+  const [failed, setFailed] = useState(false);
+
+  if (failed) {
+    return <span className="text-base font-bold text-primary">{initials}</span>;
+  }
+
+  return (
+    <img
+      src={src}
+      alt={companyName}
+      className="w-11 h-11 object-contain"
+      onError={() => {
+        if (src === primaryUrl && fallbackUrl) {
+          setSrc(fallbackUrl);
+        } else {
+          setFailed(true);
+        }
+      }}
+    />
+  );
+}
+
+// ─────────────────────────────────────────────
+// Company profile panel — sticky right sidebar
+// ─────────────────────────────────────────────
+
+function CompanyProfilePanel({
+  fields,
+  enrichment,
+}: {
+  fields: Fields;
+  enrichment: EnrichedCompanyData | null;
+}) {
+  const userName = (fields.userName as string) || "";
+  const userRole = (fields.userRole as string) || "";
+  const companyName = (fields.companyName as string) || "";
+  const companyWebsite = fields.companyWebsite as string | undefined;
+
+  // Use explicit website first; fall back to auto-discovered URL from enrichment
+  const domain =
+    extractDomain(companyWebsite) ??
+    (enrichment?.discoveredWebsite ? extractDomain(enrichment.discoveredWebsite) : null);
+  // Two-level logo fallback: Clearbit (high quality) → Google S2 favicon (reliable)
+  const clearbitUrl = domain ? `https://logo.clearbit.com/${domain}` : null;
+  const googleFaviconUrl = domain ? `https://www.google.com/s2/favicons?domain=${domain}&sz=64` : null;
+
+  const companyInitials = companyName
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((w: string) => w[0]?.toUpperCase() ?? "")
+    .join("");
+
+  const userInitials = userName
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((w: string) => w[0]?.toUpperCase() ?? "")
+    .join("");
+
+  const fieldEntries = Object.entries(FIELD_LABELS)
+    .filter(([key]) => fields[key])
+    .map(([key, label]) => ({ label, value: String(fields[key]) }));
+
+  return (
+    <div className="space-y-3">
+      {/* User card — shows when name is known */}
+      {userName && (
+        <div className="bg-white rounded-2xl border border-slate-200 p-4">
+          <div className="flex items-center gap-3">
+            {/* User avatar */}
+            <div className="w-10 h-10 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0">
+              <span className="text-xs font-bold text-primary">{userInitials}</span>
+            </div>
+            {/* Name + role */}
+            <div className="min-w-0">
+              <p className="font-semibold text-foreground text-sm leading-tight truncate">
+                {userName}
+              </p>
+              {userRole && (
+                <p className="text-xs text-muted-foreground truncate mt-0.5">{userRole}</p>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Company header card — shows when company is known */}
+      {companyName && (
+        <div className="bg-white rounded-2xl border border-slate-200 p-4">
+          <div className="flex items-center gap-3 mb-3">
+            {/* Logo / initials */}
+            <div className="w-12 h-12 rounded-xl border border-slate-100 bg-slate-50 flex items-center justify-center shrink-0 overflow-hidden">
+              {clearbitUrl && googleFaviconUrl ? (
+                <CompanyLogo
+                  primaryUrl={clearbitUrl}
+                  fallbackUrl={googleFaviconUrl}
+                  companyName={companyName}
+                  initials={companyInitials}
+                />
+              ) : (
+                <span className="text-base font-bold text-primary">{companyInitials}</span>
+              )}
+            </div>
+
+            {/* Name + domain */}
+            <div className="min-w-0">
+              <p className="font-semibold text-foreground text-sm leading-tight truncate">
+                {companyName}
+              </p>
+              {domain && (
+                <p className="text-xs text-muted-foreground truncate mt-0.5">{domain}</p>
+              )}
+            </div>
+          </div>
+
+          {/* Description from enrichment */}
+          {enrichment?.description && (
+            <div className="border-t border-slate-100 pt-3 space-y-1.5">
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                {enrichment.description}
+              </p>
+              {enrichment.confidence !== "high" && (
+                <p className="text-[10px] text-amber-600 leading-snug">
+                  Not sure this is right? Drop your website URL in the chat and I&apos;ll re-check.
+                </p>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Collected fields */}
+      {fieldEntries.length > 0 && (
+        <div className="bg-white rounded-2xl border border-slate-200 p-4">
+          <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide mb-3">
+            Profile so far
+          </p>
+          <div className="space-y-3">
+            {fieldEntries.map(({ label, value }) => (
+              <div key={label}>
+                <p className="text-[11px] text-muted-foreground mb-0.5">{label}</p>
+                <p className="text-sm font-medium text-foreground leading-snug">{value}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────
+// Chat header — logo + title only (banner lives in sticky right panel)
+// ─────────────────────────────────────────────
+
+function ChatHeader({ extractedFields }: { extractedFields: Fields }) {
+  const companyName = extractedFields.companyName as string | undefined;
+
+  return (
+    <div className="mb-8 text-center space-y-1">
+      <div className="flex items-center justify-center gap-2.5 mb-3">
+        <LogoMark size="md" />
+        <span className="text-base font-bold text-foreground tracking-tight">CX Mate</span>
+      </div>
+      <h1 className="text-2xl font-bold text-foreground tracking-tight">
+        {companyName
+          ? `Building ${companyName}'s CX playbook`
+          : "Let's build your CX playbook"}
+      </h1>
+      <p className="text-sm text-muted-foreground">
+        A short conversation that replaces hours of CX strategy work
+      </p>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────
+// Heads-up banner — lives in the sticky right panel, always visible
+// ─────────────────────────────────────────────
+
+function HeadsUpBanner({
+  greeting,
+  stageMsg,
+}: {
+  greeting: string | null;
+  stageMsg: StageMessage;
+}) {
+  return (
+    <div className="bg-primary/5 border border-primary/15 rounded-2xl px-4 py-4 flex gap-3 items-start animate-in fade-in slide-in-from-top-2 duration-500">
+      <div className="shrink-0 mt-0.5">
+        <LogoMark size="sm" />
+      </div>
+      <div className="min-w-0">
+        <p className="text-[10px] font-bold text-primary uppercase tracking-widest mb-1.5">
+          {greeting ? `Heads up, ${greeting}` : "Heads up"}
+        </p>
+        <p className="text-sm font-semibold text-foreground leading-snug mb-1">
+          {stageMsg.headline}
+        </p>
+        <p className="text-xs text-muted-foreground leading-relaxed">
+          {stageMsg.body}
+        </p>
+      </div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────
+// Suggestion chips — multi-select shortcuts for open-ended questions
+// Tap to toggle; selected chips are sent together on submit
+// ─────────────────────────────────────────────
+
+function SuggestionChips({
+  chips,
+  selected,
+  onToggle,
+  disabled,
+}: {
+  chips: string[];
+  selected: string[];
+  onToggle: (chip: string) => void;
+  disabled: boolean;
+}) {
+  return (
+    <div className="flex flex-wrap gap-2 mb-3">
+      {chips.map((chip) => {
+        const isSelected = selected.includes(chip);
+        return (
+          <button
+            key={chip}
+            type="button"
+            disabled={disabled}
+            onClick={() => onToggle(chip)}
+            className={`text-xs font-medium px-3 py-1.5 rounded-full border transition-all duration-150 disabled:opacity-30 disabled:cursor-not-allowed ${
+              isSelected
+                ? "bg-primary text-primary-foreground border-primary shadow-sm scale-105"
+                : "border-primary/25 bg-primary/5 text-primary hover:bg-primary/15 hover:border-primary/40"
+            }`}
+          >
+            {chip}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────
+// Insight bubble — subtle contextual nudge (inline, doesn't interrupt flow)
+// ─────────────────────────────────────────────
+
+function InsightBubble({ content }: { content: string }) {
+  return (
+    <div className="flex items-center gap-2.5 mb-4 pl-1">
+      <Sparkle size={13} className="text-amber-400 shrink-0" weight="fill" />
+      <p className="text-xs text-amber-700/80 leading-relaxed italic">{content}</p>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────
+// Typing indicator
+// ─────────────────────────────────────────────
+
+function TypingIndicator() {
+  return (
+    <div className="flex gap-3.5 mb-6">
+      <div className="flex-shrink-0 w-10 h-10 flex items-center justify-center">
+        <LogoMark size="md" className="shadow-sm" />
+      </div>
+      <div className="bg-gradient-to-br from-white to-secondary/40 rounded-2xl rounded-tl-sm px-5 py-4 border border-border/50 shadow-sm flex items-center gap-1.5">
+        <span
+          className="w-1.5 h-1.5 bg-muted-foreground/50 rounded-full animate-bounce"
+          style={{ animationDelay: "0ms" }}
+        />
+        <span
+          className="w-1.5 h-1.5 bg-muted-foreground/50 rounded-full animate-bounce"
+          style={{ animationDelay: "160ms" }}
+        />
+        <span
+          className="w-1.5 h-1.5 bg-muted-foreground/50 rounded-full animate-bounce"
+          style={{ animationDelay: "320ms" }}
+        />
+      </div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────
+// Generating Experience
+// (mirrors onboarding-wizard.tsx — kept in sync manually)
+// ─────────────────────────────────────────────
+
+function GeneratingExperience({ companyName }: { companyName: string }) {
+  const [phase, setPhase] = useState(0);
+  const [seconds, setSeconds] = useState(0);
+  const name = companyName || "your company";
+
+  const phases = [
+    {
+      title: "Reading your company profile",
+      detail: `Cross-referencing ${name}'s stage, vertical, and business model against B2B benchmarks`,
+    },
+    {
+      title: "Mapping the full lifecycle",
+      detail: "Building a full lifecycle journey: every stage, every handoff, every risk",
+    },
+    {
+      title: "Scoring meaningful moments",
+      detail: "Identifying the 10-15 interactions where customers decide to stay or leave",
+    },
+    {
+      title: "Running risk analysis",
+      detail: `Calculating revenue at risk based on ${name}'s real numbers, not guesswork`,
+    },
+    {
+      title: "Writing your CX intelligence report",
+      detail: "Surfacing the patterns your team won't tell you about, backed by data",
+    },
+    {
+      title: "Building your action playbook",
+      detail: "Every insight becomes a prioritized action with templates, timelines, and owners",
+    },
+  ];
+
+  useEffect(() => {
+    const timer = setInterval(() => setSeconds((s) => s + 1), 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
+    const timings = [0, 10000, 25000, 45000, 65000, 85000];
+    const timeouts = timings.map((ms, i) => setTimeout(() => setPhase(i), ms));
+    return () => timeouts.forEach(clearTimeout);
+  }, []);
+
+  const progress = Math.min((seconds / 120) * 100, 95);
+
+  return (
+    <div className="rounded-2xl border border-slate-200 bg-white p-8 space-y-8">
+      <div className="text-center space-y-3">
+        <h2 className="text-2xl font-bold text-slate-800 tracking-tight">
+          Building {name}&apos;s CX playbook
+        </h2>
+        <p className="text-sm text-slate-500">
+          A certified CX expert needs 3-4 hours for this.{" "}
+          <span className="font-medium text-primary">You&apos;ll have it in minutes.</span>
+        </p>
+      </div>
+
+      <div className="space-y-1.5">
+        <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
+          <div
+            className="h-full bg-slate-400 rounded-full transition-all duration-1000 ease-out"
+            style={{ width: `${progress}%` }}
+          />
+        </div>
+        <div className="flex justify-between">
+          <span className="text-[11px] text-slate-400 tabular-nums">
+            {Math.floor(seconds / 60)}:{(seconds % 60).toString().padStart(2, "0")} elapsed
+          </span>
+          <span className="text-[11px] text-slate-400">
+            {seconds < 60 ? "Analyzing..." : seconds < 90 ? "Almost there..." : "Finalizing..."}
+          </span>
+        </div>
+      </div>
+
+      <div className="space-y-3">
+        {phases.map((p, i) => {
+          const isDone = i < phase;
+          const isActive = i === phase;
+          return (
+            <div
+              key={i}
+              className={`flex items-start gap-3 transition-all duration-500 ${
+                isDone || isActive ? "opacity-100" : "opacity-30"
+              }`}
+            >
+              <div className="mt-0.5 shrink-0">
+                {isDone ? (
+                  <div className="w-5 h-5 rounded-full bg-slate-100 border border-slate-300 flex items-center justify-center">
+                    <svg
+                      className="w-3 h-3 text-slate-500"
+                      fill="none"
+                      viewBox="0 0 12 12"
+                      stroke="currentColor"
+                      strokeWidth={2.5}
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M2 6l3 3 5-5" />
+                    </svg>
+                  </div>
+                ) : isActive ? (
+                  <div className="w-5 h-5 rounded-full border-2 border-slate-400 border-t-transparent animate-spin" />
+                ) : (
+                  <div className="w-5 h-5 rounded-full border border-slate-200" />
+                )}
+              </div>
+              <div>
+                <p
+                  className={`text-sm font-medium leading-snug ${
+                    isDone ? "text-slate-400" : isActive ? "text-slate-800" : "text-slate-400"
+                  }`}
+                >
+                  {p.title}
+                </p>
+                {isActive && (
+                  <p className="text-xs text-slate-500 mt-0.5 leading-relaxed">{p.detail}</p>
+                )}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────
+// Main component
+// ─────────────────────────────────────────────
+
+export function OnboardingChat() {
+  const router = useRouter();
+
+  // Chat state
+  const [messages, setMessages] = useState<ChatMessage[]>([
+    { role: "assistant", content: OPENING_MESSAGE },
+  ]);
+  const [inputValue, setInputValue] = useState("");
+  const [isThinking, setIsThinking] = useState(false);
+
+  // Extracted fields — grows as conversation proceeds
+  const [extractedFields, setExtractedFields] = useState<Fields>({});
+
+  // Generation state
+  const [pendingFields, setPendingFields] = useState<Fields | null>(null);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+
+  // Voice input state
+  const [isListening, setIsListening] = useState(false);
+  const [supportsVoice, setSupportsVoice] = useState(false);
+
+  // Multi-select chip state — cleared when AI replies
+  const [selectedChips, setSelectedChips] = useState<string[]>([]);
+  const toggleChip = useCallback((chip: string) => {
+    setSelectedChips((prev) =>
+      prev.includes(chip) ? prev.filter((c) => c !== chip) : [...prev, chip]
+    );
+  }, []);
+
+  // Refs
+  const bottomRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
+  const abortRef = useRef<AbortController | null>(null);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const enrichmentRef = useRef<EnrichedCompanyData | null>(null);
+  const insightsShown = useRef<Set<string>>(new Set());
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const recognitionRef = useRef<any>(null);
+
+  // Enrichment hook
+  const { enrichment, enrich } = useCompanyEnrichment();
+
+  // Keep enrichmentRef in sync
+  useEffect(() => {
+    enrichmentRef.current = enrichment;
+  }, [enrichment]);
+
+  // Detect voice support on mount
+  useEffect(() => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const w = window as any;
+    setSupportsVoice(!!(w.SpeechRecognition || w.webkitSpeechRecognition));
+  }, []);
+
+  // Voice input toggle
+  const toggleVoice = useCallback(() => {
+    if (isListening) {
+      recognitionRef.current?.stop();
+      return;
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const SpeechRecognitionAPI = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SpeechRecognitionAPI) return;
+
+    const recognition = new SpeechRecognitionAPI();
+    recognition.lang = "en-US";
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+    recognition.continuous = false;
+
+    recognition.onstart = () => setIsListening(true);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    recognition.onresult = (event: any) => {
+      const transcript: string = event.results[0][0].transcript;
+      setInputValue(transcript);
+      // Auto-resize textarea after fill
+      setTimeout(() => {
+        if (inputRef.current) {
+          inputRef.current.style.height = "auto";
+          inputRef.current.style.height = `${inputRef.current.scrollHeight}px`;
+          inputRef.current.focus();
+        }
+      }, 0);
+    };
+    recognition.onerror = () => setIsListening(false);
+    recognition.onend = () => setIsListening(false);
+
+    recognitionRef.current = recognition;
+    recognition.start();
+  }, [isListening]);
+
+  // Auto-scroll to bottom
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages, isThinking]);
+
+  // Clear chip selection when AI replies (chips for a new question appear fresh)
+  useEffect(() => {
+    setSelectedChips([]);
+  }, [messages.length]);
+
+  // Auto-focus input on mount
+  useEffect(() => {
+    inputRef.current?.focus();
+  }, []);
+
+  // Side effect: fire enrichment when company name or website changes
+  // Key = name|website so we re-enrich when the website is provided later
+  // (first pass might get the wrong company if name is ambiguous — website disambiguates)
+  const lastEnrichedKey = useRef("");
+  useEffect(() => {
+    const companyName = extractedFields.companyName as string | undefined;
+    const companyWebsite = extractedFields.companyWebsite as string | undefined;
+    if (!companyName) return;
+    const key = `${companyName.toLowerCase().trim()}|${(companyWebsite || "").toLowerCase().trim()}`;
+    if (key === lastEnrichedKey.current) return;
+    lastEnrichedKey.current = key;
+    enrich(companyName, companyWebsite);
+  }, [extractedFields.companyName, extractedFields.companyWebsite, enrich]);
+
+  // Side effect: apply officialCompanyName from enrichment back to extractedFields.
+  // When the user types an ambiguous name (e.g. "orca ai"), enrichment auto-discovers
+  // a domain and returns the canonical name from the website (e.g. "Orca Security").
+  // This keeps the panel header, chat title, and journey generation all consistent.
+  useEffect(() => {
+    const officialName = enrichment?.officialCompanyName;
+    if (!officialName) return;
+    setExtractedFields((prev) => {
+      const current = (prev.companyName as string | undefined) ?? "";
+      // Only update if different (case-insensitive) — avoids unnecessary re-renders
+      if (current.toLowerCase().trim() === officialName.toLowerCase().trim()) return prev;
+      return { ...prev, companyName: officialName };
+    });
+  }, [enrichment?.officialCompanyName]);
+
+  // Side effect: identify user + send magic link when email extracted
+  const emailSentRef = useRef(false);
+  useEffect(() => {
+    const userEmail = extractedFields.userEmail as string | undefined;
+    const userName = extractedFields.userName as string | undefined;
+    const companyName = extractedFields.companyName as string | undefined;
+    if (userEmail && !emailSentRef.current) {
+      emailSentRef.current = true;
+      identify(userEmail, { name: userName, company: companyName });
+      const supabase = createClient();
+      supabase.auth
+        .signInWithOtp({
+          email: userEmail,
+          options: {
+            emailRedirectTo: `${window.location.origin}/auth/callback?redirect=/dashboard`,
+            shouldCreateUser: true,
+            data: { company_name: companyName, name: userName },
+          },
+        })
+        .catch(() => {
+          /* never block onboarding for auth */
+        });
+    }
+  }, [extractedFields.userEmail, extractedFields.userName, extractedFields.companyName]);
+
+  // ── Journey generation ────────────────────────────────────────────────
+  const startGeneration = useCallback(
+    async (fields: Fields, retryCount = 0) => {
+      setIsGenerating(true);
+      setSubmitError(null);
+      const generationStart = Date.now();
+
+      try {
+        const controller = new AbortController();
+        abortRef.current = controller;
+        timeoutRef.current = setTimeout(
+          () => controller.abort("Request timed out"),
+          240_000
+        );
+
+        const submitData = enrichmentRef.current
+          ? { ...fields, enrichmentData: enrichmentRef.current }
+          : fields;
+
+        track("journey_generation_started", {
+          maturity: fields.companyMaturity,
+          journey_type: fields.journeyType,
+        });
+
+        const response = await fetch("/api/onboarding", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(submitData),
+          signal: controller.signal,
+        });
+
+        if (timeoutRef.current) clearTimeout(timeoutRef.current);
+
+        if (!response.ok) {
+          const errorBody = await response.json().catch(() => null);
+          throw new Error(
+            errorBody?.details || "Failed to generate journey. Please try again."
+          );
+        }
+
+        const result = await response.json();
+        const durationSeconds = Math.round((Date.now() - generationStart) / 1000);
+
+        track("journey_generation_succeeded", {
+          duration_seconds: durationSeconds,
+          template_id: result.templateId ?? "",
+        });
+        notifyOwner("journey_generation_succeeded", {
+          email: fields.userEmail,
+          companyName: fields.companyName,
+          details: `Chat onboarding — ${result.journey?.stages?.length ?? "?"} stages in ${durationSeconds}s`,
+        });
+
+        sessionStorage.setItem("cx-mate-journey", JSON.stringify(result));
+        router.push(`/journey?id=${result.templateId}`);
+      } catch (error) {
+        if (error instanceof DOMException && error.name === "AbortError") {
+          const isTimeout = abortRef.current?.signal?.reason === "Request timed out";
+          if (isTimeout && retryCount < 1) {
+            track("journey_generation_retried");
+            startGeneration(fields, retryCount + 1);
+            return;
+          }
+          track("journey_generation_failed", {
+            error_type: "timeout",
+            retry_count: retryCount,
+          });
+          setSubmitError(
+            "Generation took a bit longer than usual. Your answers are saved. Click Retry."
+          );
+          setIsGenerating(false);
+          return;
+        }
+        track("journey_generation_failed", {
+          error_type: "api_error",
+          retry_count: retryCount,
+        });
+        setSubmitError(
+          error instanceof Error ? error.message : "Something went wrong. Please retry."
+        );
+        setIsGenerating(false);
+      }
+    },
+    [router]
+  );
+
+  // Trigger generation 1.2s after conversation completes
+  useEffect(() => {
+    if (!pendingFields) return;
+    const timer = setTimeout(() => {
+      startGeneration(pendingFields);
+      setPendingFields(null);
+    }, 1200);
+    return () => clearTimeout(timer);
+  }, [pendingFields, startGeneration]);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    };
+  }, []);
+
+  // ── Send message ──────────────────────────────────────────────────────
+  const sendMessage = useCallback(
+    async (text: string) => {
+      const trimmed = text.trim();
+      if (!trimmed || isThinking) return;
+
+      const userMsg: ChatMessage = { role: "user", content: trimmed };
+
+      // Only pass user/assistant messages to the API
+      const apiMessages = [...messages, userMsg].filter(
+        (m): m is { role: "user" | "assistant"; content: string } =>
+          m.role === "user" || m.role === "assistant"
+      );
+
+      setMessages((prev) => [...prev, userMsg]);
+      setInputValue("");
+      setIsThinking(true);
+
+      try {
+        const res = await fetch("/api/onboarding/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            messages: apiMessages,
+            extractedFields,
+            enrichmentData: enrichmentRef.current,
+          }),
+        });
+
+        if (!res.ok) throw new Error("Failed to get response");
+
+        const data = await res.json();
+
+        // Merge extracted fields + apply maturity-derived fields
+        const prevFields: Fields = { ...extractedFields };
+        const newFields: Fields = { ...data.extractedFields };
+        if (newFields.companyMaturity) {
+          const derived = deriveFromMaturity(newFields.companyMaturity);
+          Object.assign(newFields, derived);
+        }
+        setExtractedFields(newFields);
+
+        // ── Build inline insight bubbles ───────────────────────────────
+        const extras: ChatMessage[] = [];
+
+        Object.entries(FIELD_INSIGHTS).forEach(([fieldKey, insightContent]) => {
+          if (insightsShown.current.has(fieldKey)) return;
+          if (!newFields[fieldKey] || prevFields[fieldKey]) return;
+          insightsShown.current.add(fieldKey);
+          extras.push({ role: "insight", content: insightContent });
+        });
+
+        // Add AI reply + any insight bubbles
+        setMessages((prev) => [
+          ...prev,
+          { role: "assistant", content: data.reply },
+          ...extras,
+        ]);
+
+        // Track
+        track("onboarding_chat_message", {
+          turn: apiMessages.filter((m) => m.role === "user").length,
+          is_complete: data.isComplete,
+          company: newFields.companyName,
+        });
+
+        // Trigger generation if complete
+        if (data.isComplete) {
+          setPendingFields(newFields);
+          track("onboarding_chat_completed", { company: newFields.companyName });
+          notifyOwner("onboarding_started", {
+            email: newFields.userEmail,
+            companyName: newFields.companyName,
+          });
+        }
+      } catch (err) {
+        console.error("[OnboardingChat] sendMessage error:", err);
+        setMessages((prev) => [
+          ...prev,
+          {
+            role: "assistant",
+            content: "Sorry, something went wrong. Could you try that again?",
+          },
+        ]);
+      } finally {
+        setIsThinking(false);
+      }
+    },
+    [messages, extractedFields, isThinking]
+  );
+
+  const buildSendText = () => {
+    const chipPart = selectedChips.length > 0 ? selectedChips.join(", ") : "";
+    const typedPart = inputValue.trim();
+    if (chipPart && typedPart) return `${chipPart}, ${typedPart}`;
+    return chipPart || typedPart;
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      const text = buildSendText();
+      if (text) {
+        sendMessage(text);
+        setSelectedChips([]);
+      }
+    }
+  };
+
+  // Whether to show the profile panel (appears as soon as name OR company is known)
+  const hasCompanyData = !!(extractedFields.userName || extractedFields.companyName);
+
+  // ── Banner state (computed from enrichment + conversation) ───────────
+  const _companyName = extractedFields.companyName as string | undefined;
+  const _userName = extractedFields.userName as string | undefined;
+  const _companyMaturity = extractedFields.companyMaturity as string | undefined;
+  let _stage: "early" | "growing" | "scaling" | null = null;
+  if (_companyMaturity) {
+    _stage = inferStageFromMaturity(_companyMaturity);
+  } else if (enrichment?.suggestedCompanySize) {
+    _stage = inferStageFromSize(enrichment.suggestedCompanySize);
+  }
+  const _hasTrustworthy = enrichment && enrichment.confidence !== "low";
+  const showBanner = !!(_companyName && _stage && (_hasTrustworthy || _companyMaturity));
+  const stageMsg = _stage ? buildStageMessage(_stage, enrichment) : null;
+  const greeting = _userName ?? null;
+
+  // ── Suggestion chips (based on last AI question) ─────────────────────
+  const lastAIMsg = [...messages].reverse().find((m) => m.role === "assistant");
+  const suggestionChips =
+    lastAIMsg && !isThinking && !pendingFields
+      ? getSuggestionChips(lastAIMsg.content)
+      : null;
+
+  // ── Render: generating screen ─────────────────────────────────────────
+  if (isGenerating) {
+    return (
+      <div className="w-full max-w-2xl mx-auto space-y-6">
+        <GeneratingExperience
+          companyName={(extractedFields.companyName as string) || ""}
+        />
+        {submitError && (
+          <div className="p-4 rounded-xl bg-red-50 border border-red-200 space-y-3">
+            <p className="text-sm text-red-700">{submitError}</p>
+            <Button size="sm" onClick={() => startGeneration(extractedFields)}>
+              Retry
+            </Button>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // ── Render: chat ──────────────────────────────────────────────────────
+  return (
+    <div
+      className="w-full max-w-[960px] mx-auto"
+      style={{
+        display: "grid",
+        gridTemplateColumns: "1fr 240px",
+        gap: "2rem",
+        alignItems: "start",
+      }}
+    >
+      {/* ── Chat column — scrolls naturally with the page ── */}
+      <div className="min-w-0 flex flex-col" style={{ minHeight: "calc(100vh - 160px)" }}>
+        {/* Header — logo + title, no banner */}
+        <ChatHeader extractedFields={extractedFields} />
+
+        {/* Message list */}
+        <div className="flex-1 space-y-1 pb-6">
+          {messages.map((msg, i) => {
+            // ── Insight bubble ──
+            if (msg.role === "insight") {
+              return <InsightBubble key={i} content={msg.content} />;
+            }
+
+            // ── AI message ──
+            if (msg.role === "assistant") {
+              return (
+                <div key={i} className="flex gap-3.5 mb-6">
+                  <div className="flex-shrink-0 w-10 h-10 flex items-center justify-center">
+                    <LogoMark size="md" className="shadow-sm" />
+                  </div>
+                  <div className="bg-gradient-to-br from-white to-secondary/40 rounded-2xl rounded-tl-sm px-5 py-4 max-w-lg border border-border/50 shadow-sm">
+                    <div className="text-sm leading-relaxed space-y-2 text-foreground/90">
+                      {renderAIContent(msg.content)}
+                    </div>
+                  </div>
+                </div>
+              );
+            }
+
+            // ── User message ──
+            return (
+              <div key={i} className="flex justify-end mb-5">
+                <div className="bg-primary text-primary-foreground rounded-2xl rounded-tr-sm px-4 py-3 max-w-sm shadow-sm">
+                  <p className="text-sm leading-relaxed whitespace-pre-wrap">{msg.content}</p>
+                </div>
+              </div>
+            );
+          })}
+
+          {isThinking && <TypingIndicator />}
+
+          <div ref={bottomRef} />
+        </div>
+
+        {/* Input bar */}
+        <div className="sticky bottom-0 pb-6 pt-4">
+          {/* Suggestion chips — multi-select; send via the ↑ button */}
+          {suggestionChips && (
+            <SuggestionChips
+              chips={suggestionChips}
+              selected={selectedChips}
+              onToggle={toggleChip}
+              disabled={isThinking || !!pendingFields}
+            />
+          )}
+          <div className="bg-slate-100 rounded-2xl flex gap-2 items-end px-4 py-3">
+            <textarea
+              ref={inputRef}
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder={isListening ? "Listening…" : "Type your answer…"}
+              rows={1}
+              disabled={isThinking || !!pendingFields}
+              className="flex-1 resize-none bg-transparent text-sm text-foreground placeholder:text-slate-400 focus:outline-none leading-relaxed max-h-32 disabled:opacity-50"
+              onInput={(e) => {
+                const t = e.target as HTMLTextAreaElement;
+                t.style.height = "auto";
+                t.style.height = `${t.scrollHeight}px`;
+              }}
+            />
+
+            {/* Mic button — only shown when browser supports it */}
+            {supportsVoice && (
+              <button
+                type="button"
+                onClick={toggleVoice}
+                disabled={isThinking || !!pendingFields}
+                className={`flex-shrink-0 w-9 h-9 rounded-xl flex items-center justify-center transition-all disabled:opacity-30 disabled:cursor-not-allowed ${
+                  isListening
+                    ? "bg-red-100 text-red-500 animate-pulse"
+                    : "text-slate-400 hover:text-slate-600 hover:bg-slate-200"
+                }`}
+                aria-label={isListening ? "Stop listening" : "Voice input"}
+              >
+                <Microphone size={16} weight={isListening ? "fill" : "regular"} />
+              </button>
+            )}
+
+            {/* Send button — sends chips + typed text combined */}
+            <button
+              onClick={() => {
+                const text = buildSendText();
+                if (text) {
+                  sendMessage(text);
+                  setSelectedChips([]);
+                }
+              }}
+              disabled={(!inputValue.trim() && selectedChips.length === 0) || isThinking || !!pendingFields}
+              className="flex-shrink-0 w-9 h-9 rounded-xl bg-primary text-primary-foreground flex items-center justify-center hover:bg-primary/90 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+              aria-label="Send"
+            >
+              {isThinking ? (
+                <span className="w-4 h-4 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin" />
+              ) : (
+                <ArrowRight size={16} weight="bold" />
+              )}
+            </button>
+          </div>
+          <p className="text-center text-[11px] text-muted-foreground mt-2">
+            Enter to send · Shift+Enter for new line
+          </p>
+        </div>
+      </div>
+
+      {/* ── Right panel — sticky to viewport, never scrolls with chat ── */}
+      <div
+        className="transition-opacity duration-500 ease-out"
+        style={{
+          opacity: hasCompanyData ? 1 : 0,
+          pointerEvents: hasCompanyData ? "auto" : "none",
+          // Sticky to just below the nav header (56px = h-14)
+          position: "sticky",
+          top: "56px",
+          alignSelf: "start",
+          maxHeight: "calc(100vh - 72px)",
+          overflowY: "auto",
+        }}
+      >
+        <div className="pt-4 space-y-3 pb-6">
+          {/* Heads-up banner — always at top of panel */}
+          {showBanner && stageMsg && (
+            <HeadsUpBanner greeting={greeting} stageMsg={stageMsg} />
+          )}
+          <CompanyProfilePanel fields={extractedFields} enrichment={enrichment} />
+        </div>
+      </div>
+    </div>
+  );
+}

@@ -73,9 +73,32 @@ You are the QA Agent for CX Mate. You ensure quality, catch edge cases, and vali
 | Winn.ai | Sales Tech/AI | Existing customers | Scaling | Customer |
 | Deel | HR Tech | Existing customers | Scaling | Full Lifecycle |
 
+## Available Skills
+
+- `/qa-gatekeeper` — Full market-readiness audit (5-category scorecard)
+- `/cx-expert` — Validate CX methodology and journey quality
+
+## Context Integrity Rules (MANDATORY)
+
+Before writing or executing any test plan:
+
+1. **Read what you're testing.** Don't test against assumptions — read the component code, API route, and prompt to understand current behavior.
+2. **Check sprint-log for what's shipped vs deferred.** Don't file bugs for features that aren't built yet.
+3. **Check decisions.md for intentional behavior.** What looks like a bug may be a documented decision.
+4. **Test the data chain end-to-end.** Onboarding → API → Claude prompt → generated output → frontend display. A test that only covers one layer misses the real bugs.
+5. **Use real test personas.** Don't test with fake data — use the documented test personas above. They cover all 4 maturity paths.
+
+**The chat regression lesson:** A new onboarding was built without verifying that the journey prompt still received all 33+ fields it needs. QA should have caught this by testing the full data chain, not just the UI.
+
+## Workflows
+
+- `T-tools/03-workflows/feature-development-workflow.md` — Step 4: VALIDATE (your primary role)
+- `T-tools/03-workflows/context-integrity-workflow.md` — Pre-test verification gate
+
 ## Required Reading
 - `C-core/project-brief.md`
 - `C-core/product-architecture.md`
 - `C-core/tech-stack.md`
 - `A-agents/qa-gatekeeper-agent.md` (for market-readiness audits)
 - `B-brain/01-cx-methodology/` (CX domain knowledge — journey stages, moments taxonomy, expert frameworks)
+- **If testing onboarding or journey:** `src/lib/ai/journey-prompt.ts`, `src/types/onboarding.ts`
