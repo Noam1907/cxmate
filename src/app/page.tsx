@@ -236,28 +236,39 @@ function DarkSection() {
 // ─── Comparison: Expert vs CX Mate ───────────────────────────────────────────
 
 function ComparisonSection() {
+  const stages = [
+    { label: "Pre-launch", active: true },
+    { label: "First customers", active: true },
+    { label: "Growing", active: true },
+    { label: "Scaling", active: true },
+    { label: "Enterprise", active: true },
+  ];
+
   return (
     <section style={{ backgroundColor: SAGE }} className="border-b border-slate-200/60">
       <div className="max-w-5xl mx-auto px-6 py-20">
         <div className="text-center mb-14">
           <p className="text-xs font-bold uppercase tracking-widest text-teal-600 mb-3">
-            Set your expectations
+            Why now, not later
           </p>
           <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900">
-            What used to take a consultant 6 weeks
+            You don&apos;t need to wait until Series B <br className="hidden sm:block" />
+            to get your CX right
           </h2>
           <p className="text-base text-slate-500 mt-3 max-w-xl mx-auto">
-            CX Mate delivers in one conversation. Here&apos;s the honest comparison.
+            CX consultants are great — for larger companies with complex operations.
+            But your first customers deserve a designed journey too.
           </p>
         </div>
 
+        {/* Side-by-side comparison cards */}
         <div className="grid sm:grid-cols-2 gap-5 max-w-3xl mx-auto">
-          {/* Old way */}
+          {/* Consultant — respectful framing */}
           <div className="rounded-2xl border border-slate-300 bg-white p-6">
             <div className="flex items-center gap-2 mb-5">
               <span className="text-lg">👤</span>
               <span className="text-xs font-bold uppercase tracking-widest text-slate-400">
-                Traditional CX Consultant
+                CX Consultant (Series B+)
               </span>
             </div>
             <ul className="space-y-3">
@@ -276,12 +287,12 @@ function ComparisonSection() {
             </ul>
           </div>
 
-          {/* CX Mate */}
+          {/* CX Mate — early stage positioning */}
           <div className="rounded-2xl border-2 p-6" style={{ borderColor: "#0D9488", backgroundColor: "#E0F7F4" }}>
             <div className="flex items-center gap-2 mb-5">
               <LogoMark size="sm" />
               <span className="text-xs font-bold uppercase tracking-widest text-teal-700">
-                CX Mate
+                CX Mate (Day One →)
               </span>
             </div>
             <ul className="space-y-3">
@@ -303,8 +314,64 @@ function ComparisonSection() {
           </div>
         </div>
 
-        <p className="text-center text-xs text-slate-400 mt-8 max-w-md mx-auto">
-          CX Mate isn&apos;t replacing your CX team — it&apos;s giving you the foundation so they can focus on what matters.
+        {/* When you start — stage timeline */}
+        <div className="mt-14 max-w-3xl mx-auto">
+          <p className="text-xs font-bold uppercase tracking-widest text-center text-slate-400 mb-6">
+            When companies typically start thinking about CX
+          </p>
+
+          {/* Timeline bar */}
+          <div className="relative">
+            {/* Stage labels + dots */}
+            <div className="flex justify-between items-end mb-3">
+              {stages.map((stage) => (
+                <div key={stage.label} className="flex flex-col items-center gap-1.5 flex-1">
+                  <span className="text-[10px] sm:text-xs text-slate-500 font-medium text-center leading-tight">
+                    {stage.label}
+                  </span>
+                </div>
+              ))}
+            </div>
+
+            {/* Track */}
+            <div className="relative h-3 rounded-full bg-slate-200 overflow-hidden">
+              {/* CX Mate range — full bar, starts from the beginning */}
+              <div
+                className="absolute inset-y-0 left-0 rounded-full"
+                style={{ width: "100%", backgroundColor: "#0D9488" }}
+              />
+            </div>
+
+            {/* Consultant range — only the last 40% */}
+            <div className="relative h-3 rounded-full bg-slate-200 overflow-hidden mt-2">
+              <div
+                className="absolute inset-y-0 right-0 rounded-full bg-slate-400"
+                style={{ width: "40%" }}
+              />
+            </div>
+
+            {/* Labels for the bars */}
+            <div className="flex justify-between mt-3">
+              <div className="flex items-center gap-1.5">
+                <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: "#0D9488" }} />
+                <span className="text-xs font-semibold text-teal-700">CX Mate — start from day one</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <span className="w-2.5 h-2.5 rounded-full bg-slate-400 shrink-0" />
+                <span className="text-xs font-semibold text-slate-500">Consultant — typically Series B+</span>
+              </div>
+            </div>
+          </div>
+
+          <p className="text-center text-sm text-slate-500 mt-8 max-w-lg mx-auto leading-relaxed">
+            You probably already have strong instincts about what your customers need.
+            <span className="font-semibold text-slate-700"> CX Mate turns those instincts into a structured plan </span>
+            — so you can start doing CX right from day one, not after you can afford a consultant.
+          </p>
+        </div>
+
+        <p className="text-center text-xs text-slate-400 mt-8 max-w-lg mx-auto">
+          When your company grows into needing a CX team or a consultant, you&apos;ll have the foundation already in place. CX Mate makes the first steps easier, cheaper, and more precise.
         </p>
       </div>
     </section>
