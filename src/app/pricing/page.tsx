@@ -35,6 +35,7 @@ interface TierConfig {
   ctaLabel: string;
   ctaHref: string | null; // null = checkout, string = nav link
   ctaStyle: "primary" | "outline" | "subtle";
+  comingSoon?: boolean; // disables checkout, shows "Coming Soon" state
 }
 
 const TIERS: TierConfig[] = [
@@ -96,11 +97,12 @@ const TIERS: TierConfig[] = [
       "HubSpot / Intercom integration",
       "Slack nudges & reminders",
     ],
-    badge: null,
+    badge: "Coming soon",
     priceKey: "pro_monthly",
-    ctaLabel: "Go Pro",
+    ctaLabel: "Notify Me When It Launches",
     ctaHref: null,
     ctaStyle: "outline",
+    comingSoon: true,
   },
 ];
 
@@ -299,14 +301,20 @@ export default function PricingPage() {
             <div
               key={tier.name}
               className={`relative rounded-2xl border p-6 flex flex-col ${
-                tier.highlight
-                  ? "border-primary ring-2 ring-primary/20 bg-white shadow-lg"
-                  : "border-slate-200 bg-white"
+                tier.comingSoon
+                  ? "border-slate-200 bg-slate-50/60 opacity-75"
+                  : tier.highlight
+                    ? "border-primary ring-2 ring-primary/20 bg-white shadow-lg"
+                    : "border-slate-200 bg-white"
               }`}
             >
               {/* Badge */}
               {tier.badge && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full text-xs font-semibold bg-primary text-white whitespace-nowrap">
+                <div className={`absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full text-xs font-semibold whitespace-nowrap ${
+                  tier.comingSoon
+                    ? "bg-slate-400 text-white"
+                    : "bg-primary text-white"
+                }`}>
                   {tier.badge}
                 </div>
               )}
@@ -333,7 +341,14 @@ export default function PricingPage() {
 
               {/* CTA */}
               <div className="mb-6">
-                {tier.ctaHref ? (
+                {tier.comingSoon ? (
+                  <a
+                    href="mailto:hello@cxmate.ai?subject=Notify%20me%20when%20Pro%20launches"
+                    className="flex items-center justify-center gap-2 w-full text-sm font-semibold py-2.5 px-4 rounded-xl transition-colors bg-slate-100 hover:bg-slate-200 text-slate-600"
+                  >
+                    {tier.ctaLabel}
+                  </a>
+                ) : tier.ctaHref ? (
                   <Link
                     href={tier.ctaHref}
                     className={`flex items-center justify-center gap-2 w-full text-sm font-semibold py-2.5 px-4 rounded-xl transition-colors ${
