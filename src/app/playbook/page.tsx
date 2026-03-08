@@ -114,6 +114,11 @@ function RecommendationCard({
           <div className="flex items-center gap-2 mt-1 flex-wrap">
             <span className="text-xs font-medium text-slate-600 bg-slate-100 px-2 py-0.5 rounded-full">{rec.owner}</span>
             <span className="text-xs text-slate-400">{rec.timing}</span>
+            {rec.toolsUsed && rec.toolsUsed.length > 0 && rec.toolsUsed.map((tool) => (
+              <span key={tool} className="text-[10px] font-medium text-violet-700 bg-violet-50 border border-violet-100 px-1.5 py-0.5 rounded-full">
+                🔧 {tool}
+              </span>
+            ))}
           </div>
 
           {expanded && (
@@ -497,9 +502,9 @@ export default function PlaybookPage() {
                     },
                     {
                       color: "bg-sky-50 text-sky-600",
-                      icon: "🤖",
-                      title: "Ready for AI asset creation",
-                      desc: "Export to NotebookLM, Claude, or ChatGPT — turn your playbook into board decks, onboarding docs, and QBRs in minutes",
+                      icon: "📄",
+                      title: "Export-ready PDF report",
+                      desc: "Download your full playbook as a shareable PDF — ready for your leadership deck, team kickoff, or next all-hands",
                     },
                   ].map((item) => (
                     <div key={item.title} className="flex items-start gap-3">
