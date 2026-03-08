@@ -738,14 +738,14 @@ export default function PlaybookPage() {
           />
         ))}
 
-        {/* Generate QBR — the big action */}
+        {/* Generate CX Review — the big action */}
         <div className="rounded-2xl border border-primary/20 bg-primary/5 p-6 space-y-3">
           <div className="flex items-start gap-3">
             <Sparkle size={20} className="text-primary mt-0.5 shrink-0" weight="fill" />
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-bold text-slate-900">Your QBR is one click away</p>
+              <p className="text-sm font-bold text-slate-900">Your CX Review is one click away</p>
               <p className="text-xs text-slate-500 mt-0.5">
-                CX Mate turns your playbook into a board-ready Quarterly Business Review — with health score, risks, priorities, and measurement plan.
+                CX Mate turns your playbook into a management-ready CX Review — with health score, risks, priorities, and measurement plan.
               </p>
             </div>
           </div>
@@ -758,7 +758,7 @@ export default function PlaybookPage() {
               }}
             >
               <Sparkle size={15} weight="fill" className="mr-2" />
-              Generate my QBR
+              Generate my CX Review
             </Button>
           </Link>
         </div>

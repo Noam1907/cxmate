@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { ArrowLeft, Copy, Check, ArrowSquareOut, DownloadSimple, Sparkle } from "@phosphor-icons/react";
+import { ArrowLeft, Copy, Check, ArrowSquareOut, ArrowRight, DownloadSimple, Sparkle } from "@phosphor-icons/react";
 import type { GeneratedPlaybook } from "@/lib/ai/recommendation-prompt";
 import type { GeneratedJourney } from "@/lib/ai/journey-prompt";
 import type { GeneratedQBR } from "@/lib/ai/qbr-prompt";
@@ -59,7 +59,7 @@ function CopyConfirmButton({ getText, label }: { getText: () => string; label: s
 
 function ExportRow({ qbr }: { qbr: GeneratedQBR }) {
   const qbrText = generateQBRText(qbr);
-  const claudePrompt = `Here is my ${qbr.quarter} CX QBR for ${qbr.companyName}. Help me prepare for the presentation, identify gaps, and suggest what to add:\n\n${qbrText}`;
+  const claudePrompt = `Here is my ${qbr.quarter} CX Review for ${qbr.companyName}. Help me prepare for the presentation, identify gaps, and suggest what to add:\n\n${qbrText}`;
 
   const openWith = (url: string, label: string) => {
     navigator.clipboard.writeText(qbrText).catch(() => {});
@@ -68,11 +68,14 @@ function ExportRow({ qbr }: { qbr: GeneratedQBR }) {
   };
 
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-4 flex flex-wrap items-center gap-3">
-      <span className="text-xs font-semibold text-slate-500 uppercase tracking-wide shrink-0">Export & extend</span>
-      <div className="flex flex-wrap items-center gap-2 ml-auto">
+    <div className="rounded-xl border border-slate-200 bg-white p-4 space-y-3">
+      <div className="flex items-center justify-between">
+        <span className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Export & extend</span>
+        <ExportPdfButton page="qbr" title={`${qbr.companyName} — ${qbr.quarter} CX Review`} size="sm" />
+      </div>
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
         <CopyConfirmButton getText={() => qbrText} label="Copy for NotebookLM" />
-        <span className="text-slate-200">|</span>
+        <span className="text-slate-200 text-xs">|</span>
         <button
           onClick={() => openWith("https://notebooklm.google.com", "notebooklm")}
           className="flex items-center gap-1.5 text-xs font-medium text-slate-600 hover:text-slate-900 transition-colors"
@@ -80,7 +83,7 @@ function ExportRow({ qbr }: { qbr: GeneratedQBR }) {
           <ArrowSquareOut size={13} />
           Open NotebookLM
         </button>
-        <span className="text-slate-200">|</span>
+        <span className="text-slate-200 text-xs">|</span>
         <button
           onClick={() => {
             navigator.clipboard.writeText(claudePrompt).catch(() => {});
@@ -92,7 +95,7 @@ function ExportRow({ qbr }: { qbr: GeneratedQBR }) {
           <ArrowSquareOut size={13} />
           Open in Claude
         </button>
-        <span className="text-slate-200">|</span>
+        <span className="text-slate-200 text-xs">|</span>
         <button
           onClick={() => {
             navigator.clipboard.writeText(claudePrompt).catch(() => {});
@@ -104,8 +107,6 @@ function ExportRow({ qbr }: { qbr: GeneratedQBR }) {
           <ArrowSquareOut size={13} />
           Open in ChatGPT
         </button>
-        <span className="text-slate-200">|</span>
-        <ExportPdfButton page="qbr" title={`${qbr.companyName} — ${qbr.quarter} CX Review`} />
       </div>
     </div>
   );
@@ -135,13 +136,13 @@ function QBRLoading({ companyName }: { companyName: string }) {
       <div className="space-y-3">
         <div className="inline-flex items-center gap-2 bg-primary/8 border border-primary/15 rounded-full px-4 py-1.5">
           <Sparkle size={14} className="text-primary animate-pulse" weight="fill" />
-          <span className="text-xs font-semibold text-primary">Generating QBR</span>
+          <span className="text-xs font-semibold text-primary">Generating CX Review</span>
         </div>
         <h1 className="text-2xl font-bold text-slate-900">
-          Building {companyName}&apos;s QBR
+          Building {companyName}&apos;s CX Review
         </h1>
         <p className="text-sm text-slate-500">
-          Turning your journey map and playbook into a board-ready quarterly review
+          Turning your journey map and playbook into a management-ready CX review
         </p>
       </div>
 
@@ -270,7 +271,7 @@ export default function QBRPage() {
     return (
       <main className="min-h-screen flex items-center justify-center p-8">
         <div className="text-center space-y-4 max-w-md">
-          <h1 className="text-xl font-bold text-slate-900">Couldn&apos;t generate QBR</h1>
+          <h1 className="text-xl font-bold text-slate-900">Couldn&apos;t generate CX Review</h1>
           <p className="text-sm text-red-600 bg-red-50 border border-red-100 rounded-lg p-3">{error}</p>
           <div className="flex gap-3 justify-center">
             <Button onClick={generate} size="sm">Try again</Button>
@@ -294,7 +295,7 @@ export default function QBRPage() {
       {/* PDF cover page — print only */}
       <PrintCover
         companyName={qbr.companyName}
-        documentType="CX Quarterly Review"
+        documentType="CX Review"
       />
 
       <div className="max-w-2xl mx-auto px-6 py-12 space-y-8">
@@ -322,11 +323,10 @@ export default function QBRPage() {
           <div className="flex items-start justify-between gap-4">
             <div>
               <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-1">
-                {qbr.quarter} Quarterly Business Review
+                {qbr.quarter} CX Review
               </p>
               <h1 className="text-3xl font-bold text-slate-900 tracking-tight">{qbr.companyName}</h1>
             </div>
-            <ExportPdfButton page="qbr" title={`${qbr.companyName} — ${qbr.quarter} CX Review`} />
           </div>
         </div>
 
@@ -429,12 +429,12 @@ export default function QBRPage() {
         </div>
 
         {/* Ask of the Quarter */}
-        <div className="rounded-2xl border border-slate-200 bg-white p-6 space-y-3">
-          <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest">Ask of the Quarter</p>
+        <div className="rounded-2xl border border-primary/20 bg-primary/3 p-6 space-y-3">
+          <p className="text-xs font-semibold text-primary/70 uppercase tracking-widest">What we need this quarter</p>
           <ul className="space-y-2.5">
             {qbr.askOfTheQuarter.map((ask, i) => (
               <li key={i} className="flex items-start gap-2.5">
-                <DownloadSimple size={14} className="text-primary mt-0.5 shrink-0" weight="bold" />
+                <ArrowRight size={14} className="text-primary mt-0.5 shrink-0" weight="bold" />
                 <p className="text-sm text-slate-700">{ask}</p>
               </li>
             ))}
@@ -447,7 +447,10 @@ export default function QBRPage() {
             <p className="text-xs font-semibold text-amber-600 uppercase tracking-widest">Open Items</p>
             <ul className="space-y-1.5">
               {qbr.openItems.map((item, i) => (
-                <li key={i} className="text-sm text-amber-800">· {item}</li>
+                <li key={i} className="flex items-start gap-2 text-sm text-amber-800">
+                  <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-amber-400 shrink-0" />
+                  {item}
+                </li>
               ))}
             </ul>
           </div>

@@ -12,7 +12,7 @@ export type PrintDocumentType =
   | "CX Intelligence Report"
   | "Journey Map"
   | "CX Playbook"
-  | "CX Quarterly Review";
+  | "CX Review";
 
 const DOCUMENT_DESCRIPTIONS: Record<PrintDocumentType, string> = {
   "CX Intelligence Report":
@@ -21,8 +21,8 @@ const DOCUMENT_DESCRIPTIONS: Record<PrintDocumentType, string> = {
     "Your complete customer journey from first touch to advocacy, with meaningful moments mapped by severity, stage risk overview, and evidence annotations tied to your specific pain points.",
   "CX Playbook":
     "Your prioritised action plan — specific recommendations with ready-to-use templates, effort estimates, measurement guidance, and AI tool suggestions for every stage of your journey.",
-  "CX Quarterly Review":
-    "Your AI-generated Quarterly Business Review — CX health score, top risks, quarter priorities, measurement framework, and action plan, built from your journey map and playbook data.",
+  "CX Review":
+    "Your AI-generated CX Review — CX health score, key findings, top risks, priorities, measurement framework, and action plan, built from your journey map and playbook data.",
 };
 
 interface PrintCoverProps {
