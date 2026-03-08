@@ -148,9 +148,9 @@ function HeroSection() {
 
             {/* Subheadline */}
             <p className="text-lg sm:text-xl text-slate-600 leading-relaxed mb-10 max-w-md">
-              The companies that win at retention map their entire lifecycle before the gaps cost them.
-              One conversation. 50+ meaningful moments. Benchmarked against companies at your exact stage.
-              Know exactly where to invest — before your customers have to tell you.
+              Most B2B startups find out what their customers actually experience from a churn conversation they didn&apos;t see coming.
+              One conversation with CX Mate maps 50+ moments across your customer lifecycle —
+              and tells you exactly what to fix before they decide to leave.
             </p>
 
             {/* CTAs */}
@@ -161,24 +161,24 @@ function HeroSection() {
                   className="rounded-xl px-8 py-6 text-base font-bold shadow-md hover:shadow-xl transition-all"
                   style={{ backgroundColor: "#0D9488", color: "white" }}
                 >
-                  Get Your Week 1 CX Sprint →
+                  Map My CX Journey →
                 </Button>
               </Link>
               <p className="text-sm text-slate-500">
-                One conversation. No setup required.
+                One conversation. No setup, no credit card.
               </p>
             </div>
 
             {/* Stats strip */}
             <div className="flex items-center gap-6 mt-10 pt-8 border-t border-slate-200">
               <div>
-                <div className="text-2xl font-extrabold text-slate-900">Minutes</div>
-                <div className="text-xs text-slate-500 mt-0.5">Not months</div>
+                <div className="text-2xl font-extrabold text-slate-900">50+</div>
+                <div className="text-xs text-slate-500 mt-0.5">Moments mapped</div>
               </div>
               <div className="w-px h-8 bg-slate-300" />
               <div>
-                <div className="text-2xl font-extrabold text-slate-900">50+</div>
-                <div className="text-xs text-slate-500 mt-0.5">Moments mapped</div>
+                <div className="text-2xl font-extrabold text-slate-900">3</div>
+                <div className="text-xs text-slate-500 mt-0.5">Deliverables: Map · Playbook · Review</div>
               </div>
               <div className="w-px h-8 bg-slate-300" />
               <div>
@@ -186,7 +186,7 @@ function HeroSection() {
                   <span className="w-2 h-2 rounded-full bg-teal-500 animate-pulse" />
                   <div className="text-2xl font-extrabold text-slate-900">Live AI</div>
                 </div>
-                <div className="text-xs text-slate-500 mt-0.5">No templates, ever</div>
+                <div className="text-xs text-slate-500 mt-0.5">Specific to your business, always</div>
               </div>
             </div>
           </div>
@@ -208,16 +208,17 @@ function DarkSection() {
     <section className="bg-slate-950 py-20 px-6">
       <div className="max-w-4xl mx-auto text-center">
         <p className="text-xs font-bold uppercase tracking-widest mb-6" style={{ color: "#2DD4BF" }}>
-          The truth about your CX
+          The question nobody wants to answer
         </p>
         <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white leading-tight mb-6">
-          The journey exists whether{" "}
+          When did you last experience your product{" "}
           <br className="hidden sm:block" />
-          <span style={{ color: "#2DD4BF" }}>you designed it or not.</span>
+          <span style={{ color: "#2DD4BF" }}>the way your customers do?</span>
         </h2>
         <p className="text-lg text-slate-400 max-w-2xl mx-auto mb-10">
-          Most B2B companies lose 15–30% of revenue to CX gaps they never mapped.
-          Customers don't tell you they're leaving. They just stop responding.
+          Not during a demo. Not during onboarding with you on the call.
+          The real experience — when they&apos;re stuck, when support is slow, when the renewal conversation catches them off guard.
+          CX Mate maps what actually happens.
         </p>
         <Link href="/onboarding">
           <Button
@@ -225,7 +226,7 @@ function DarkSection() {
             className="rounded-xl px-8 py-6 text-base font-bold"
             style={{ backgroundColor: "#0D9488", color: "white" }}
           >
-            Get Your Week 1 CX Sprint →
+            See My Customer&apos;s Journey →
           </Button>
         </Link>
       </div>
@@ -384,28 +385,28 @@ function HowItWorksSection() {
   const steps = [
     {
       number: 1,
-      label: "Conversation",
+      label: "The Conversation",
       title: "Tell us about your business",
-      description: "Your stage, your customers, your biggest pain. CX Mate adapts to where you are — not a generic template.",
-      detail: "No setup required · No credit card",
+      description: "Your product, your customers, your team, and where things break. CX Mate adapts to your answers — not a form, a real conversation.",
+      detail: "15–20 questions · No setup, no credit card",
       accent: "#F0C040",
       accentDark: "#92400E",
     },
     {
       number: 2,
-      label: "Analysis",
-      title: "We map everything",
-      description: "50+ meaningful moments, benchmarked against companies at your exact stage and vertical. Every gap, quantified.",
-      detail: "~2 minutes · Runs while you watch",
+      label: "Journey Map",
+      title: "Every stage, every moment",
+      description: "50+ touchpoints mapped across your customer lifecycle — with the friction points, emotional dips, and handoff gaps your team doesn't see.",
+      detail: "~3 minutes · Benchmarked to your stage + vertical",
       accent: "#0D9488",
       accentDark: "#134E4A",
     },
     {
       number: 3,
-      label: "Your Sprint",
-      title: "You get a sprint plan",
-      description: "Prioritized actions with copy-paste templates. Not theory. What to ship this week — starting Monday.",
-      detail: "Instant · PDF export included",
+      label: "Playbook + CX Review",
+      title: "Know exactly what to do Monday",
+      description: "A prioritized action plan with copy-paste templates. Plus a management-ready CX Review to present at your next team meeting.",
+      detail: "Instant · PDF export · Share with your team",
       accent: "#16A34A",
       accentDark: "#14532D",
     },
@@ -417,7 +418,7 @@ function HowItWorksSection() {
         <div className="text-center mb-14">
           <p className="text-xs font-bold uppercase tracking-widest text-teal-600 mb-3">How it works</p>
           <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900">
-            One conversation. Your whole journey.
+            One conversation. Three deliverables. Zero setup.
           </h2>
         </div>
 
@@ -464,28 +465,28 @@ function HowItWorksSection() {
 function FeaturesSection() {
   const features = [
     {
-      badge: "CX Intelligence",
-      title: "Where the real risks are hiding",
-      description: "The gaps your team doesn't see, quantified by revenue impact. Not opinions — methodology.",
-      emoji: "🔍",
-    },
-    {
       badge: "Journey Map",
-      title: "Your whole lifecycle, visualized",
-      description: "Every stage, every meaningful moment, mapped to your business model and maturity stage.",
+      title: "Your customer lifecycle, end to end",
+      description: "Every stage mapped — from first contact to renewal. The handoffs, the friction points, the moments of delight, and the 2–3 places where customers quietly decide whether to stay.",
       emoji: "🗺️",
     },
     {
-      badge: "CX Sprint",
-      title: "What to ship this week",
-      description: "Prioritized actions with copy-paste templates and expected outcomes. Not theory. Execution. Starting Monday.",
+      badge: "CX Playbook",
+      title: "A plan you can actually execute",
+      description: "Prioritized actions specific to your stage and vertical. Not 'improve communication' — actual initiatives ranked by impact, with templates to ship them this week.",
       emoji: "⚡",
     },
     {
+      badge: "CX Review",
+      title: "Ready for your next management meeting",
+      description: "A clear document that tells the story of your customer experience — health score, top risks, quarter priorities, and what you need from the team to fix it.",
+      emoji: "📋",
+    },
+    {
       badge: "Live Intelligence",
-      title: "Fresh analysis. Every time.",
-      description: "No templates, no generic frameworks. Every journey is generated live by AI — specific to your stage, vertical, and the moment you're in.",
-      emoji: "⚡",
+      title: "Specific to you. Never generic.",
+      description: "No templates. No copy-paste frameworks. Every analysis is generated live — calibrated to your company stage, vertical, and the actual answers you give.",
+      emoji: "🧠",
     },
   ];
 
@@ -493,9 +494,9 @@ function FeaturesSection() {
     <section style={{ backgroundColor: SAGE }}>
       <div className="max-w-5xl mx-auto px-6 py-16">
         <div className="text-center mb-10">
-          <p className="text-xs font-bold uppercase tracking-widest text-teal-600 mb-3">What you get</p>
+          <p className="text-xs font-bold uppercase tracking-widest text-teal-600 mb-3">What you walk away with</p>
           <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900">
-            Everything you need to design it right.
+            Not a report. A plan you act on Monday.
           </h2>
         </div>
 
@@ -530,11 +531,11 @@ function BottomCTA() {
     <section className="bg-slate-950 border-t border-white/8">
       <div className="max-w-2xl mx-auto px-6 py-20 text-center">
         <h2 className="text-4xl sm:text-5xl font-extrabold text-white tracking-tight mb-4">
-          Stop guessing.{" "}
-          <span style={{ color: "#2DD4BF" }}>Start mapping.</span>
+          Your customers already have an experience with your product.{" "}
+          <span style={{ color: "#2DD4BF" }}>Time to find out what it actually is.</span>
         </h2>
         <p className="text-slate-400 text-lg mb-10">
-          Find out what your customers actually experience — and exactly what to fix first.
+          One conversation. Journey Map, CX Playbook, and CX Review — delivered in minutes.
         </p>
         <Link href="/onboarding">
           <Button
@@ -542,11 +543,11 @@ function BottomCTA() {
             className="rounded-xl px-10 py-7 text-base font-bold shadow-lg hover:shadow-xl transition-all"
             style={{ backgroundColor: "#0D9488", color: "white" }}
           >
-            Get Your Week 1 CX Sprint →
+            Map My CX Journey →
           </Button>
         </Link>
         <p className="text-xs text-slate-600 mt-4">
-          One conversation. No setup required.
+          One conversation. No setup, no credit card.
         </p>
       </div>
     </section>
@@ -599,7 +600,7 @@ export default function Home() {
                 className="rounded-lg font-semibold"
                 style={{ backgroundColor: "#0D9488", color: "white" }}
               >
-                Get Started
+                Map My Journey
               </Button>
             </Link>
           </div>
