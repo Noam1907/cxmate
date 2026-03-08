@@ -357,7 +357,7 @@ export default function QBRPage() {
         <div className="rounded-2xl border border-slate-200 bg-white p-6 space-y-3">
           <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest">Key Findings</p>
           <ul className="space-y-2.5">
-            {qbr.keyFindings.map((f, i) => (
+            {(qbr.keyFindings ?? []).map((f, i) => (
               <li key={i} className="flex items-start gap-2.5">
                 <span className="mt-0.5 w-5 h-5 rounded-full bg-primary/10 text-primary text-xs font-bold flex items-center justify-center shrink-0">
                   {i + 1}
@@ -371,7 +371,7 @@ export default function QBRPage() {
         {/* Top Risks */}
         <div className="space-y-3">
           <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest">Top Risks</p>
-          {qbr.topRisks.map((risk, i) => (
+          {(qbr.topRisks ?? []).map((risk, i) => (
             <div key={i} className="rounded-2xl border border-slate-200 bg-white p-5 space-y-2">
               <div className="flex items-start justify-between gap-3">
                 <p className="text-sm font-semibold text-slate-800">{risk.risk}</p>
@@ -391,7 +391,7 @@ export default function QBRPage() {
         {/* Quarter Priorities */}
         <div className="space-y-3">
           <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest">{qbr.quarter} Priorities</p>
-          {qbr.quarterPriorities.map((p, i) => (
+          {(qbr.quarterPriorities ?? []).map((p, i) => (
             <div key={i} className="rounded-2xl border border-slate-200 bg-white p-5 space-y-3">
               <div className="flex items-start gap-3">
                 <span className="w-6 h-6 rounded-full bg-primary text-white text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">
@@ -414,7 +414,7 @@ export default function QBRPage() {
           <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest">Measurement Framework</p>
           <p className="text-sm text-slate-600 leading-relaxed">{qbr.measurementFramework.summary}</p>
           <div className="space-y-2">
-            {qbr.measurementFramework.checkpoints.map((c, i) => (
+            {(qbr.measurementFramework?.checkpoints ?? []).map((c, i) => (
               <div key={i} className="flex items-start gap-3 py-2 border-b last:border-b-0 border-slate-100">
                 <span className="text-xs font-semibold text-primary bg-primary/8 border border-primary/15 px-2 py-0.5 rounded-full shrink-0 mt-0.5">
                   {c.stage}
@@ -432,7 +432,7 @@ export default function QBRPage() {
         <div className="rounded-2xl border border-primary/20 bg-primary/3 p-6 space-y-3">
           <p className="text-xs font-semibold text-primary/70 uppercase tracking-widest">What we need this quarter</p>
           <ul className="space-y-2.5">
-            {qbr.askOfTheQuarter.map((ask, i) => (
+            {(qbr.askOfTheQuarter ?? []).map((ask, i) => (
               <li key={i} className="flex items-start gap-2.5">
                 <ArrowRight size={14} className="text-primary mt-0.5 shrink-0" weight="bold" />
                 <p className="text-sm text-slate-700">{ask}</p>
@@ -442,11 +442,11 @@ export default function QBRPage() {
         </div>
 
         {/* Open Items */}
-        {qbr.openItems?.length > 0 && (
+        {(qbr.openItems ?? []).length > 0 && (
           <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5 space-y-2">
             <p className="text-xs font-semibold text-amber-600 uppercase tracking-widest">Open Items</p>
             <ul className="space-y-1.5">
-              {qbr.openItems.map((item, i) => (
+              {(qbr.openItems ?? []).map((item, i) => (
                 <li key={i} className="flex items-start gap-2 text-sm text-amber-800">
                   <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-amber-400 shrink-0" />
                   {item}

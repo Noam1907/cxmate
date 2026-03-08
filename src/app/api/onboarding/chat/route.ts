@@ -11,6 +11,8 @@
 
 import { NextResponse } from "next/server";
 
+export const maxDuration = 60;
+
 type MessageRole = "user" | "assistant";
 
 interface Message {
