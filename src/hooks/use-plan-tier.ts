@@ -21,10 +21,14 @@ interface UsePlanTierResult {
 }
 
 export function usePlanTier(): UsePlanTierResult {
-  const [tier, setTier] = useState<PlanTier>("free");
-  const [loading, setLoading] = useState(true);
+  // Dev override: set window.__DEV_PLAN_TIER = "pro" in console to bypass gates
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const devOverride = typeof window !== "undefined" && (window as any).__DEV_PLAN_TIER as PlanTier | undefined;
+  const [tier, setTier] = useState<PlanTier>(devOverride || "free");
+  const [loading, setLoading] = useState(!devOverride);
 
   const fetchTier = useCallback(async () => {
+    if (devOverride) { setTier(devOverride); setLoading(false); return; }
     try {
       const res = await fetch("/api/billing/plan-tier");
       if (res.ok) {
@@ -36,7 +40,7 @@ export function usePlanTier(): UsePlanTierResult {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [devOverride]);
 
   useEffect(() => {
     fetchTier();

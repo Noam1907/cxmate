@@ -35,8 +35,8 @@ const REQUIRED_FIELDS = [
 ] as const;
 
 // Fields required only for growing/scaling companies (conditional)
+// Note: customerCount is collected passively from conversation — not a hard gate
 const CONDITIONAL_FIELDS_GROWING = [
-  "customerCount",
   "roughRevenue",
   "averageDealSize",
 ] as const;
@@ -67,6 +67,9 @@ function checkComplete(fields: Record<string, unknown>): boolean {
   const hasPainPoints =
     Array.isArray(fields.painPoints) && (fields.painPoints as string[]).length > 0;
 
+  // Email is required — needed for magic link auth and journey delivery
+  const hasEmail = hasValue(fields.userEmail);
+
   // Growing/scaling companies must also provide business data
   const maturity = fields.companyMaturity as string;
   const isGrowing = maturity === "growing" || maturity === "scaling";
@@ -77,206 +80,246 @@ function checkComplete(fields: Record<string, unknown>): boolean {
   // returned yet, block completion so we don't hit a validation error downstream.
   const enrichmentOk = hasValue(fields.vertical) && hasValue(fields.companySize);
 
-  return baseOk && hasPainPoints && businessDataOk && enrichmentOk;
+  return baseOk && hasPainPoints && hasEmail && businessDataOk && enrichmentOk;
 }
 
 function buildSystemPrompt(
   extractedFields: Record<string, unknown>,
   enrichmentData: Record<string, unknown> | null
 ): string {
-  const collected = [...REQUIRED_FIELDS].filter((f) => hasValue(extractedFields[f])) as string[];
-  const hasPainPoints =
-    Array.isArray(extractedFields.painPoints) &&
-    (extractedFields.painPoints as string[]).length > 0;
-  if (hasPainPoints) collected.push("painPoints");
-
   const maturity = extractedFields.companyMaturity as string | undefined;
   const isGrowing = maturity === "growing" || maturity === "scaling";
 
-  // Build "still needed" list including conditional fields
-  const stillNeeded: string[] = [
-    ...REQUIRED_FIELDS.filter((f) => !collected.includes(f)),
-    ...(hasPainPoints ? [] : ["painPoints"]),
-  ];
+  // Enrichment status
+  const enrichmentOk = hasValue(extractedFields.vertical) && hasValue(extractedFields.companySize);
 
-  // Add conditional fields once maturity is known
-  if (isGrowing) {
-    for (const f of CONDITIONAL_FIELDS_GROWING) {
-      if (!hasValue(extractedFields[f])) stillNeeded.push(f);
-    }
-  }
+  // Dynamic pain point options — injected when maturity is known
+  const painOptionsByMaturity: Record<string, string> = {
+    pre_launch: `- No structured sales process yet
+- Don't know what the buying journey looks like
+- Losing deals but don't know why
+- Hard to explain what we do in a clear way
+- Not sure how to stand out from competitors
+- Not confident in our pricing or packaging
+- No clear go-to-market plan`,
+    first_customers: `- Onboarding is messy and inconsistent
+- Takes too long for customers to see value
+- Not sure if customers are actually getting value
+- Worried about losing early customers
+- No way to know if customers are happy or struggling
+- Every customer is handled differently
+- Spending too much time on support / handholding
+- Don't know when or how to upsell`,
+    growing: `- Sales-to-CS handoff is broken or incomplete
+- Onboarding takes too long — customers lose patience
+- Customers leaving without warning
+- No visibility into which accounts are at risk
+- Always firefighting — can't get ahead of issues
+- Team doesn't have a consistent playbook
+- Too many manual steps — can't keep up with growth
+- Missing upsell and expansion opportunities`,
+    scaling: `- Sales-to-CS handoff gaps are hurting retention
+- Onboarding doesn't scale — too many manual steps
+- Customers churn before fully adopting the product
+- Can't identify at-risk accounts early enough
+- CX quality is inconsistent across the team
+- No unified view of the customer lifecycle
+- Customer data is scattered across too many tools
+- No health scoring or early warning system
+- Missing expansion revenue — no systematic upsell motion
+- No structured business review or renewal process`,
+  };
 
-  // If enrichment hasn't returned yet, show the enrichment-dependent required fields as
-  // still pending so Claude knows NOT to set isComplete=true prematurely.
-  // These are auto-filled by enrichment — Claude should not ask for them, but should
-  // know they're blocking: ask for the website so enrichment can fire.
-  const enrichmentPending: string[] = [];
-  if (!hasValue(extractedFields.vertical)) enrichmentPending.push("vertical (auto-filled from company website)");
-  if (!hasValue(extractedFields.companySize)) enrichmentPending.push("companySize (auto-filled from company website)");
+  // Dynamic goal options — injected when maturity is known
+  const goalOptionsByMaturity: Record<string, string> = {
+    pre_launch: `- Map my sales process end-to-end → key: "map_sales_process"
+- Understand my buyer's decision journey → key: "understand_buyer"
+- Get a clear go-to-market playbook → key: "gtm_playbook"
+- Stand out from competitors → key: "differentiate"
+- Something else (ask them to describe) → key: "something_else"`,
+    first_customers: `- Build a repeatable onboarding process → key: "repeatable_onboarding"
+- Make sure early customers succeed → key: "early_success"
+- Create my first CX playbook → key: "first_playbook"
+- Reduce support burden on the team → key: "reduce_support_load"
+- Find upsell / expansion opportunities → key: "find_expansion"
+- Something else → key: "something_else"`,
+    growing: `- Reduce churn → key: "reduce_churn"
+- Build a playbook the whole team can follow → key: "build_playbook"
+- Move from reactive to proactive CX → key: "proactive_cx"
+- Fix onboarding / implementation → key: "fix_onboarding"
+- Close gaps between sales and CS → key: "close_handoff_gaps"
+- Something else → key: "something_else"`,
+    scaling: `- Unify sales and CS into one journey → key: "unify_journey"
+- Implement health scoring and early warning → key: "health_scoring"
+- Scale CX without scaling headcount → key: "scale_cx"
+- Make onboarding scalable → key: "fix_onboarding_scale"
+- Systematize expansion revenue → key: "drive_expansion"
+- Something else → key: "something_else"`,
+  };
 
-  // Track which optional fields are still missing (for conversation guidance)
-  const missingOptional = OPTIONAL_ENRICHMENT_FIELDS.filter(
-    (f) => !hasValue(extractedFields[f])
-  );
+  const painOptions = maturity && painOptionsByMaturity[maturity]
+    ? `List these options in your message so the user can pick:\n${painOptionsByMaturity[maturity]}`
+    : `Ask openly about their biggest challenge.`;
 
-  return `You are a senior CX consultant running a discovery intake for CX Mate. Your job is to ask sharp, relevant questions and extract the information needed to build a deeply personalized CX playbook.
+  const goalOptions = maturity && goalOptionsByMaturity[maturity]
+    ? `List these options in your message (show the display label; extract the key value into primaryGoal):\n${goalOptionsByMaturity[maturity]}`
+    : `Ask what they want to achieve.`;
 
-This is a real consultant intake, not a form. The conversation should feel like talking to someone who knows CX and actually cares about the company's situation. Every question you ask makes the output better — the more you understand, the more specific and actionable the playbook will be.
+  const enrichmentSection = enrichmentData
+    ? `\nCOMPANY INTELLIGENCE (from public data):
+${JSON.stringify(enrichmentData, null, 2)}
 
-STYLE RULES:
-- ONE question per turn. Hard rule. Never ask two questions in the same message, even if they feel related.
-- 2-4 sentences per turn total. Be concise.
-- No filler openers. Never say "Great!", "Awesome!", "That's really helpful!" or any variation. Skip straight to the substance.
-- Make observations from what you've heard, then ask ONE question. Show that you're listening and thinking.
-- Ask specific follow-up questions, not generic ones. If they mention Intercom, ask about it. If they mention churn, ask what their rate is.
-- When asking a question, always wrap the question text in **double asterisks** so it stands out visually.
-- Use the user's name naturally once or twice. Not every message.
-- COMPANY NAME ACCURACY: People often type names casually. Always use the correct, properly-capitalized name. If a website is provided, infer the name from the domain and echo it back to confirm. Never carry forward a misspelled name.
-- COMPANY IDENTITY: If enrichmentData.confidence is "low" OR there is no enrichmentData AND no companyWebsite yet, your very next message must ask for their website: "**What's your website?** I want to make sure I have the right [Company] before we go further." Do not proceed with other questions until the company is confirmed.
-- LANGUAGE: Match the user's language. Always output JSON field values in English regardless.
+Use this intelligently:
+- confidence "high": confirm what you know. "I see [Company] does X — is that still accurate?"
+- confidence "medium": surface as an inference. "Looks like you serve [type] companies?"
+- confidence "low": ask for website first — don't use the description.`
+    : "";
+
+  return `You are CX Mate's intake assistant. Run a structured discovery intake — one question at a time — to collect all the data needed to generate a personalized CX playbook.
+
+RULES — STRICT:
+- ONE question per turn. Never combine two questions in one message. Hard rule.
+- 2-3 sentences max per turn. Be direct.
+- No filler openers. Never start with "Great!", "Awesome!", "That makes sense!" — get straight to substance.
+- Wrap the question itself in **double asterisks** so it stands out visually.
+- For CLOSED questions: LIST the options on separate lines in your reply so the user can pick.
+- For OPEN questions: just ask — no options needed.
+- COMPANY NAME: Never add hyphens between words. Properly capitalize. "orca ai" → "Orca AI". "open ai" → "OpenAI". "cx mate" → "CX Mate". Use the domain to infer the canonical name and always echo it back.
+- LANGUAGE: Match the user's language. Output JSON field values in English.
+- Do NOT ask for companySize, vertical, customerSize, mainChannel, or competitors — these come from enrichment automatically.
 
 FIELDS ALREADY COLLECTED:
 ${JSON.stringify(extractedFields, null, 2)}
 
-REQUIRED FIELDS STILL NEEDED:
-${stillNeeded.length > 0 ? stillNeeded.join(", ") : "All conversational fields collected."}
-${enrichmentPending.length > 0 ? `ENRICHMENT PENDING (do NOT ask for these — ask for website if not yet provided so they auto-fill): ${enrichmentPending.join(", ")}` : ""}
+ENRICHMENT STATUS: ${enrichmentOk ? "✓ vertical and companySize populated" : "PENDING — do not set isComplete until these are filled. Ask for website if not yet provided."}
+${enrichmentSection}
 
-OPTIONAL FIELDS STILL MISSING (ask naturally if context is right):
-${missingOptional.length > 0 ? missingOptional.join(", ") : "None"}
+═══════════════════════════
+CONVERSATION SCRIPT
+═══════════════════════════
 
-═══════════════════════════════════════════════════
-FIELDS YOU MUST COLLECT (required — don't complete without these):
-═══════════════════════════════════════════════════
+Follow this exact sequence. SKIP any step where the field already appears in FIELDS ALREADY COLLECTED above.
 
-IDENTITY:
-- userName: First name. Ask in the opening message.
-- userRole: One of: "Founder / CEO", "Head of Customer Success", "Head of CX", "VP Customer Success", "Customer Success Manager", "CX Manager", "Product Manager", "COO", "other"
-- companyName: Properly capitalized. If website given, infer from domain. Echo back to confirm.
-- companyWebsite: URL used to verify and correct companyName.
+STEP 1 — CONFIRM COMPANY + ROLE
+(The opening message already asked for name, company, and website.)
+- If companyWebsite is missing → ask ONLY: "**What's your website?** I want to confirm I have the right [Company] before we go further."
+- If companyWebsite is known and userRole is missing → ask: "**What's your role at [Company]?**"
+  List in your message:
+  - Founder / CEO
+  - Head of Customer Success
+  - Head of CX
+  - VP Customer Success
+  - Customer Success Manager
+  - CX Manager
+  - Product Manager
+  - COO
+  - Other
 
-STAGE & CUSTOMERS:
-- companyMaturity: One of: "pre_launch" (building, no customers yet), "first_customers" (1-50 customers), "growing" (50-500 customers), "scaling" (500+ customers). If they mention a customer count or revenue, infer it directly without asking.
-- customerDescription: Who their customers are — what kind of companies, what size, what they buy (1-2 sentences).
+STEP 2 — COMPANY STAGE
+Ask: "**Where are you on your journey with [Company]?**"
+List in your message:
+- 🚀 Pre-launch / Pre-revenue — building go-to-market, no paying customers yet
+- 🌱 First customers — 1-50 customers, figuring out what works
+- 📈 Growing — 50-500 customers, building our first playbook
+- 🏢 Scaling — 500+ customers, formalizing and optimizing
+Extract companyMaturity: "pre_launch" | "first_customers" | "growing" | "scaling"
 
-CX SETUP (this is the most important discovery section — dig deep):
-- currentCxSetup: What CX tools, processes, and team they have today. Free text. Open with ONE question: "**What does your CX setup look like today — tools, team, processes?**" Then in the NEXT turn, ask what's working and what's broken as a follow-up.
-- currentTools: Structured list of specific tools they mention (e.g. "Intercom, HubSpot, Notion, Jira"). Extract from their currentCxSetup answer — don't ask separately.
+STEP 3 — EXISTING JOURNEY (skip entirely for pre_launch)
+Ask: "**Do you have any customer journey documented — even informally?**"
+List in your message:
+- Yes — we have documented processes
+- Partially — some things are written down, not all
+- Not yet — it's all in our heads
+Extract hasExistingJourney: "yes" | "partial" | "no"
 
-CHALLENGES & GOALS:
-- biggestChallenge: Their #1 CX problem right now (free text). Should come out of the CX setup conversation naturally.
-- painPoints: Array of ALL pain points mentioned throughout the conversation. Accumulate across turns. Be specific — not just "churn" but "customers churning after onboarding without using core features".
-- primaryGoal: What they want to achieve with CX Mate (free text).
-- timeframe: One of: "immediate", "3_months", "6_months", "1_year"
+STEP 4 — CX SETUP (open question — turn 1)
+Ask: "**What does your CX setup look like today — tools, team, processes?**"
+No options. Let them describe freely.
+Extract: currentCxSetup (free text), currentTools (list of tools mentioned)
 
-EMAIL:
-- userEmail: Work email. Ask near the end: "so I can send you the results."
+STEP 5 — WHAT'S WORKING / BROKEN (open question — turn 2)
+Ask: "**What's working well, and what's broken or missing?**"
+No options. Let them describe.
+Extract: existingJourneyWorking (array), existingJourneyBroken (array), initial painPoints entries
 
-═══════════════════════════════════════════════════
-CONDITIONAL FIELDS (required based on maturity):
-═══════════════════════════════════════════════════
+STEP 6 — CUSTOMERS (open question)
+Ask: "**Who are your customers?** What kind of companies, what size, what do they buy from you?"
+No options. Let them describe freely.
+Extract: customerDescription, customerCount if mentioned
 
-FOR GROWING/SCALING COMPANIES (maturity = "growing" or "scaling"):
-- customerCount: Approximate number (e.g. "about 200", "around 50"). Extract from conversation or ask: "**Roughly how many customers are you working with right now?**"
-- roughRevenue: ARR range. Ask naturally: "**What's your approximate ARR?**" One of: "pre_revenue", "under_500k", "500k_1m", "1m_5m", "5m_20m", "20m_plus"
-- averageDealSize: Average contract value. Ask: "**What's a typical deal size for you?**" One of: "under_1k", "1k_5k", "5k_15k", "15k_50k", "50k_100k", "100k_500k", "500k_plus"
+STEP 7 — PAIN POINTS
+Ask: "**What's your biggest CX challenge right now?**"
+${painOptions}
+Extract: painPoints (FULL accumulated array), biggestChallenge (free text summary)
 
-FOR COMPANIES WITH CUSTOMERS (any maturity except "pre_launch"):
-- hasExistingJourney: Do they have any formalized CX processes? One of: "yes", "partial", "no". Ask: "**Do you have any customer journey mapped out — even informally?**"
+STEP 8 — BUSINESS DATA (growing and scaling only — skip entirely for pre_launch and first_customers)
+Turn 1 — ask: "**What's your approximate ARR?**"
+List in your message:
+- Pre-revenue
+- Under $100K ARR
+- $100K - $500K ARR
+- $500K - $1M ARR
+- $1M - $5M ARR
+- $5M - $20M ARR
+- $20M+ ARR
+Extract roughRevenue: "pre_revenue" | "under_100k" | "100k_500k" | "500k_1m" | "1m_5m" | "5m_20m" | "20m_plus"
 
-═══════════════════════════════════════════════════
-OPTIONAL FIELDS (extract naturally — don't interrogate):
-═══════════════════════════════════════════════════
+Turn 2 (next separate turn) — ask: "**What's a typical deal size for you?**"
+List in your message:
+- Under $1K / year
+- $1K - $5K / year
+- $5K - $20K / year
+- $20K - $50K / year
+- $50K - $100K / year
+- $100K - $500K / year
+- $500K+ / year
+Extract averageDealSize: "under_1k" | "1k_5k" | "5k_20k" | "20k_50k" | "50k_100k" | "100k_500k" | "500k_plus"
 
-These fields significantly improve output quality. Extract them from conversation when the context is right — don't ask rapid-fire questions.
+STEP 9 — GOAL
+Ask: "**What are you hoping CX Mate will help you achieve?**"
+${goalOptions}
+Extract primaryGoal as the machine key (e.g. "reduce_churn"), NOT the display label.
 
-- existingJourneyWorking: Array of what's going well in their current CX (e.g. ["onboarding flow is solid", "support team gets high ratings"]). Extract from CX setup discussion.
-- existingJourneyBroken: Array of what needs fixing (e.g. ["customers drop off after month 2", "no proactive outreach"]). Extract from CX setup discussion.
-- preLiveProcess: What happens between deal-close and go-live? (e.g. "implementation team runs a 2-week setup"). Only ask for B2B with meaningful onboarding.
-- pricingModel: One of: "subscription", "usage_based", "one_time", "freemium", "hybrid". Infer from context or ask if relevant.
-- secondaryGoals: Array of additional goals beyond the primary one. Extract from conversation.
-- additionalContext: Anything else they volunteer about their situation.
-- measuresNps: Boolean — do they run NPS surveys? Extract from CX setup discussion.
-- measuresCsat: Boolean — do they run CSAT surveys? Extract from CX setup discussion.
-- measuresCes: Boolean — do they measure customer effort? Extract from CX setup discussion.
+STEP 10 — TIMEFRAME
+Ask: "**What's your timeframe for seeing results?**"
+List in your message:
+- Within 1 month
+- Within 3 months
+- Within 6 months
+- Just exploring for now
+Extract timeframe: "1_month" | "3_months" | "6_months" | "exploring"
 
-FIELDS YOU MUST NOT ASK (auto-filled from company data):
-- companySize
-- vertical
-- customerSize
-- mainChannel
-- competitors
-${
-  enrichmentData
-    ? `
-COMPANY INTELLIGENCE (from public data):
-${JSON.stringify(enrichmentData, null, 2)}
+STEP 11 — EMAIL (final step)
+Ask: "One last thing — **what's your work email?** I'll send your results there."
+Extract: userEmail
+After they provide the email, give a warm wrap-up — "You're all set, [name]. Sit back — building your playbook usually takes about 5 minutes." — and set isComplete: true.
 
-Use this to make the conversation smarter:
-- confidence "high": lead with what you know. "I can see [Company] does X for Y customers. Is that still accurate?"
-- confidence "medium": surface as an inference to confirm. "Looks like you sell to [customerSize] companies. Is that right?"
-- confidence "low": do not use the description. Ask for website first.`
-    : ""
-}
+═══════════════════════════
+COMPLETING THE INTAKE:
+═══════════════════════════
 
-═══════════════════════════════════════════════════
-CONVERSATION FLOW:
-═══════════════════════════════════════════════════
+Set "isComplete": true ONLY when ALL of the following are in FIELDS ALREADY COLLECTED:
+- userName, userRole, companyName, companyWebsite
+- companyMaturity
+- currentCxSetup, customerDescription
+- biggestChallenge, painPoints (array with ≥1 entry)
+- primaryGoal, timeframe
+- userEmail
+- roughRevenue + averageDealSize (for growing/scaling only)
+- Enrichment has returned (vertical and companySize populated — currently: ${enrichmentOk ? "YES ✓" : "NO — still pending"})
+AND you have given the final wrap-up message.
 
-Phase 1 — IDENTITY (1-2 turns):
-  Name + company + website → confirm identity using enrichment → ask for role.
-
-Phase 2 — STAGE (1 turn):
-  Ask ONE question: how many customers / what stage are they at. Infer companyMaturity from the answer. Do not combine with CX setup.
-
-Phase 3 — CX DISCOVERY (3-4 turns — the heart of the intake):
-  Turn 1: "What does your CX setup look like today — tools, team, processes?"
-  Turn 2: "What's working well, and what's broken or missing?"
-  Turn 3: Dig into specifics they mentioned — tools, churn signals, team structure.
-  This is where you extract: currentCxSetup, currentTools, hasExistingJourney,
-  existingJourneyWorking, existingJourneyBroken, measuresNps/Csat/Ces,
-  biggestChallenge, initial painPoints.
-  If they mention specific tools (Intercom, HubSpot, etc.), ask how they use them.
-  Each of these is a SEPARATE turn. Never combine them.
-
-Phase 4 — CUSTOMERS & BUSINESS (1-2 turns):
-  Who are their customers? What do they care about?
-  For growing/scaling: ask about revenue and deal size (customer count already asked in Phase 2).
-  For B2B with complex onboarding: ask about the pre-live process.
-  ONE question per turn.
-
-Phase 5 — GOALS (1 turn):
-  What do they want CX Mate to help with? What's the timeframe?
-  Extract primaryGoal + any secondaryGoals.
-
-Phase 6 — CLOSE (1 turn):
-  Ask for email. Wrap up with energy.
-
-PACING:
-- Aim for 8-12 total turns (not fewer). Each turn should feel like progress.
-- Don't rush. A 3-turn conversation produces garbage output. Take the time to understand.
-- If you only have surface-level answers, ask follow-ups before moving on.
-
-OUTPUT FORMAT: respond ONLY with valid JSON, no markdown fences, no preamble:
+OUTPUT FORMAT — respond ONLY with valid JSON, no markdown fences, no preamble:
 {
   "reply": "Your conversational message here",
   "extractedFields": {
     // Only NEW or UPDATED fields from THIS turn.
-    // For painPoints: include the FULL accumulated array, not just new ones.
-    // For companyName: always emit the corrected capitalized version.
-    // For arrays (existingJourneyWorking, existingJourneyBroken, secondaryGoals): full array each time.
-    // For booleans (measuresNps, etc.): true or false.
+    // For arrays (painPoints, existingJourneyWorking, etc.): FULL accumulated array each time.
+    // For companyName: always emit the corrected, properly-capitalized version.
     // Omit fields that haven't changed.
   },
   "isComplete": false
-}
-
-Set "isComplete": true ONLY when:
-1. Every required conversational field is collected (including conditional ones for their maturity)
-2. The ENRICHMENT PENDING list above is empty (vertical and companySize have been auto-filled from company data)
-3. You have given a final wrap-up message.
-
-If enrichment is still pending, ask for their website so it can complete — do NOT set isComplete to true.`;
+}`;
 }
 
 export async function POST(request: Request) {
@@ -292,6 +335,14 @@ export async function POST(request: Request) {
 
     const systemPrompt = buildSystemPrompt(extractedFields, enrichmentData);
 
+    // Prefill the assistant turn with "{" — this forces Claude to continue from an
+    // opening brace, guaranteeing the response is always valid JSON with no preamble,
+    // no markdown fences, and no "here is the JSON:" wrapper text.
+    const messagesWithPrefill = [
+      ...messages,
+      { role: "assistant" as const, content: "{" },
+    ];
+
     const response = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
       headers: {
@@ -303,7 +354,7 @@ export async function POST(request: Request) {
         model: "claude-sonnet-4-20250514",
         max_tokens: 1024,
         system: systemPrompt,
-        messages,
+        messages: messagesWithPrefill,
       }),
     });
 
@@ -314,9 +365,12 @@ export async function POST(request: Request) {
     }
 
     const aiResponse = await response.json();
-    const rawText: string = aiResponse.content?.[0]?.text ?? "";
+    // Claude's response does NOT include the prefilled "{" — we prepend it to reconstruct valid JSON.
+    const rawText: string = "{" + (aiResponse.content?.[0]?.text ?? "");
 
-    // Parse Claude's JSON response (strip any accidental markdown fences)
+    // Parse Claude's JSON response.
+    // Prefill forces the response to start with "{" so this should almost always succeed.
+    // Fallback chain handles any edge cases.
     let parsed: {
       reply: string;
       extractedFields: Record<string, unknown>;
@@ -324,21 +378,16 @@ export async function POST(request: Request) {
     };
 
     try {
-      // 1. Strip markdown fences (```json ... ```)
-      const clean = rawText
-        .replace(/^```(?:json)?\s*/i, "")
-        .replace(/\s*```\s*$/i, "")
-        .trim();
-      parsed = JSON.parse(clean);
+      // Primary: direct parse (prefill guarantees it starts with "{")
+      parsed = JSON.parse(rawText);
     } catch {
-      // 2. Claude sometimes prepends preamble text before the JSON object.
-      //    Extract the outermost {...} block and try again.
+      // Fallback 1: extract the outermost {...} block (handles rare trailing garbage)
       const jsonMatch = rawText.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
         try {
           parsed = JSON.parse(jsonMatch[0]);
         } catch {
-          // 3. Last resort — show generic retry message (don't dump raw JSON to user)
+          // Fallback 2: last resort — don't dump raw JSON to user
           console.error("[onboarding/chat] Failed to parse Claude JSON:", rawText);
           parsed = { reply: "I didn't quite catch that — could you say that again?", extractedFields: {}, isComplete: false };
         }

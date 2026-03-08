@@ -8,6 +8,9 @@
     },
     "src/app/api/enrich-company/route.ts": {
       "maxDuration": 30
+    },
+    "src/app/api/generate-qbr/route.ts": {
+      "maxDuration": 120
     }
   },
   "crons": [

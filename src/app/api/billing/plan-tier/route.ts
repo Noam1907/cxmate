@@ -11,8 +11,15 @@ import { getUser, getOrgId } from "@/lib/supabase/auth";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { PlanTier } from "@/lib/tier-access";
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    // Dev override: ?tier=pro or ?tier=full_analysis for testing
+    const url = new URL(request.url);
+    const devTier = url.searchParams.get("tier");
+    if (process.env.NODE_ENV === "development" && devTier) {
+      return NextResponse.json({ tier: devTier as PlanTier });
+    }
+
     const user = await getUser();
     if (!user) {
       return NextResponse.json({ tier: "free" as PlanTier });

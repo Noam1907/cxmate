@@ -40,7 +40,14 @@ export type AnalyticsEvent =
   // Beta / waitlist
   | { name: "waitlist_joined"; referral_source?: string; role?: string }
   // Export
-  | { name: "pdf_exported"; page: "journey" | "cx_report" | "playbook" | "dashboard" };
+  | { name: "pdf_exported"; page: "journey" | "cx_report" | "playbook" | "dashboard" | "qbr" }
+  | { name: "playbook_exported"; destination: string }
+  // QBR
+  | { name: "qbr_cta_clicked" }
+  | { name: "qbr_generation_started" }
+  | { name: "qbr_generation_succeeded"; company?: string; quarter?: string }
+  | { name: "qbr_generation_failed"; error?: string }
+  | { name: "qbr_exported"; destination: string };
 
 // ─── Track Function ───────────────────────────────────────────────────────────
 

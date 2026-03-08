@@ -217,6 +217,36 @@ Key validated stats for use in impact projections, prompts, and messaging (sourc
   - Added principles #10 (eat our own cooking) and #11 (build on what exists) to product-architecture.md
   - The moat is in the inputs, not the model. This principle was already in the project brief — but it wasn't enforced as a constraint. Now it is.
 
+### 2026-03-07 — The Intelligence Stack Upgrade: What "Depth" Actually Means in Practice
+
+- **The C+ → A gap is entirely in the input specificity, not the model.** Orca AI scored C+ with the old system because generic LLM knowledge of maritime AI is shallow. The updated intelligence stack produced: bridge officer professional identity as the adoption barrier (not feature confusion), Fleet Safety Director 2-3 year tenure as the champion risk signal, Lloyd's actuarial language as the CFO ROI mechanism, and EMSA incident data as the benchmark source. The model is identical — the context layer is what changed.
+- **"Monitoring" is the single most damaging word Orca AI can use.** The entire Safety Culture Wall pattern traces to one language choice. Professionals with 20 years of sea experience don't accept a system that implies they need to be monitored. The fix is not a feature — it's a vocabulary audit. This class of insight (domain-specific word that triggers professional identity defense) is only accessible when L1 (CX methodology) understands professional identity dynamics and L2 (market intelligence) understands the maritime culture. Vertical-specific language audits are a recurring pattern across enterprise B2B products.
+- **Selling the absence of accidents requires instrumentation on Day 1.** The "Phantom Metric Problem" is not unique to maritime — it appears in any product that delivers preventive value (security software, predictive maintenance, insurance). The pattern: if you don't capture the baseline before the product starts working, you can never prove what it prevented. The actionable rule: for any product that prevents negative outcomes, Day 1 data collection is a CX requirement, not a nice-to-have.
+- **COO-ready output and internal working output are different documents.** The internal output (`orca-ai-cx-mate-full-output.md`) contains intelligence layer references, confrontation mode labels, methodology annotations, and architecture meta-commentary — useful for the team, wrong for the client. The COO-ready version (`orca-ai-coo-report.md`) strips all of that and reads like a premium consulting deliverable. Rule: every significant output needs two versions. The internal one explains WHY (useful for team learning). The external one delivers WHAT (useful for clients and demo validation).
+- **The moat validation loop:** Build the output → strip the internal scaffolding → show it to the customer → "how did you know this about us?" is the north star signal. If the COO asks that question, the intelligence stack is working. If they say "this is generic," something in the input chain failed. Run this validation cycle on every new vertical before claiming the stack works there.
+
+### 2026-03-07 — Core Files Must Be Read Before ANY Output, Not Just Code
+
+- **What happened:** Asked to write a working paper on enrichment layer architecture. Jumped straight to writing from conversation context + memory file. Produced a paper with a conflicting layer numbering scheme (invented "L1/L2/L3") that directly clashed with the existing 5-layer intelligence roadmap already in `O-output/intelligence-layers-roadmap.md`. Also missed the NotebookLM export decision already made and documented in `product-architecture.md`. Had to rewrite from scratch after reading the correct files.
+- **The mistaken assumption:** "The memory file and conversation summary tell me enough context to work." They don't. The memory file tells you what changed *this session*. Core files tell you what was decided *across all sessions*. These are different things.
+- **The protocol violation:** Session Start Protocol in CLAUDE.md is explicit: read core files first, build second. This applies to **all output** — working papers, strategy docs, prompts, code — not just code changes. There is no "small enough" task that skips the reading step.
+- **Why it matters:** We now have a living intelligence layers roadmap (`O-output/intelligence-layers-roadmap.md`) that took significant effort to produce. Any agent writing about intelligence layers without reading it is guaranteed to reinvent it wrongly. The same is true for `product-architecture.md`, `decisions.md`, and every other core file.
+- **The fix:**
+  1. Before ANY work — code, documents, prompts, strategy — read: `C-core/product-architecture.md`, the relevant `O-output/` files for that topic, and `M-memory/decisions.md`.
+  2. The session start protocol is not optional even in continuation sessions. Continuation ≠ context. Read the files anyway.
+  3. If an `O-output/` file already exists on the topic you're working on, read it first. Don't write a new one until you understand what the old one says.
+- **The principle this reinforces:** "Build on what exists" (Principle #11 in product-architecture.md). It applies to documents and working papers just as much as code.
+
+---
+
+### 2026-03-08 — Agentic-First Design as Core Principle
+
+- **Source:** Yaniv Yaakubovich (Israeli product/design leader, 10K followers) posted a framework for 3 stages of AI interface design. Stage 1 = static UI + AI automations. Stage 2 = static + agent management. Stage 3 = 100% AI-first (conversation-based, generative UI, proactive, transparent). CX Mate is late Stage 1 pushing into Stage 2. We need to build for Stage 3.
+- **The principle:** "We are building for the new world." Every feature, every screen, every agent decision should be evaluated through the agentic-first lens. Not "what page does the user go to?" but "how does the system bring this to the user?"
+- **What changed:** Added Principle #12 (Agentic-first design) to `C-core/product-architecture.md`. Added full "Agentic-First Design Lens" section to `A-agents/ai-engineer-agent.md` with a checkpoint table every feature must pass. Saved strategic intel to `M-memory/intel/2026-03-08-agentic-first-design.md`.
+- **Practical implications:** (1) Chat onboarding is our first Stage 3 feature — treat it as the paradigm, not the exception. (2) Output pages should evolve toward generative UI — AI decides what to show. (3) Between-session behavior (nudges, re-analysis, proactive insights) is the real Pro tier value. (4) Every AI prompt should be designed as a re-invocable agent, not a one-shot generator. (5) Transparency (Evidence Wall, formulas, data badges) is our existing Stage 3 strength — double down.
+- **The AI Engineer is now the guardian of this direction.** Their checkpoint: before any feature, ask "Is this Stage 1 or Stage 3?"
+
 ---
 
 ## Version History

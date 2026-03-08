@@ -31,7 +31,7 @@ export interface PlaybookRecommendation {
   momentName: string;
   stageName: string;
   action: string; // What to do — specific and concrete
-  type: "email" | "call" | "internal_process" | "automation" | "measurement";
+  type: "email" | "call" | "internal_process" | "automation" | "measurement" | "ai_agent";
   priority: "must_do" | "should_do" | "nice_to_have";
   owner: string; // Who should do this (role, not a name)
   timing: string; // When to do it (e.g., "Within 24 hours of signup")
@@ -39,6 +39,7 @@ export interface PlaybookRecommendation {
   expectedOutcome: string;
   effort: "15_min" | "1_hour" | "half_day" | "multi_day";
   measureWith: string; // How to know it worked
+  toolsUsed?: string[]; // Specific tools from the user's stack referenced in this recommendation (e.g., ["HubSpot", "Intercom"])
 }
 
 export interface StagePlaybook {
@@ -257,18 +258,29 @@ Rules:
 5. **Assign owners.** Use roles like "Founder," "Sales Rep," "CS Manager," "Product Team" — not names.
 6. **Make effort realistic.** Use these effort levels: "15_min", "1_hour", "half_day", "multi_day".
 7. **Connect to measurement.** Every recommendation should say how to know it worked.
-8. **ALWAYS RECOMMEND AI SOLUTIONS.** For EVERY recommendation, think about whether an AI tool available TODAY can automate, assist, or enhance it. Actively recommend specific AI-powered tools and solutions. Examples:
-   - AI writing assistants (Jasper, Copy.ai) for email/content templates
-   - AI chatbots (Intercom Fin, Zendesk AI, Drift) for customer support and onboarding
-   - AI-powered analytics (Mixpanel, Amplitude, FullStory with AI insights) for behavior analysis
-   - AI meeting assistants (Gong, Chorus, Fireflies) for call analysis and coaching
-   - AI customer success platforms (Gainsight with AI, Totango, ChurnZero) for health scoring
-   - AI survey/feedback tools (Qualtrics XM, Medallia, SentiSum) for sentiment analysis
-   - AI sales tools (Apollo, Outreach, Salesloft) for prospecting and sequencing
-   - AI knowledge bases (Notion AI, Guru, Slite) for internal documentation
-   - AI workflow automation (Zapier AI, Make, n8n) for process automation
-   - LLM-powered personalization for emails, onboarding flows, and customer communications
-   When recommending AI tools, be specific: name the tool, explain HOW it applies to their specific moment, and note if it replaces manual work. The future of CX is AI-augmented — make sure every playbook reflects this.
+7b. **Tag tools explicitly.** When a recommendation specifically uses a tool from their stack (${input.currentTools ? `their tools: ${input.currentTools}` : "no specific stack given"}), include those tool names in the \`toolsUsed\` array so users can see exactly which of their tools each action uses. Only include tools that are genuinely part of executing that specific action.
+8. **ALWAYS RECOMMEND AI AGENTS AND AGENTIC SOLUTIONS — NOT JUST TOOLS.** Think in the new world: autonomous AI agents that work 24/7, not just software with AI features bolted on. For EVERY recommendation, ask: "Could an AI agent handle this autonomously?" If yes, recommend the agent-first approach.
+
+   **Agentic recommendations (prioritize these):**
+   - **AI support agents** (Intercom Fin, Zendesk AI, Ada) — autonomous first-response agents that resolve 60-80% of tickets without human intervention, learn from every interaction, escalate intelligently
+   - **AI SDR/BDR agents** (11x.ai, Artisan, Relevance AI) — autonomous prospecting agents that research leads, write personalized outreach, handle replies, and book meetings while humans sleep
+   - **AI onboarding agents** — build custom agents (via LLM APIs or platforms like Relevance AI, Voiceflow) that guide new users through setup conversationally, detect confusion, adapt the flow in real-time
+   - **AI customer success agents** (Gainsight Staircase AI, ChurnZero AI) — agents that monitor health signals continuously, detect risk patterns before humans notice, auto-trigger interventions
+   - **AI meeting intelligence agents** (Gong, Fireflies, Otter) — agents that join calls autonomously, extract action items, detect sentiment shifts, flag coaching moments, generate follow-ups
+   - **AI workflow agents** (Zapier AI agents, Make AI, n8n with LLM nodes, Relevance AI) — agents that don't just automate triggers but make decisions: "customer hasn't logged in for 7 days AND has open support ticket → send personalized re-engagement with context"
+   - **AI content agents** — agents that generate personalized customer communications at scale: onboarding sequences that adapt per user, renewal messages that reference actual usage data, expansion suggestions timed to value milestones
+   - **AI analytics agents** (Mixpanel, Amplitude, FullStory with AI) — agents that proactively surface insights: "3 customers from your enterprise segment dropped off at the same step this week"
+   - **AI feedback agents** (Qualtrics XM, SentiSum, MonkeyLearn) — agents that continuously analyze open-text feedback across channels, detect emerging themes, alert on sentiment shifts
+   - **AI knowledge agents** (Notion AI, Guru, Glean) — agents that keep internal docs current, answer team questions instantly, detect when documentation is stale or contradicts actual processes
+
+   **The framing matters:** Don't say "use Intercom for chat support." Say "deploy an AI support agent that handles first-response 24/7 and escalates to your team only when it detects genuine complexity or emotional escalation." The recommendation should describe the AGENT's behavior, not just the tool name.
+
+   **For every recommendation, specify the automation level:**
+   - 🤖 **Fully autonomous** — agent handles end-to-end, human reviews results
+   - 🤖+👤 **Agent-assisted** — agent does the heavy lifting, human makes the final call
+   - 👤 **Human-led, AI-enhanced** — human drives, AI provides context/drafts/analysis
+
+   When recommending, be specific: name the agent/platform, describe what the agent DOES autonomously, what it escalates, and what it learns over time. The future of CX is agentic — every playbook should reflect this reality.
 9. **ALWAYS INCLUDE MEASUREMENT SETUP.** Every stage playbook MUST include at least one "type: measurement" recommendation. Choose the RIGHT measurement tool for this stage using the CX Measurement Tools knowledge above:
    - **Demo/Trial** → Post-interaction survey (CSAT/stars after every demo), CES after trial setup. Template: a 2-question email sent within 1 hour of the demo.
    - **Onboarding** → Onboarding completion tracking (milestone-based funnel), CES at Day 3 ("How easy was setup?"), CSAT at Day 7. Template: a simple 1-question in-app survey or email.
@@ -298,14 +310,15 @@ Return a JSON object with this exact structure:
           "momentName": "Which moment this addresses",
           "stageName": "Stage Name",
           "action": "Specific action to take (2-3 sentences max)",
-          "type": "email" | "call" | "internal_process" | "automation" | "measurement",
+          "type": "email" | "call" | "internal_process" | "automation" | "measurement" | "ai_agent",
           "priority": "must_do" | "should_do" | "nice_to_have",
           "owner": "Role name",
           "timing": "When to do this (specific trigger or timeframe)",
           "template": "Ready-to-use template text (email body, script, checklist). Include actual words they should use. Use [brackets] for personalization fields.",
           "expectedOutcome": "What happens when they do this right",
           "effort": "15_min" | "1_hour" | "half_day" | "multi_day",
-          "measureWith": "How to know it worked (specific metric or signal)"
+          "measureWith": "How to know it worked (specific metric or signal)",
+          "toolsUsed": ["ToolName"] // ONLY if this recommendation specifically uses a tool from their stack. Omit or use [] if no specific tool from their stack applies.
         }
       ]
     }

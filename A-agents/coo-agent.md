@@ -243,7 +243,8 @@ All skills are available to the COO for delegation:
 
 ## Workflows
 
-- `T-tools/03-workflows/session-start-workflow.md` — How every session begins (your primary workflow)
+- `T-tools/03-workflows/morning-routine-workflow.md` — **Daily morning routine** (session start + CX intel + system health + sprint alignment + morning brief). Run this at the start of every morning session.
+- `T-tools/03-workflows/session-start-workflow.md` — How every session begins (embedded in morning routine Step 1)
 - `T-tools/03-workflows/context-integrity-workflow.md` — Pre-build verification gate
 - `T-tools/03-workflows/feature-development-workflow.md` — Define → Design → Build → Validate cycle
 - `T-tools/03-workflows/strategic-decision-workflow.md` — Strategist → Devil's Advocate → Chief of Staff

@@ -8,7 +8,8 @@ import type { GeneratedJourney } from "@/lib/ai/journey-prompt";
 import type { OnboardingInput } from "@/lib/validations/onboarding";
 import { buildEvidenceMap, getMomentAnnotations, type EvidenceMap } from "@/lib/evidence-matching";
 import { track } from "@/lib/analytics";
-import { Check, ChartBar } from "@phosphor-icons/react";
+import { Check, ChartBar, Copy, ArrowSquareOut, Sparkle } from "@phosphor-icons/react";
+import { generatePlaybookText } from "@/lib/ai/playbook-export";
 import { ExportPdfButton } from "@/components/ui/export-pdf-button";
 import { PrintCover } from "@/components/pdf/print-cover";
 import { SaveResultsBanner } from "@/components/ui/save-results-banner";
@@ -39,7 +40,7 @@ function makeKey(rec: PlaybookRecommendation): string {
 }
 
 function statusCycle(s: RecStatus): RecStatus {
-  return s === "not_started" ? "in_progress" : s === "in_progress" ? "done" : "not_started";
+  return s === "not_started" ? "done" : "not_started";
 }
 
 function priorityLabel(priority: string) {
@@ -114,6 +115,11 @@ function RecommendationCard({
           <div className="flex items-center gap-2 mt-1 flex-wrap">
             <span className="text-xs font-medium text-slate-600 bg-slate-100 px-2 py-0.5 rounded-full">{rec.owner}</span>
             <span className="text-xs text-slate-400">{rec.timing}</span>
+            {rec.toolsUsed && rec.toolsUsed.length > 0 && rec.toolsUsed.map((tool) => (
+              <span key={tool} className="text-[10px] font-medium text-violet-700 bg-violet-50 border border-violet-100 px-1.5 py-0.5 rounded-full">
+                🔧 {tool}
+              </span>
+            ))}
           </div>
 
           {expanded && (
@@ -198,6 +204,64 @@ function StageSection({
   );
 }
 
+// ─── Playbook Export Row ──────────────────────────────────────────────────────
+
+function CopiedButton({ getText, label }: { getText: () => string; label: string }) {
+  const [copied, setCopied] = useState(false);
+  const handle = async () => {
+    try { await navigator.clipboard.writeText(getText()); } catch { /* ignore */ }
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2500);
+  };
+  return (
+    <button onClick={handle} className="flex items-center gap-1.5 text-xs font-medium text-slate-600 hover:text-slate-900 transition-colors">
+      {copied ? <Check size={12} className="text-emerald-500" weight="bold" /> : <Copy size={12} />}
+      {copied ? "Copied!" : label}
+    </button>
+  );
+}
+
+function PlaybookExportRow({ playbook }: { playbook: GeneratedPlaybook }) {
+  const playbookText = generatePlaybookText(playbook);
+  const claudePrompt = `Here is my CX playbook for ${playbook.companyName}. Help me implement it — ask me which stage to focus on first:\n\n${playbookText}`;
+
+  const openWith = (url: string, dest: string) => {
+    navigator.clipboard.writeText(playbookText).catch(() => {});
+    window.open(url, "_blank");
+    track("playbook_exported", { destination: dest });
+  };
+
+  return (
+    <div className="rounded-xl border border-slate-200 bg-white p-4 flex flex-wrap items-center gap-3">
+      <span className="text-xs font-semibold text-slate-500 uppercase tracking-wide shrink-0">Export & extend</span>
+      <div className="flex flex-wrap items-center gap-2 ml-auto">
+        <CopiedButton getText={() => playbookText} label="Copy for NotebookLM" />
+        <span className="text-slate-200">|</span>
+        <button
+          onClick={() => openWith("https://notebooklm.google.com", "notebooklm")}
+          className="flex items-center gap-1.5 text-xs font-medium text-slate-600 hover:text-slate-900 transition-colors"
+        >
+          <ArrowSquareOut size={12} />Open NotebookLM
+        </button>
+        <span className="text-slate-200">|</span>
+        <button
+          onClick={() => { navigator.clipboard.writeText(claudePrompt).catch(() => {}); window.open("https://claude.ai/new", "_blank"); track("playbook_exported", { destination: "claude" }); }}
+          className="flex items-center gap-1.5 text-xs font-medium text-slate-600 hover:text-slate-900 transition-colors"
+        >
+          <ArrowSquareOut size={12} />Open in Claude
+        </button>
+        <span className="text-slate-200">|</span>
+        <button
+          onClick={() => { navigator.clipboard.writeText(claudePrompt).catch(() => {}); window.open("https://chatgpt.com", "_blank"); track("playbook_exported", { destination: "chatgpt" }); }}
+          className="flex items-center gap-1.5 text-xs font-medium text-slate-600 hover:text-slate-900 transition-colors"
+        >
+          <ArrowSquareOut size={12} />Open in ChatGPT
+        </button>
+      </div>
+    </div>
+  );
+}
+
 // ─── Filter ───────────────────────────────────────────────────────────────────
 
 type FilterMode = "all" | "must_do" | "quick_wins";
@@ -217,6 +281,8 @@ export default function PlaybookPage() {
   const [currentTools, setCurrentTools] = useState<string>("");
   // true when background pre-generation is in flight (started during onboarding)
   const [preparing, setPreparing] = useState(false);
+  // Timer-based progress for the generating state (0-90%)
+  const [genProgress, setGenProgress] = useState(0);
   const { statuses, setStatus } = useRecommendationStatus();
 
   // ── NOTE: Tier gate moved AFTER all useEffect calls (Rules of Hooks) ──
@@ -305,6 +371,24 @@ export default function PlaybookPage() {
     }
     init();
   }, []);
+
+  // Drive progress bar during generation (timer-based, tops out at 90%)
+  useEffect(() => {
+    const isGenerating = loading || preparing;
+    if (!isGenerating) {
+      setGenProgress(0);
+      return;
+    }
+    setGenProgress(5);
+    // Ramp from 5 → 90 over ~180s (playbook takes ~2-3min)
+    const interval = setInterval(() => {
+      setGenProgress((p) => {
+        const next = p + (90 - p) * 0.04; // asymptotic approach toward 90
+        return Math.min(next, 90);
+      });
+    }, 2000);
+    return () => clearInterval(interval);
+  }, [loading, preparing]);
 
   // Poll sessionStorage every 2s waiting for pre-generated playbook to land
   useEffect(() => {
@@ -438,7 +522,10 @@ export default function PlaybookPage() {
                   Turning your journey map into prioritized actions you can start this week.
                 </p>
                 <div className="h-1 bg-slate-100 rounded-full overflow-hidden max-w-xs mx-auto">
-                  <div className="h-full bg-primary rounded-full animate-pulse w-2/3" />
+                  <div
+                    className="h-full bg-primary rounded-full transition-all duration-[2000ms] ease-out"
+                    style={{ width: `${genProgress}%` }}
+                  />
                 </div>
               </div>
 
@@ -474,9 +561,9 @@ export default function PlaybookPage() {
                     },
                     {
                       color: "bg-sky-50 text-sky-600",
-                      icon: "🤖",
-                      title: "Ready for AI asset creation",
-                      desc: "Export to NotebookLM, Claude, or ChatGPT — turn your playbook into board decks, onboarding docs, and QBRs in minutes",
+                      icon: "📄",
+                      title: "Export-ready PDF report",
+                      desc: "Download your full playbook as a shareable PDF — ready for your leadership deck, team kickoff, or next all-hands",
                     },
                   ].map((item) => (
                     <div key={item.title} className="flex items-start gap-3">
@@ -650,6 +737,34 @@ export default function PlaybookPage() {
             evidenceMap={evidenceMap}
           />
         ))}
+
+        {/* Generate CX Review — the big action */}
+        <div className="rounded-2xl border border-primary/20 bg-primary/5 p-6 space-y-3">
+          <div className="flex items-start gap-3">
+            <Sparkle size={20} className="text-primary mt-0.5 shrink-0" weight="fill" />
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-bold text-slate-900">Your CX Review is one click away</p>
+              <p className="text-xs text-slate-500 mt-0.5">
+                CX Mate turns your playbook into a management-ready CX Review — with health score, risks, priorities, and measurement plan.
+              </p>
+            </div>
+          </div>
+          <Link href="/qbr">
+            <Button
+              className="w-full"
+              onClick={() => {
+                sessionStorage.removeItem("cx-mate-qbr");
+                track("qbr_cta_clicked");
+              }}
+            >
+              <Sparkle size={15} weight="fill" className="mr-2" />
+              Generate my CX Review
+            </Button>
+          </Link>
+        </div>
+
+        {/* Export & extend */}
+        <PlaybookExportRow playbook={playbook} />
 
         {/* Footer */}
         <div className="flex items-center justify-between pt-8 border-t mt-4">

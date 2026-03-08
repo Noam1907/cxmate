@@ -1,0 +1,530 @@
+{
+  "success": true,
+  "templateId": "preview",
+  "journey": {
+    "name": "Planhat Customer Success Platform Journey",
+    "stages": [
+      {
+        "name": "Problem Recognition",
+        "stageType": "sales",
+        "description": "B2B SaaS companies realize their customer success efforts are reactive and they're losing customers silently without warning signs",
+        "emotionalState": "Frustrated and overwhelmed",
+        "topFailureRisk": "Generic positioning that doesn't address the specific pain of silent churn",
+        "successPattern": "Lead with outcome-focused messaging: 'Companies like yours prevent 30% of churn by detecting at-risk customers 90 days earlier'",
+        "benchmarkContext": "B2B SaaS companies typically lose 20-30% of prospects at this stage due to unclear value proposition",
+        "existingTools": [
+          {
+            "name": "Website",
+            "domain": "planhat.com"
+          }
+        ],
+        "meaningfulMoments": [
+          {
+            "name": "Silent Churn Realization",
+            "type": "decision",
+            "description": "Prospect discovers they've lost customers without any warning signals or ability to intervene",
+            "severity": "critical",
+            "triggers": [
+              "Unexpected churn",
+              "No early warning system"
+            ],
+            "recommendations": [
+              "Position Planhat as early warning system",
+              "Share silent churn prevention case studies"
+            ],
+            "diagnosis": "Prospects need to see the cost of reactive customer success before they value proactive solutions",
+            "actionTemplate": "Create content showing the true cost of silent churn with specific dollar calculations",
+            "cxToolRecommendation": "Track content engagement to identify prospects actively researching churn prevention",
+            "impactIfIgnored": "Prospects won't understand urgency and will delay purchase decisions indefinitely",
+            "addressesPainPoints": [
+              "silent_churn"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Solution Evaluation",
+        "stageType": "sales",
+        "description": "Prospects compare Planhat against Gainsight, Totango, and ChurnZero while building internal consensus",
+        "emotionalState": "Analytical but pressured",
+        "topFailureRisk": "Getting commoditized in feature comparisons instead of differentiated on outcomes",
+        "successPattern": "Champion enablement kit with competitive differentiation focused on AI-powered automation vs manual processes",
+        "benchmarkContext": "Customer success platform evaluations typically involve 6-8 stakeholders and take 4-8 weeks",
+        "existingTools": [
+          {
+            "name": "Demo environment",
+            "domain": "planhat.com"
+          }
+        ],
+        "meaningfulMoments": [
+          {
+            "name": "Competitor Comparison",
+            "type": "risk",
+            "description": "Prospect evaluates Planhat against established players like Gainsight with larger feature sets",
+            "severity": "high",
+            "triggers": [
+              "Competitor mentions",
+              "Feature comparison requests"
+            ],
+            "recommendations": [
+              "Focus on AI automation advantages",
+              "Show speed-to-value vs legacy platforms"
+            ],
+            "diagnosis": "Prospects default to feature checklists instead of evaluating which platform prevents churn fastest",
+            "actionTemplate": "Create head-to-head comparison showing time-to-first-insight: Planhat vs competitors",
+            "cxToolRecommendation": "Post-demo survey asking which specific capability addresses their biggest pain point",
+            "impactIfIgnored": "Deals stall in evaluation as prospects get overwhelmed by feature comparisons",
+            "addressesPainPoints": [
+              "no_health_scoring"
+            ]
+          },
+          {
+            "name": "Stakeholder Buy-in",
+            "type": "decision",
+            "description": "Champion needs to sell Planhat internally to finance, IT, and executive leadership",
+            "severity": "critical",
+            "triggers": [
+              "Multiple stakeholder meeting requests",
+              "ROI questions"
+            ],
+            "recommendations": [
+              "Provide champion enablement kit",
+              "Offer executive briefing calls"
+            ],
+            "diagnosis": "Champions struggle to articulate Planhat's value to stakeholders who care about different outcomes",
+            "actionTemplate": "Create stakeholder-specific one-pagers: ROI for finance, security for IT, growth metrics for executives",
+            "cxToolRecommendation": "Track deal velocity by stakeholder involvement to identify enablement gaps",
+            "impactIfIgnored": "Deals stall as champions can't build consensus without proper enablement materials"
+          }
+        ]
+      },
+      {
+        "name": "Demo & Trial",
+        "stageType": "sales",
+        "description": "Prospects see Planhat in action using their actual customer data to demonstrate health scoring and churn prevention",
+        "emotionalState": "Cautiously optimistic",
+        "topFailureRisk": "Generic demo showing all features instead of solving their specific churn problem",
+        "successPattern": "Value-first demo design: show health score identifying at-risk customers in first 10 minutes",
+        "benchmarkContext": "B2B SaaS demos convert 20-30% to next step when properly customized",
+        "existingTools": [
+          {
+            "name": "Demo environment",
+            "domain": "planhat.com"
+          }
+        ],
+        "meaningfulMoments": [
+          {
+            "name": "Health Score Aha Moment",
+            "type": "delight",
+            "description": "Prospect sees how Planhat would have predicted their recent churn cases 60-90 days earlier",
+            "severity": "critical",
+            "triggers": [
+              "Customer data uploaded",
+              "Health score calculation"
+            ],
+            "recommendations": [
+              "Use their actual churned customers as examples",
+              "Show predictive timeline"
+            ],
+            "diagnosis": "Prospects need to see their specific problem solved, not generic platform capabilities",
+            "actionTemplate": "Prepare demo using prospect's actual customer scenarios showing churn prevention timeline",
+            "cxToolRecommendation": "Post-demo CES survey measuring how clearly they understood the solution to their problem",
+            "impactIfIgnored": "Generic demos fail to create conviction and deals lose momentum immediately",
+            "addressesPainPoints": [
+              "no_health_scoring",
+              "silent_churn"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Negotiation",
+        "stageType": "sales",
+        "description": "Prospect has chosen Planhat and is optimizing terms, timeline, and implementation approach",
+        "emotionalState": "Eager but cautious",
+        "topFailureRisk": "Price objections because value wasn't sufficiently anchored before pricing discussion",
+        "successPattern": "Outcome-based value narrative: frame investment against cost of silent churn they're currently experiencing",
+        "benchmarkContext": "Customer success platform deals typically close 15-25% below list price",
+        "existingTools": [
+          {
+            "name": "Proposal templates",
+            "domain": "planhat.com"
+          }
+        ],
+        "meaningfulMoments": [
+          {
+            "name": "ROI Justification",
+            "type": "decision",
+            "description": "Prospect needs to justify Planhat investment to finance team using specific churn prevention numbers",
+            "severity": "high",
+            "triggers": [
+              "Pricing discussion",
+              "Finance team involvement"
+            ],
+            "recommendations": [
+              "Provide ROI calculator",
+              "Reference similar customer outcomes"
+            ],
+            "diagnosis": "Finance teams evaluate cost without context of current churn losses being prevented",
+            "actionTemplate": "Create ROI calculator showing annual churn cost vs Planhat investment with payback timeline",
+            "cxToolRecommendation": "Track pricing objection frequency to identify value communication gaps",
+            "impactIfIgnored": "Deals get stuck in procurement without clear ROI justification for investment"
+          }
+        ]
+      },
+      {
+        "name": "Implementation",
+        "stageType": "customer",
+        "description": "Customer integrates Planhat with their systems and sets up initial health scoring rules",
+        "emotionalState": "Excited but anxious",
+        "topFailureRisk": "Technical setup delays that prevent reaching first value within 48 hours",
+        "successPattern": "First value in 48 hours: health score running on their customer data showing immediate insights",
+        "benchmarkContext": "Customer success platforms typically take 2-4 weeks for full implementation",
+        "existingTools": [
+          {
+            "name": "Onboarding team",
+            "domain": "planhat.com"
+          }
+        ],
+        "meaningfulMoments": [
+          {
+            "name": "Data Integration Success",
+            "type": "delight",
+            "description": "Customer's data is flowing into Planhat and health scores are calculating for their customer base",
+            "severity": "critical",
+            "triggers": [
+              "Data sync completion",
+              "First health scores generated"
+            ],
+            "recommendations": [
+              "Celebrate first health score milestone",
+              "Show immediate insights"
+            ],
+            "diagnosis": "Technical setup success determines whether customer sees value fast enough to build usage habits",
+            "actionTemplate": "Send personalized milestone celebration when first 100 customer health scores are generated",
+            "cxToolRecommendation": "Implementation progress tracking with automated milestone celebrations",
+            "impactIfIgnored": "Delayed value realization leads to buyer's remorse and implementation stall",
+            "addressesPainPoints": [
+              "no_health_scoring"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Early Adoption",
+        "stageType": "customer",
+        "description": "Customer team learns to interpret health scores and begins taking action on at-risk customer alerts",
+        "emotionalState": "Learning but hopeful",
+        "topFailureRisk": "Customer success team overwhelmed by alerts without clear prioritization or action playbooks",
+        "successPattern": "Proactive Day 7 check-in with prioritized action recommendations based on their top at-risk customers",
+        "benchmarkContext": "60% of customer success platform users abandon adoption if they don't see churn prevention within 30 days",
+        "existingTools": [
+          {
+            "name": "Customer success team",
+            "domain": "planhat.com"
+          }
+        ],
+        "meaningfulMoments": [
+          {
+            "name": "First Churn Save",
+            "type": "delight",
+            "description": "Customer prevents their first churn using Planhat's early warning system",
+            "severity": "critical",
+            "triggers": [
+              "At-risk customer saved",
+              "Retention win reported"
+            ],
+            "recommendations": [
+              "Document and celebrate the save",
+              "Calculate dollar value prevented"
+            ],
+            "diagnosis": "First churn prevention success proves ROI and builds confidence in the system",
+            "actionTemplate": "Create case study template for first churn save with specific dollar impact calculation",
+            "cxToolRecommendation": "Churn prevention tracking with automated win documentation",
+            "impactIfIgnored": "Without early wins, customer questions investment and usage drops off",
+            "addressesPainPoints": [
+              "silent_churn",
+              "reactive_support"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Value Realization",
+        "stageType": "customer",
+        "description": "Customer can quantify churn reduction and ROI from using Planhat's predictive capabilities",
+        "emotionalState": "Confident and satisfied",
+        "topFailureRisk": "Customer can't articulate specific ROI metrics at renewal time",
+        "successPattern": "Quarterly Business Review documenting churn prevented, revenue saved, and team productivity gains",
+        "benchmarkContext": "Customer success platform ROI typically becomes measurable after 6 months of consistent usage",
+        "existingTools": [
+          {
+            "name": "Account management",
+            "domain": "planhat.com"
+          }
+        ],
+        "meaningfulMoments": [
+          {
+            "name": "ROI Measurement",
+            "type": "decision",
+            "description": "Customer calculates definitive ROI from churn prevention and can defend Planhat investment",
+            "severity": "high",
+            "triggers": [
+              "6-month usage milestone",
+              "QBR scheduled"
+            ],
+            "recommendations": [
+              "Document specific outcomes achieved",
+              "Calculate churn prevention ROI"
+            ],
+            "diagnosis": "Customers who can't articulate ROI at renewal time become price-sensitive and churn risks",
+            "actionTemplate": "Run QBR showing: customers at-risk identified, churn prevented, revenue saved, team efficiency gains",
+            "cxToolRecommendation": "Quarterly NPS with ROI articulation follow-up questions",
+            "impactIfIgnored": "Renewal becomes price negotiation instead of value continuation"
+          }
+        ]
+      },
+      {
+        "name": "Expansion",
+        "stageType": "customer",
+        "description": "Customer adds more team members, higher plan tiers, or additional Planhat modules",
+        "emotionalState": "Growth-minded",
+        "topFailureRisk": "Missing expansion signals when customer is ready to grow usage",
+        "successPattern": "Proactive expansion alerts when customers hit usage limits or request advanced features",
+        "benchmarkContext": "Customer success platforms typically see 15-25% net revenue expansion among successful customers",
+        "existingTools": [
+          {
+            "name": "Account management",
+            "domain": "planhat.com"
+          }
+        ],
+        "meaningfulMoments": [
+          {
+            "name": "Usage Limit Signals",
+            "type": "decision",
+            "description": "Customer approaches plan limits or requests features from higher tiers",
+            "severity": "medium",
+            "triggers": [
+              "Usage threshold reached",
+              "Advanced feature requests"
+            ],
+            "recommendations": [
+              "Proactive upgrade conversation",
+              "ROI-based expansion proposal"
+            ],
+            "diagnosis": "Customers showing expansion signals are ready to invest more but need proactive outreach",
+            "actionTemplate": "Set automated alerts for usage thresholds and feature requests indicating upgrade readiness",
+            "cxToolRecommendation": "Expansion signal detection with automated account review triggers",
+            "impactIfIgnored": "Customers may seek alternatives rather than upgrade if expansion isn't offered proactively"
+          }
+        ]
+      },
+      {
+        "name": "Renewal & Advocacy",
+        "stageType": "customer",
+        "description": "Customer renews Planhat subscription and potentially becomes reference customer for similar prospects",
+        "emotionalState": "Loyal and proud",
+        "topFailureRisk": "Surprise renewal objections because customer health wasn't monitored pre-renewal",
+        "successPattern": "Pre-renewal value summary 60 days before renewal showing quantified churn prevention outcomes",
+        "benchmarkContext": "Customer success platform renewal rates typically range from 85-95% for successful implementations",
+        "existingTools": [
+          {
+            "name": "Renewal team",
+            "domain": "planhat.com"
+          }
+        ],
+        "meaningfulMoments": [
+          {
+            "name": "Advocacy Moment",
+            "type": "delight",
+            "description": "Customer expresses genuine satisfaction and willingness to recommend Planhat to peers",
+            "severity": "medium",
+            "triggers": [
+              "NPS 9-10 score",
+              "Unsolicited positive feedback"
+            ],
+            "recommendations": [
+              "Request testimonial or case study",
+              "Ask for referral within 48 hours"
+            ],
+            "diagnosis": "Peak satisfaction moments create narrow windows for advocacy requests",
+            "actionTemplate": "When customer gives NPS 9-10, immediately follow up asking for specific testimonial or referral",
+            "cxToolRecommendation": "NPS trigger for immediate advocacy outreach automation",
+            "impactIfIgnored": "Advocacy opportunities fade quickly if not captured at peak satisfaction moments"
+          }
+        ]
+      }
+    ],
+    "confrontationInsights": [
+      {
+        "pattern": "Silent Churn Epidemic",
+        "likelihood": "high",
+        "description": "You're probably losing 2-3% of customers monthly without any warning system - that's the industry average for B2B SaaS your size",
+        "businessImpact": "At $4.2M ARR with 2% monthly churn, you're losing $84K monthly in silent churn",
+        "immediateAction": "Interview your last 5 churned customers to understand how early the warning signs appeared",
+        "measureWith": "Post-churn exit survey asking 'when did you first consider leaving?'",
+        "companionAdvice": "I've seen this movie before - the churn you see is just the tip of the iceberg",
+        "addressesPainPoints": [
+          "silent_churn",
+          "reactive_support"
+        ]
+      },
+      {
+        "pattern": "Health Score Blind Spot",
+        "likelihood": "high",
+        "description": "Without health scoring, your CS team is flying blind - reacting to problems instead of preventing them",
+        "businessImpact": "Companies with health scores reduce churn 20-30% by catching at-risk customers 60-90 days earlier",
+        "immediateAction": "Build a simple health score with 4 inputs: login frequency, feature usage, support tickets, payment status",
+        "measureWith": "Track how many at-risk customers you identify before they complain vs after",
+        "companionAdvice": "You're in the customer success platform business - you need your own health score first",
+        "addressesPainPoints": [
+          "no_health_scoring",
+          "silent_churn"
+        ]
+      },
+      {
+        "pattern": "Generic Demo Syndrome",
+        "likelihood": "medium",
+        "description": "Your demos probably show features instead of solving specific churn problems - that's why conversion feels low",
+        "businessImpact": "Value-first demos convert 2-3x better than feature tour demos for B2B SaaS",
+        "immediateAction": "Restructure demos to show health score preventing their actual churn cases in first 10 minutes",
+        "measureWith": "Post-demo survey asking 'how clearly did we address your specific challenge?'",
+        "companionAdvice": "Stop showing what your product does - start showing what their problem looks like solved"
+      }
+    ],
+    "cxToolRoadmap": [
+      {
+        "tool": "Health Score Dashboard",
+        "whenToDeploy": "Immediately for your own customer base",
+        "whyThisTool": "You need to eat your own dog food - build the health score you sell to customers",
+        "expectedOutcome": "Identify 20-30% of at-risk customers 60-90 days earlier"
+      },
+      {
+        "tool": "Post-Demo CES Survey",
+        "whenToDeploy": "After every demo starting next week",
+        "whyThisTool": "Measure whether demos solve specific problems vs just show features",
+        "expectedOutcome": "Identify which demo elements create conviction vs confusion"
+      },
+      {
+        "tool": "Quarterly NPS with ROI Follow-up",
+        "whenToDeploy": "For customers past 6-month mark",
+        "whyThisTool": "Connect satisfaction scores to quantifiable churn prevention outcomes",
+        "expectedOutcome": "Build renewal value narratives before you need them"
+      }
+    ],
+    "impactProjections": [
+      {
+        "area": "Churn Reduction via Health Scoring",
+        "potentialImpact": "$504K-$840K annually / 20-30% churn reduction",
+        "timeToRealize": "3-6 months after implementation",
+        "effort": "medium",
+        "calculation": "350 customers × $12K ACV × 2% monthly churn × 20-30% reduction × 12 months",
+        "dataSource": "benchmark_estimated"
+      },
+      {
+        "area": "Demo Conversion Improvement",
+        "potentialImpact": "$126K-$252K annually / 30-60% demo conversion lift",
+        "timeToRealize": "1-3 months after demo redesign",
+        "effort": "low",
+        "calculation": "Assuming 50 demos/month × 20% current conversion × 30-60% improvement × $12K ACV",
+        "dataSource": "benchmark_estimated"
+      },
+      {
+        "area": "Renewal Rate Protection",
+        "potentialImpact": "$210K-$420K annually / 5-10% renewal rate improvement",
+        "timeToRealize": "6-12 months",
+        "effort": "medium",
+        "calculation": "350 customers × $12K ACV × 5-10% renewal improvement",
+        "dataSource": "benchmark_estimated"
+      }
+    ],
+    "techStackRecommendations": [
+      {
+        "category": "cs_platform",
+        "categoryLabel": "Customer Health Monitoring",
+        "tools": [
+          "ChurnZero",
+          "Gainsight"
+        ],
+        "whyNow": "You need your own health scoring system to prevent silent churn",
+        "connectWith": "Your CRM and product analytics to create comprehensive customer health pictures"
+      },
+      {
+        "category": "survey",
+        "categoryLabel": "Voice of Customer",
+        "tools": [
+          "Typeform",
+          "SurveyMonkey"
+        ],
+        "whyNow": "Start with simple CSAT and CES surveys to understand experience gaps",
+        "connectWith": "Your CRM to close the feedback loop and track sentiment trends"
+      },
+      {
+        "category": "analytics",
+        "categoryLabel": "Product Usage Analytics",
+        "tools": [
+          "Mixpanel",
+          "Amplitude"
+        ],
+        "whyNow": "Usage patterns are the strongest predictor of churn for SaaS platforms",
+        "connectWith": "Your health score system to create behavioral churn prediction models"
+      }
+    ],
+    "assumptions": [
+      "Estimated 350 customers and $12K ACV based on industry benchmarks for 51-150 employee B2B SaaS companies",
+      "Assumed 2% monthly churn rate typical for growing-stage customer success platforms",
+      "Used benchmark data since no specific customer metrics were provided"
+    ],
+    "maturityAssessment": "Dana, you're at a classic inflection point - you've built a great product but you're flying blind on your own customer health. The irony is thick: you sell churn prevention but don't have early warning systems for your own customers."
+  },
+  "onboardingData": {
+    "userName": "Dana",
+    "userRole": "Head of Customer Success",
+    "companyName": "Planhat",
+    "companyWebsite": "planhat.com",
+    "vertical": "b2b_saas",
+    "companySize": "51-150",
+    "industry": "customer_success_platform",
+    "companyMaturity": "growing",
+    "hasExistingJourney": "",
+    "journeyType": "full_lifecycle",
+    "hasExistingCustomers": true,
+    "customerCount": "",
+    "customerDescription": "B2B SaaS companies needing customer success platform",
+    "customerSize": "mid_market",
+    "mainChannel": "sales_led",
+    "pricingModel": "",
+    "roughRevenue": "",
+    "averageDealSize": "",
+    "measuresNps": false,
+    "measuresCsat": false,
+    "measuresCes": false,
+    "npsResponseCount": "",
+    "hasJourneyMap": false,
+    "dataVsGut": "all_gut",
+    "biggestChallenge": "Customers churn silently — we only find out when they're already gone",
+    "painPoints": [
+      "silent_churn",
+      "no_health_scoring",
+      "reactive_support"
+    ],
+    "primaryGoal": "reduce_churn",
+    "timeframe": "next_quarter",
+    "competitors": "Gainsight, Totango, ChurnZero, Vitally",
+    "enrichmentData": {
+      "suggestedVertical": "b2b_saas",
+      "suggestedCompanySize": "51-150",
+      "description": "Planhat is an AI-powered customer platform that automates and augments commercial operations for sales, customer success, and professional services teams.",
+      "suggestedCompetitors": [
+        "Gainsight",
+        "Totango",
+        "ChurnZero",
+        "Vitally"
+      ],
+      "suggestedCustomerSize": "mid_market",
+      "suggestedMainChannel": "sales_led",
+      "confidence": "high",
+      "reasoning": "Planhat is a well-known B2B SaaS company in the customer success platform space, competing directly with Gainsight and Totango."
+    }
+  }
+}

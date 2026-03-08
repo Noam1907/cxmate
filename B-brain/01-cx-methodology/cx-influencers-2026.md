@@ -114,6 +114,19 @@ CX Mate's outputs should reference established CX expert frameworks where releva
 | Tiffani Bova | EX↔CX link, internal enablement, CS team plays |
 | Dan Gingiss | Delight moments, advocacy, shareable experiences |
 | Adrian Swinscoe | Simplification, early-stage focus, cutting complexity |
+| Keren Shaked | Startup CX foundations, practical implementation, founder-language CX, Israeli market |
+
+---
+
+## Israeli & Regional Practitioners
+
+### Keren Shaked
+- **Title:** CX practitioner, educator, and one of the most active CX voices in the Israeli tech ecosystem.
+- **Focus:** Making CX practical, accessible, and business-outcome-driven for B2B startups and scale-ups. Strong emphasis on the human and emotional layer of customer journeys — not just process. Known for connecting CX thinking directly to founder language (revenue, churn, growth) rather than classic "customer satisfaction" framing.
+- **Why relevant to CX Mate:** Speaks directly to the ICP — founders and teams who haven't hired a CX expert yet. Her content translates CX methodology into startup-native language, which is exactly the tone CX Mate needs.
+- **LinkedIn:** Active thought leader — follow and monitor for new frameworks, perspectives, and emerging Israeli market CX patterns.
+- **Use when:** Startup CX foundations, practical implementation for early-stage teams, making CX real for non-CX-professionals, Israeli/regional market context.
+- **⚠️ Enrich from LinkedIn:** This entry should be updated regularly as her LinkedIn content evolves. Pull frameworks, quotes, and insights from her posts to keep this current.
 
 ---
 
