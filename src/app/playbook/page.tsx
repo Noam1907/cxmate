@@ -39,7 +39,7 @@ function makeKey(rec: PlaybookRecommendation): string {
 }
 
 function statusCycle(s: RecStatus): RecStatus {
-  return s === "not_started" ? "in_progress" : s === "in_progress" ? "done" : "not_started";
+  return s === "not_started" ? "done" : "not_started";
 }
 
 function priorityLabel(priority: string) {
@@ -217,6 +217,8 @@ export default function PlaybookPage() {
   const [currentTools, setCurrentTools] = useState<string>("");
   // true when background pre-generation is in flight (started during onboarding)
   const [preparing, setPreparing] = useState(false);
+  // Timer-based progress for the generating state (0-90%)
+  const [genProgress, setGenProgress] = useState(0);
   const { statuses, setStatus } = useRecommendationStatus();
 
   // ── NOTE: Tier gate moved AFTER all useEffect calls (Rules of Hooks) ──
@@ -305,6 +307,24 @@ export default function PlaybookPage() {
     }
     init();
   }, []);
+
+  // Drive progress bar during generation (timer-based, tops out at 90%)
+  useEffect(() => {
+    const isGenerating = loading || preparing;
+    if (!isGenerating) {
+      setGenProgress(0);
+      return;
+    }
+    setGenProgress(5);
+    // Ramp from 5 → 90 over ~180s (playbook takes ~2-3min)
+    const interval = setInterval(() => {
+      setGenProgress((p) => {
+        const next = p + (90 - p) * 0.04; // asymptotic approach toward 90
+        return Math.min(next, 90);
+      });
+    }, 2000);
+    return () => clearInterval(interval);
+  }, [loading, preparing]);
 
   // Poll sessionStorage every 2s waiting for pre-generated playbook to land
   useEffect(() => {
@@ -438,7 +458,10 @@ export default function PlaybookPage() {
                   Turning your journey map into prioritized actions you can start this week.
                 </p>
                 <div className="h-1 bg-slate-100 rounded-full overflow-hidden max-w-xs mx-auto">
-                  <div className="h-full bg-primary rounded-full animate-pulse w-2/3" />
+                  <div
+                    className="h-full bg-primary rounded-full transition-all duration-[2000ms] ease-out"
+                    style={{ width: `${genProgress}%` }}
+                  />
                 </div>
               </div>
 
