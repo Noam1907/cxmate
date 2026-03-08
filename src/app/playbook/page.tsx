@@ -8,7 +8,8 @@ import type { GeneratedJourney } from "@/lib/ai/journey-prompt";
 import type { OnboardingInput } from "@/lib/validations/onboarding";
 import { buildEvidenceMap, getMomentAnnotations, type EvidenceMap } from "@/lib/evidence-matching";
 import { track } from "@/lib/analytics";
-import { Check, ChartBar } from "@phosphor-icons/react";
+import { Check, ChartBar, Copy, ArrowSquareOut, Sparkle } from "@phosphor-icons/react";
+import { generatePlaybookText } from "@/lib/ai/playbook-export";
 import { ExportPdfButton } from "@/components/ui/export-pdf-button";
 import { PrintCover } from "@/components/pdf/print-cover";
 import { SaveResultsBanner } from "@/components/ui/save-results-banner";
@@ -198,6 +199,64 @@ function StageSection({
             />
           );
         })}
+      </div>
+    </div>
+  );
+}
+
+// ─── Playbook Export Row ──────────────────────────────────────────────────────
+
+function CopiedButton({ getText, label }: { getText: () => string; label: string }) {
+  const [copied, setCopied] = useState(false);
+  const handle = async () => {
+    try { await navigator.clipboard.writeText(getText()); } catch { /* ignore */ }
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2500);
+  };
+  return (
+    <button onClick={handle} className="flex items-center gap-1.5 text-xs font-medium text-slate-600 hover:text-slate-900 transition-colors">
+      {copied ? <Check size={12} className="text-emerald-500" weight="bold" /> : <Copy size={12} />}
+      {copied ? "Copied!" : label}
+    </button>
+  );
+}
+
+function PlaybookExportRow({ playbook }: { playbook: GeneratedPlaybook }) {
+  const playbookText = generatePlaybookText(playbook);
+  const claudePrompt = `Here is my CX playbook for ${playbook.companyName}. Help me implement it — ask me which stage to focus on first:\n\n${playbookText}`;
+
+  const openWith = (url: string, dest: string) => {
+    navigator.clipboard.writeText(playbookText).catch(() => {});
+    window.open(url, "_blank");
+    track("playbook_exported", { destination: dest });
+  };
+
+  return (
+    <div className="rounded-xl border border-slate-200 bg-white p-4 flex flex-wrap items-center gap-3">
+      <span className="text-xs font-semibold text-slate-500 uppercase tracking-wide shrink-0">Export & extend</span>
+      <div className="flex flex-wrap items-center gap-2 ml-auto">
+        <CopiedButton getText={() => playbookText} label="Copy for NotebookLM" />
+        <span className="text-slate-200">|</span>
+        <button
+          onClick={() => openWith("https://notebooklm.google.com", "notebooklm")}
+          className="flex items-center gap-1.5 text-xs font-medium text-slate-600 hover:text-slate-900 transition-colors"
+        >
+          <ArrowSquareOut size={12} />Open NotebookLM
+        </button>
+        <span className="text-slate-200">|</span>
+        <button
+          onClick={() => { navigator.clipboard.writeText(claudePrompt).catch(() => {}); window.open("https://claude.ai/new", "_blank"); track("playbook_exported", { destination: "claude" }); }}
+          className="flex items-center gap-1.5 text-xs font-medium text-slate-600 hover:text-slate-900 transition-colors"
+        >
+          <ArrowSquareOut size={12} />Open in Claude
+        </button>
+        <span className="text-slate-200">|</span>
+        <button
+          onClick={() => { navigator.clipboard.writeText(claudePrompt).catch(() => {}); window.open("https://chatgpt.com", "_blank"); track("playbook_exported", { destination: "chatgpt" }); }}
+          className="flex items-center gap-1.5 text-xs font-medium text-slate-600 hover:text-slate-900 transition-colors"
+        >
+          <ArrowSquareOut size={12} />Open in ChatGPT
+        </button>
       </div>
     </div>
   );
@@ -678,6 +737,34 @@ export default function PlaybookPage() {
             evidenceMap={evidenceMap}
           />
         ))}
+
+        {/* Generate QBR — the big action */}
+        <div className="rounded-2xl border border-primary/20 bg-primary/5 p-6 space-y-3">
+          <div className="flex items-start gap-3">
+            <Sparkle size={20} className="text-primary mt-0.5 shrink-0" weight="fill" />
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-bold text-slate-900">Your QBR is one click away</p>
+              <p className="text-xs text-slate-500 mt-0.5">
+                CX Mate turns your playbook into a board-ready Quarterly Business Review — with health score, risks, priorities, and measurement plan.
+              </p>
+            </div>
+          </div>
+          <Link href="/qbr">
+            <Button
+              className="w-full"
+              onClick={() => {
+                sessionStorage.removeItem("cx-mate-qbr");
+                track("qbr_cta_clicked");
+              }}
+            >
+              <Sparkle size={15} weight="fill" className="mr-2" />
+              Generate my QBR
+            </Button>
+          </Link>
+        </div>
+
+        {/* Export & extend */}
+        <PlaybookExportRow playbook={playbook} />
 
         {/* Footer */}
         <div className="flex items-center justify-between pt-8 border-t mt-4">

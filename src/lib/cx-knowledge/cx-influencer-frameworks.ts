@@ -44,7 +44,8 @@ export type FrameworkContext =
   | "support"
   | "handoff"
   | "expansion"
-  | "decision_science";
+  | "decision_science"
+  | "startup_cx";
 
 // ============================================
 // Framework Library
@@ -178,6 +179,19 @@ export const CX_FRAMEWORKS: InfluencerFramework[] = [
       "Fred Reichheld, who created NPS, emphasises: the score is meaningless without closing the loop. Every detractor response needs a human follow-up.",
   },
 
+  // ── Israeli & Regional Practitioners ─────────────────────
+  {
+    id: "shaked_startup_cx",
+    expert: "Keren Shaked",
+    framework: "Practical CX for Startups",
+    principle:
+      "CX doesn't require a CX team to start. Founders who speak the language of revenue, churn, and growth — not 'satisfaction' — build better customer journeys from day one.",
+    applyWhen: ["startup_cx", "onboarding", "simplification", "journey_mapping", "churn_prevention"],
+    stageRelevance: ["both"],
+    citationExample:
+      "Keren Shaked's approach: before building a CX process, ask what the customer actually needs to succeed — not what you think looks like good service.",
+  },
+
   // ── Disruptors ────────────────────────────────────────────
   {
     id: "gingiss_experience_maker",
@@ -279,9 +293,9 @@ export function getRelevantFrameworks(
   if (!contexts.includes("measurement")) contexts.push("measurement");
   if (!contexts.includes("journey_mapping")) contexts.push("journey_mapping");
 
-  // Early-stage → add simplification + onboarding
+  // Early-stage → add simplification + onboarding + startup_cx
   if (companyStage === "early") {
-    contexts.push("simplification", "onboarding");
+    contexts.push("simplification", "onboarding", "startup_cx");
   }
 
   // Growing → add leadership + employee_experience

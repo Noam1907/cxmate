@@ -25,21 +25,28 @@ This guide covers: (1) creating the demo account, (2) running onboarding with th
    - Email: `demo@cxmate.app`
    - Password: *(choose a strong password — store it in 1Password or your password manager)*
 4. Click **Sign Up**
-5. Check for confirmation email if Supabase requires email verification (may need to disable for demo email, or use a real email alias you own)
 
-> **Tip:** If you want to avoid email verification, create the user directly in **Supabase Dashboard → Authentication → Users → Invite User** and set a password.
+> **Tip:** If you need to reset the password and the email isn't real, go to **Supabase Dashboard → SQL Editor** and run:
+> ```sql
+> UPDATE auth.users
+> SET encrypted_password = crypt('YourNewPassword!', gen_salt('bf'))
+> WHERE email = 'demo@cxmate.app';
+> ```
 
 ---
 
 ## Step 2 — Run the Onboarding (Exact Inputs)
 
-Log in as demo@cxmate.app, go to `/onboarding`, and fill in **exactly** the following. Every field is calibrated for maximum demo output quality.
+Log in as demo@cxmate.app, go to `/onboarding`, click **Map my journey →**, then fill in **exactly** the following. Every field is calibrated for maximum demo output quality.
+
+---
 
 ### Step 1 — Welcome
 
 | Field | Value |
 |---|---|
 | Your name | Alex Rivera |
+| Your email | demo@cxmate.app |
 | Your role | Head of Product |
 | Company name | **Flowdesk** |
 | Company website | flowdesk.io |
@@ -48,15 +55,7 @@ Log in as demo@cxmate.app, go to `/onboarding`, and fill in **exactly** the foll
 
 ---
 
-### Step 2 — Maturity
-
-**Select:** Growing
-
-> *Why?* → Unlocks the business data step, journey existence step, and full lifecycle path. Generates the richest, most impressive output.
-
----
-
-### Step 3 — Company Profile
+### Step 2 — Company
 
 | Field | Value |
 |---|---|
@@ -66,19 +65,67 @@ Log in as demo@cxmate.app, go to `/onboarding`, and fill in **exactly** the foll
 
 ---
 
-### Step 4 — Customer Profile
+### Step 3 — Stage (Maturity)
 
-| Field | Value |
-|---|---|
-| Customer size | SMBs (10–200 employees) |
-| Customer count | 201–500 customers |
-| Customer description | "Teams and companies that manage client work, product delivery, or internal operations. They come in on a free trial, activate on Day 1, and we lose them before they hit the aha moment." |
-| Main channel | Product-led growth (self-serve + sales assist) |
-| Pre-live process | "Free trial → onboarding email sequence → optional sales call for teams 20+ → upgrade prompt at Day 14" |
+**Select:** Growing
+
+> *Why?* → Unlocks the business data step, journey existence step, and full lifecycle path. Generates the richest, most impressive output.
 
 ---
 
-### Step 5 — Business Data
+### Step 4 — Existing Journey
+
+**Has an existing journey?** → **We have some pieces, but it's not complete**
+
+**What do you have in place? (check these):**
+
+*Pre-sale:*
+- ✅ Sales pipeline / CRM stages
+- ✅ Demo or trial process
+
+*Onboarding:*
+- ✅ Onboarding checklist / milestones
+
+*Ongoing Success:*
+- ✅ Support / escalation flow
+
+*Leave all others unchecked.*
+
+**What's working well? (green chips — select these):**
+- ✅ Sales → CS handoff is smooth
+- ✅ Onboarding is self-serve / low-touch
+- ✅ Support is fast and responsive
+
+**What needs fixing? (red chips — select these):**
+- ✅ Customers don't reach 'aha moment'
+- ✅ Low product adoption after onboarding
+- ✅ Churn spikes at month 3–6
+- ✅ No early warning on at-risk accounts
+
+*(Skip file upload — not needed for demo)*
+
+---
+
+### Step 5 — Customer Profile
+
+| Field                | Value                                                                                                                                                                                      |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Customer size        | SMBs (10–200 employees)                                                                                                                                                                    |
+| Customer count       | 201–500 customers                                                                                                                                                                          |
+| Customer description | "Teams and companies that manage client work, product delivery, or internal operations. They come in on a free trial, activate on Day 1, and we lose them before they hit the aha moment." |
+| Main channel         | Product-led growth (self-serve + sales assist)                                                                                                                                             |
+| Pre-live process     | "Free trial → onboarding email sequence → optional sales call for teams 20+ → upgrade prompt at Day 14"                                                                                    |
+
+---
+
+### Step 6 — Competitors
+
+Enter one by one or comma-separated:
+> `Asana, Monday.com, ClickUp, Notion, Linear`
+
+---
+
+### Step 7 — Business Numbers
 
 | Field | Value |
 |---|---|
@@ -89,26 +136,7 @@ Log in as demo@cxmate.app, go to `/onboarding`, and fill in **exactly** the foll
 
 ---
 
-### Step 6 — Existing Journey
-
-**Has an existing journey?** → Partial
-
-**Check these boxes:**
-- ✅ Sales pipeline
-- ✅ Onboarding checklist
-- ✅ Support flow
-
-**Leave unchecked:**
-- ❌ CS playbook
-- ❌ Renewal process
-- ❌ Health scoring
-
-**Description:**
-> "We have a 5-email onboarding sequence and an in-app checklist, but they're disconnected. Our trial-to-paid rate is around 18% and we think the aha moment isn't landing fast enough."
-
----
-
-### Step 7 — Pain Points
+### Step 8 — Pain Points
 
 **Biggest challenge** (free text):
 > "We're losing ~40% of trial users before converting, and another 20% in the first 60 days after they pay. We know the problem is in the activation window but we don't know exactly where it breaks."
@@ -118,13 +146,6 @@ Log in as demo@cxmate.app, go to `/onboarding`, and fill in **exactly** the foll
 - ✅ Customers leaving without warning (invisible churn)
 - ✅ Onboarding takes too long before customers see value
 - ✅ High support volume in the first 90 days
-
----
-
-### Step 8 — Competitors
-
-Enter one by one or comma-separated:
-> `Asana, Monday.com, ClickUp, Notion, Linear`
 
 ---
 
@@ -141,16 +162,21 @@ Enter one by one or comma-separated:
 
 ---
 
-## Step 3 — Generate and Verify
+### Step 10 — Generate
 
-1. Click **Generate My Journey** → wait ~60-90 seconds
-2. Verify the CX Report shows:
+Click **Build My CX Playbook →** and wait ~2–5 minutes.
+
+---
+
+## Step 3 — Verify the Output
+
+1. Verify the CX Report shows:
    - Revenue impact number in the **$100K–$500K range** ✅
    - At least 3 high-risk patterns ✅
    - "Trial activation" or "Day 30" moments visible ✅
-3. Navigate to **Journey Map** → verify stages load, moments visible
-4. Go to **Playbook** → click **Generate Playbook** → wait for recommendations
-5. Verify playbook has action items across multiple stages
+2. Navigate to **Journey Map** → verify stages load, moments visible
+3. Go to **Playbook** → click **Generate Playbook** → wait for recommendations
+4. Verify playbook has action items across multiple stages
 
 > **If the revenue number looks too low:** Re-run with `roughRevenue: $3M-$5M` selected and `customerCount: 501-1000`. This gives more weight to the impact calculator.
 
@@ -185,10 +211,10 @@ When you need to regenerate (after a product update, or if the output feels stal
 | Item | Value |
 |---|---|
 | Email | demo@cxmate.app |
-| Password | *(set by you — do not write here)* |
+| Password | *(set by you — do not write here — store in 1Password)* |
 | Account type | Supabase Auth |
 | Journey company | Flowdesk |
-| Last regenerated | 2026-03-03 |
+| Last regenerated | 2026-03-05 |
 
 ---
 

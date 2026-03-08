@@ -607,7 +607,7 @@ Generate a customized, theory-backed journey map with the CX Mate companion voic
 2. **Meaningful Moments (2-3 per stage, max)**: Tailored to their industry and challenges. For each moment:
    - Provide a theory-backed **diagnosis** (1 sentence: root cause)
    - Give a specific **actionTemplate** (1 sentence: exactly what to do)
-   - Recommend a specific **cxToolRecommendation** (1 sentence: which tool + why)
+   - Recommend a specific **cxToolRecommendation** (1 sentence: which tool or AI agent + why). Think agentic-first: prefer autonomous AI agents (AI support agent, AI SDR, AI onboarding agent) over manual tools when they exist. Specify what the agent does autonomously.
    - State the **impactIfIgnored** (1 sentence: business cost)
    - **addressesPainPoints**: Array of pain point keys from user input (only if direct match, else omit)
    - Omit **decisionScienceInsight** and **competitorGap** to keep output concise

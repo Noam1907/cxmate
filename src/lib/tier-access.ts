@@ -21,6 +21,12 @@
  *   integrations             |  ❌  |      ❌       |  ✅
  */
 
+/**
+ * TESTING MODE: Set to true to bypass all feature gates.
+ * TODO: set back to false before launch / when billing is live.
+ */
+const GATES_DISABLED = true;
+
 export type PlanTier = "free" | "full_analysis" | "pro";
 
 export type Feature =
@@ -50,6 +56,7 @@ const ACCESS_MATRIX: Record<Feature, PlanTier[]> = {
 
 /** Check if a plan tier has access to a feature */
 export function hasAccess(tier: PlanTier, feature: Feature): boolean {
+  if (GATES_DISABLED) return true;
   return ACCESS_MATRIX[feature].includes(tier);
 }
 

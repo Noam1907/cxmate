@@ -24,7 +24,7 @@ const RECOMMENDATION_FIELD = {
     momentName:      { type: "string" },
     stageName:       { type: "string" },
     action:          { type: "string" },
-    type:            { type: "string", enum: ["email","call","internal_process","automation","measurement"] },
+    type:            { type: "string", enum: ["email","call","internal_process","automation","measurement","ai_agent"] },
     priority:        { type: "string", enum: ["must_do","should_do","nice_to_have"] },
     owner:           { type: "string" },
     timing:          { type: "string" },

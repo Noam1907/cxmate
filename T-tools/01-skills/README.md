@@ -54,4 +54,5 @@ Both locations stay in sync. The `.claude/skills/` version is what Claude Code u
 | `feature-development-workflow.md` | `/prd`, `/mrd`, `/cx-expert`, `/copywriter`, `/qa-gatekeeper` |
 | `strategic-decision-workflow.md` | strategic-decision-skill |
 | `session-start-workflow.md` | — (process workflow, no skills) |
+| `morning-routine-workflow.md` | `/cx-intel`, session-start-workflow (composes both + system health + sprint alignment) |
 | `context-integrity-workflow.md` | `/qa-gatekeeper` (Category 6 audit) |

@@ -22,6 +22,7 @@ import { LogoMark } from "@/components/ui/logo-mark";
 import { useCompanyEnrichment } from "@/hooks/use-company-enrichment";
 import { deriveFromMaturity } from "@/types/onboarding";
 import type { EnrichedCompanyData } from "@/types/enrichment";
+import { getVerticalBenchmark, getSizeBenchmark } from "@/lib/cx-knowledge";
 import { track, identify } from "@/lib/analytics";
 import { notifyOwner } from "@/lib/notify";
 import { createClient } from "@/lib/supabase/client";
@@ -54,38 +55,83 @@ const FIELD_LABELS: Record<string, string> = {
 };
 
 
-// Insights shown after specific fields are extracted (appear inline in chat)
-// Kept short and non-disruptive — they flow naturally with the conversation
-const FIELD_INSIGHTS: Record<string, string> = {
-  // Stage + vertical — fire early, anchor the personalization frame
-  companyMaturity:
-    "Playbook calibrated to your stage. We'll zero in on what actually moves the needle right now — not what works a year from now.",
-  vertical:
-    "Benchmarks locked in. Your playbook will show you what top performers in your space do differently — and exactly where you sit relative to them.",
+// Insights shown after specific fields are extracted (appear inline in chat).
+// Now DYNAMIC — references actual company data, benchmark numbers, and enrichment.
+// Each function returns a string (or null to skip) given the current fields + enrichment.
+const FIELD_INSIGHT_BUILDERS: Record<
+  string,
+  (fields: Fields, enrichment: EnrichedCompanyData | null) => string | null
+> = {
+  // Stage — fire early, anchor the personalization frame
+  companyMaturity: (fields) => {
+    const stage = fields.companyMaturity;
+    const stageLabel: Record<string, string> = {
+      "pre-revenue": "pre-revenue",
+      "early-customers": "early-customer",
+      growing: "growth-stage",
+      scaling: "scaling",
+    };
+    const label = stageLabel[stage] || stage;
+    return `Your playbook is calibrated for ${label} companies. Every recommendation is sequenced for what moves the needle at this stage — not what works two years from now.`;
+  },
 
-  // Customer scale — signals what kind of patterns are detectable
-  customerSize:
-    "At this customer scale, the patterns are already forming in your data. Most companies don't see them until they've already cost them. Your playbook surfaces them before that.",
+  // Vertical — pull real benchmark numbers
+  vertical: (fields, enrichment) => {
+    const vertical = fields.vertical || enrichment?.suggestedVertical;
+    if (!vertical || vertical === "other") return null;
+    const bench = getVerticalBenchmark(vertical);
+    if (!bench) return null;
+    const { monthlyChurnRate, onboardingCompletionRate } = bench.metrics;
+    const verticalLabel: Record<string, string> = {
+      b2b_saas: "B2B SaaS",
+      professional_services: "professional services",
+      marketplace: "marketplace",
+      fintech: "fintech",
+      ecommerce_b2b: "B2B ecommerce",
+      healthtech: "healthtech",
+    };
+    const label = verticalLabel[vertical] || vertical;
+    return `${label} benchmarks loaded: top performers hold monthly churn under ${monthlyChurnRate.good}% and onboarding completion above ${onboardingCompletionRate.good}%. Your playbook will show exactly where you sit.`;
+  },
 
-  // Goal — shapes the whole output
-  primaryGoal:
-    "Every recommendation in your playbook will be ranked by how directly it drives this outcome. No generic best practices — just what moves your specific number.",
+  // Customer scale — make it specific to their size
+  customerSize: (fields, enrichment) => {
+    const size = fields.companySize || enrichment?.suggestedCompanySize;
+    if (!size) return null;
+    const bench = getSizeBenchmark(size);
+    if (!bench) return null;
+    const { annualChurnRate } = bench.metrics;
+    return `At your scale, the average company loses ${annualChurnRate.average}% of customers annually. Top performers cut that to ${annualChurnRate.good}%. The patterns are already in your data — most companies don't see them until they've already cost them.`;
+  },
 
-  // Pain — validates and reframes the problem space
-  painPoints:
-    "The friction points you described are responsible for the majority of preventable churn at your stage. Your playbook will sequence the interventions — highest impact first.",
+  // Goal — link back to their specific goal
+  primaryGoal: (fields) => {
+    const goal = fields.primaryGoal;
+    if (!goal) return null;
+    return `Every recommendation will be ranked by how directly it drives "${goal}". No generic best practices — just what moves your specific outcome.`;
+  },
 
-  // CX setup — diagnoses the operational gap
-  cxSetup:
-    "Teams operating at this CX maturity level typically spend 70% of their capacity reacting to problems that were predictable. Your playbook shows you how to flip that ratio.",
+  // Pain — connect to real cost
+  biggestChallenge: (fields, enrichment) => {
+    const challenge = fields.biggestChallenge;
+    const vertical = fields.vertical || enrichment?.suggestedVertical;
+    if (!challenge) return null;
+    const bench = vertical ? getVerticalBenchmark(vertical) : null;
+    const churnCost = bench
+      ? `${bench.metrics.annualChurnRate.average}% annual churn`
+      : "15–20% of ARR annually";
+    return `Left unsystematized, this challenge drives ${churnCost} in preventable churn. Your playbook will sequence the highest-impact interventions first.`;
+  },
 
-  // Biggest challenge — connects problem to cost
-  biggestChallenge:
-    "Left unsystematized, this type of challenge costs B2B companies an average of 15–20% of ARR annually — in preventable churn and stalled expansion. That's exactly what we're building the fix for.",
-
-  // Differentiator — connects product identity to CX strategy
-  competitorDifferentiator:
-    "The companies that win long-term don't just deliver a product — they deliver the context that makes it irreplaceable. We're codifying that into every touchpoint of your journey.",
+  // Competitors — reference actual competitors from enrichment
+  competitorDifferentiator: (_fields, enrichment) => {
+    const competitors = enrichment?.suggestedCompetitors;
+    if (competitors && competitors.length > 0) {
+      const names = competitors.slice(0, 2).join(" and ");
+      return `We're mapping how ${names} approach their customer journey — so your playbook shows where you can outperform them at every stage.`;
+    }
+    return "Your playbook will highlight the CX gaps your competitors likely share — and the moves that create an unfair advantage.";
+  },
 };
 
 // ─────────────────────────────────────────────
@@ -649,9 +695,13 @@ function SuggestionChips({
 
 function InsightBubble({ content }: { content: string }) {
   return (
-    <div className="flex items-center gap-2.5 mb-4 pl-1">
-      <Sparkle size={13} className="text-amber-400 shrink-0" weight="fill" />
-      <p className="text-xs text-amber-700/80 leading-relaxed italic">{content}</p>
+    <div className="ml-12 mb-4 max-w-[85%]">
+      <div className="bg-amber-50/80 border border-amber-200/60 rounded-xl px-4 py-3 flex gap-3 items-start shadow-sm">
+        <div className="shrink-0 mt-0.5 w-6 h-6 rounded-full bg-amber-100 flex items-center justify-center">
+          <Sparkle size={14} className="text-amber-500" weight="fill" />
+        </div>
+        <p className="text-[13px] text-amber-900/90 leading-relaxed">{content}</p>
+      </div>
     </div>
   );
 }
@@ -849,6 +899,7 @@ export function OnboardingChat() {
 
   // Refs
   const bottomRef = useRef<HTMLDivElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const abortRef = useRef<AbortController | null>(null);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -910,9 +961,12 @@ export function OnboardingChat() {
     recognition.start();
   }, [isListening]);
 
-  // Auto-scroll to bottom
+  // Auto-scroll to bottom of message container
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    const container = scrollContainerRef.current;
+    if (container) {
+      container.scrollTo({ top: container.scrollHeight, behavior: "smooth" });
+    }
   }, [messages, isThinking]);
 
   // Clear chip selection when AI replies (chips for a new question appear fresh)
@@ -1124,14 +1178,16 @@ export function OnboardingChat() {
         }
         setExtractedFields(newFields);
 
-        // ── Build inline insight bubbles ───────────────────────────────
+        // ── Build inline insight bubbles (dynamic, context-aware) ─────
         const extras: ChatMessage[] = [];
 
-        Object.entries(FIELD_INSIGHTS).forEach(([fieldKey, insightContent]) => {
+        Object.entries(FIELD_INSIGHT_BUILDERS).forEach(([fieldKey, builder]) => {
           if (insightsShown.current.has(fieldKey)) return;
           if (!newFields[fieldKey] || prevFields[fieldKey]) return;
+          const content = builder(newFields, enrichmentRef.current);
+          if (!content) return;
           insightsShown.current.add(fieldKey);
-          extras.push({ role: "insight", content: insightContent });
+          extras.push({ role: "insight", content });
         });
 
         // Add AI reply + any insight bubbles
@@ -1238,7 +1294,7 @@ export function OnboardingChat() {
   // ── Render: chat ──────────────────────────────────────────────────────
   return (
     <div
-      className="w-full max-w-[960px] mx-auto"
+      className="w-full max-w-[960px] mx-auto h-full"
       style={{
         display: "grid",
         gridTemplateColumns: "1fr 240px",
@@ -1246,13 +1302,11 @@ export function OnboardingChat() {
         alignItems: "start",
       }}
     >
-      {/* ── Chat column — scrolls naturally with the page ── */}
-      <div className="min-w-0 flex flex-col" style={{ minHeight: "calc(100vh - 160px)" }}>
-        {/* Header — logo + title, no banner */}
-        <ChatHeader extractedFields={extractedFields} />
-
-        {/* Message list */}
-        <div className="flex-1 space-y-1 pb-6">
+      {/* ── Chat column — fixed viewport height, messages scroll inside ── */}
+      <div className="min-w-0 flex flex-col" style={{ height: "calc(100dvh - 2rem)" }}>
+        {/* Message list — scrolls independently, input bar sits below. Header scrolls away with messages. */}
+        <div ref={scrollContainerRef} className="flex-1 overflow-y-auto space-y-1 pb-6 scroll-smooth">
+          <ChatHeader extractedFields={extractedFields} />
           {messages.map((msg, i) => {
             // ── Insight bubble ──
             if (msg.role === "insight") {
@@ -1290,8 +1344,8 @@ export function OnboardingChat() {
           <div ref={bottomRef} />
         </div>
 
-        {/* Input bar */}
-        <div className="sticky bottom-0 pb-6 pt-4">
+        {/* Input bar — sits below the scroll area, never overlaps messages */}
+        <div className="shrink-0 pb-4 pt-3">
           {/* Suggestion chips — own zone between chat and input, with real visual weight */}
           {suggestionChips && (
             <div className="mb-3">

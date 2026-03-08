@@ -153,6 +153,8 @@ Track sprint progress and status.
   Commit `7d1f04c` (10 files, 781 lines added). TypeScript clean. Deployed to Vercel.
   **BLOCKER:** Stripe account setup stalled — user's existing Stripe is Express (Go Fractional), not standard Dashboard. Israel may not appear in Stripe country list on new account creation. Alternatives discussed: Lemon Squeezy (works from Israel, Merchant of Record). Decision pending.
 - 2026-03-05: **Next session should start with:** (1) Resolve Stripe/payment processor — either get Stripe Israel working or pivot to Lemon Squeezy. (2) Set env vars: STRIPE_FULL_ANALYSIS_PRICE_ID + STRIPE_PRO_MONTHLY_PRICE_ID (or equivalent Lemon Squeezy keys). (3) Save My Results re-POST fix (P1). (4) Tool logos on journey map (plan exists in .claude/plans/). (5) Journey health scoring (P1).
+- 2026-03-06: **Chat Onboarding Branch (`preview/onboarding-chat`) — Base44 UX analysis, chip polish, JSON prefill fix, chat flow diagnosis.** Commits: `c3de94f` (VIP chips), `0fd1e3c` (assistant prefill JSON fix). Fixed Vercel Preview env (all 10 vars were Production-only → added to Preview). Full flow diagnosis done — see `O-output/chat-flow-diagnosis-2026-03-06.md`.
+- 2026-03-06: **Next session should start with:** Fix chat flow Steps 3-5 per diagnosis doc. Then end-to-end test of full chat path.
 
 ---
 
@@ -425,6 +427,46 @@ Track sprint progress and status.
 - Revenue Protected counter on Dashboard (benchmark-based, starts $0, grows with playbook completion)
 - "Save My Results" CTA for anonymous users
 - Full regression QA (gatekeeper audit)
+
+---
+
+## Session — 2026-03-07 (Intelligence Architecture + Orca AI Reference Output)
+
+### Completed this session
+
+**Intelligence Stack Architecture:**
+- **COO impact assessment** — Evaluated whether wizard UX changes (conversational identity, enrichment editor, logo fallback, journey checklist) or intelligence stack work affects pricing model or tier gates. Verdict: pricing model unchanged. Pro tier value expands (Champion tracking + Expectation Gap Alert + Layer 6 full loop). Free tier gains Gemini/NotebookLM export. One flag: "AI stack recommendations" copy is ambiguous — Free = static L3, Pro = live-refreshed L3.
+- **Enablement + Marketing layer added** to `O-output/cx-mate-enrichment-layer-architecture.md` — Three tracks: Track A (Customer Messages: stage templates, persona-specific), Track B (Internal CS Enablement: talk tracks, objection handling, QBR deck skeleton), Track C (Marketing Alignment: asset mapping, G2 trigger, referral trigger). Stage-by-stage Enablement Pack format table. Pricing map (Free → Starter → Pro → Premium depth levels). Updated Implementation Priority table.
+- **`B-brain/00-architecture/intelligence-stack.md` created** — Condensed operational spec (not narrative). All 7 layers + Enablement layer + moat structure + pricing alignment + implementation priorities. Contains the L4B MEDDPICC fields table and the critical L0 constraint (onboarding MUST feed all journey prompt fields). Source of truth for agents working on the intelligence stack.
+- **3 decisions logged** in `M-memory/decisions.md`: (1) pricing model unchanged + Pro tier value expansion, (2) Enablement + Marketing layer decision, (3) B-brain as source of truth for intelligence stack.
+
+**Orca AI Reference Output (full quality demonstration):**
+- **`O-output/orca-ai-cx-mate-full-output.md` created** — Full CX Mate output for Orca AI (maritime navigation AI, Israeli) demonstrating all 7 intelligence layers active. Previous result with old system: C+. New result: demonstrates what maritime-specific depth produces.
+  - 6 confrontation patterns (Safety Culture Wall, Phantom Metric Problem, MEDDPICC Black Hole, Post-Installation Desert, Champion Departure Crisis, Fleet Bottleneck)
+  - Full lifecycle journey map (7 stages, 35 moments)
+  - 6 playbook actions with AI prompts, tool recommendations, and templates
+  - Full enablement pack (Stage 4 + Stage 6 templates: CS talk tracks + customer email templates)
+  - Revenue projections (~$339K at risk, ~$1.05M opportunity) with maritime actuarial methodology
+  - Champion Departure Trigger: full 30-day protocol with 4 email templates
+  - Intelligence Layer Summary table showing exactly what each layer contributed
+- **`O-output/orca-ai-coo-report.md` created** — Polished, client-facing, COO-ready version. Removes all internal meta-commentary and architecture references. Executive consulting level language. Maritime-informed. Designed to be shared directly with the Orca AI COO for validation.
+
+### Key insight from this session
+The intelligence stack upgrade (all 7 layers active) turned a "C+" Orca AI output into a document the COO reads and says "how did you know this about us?" The gap was not the AI model — it was the specificity of the inputs: knowing bridge officers resist "monitoring" framing (professional identity, not feature confusion), knowing Fleet Safety Directors average 2-3 year tenures, knowing Lloyd's actuarial data is the ROI language their CFO speaks. This validates the core architecture argument: the moat is in the input system and methodology, not the model.
+
+### Files created/modified this session
+- `O-output/cx-mate-enrichment-layer-architecture.md` — Enablement layer added
+- `B-brain/00-architecture/intelligence-stack.md` — Created (new source of truth file)
+- `M-memory/decisions.md` — 3 new entries
+- `O-output/orca-ai-cx-mate-full-output.md` — Created
+- `O-output/orca-ai-coo-report.md` — Created
+
+### Next session starts with
+- **Homepage clarity**: make it clear what you get (journey + report + playbook) — still pending from earlier
+- **Chat-skinned wizard**: approved plan in `~/.claude/plans/quiet-meandering-taco.md` — onboarding-chat-wizard.tsx build
+- Revenue Protected counter on Dashboard (benchmark-based)
+- Playbook persistence to Supabase (Phase 4)
+- Full regression QA / gatekeeper audit before next demo
 
 ---
 

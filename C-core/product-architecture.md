@@ -229,6 +229,7 @@ Every user gets a "Open in NotebookLM" button alongside Export PDF. CX Mate expo
 9. **Try before you buy** — Anonymous preview, save when ready
 10. **Eat our own cooking** — CX Mate must deliver the best possible customer experience to its own users. Every screen, flow, and interaction is a CX moment. If we wouldn't recommend it to a client, we don't ship it.
 11. **Build on what exists** — Never start from zero. Read what was built, understand why it was built that way, and extend it. Months of iteration are baked into existing code. Replacing without understanding destroys compounded value.
+12. **Agentic-first design** — We are building for the new world. Not forms, pages, and dashboards — agents, conversations, and proactive intelligence. Before building any feature, ask: "Could this be a conversation instead of a form? Could the system bring this to the user instead of waiting? Could the UI adapt to context instead of being static?" Even when shipping Stage 1/2 today, the architecture must make Stage 3 possible. Reference: `M-memory/intel/2026-03-08-agentic-first-design.md`
 
 ---
 
