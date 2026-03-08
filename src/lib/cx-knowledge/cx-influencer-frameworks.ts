@@ -1,12 +1,13 @@
 /**
- * CX Influencer Frameworks — Layer 1A: Methodology Intelligence
+ * CX Frameworks — Layer 1A: Methodology Intelligence
  *
- * Structured citation library of proven CX frameworks from recognized
- * industry experts. Injected into journey + recommendation prompts so
- * Claude can cite specific frameworks by name.
+ * Structured library of proven CX frameworks and principles.
+ * Injected into journey + recommendation prompts so Claude can
+ * apply specific frameworks with full context.
  *
  * Source: B-brain/01-cx-methodology/cx-influencers-2026.md
  * Wired into prompts: 2026-03-05
+ * Updated: 2026-03-08 — removed person name attributions
  */
 
 // ============================================
@@ -15,7 +16,6 @@
 
 export interface InfluencerFramework {
   id: string;
-  expert: string;
   framework: string;
   /** 1-sentence core principle */
   principle: string;
@@ -23,8 +23,8 @@ export interface InfluencerFramework {
   applyWhen: FrameworkContext[];
   /** Which journey stages it's most relevant to */
   stageRelevance: ("sales" | "customer" | "both")[];
-  /** How the AI should cite this in output */
-  citationExample: string;
+  /** Key insight to apply when this framework is relevant */
+  insight: string;
 }
 
 export type FrameworkContext =
@@ -55,176 +55,161 @@ export const CX_FRAMEWORKS: InfluencerFramework[] = [
   // ── Pioneers ────────────────────────────────────────────
   {
     id: "bliss_five_competencies",
-    expert: "Jeanne Bliss",
     framework: "Five Competencies of Customer-Centric Leadership",
     principle:
       "Earn the right to grow by improving customers' lives. CX must be owned at the C-suite, not delegated to support.",
     applyWhen: ["leadership", "retention", "churn_prevention", "measurement"],
     stageRelevance: ["both"],
-    citationExample:
-      'Jeanne Bliss\'s "Five Competencies" model shows that companies where the CEO personally reviews customer loss patterns reduce churn 2x faster.',
+    insight:
+      'The Five Competencies model shows that companies where the CEO personally reviews customer loss patterns reduce churn 2x faster.',
   },
   {
     id: "hyken_moments_of_magic",
-    expert: "Shep Hyken",
     framework: "Moments of Magic vs Moments of Misery",
     principle:
       "Every touchpoint is a chance to deliver. Consistency beats sporadic delight — the goal is reliable amazement, not occasional wow.",
     applyWhen: ["delight_moments", "service_culture", "onboarding", "support"],
     stageRelevance: ["customer"],
-    citationExample:
-      'This is what Shep Hyken calls a "Moment of Magic" — a touchpoint where consistent, small excellence creates lasting loyalty.',
+    insight:
+      'A "Moment of Magic" is a touchpoint where consistent, small excellence creates lasting loyalty. Consistency here matters more than a single wow moment.',
   },
   {
     id: "kaufman_uplifting_service",
-    expert: "Ron Kaufman",
     framework: "Uplifting Service",
     principle:
       "Service culture scales when the entire organisation adopts a service mindset, not just the frontline team.",
     applyWhen: ["service_culture", "employee_experience", "expansion"],
     stageRelevance: ["customer"],
-    citationExample:
-      "Ron Kaufman's Uplifting Service framework suggests aligning every team — not just CS — around the customer's success definition.",
+    insight:
+      "The Uplifting Service framework shows that aligning every team — not just CS — around the customer's success definition is what separates average from great.",
   },
 
   // ── Futurists ────────────────────────────────────────────
   {
     id: "morgan_ai_balance",
-    expert: "Blake Morgan",
     framework: "Human-AI CX Balance",
     principle:
       "The companies that win use AI to handle transactions while freeing humans to handle relationships. The wrong balance destroys trust.",
     applyWhen: ["automation", "support", "onboarding", "decision_science"],
     stageRelevance: ["both"],
-    citationExample:
-      "Blake Morgan's AI-CX framework flags this as a risk: automating a high-emotion moment removes the human touch customers need most.",
+    insight:
+      "The Human-AI CX balance principle flags a key risk: automating a high-emotion moment removes the human touch customers need most.",
   },
   {
     id: "vanbelleghem_partners",
-    expert: "Steven Van Belleghem",
     framework: "Partners in Life / AI+Human Balance",
     principle:
       "AI handles the convenience; humans handle the complexity. Brands stay human in an automated world by knowing which is which.",
     applyWhen: ["automation", "support", "onboarding"],
     stageRelevance: ["customer"],
-    citationExample:
-      'Steven Van Belleghem\'s "Partners in Life" model recommends: automate the routine, humanise the complex. This moment needs the human side.',
+    insight:
+      'The "Partners in Life" CX model recommends: automate the routine, humanise the complex. This moment needs the human side.',
   },
   {
     id: "baer_hug_haters",
-    expert: "Jay Baer",
     framework: "Experience IS Marketing / Hug Your Haters",
     principle:
       "Response speed and complaint handling are growth levers, not cost centres. Every complaint answered publicly turns 1 detractor into 10 advocates.",
     applyWhen: ["advocacy", "support", "churn_prevention"],
     stageRelevance: ["customer"],
-    citationExample:
-      "Jay Baer's research shows that responding to complaints within 1 hour increases customer advocacy by 25%. Speed is a CX strategy.",
+    insight:
+      "CX research shows that responding to complaints within 1 hour increases customer advocacy by 25%. Speed is a CX strategy, not just a service metric.",
   },
 
   // ── Practitioners ────────────────────────────────────────
   {
     id: "golding_measurement",
-    expert: "Ian Golding",
     framework: "Measurable CX Strategy",
     principle:
       "CX strategy without measurement is just good intentions. Every initiative needs a metric, a baseline, and a target.",
     applyWhen: ["measurement", "journey_mapping", "leadership"],
     stageRelevance: ["both"],
-    citationExample:
-      'Ian Golding (CCXP) identifies this as a critical moment of truth — the point where measurement discipline separates good CX from great.',
+    insight:
+      'This is a critical moment of truth — the point where measurement discipline separates good CX from great. A metric without a baseline is decoration.',
   },
   {
     id: "franz_journey_why",
-    expert: "Annette Franz",
     framework: "Journey Mapping Reveals the WHY",
     principle:
       "Don't just map what customers do — understand WHY they do it. Root cause analysis behind journey behaviour drives real change.",
     applyWhen: ["journey_mapping", "voc", "churn_prevention", "onboarding"],
     stageRelevance: ["both"],
-    citationExample:
-      "Annette Franz's journey mapping approach asks: why does the customer behave this way at this moment? The map is not the insight — the WHY is.",
+    insight:
+      "Best-practice journey mapping asks: why does the customer behave this way at this moment? The map is not the insight — the WHY is.",
   },
   {
     id: "bova_ex_cx",
-    expert: "Tiffani Bova",
     framework: "The EX↔CX Link",
     principle:
       "Employee experience directly drives customer experience. CS teams that are burnt out deliver burnt-out experiences.",
     applyWhen: ["employee_experience", "service_culture", "retention"],
     stageRelevance: ["customer"],
-    citationExample:
-      "Tiffani Bova's research proves the EX↔CX link: if your CS team is overwhelmed, your customers feel it. Fix the team before fixing the process.",
+    insight:
+      "Research on the EX↔CX link is clear: if your CS team is overwhelmed, your customers feel it. Fix the team before fixing the process.",
   },
   {
     id: "dixon_effortless",
-    expert: "Matt Dixon",
     framework: "Effortless Experience / CES",
     principle:
       "Reducing effort beats increasing delight. Customers don't want to be wowed — they want things to be easy.",
     applyWhen: ["measurement", "onboarding", "support", "simplification"],
     stageRelevance: ["customer"],
-    citationExample:
-      'Matt Dixon\'s "Effortless Experience" research shows that reducing customer effort is 4x more predictive of loyalty than delight.',
+    insight:
+      'The "Effortless Experience" research shows that reducing customer effort is 4x more predictive of loyalty than delight. Ease > wow.',
   },
   {
     id: "reichheld_loyalty",
-    expert: "Fred Reichheld",
     framework: "NPS & Loyalty Loops",
     principle:
       "Net Promoter Score works only as a system, not a number. The loop — ask, categorise, close — is what drives growth.",
     applyWhen: ["measurement", "advocacy", "retention", "voc"],
     stageRelevance: ["customer"],
-    citationExample:
-      "Fred Reichheld, who created NPS, emphasises: the score is meaningless without closing the loop. Every detractor response needs a human follow-up.",
+    insight:
+      "NPS theory is clear: the score is meaningless without closing the loop. Every detractor response needs a human follow-up within 24 hours.",
   },
 
   // ── Israeli & Regional Practitioners ─────────────────────
   {
     id: "shaked_startup_cx",
-    expert: "Keren Shaked",
     framework: "Practical CX for Startups",
     principle:
       "CX doesn't require a CX team to start. Founders who speak the language of revenue, churn, and growth — not 'satisfaction' — build better customer journeys from day one.",
     applyWhen: ["startup_cx", "onboarding", "simplification", "journey_mapping", "churn_prevention"],
     stageRelevance: ["both"],
-    citationExample:
-      "Keren Shaked's approach: before building a CX process, ask what the customer actually needs to succeed — not what you think looks like good service.",
+    insight:
+      "CX-for-startups thinking: before building a CX process, ask what the customer actually needs to succeed — not what you think looks like good service.",
   },
 
   // ── Disruptors ────────────────────────────────────────────
   {
     id: "gingiss_experience_maker",
-    expert: "Dan Gingiss",
     framework: "The Experience Maker",
     principle:
       "Small things done remarkably well create fans. Delight doesn't require grand gestures — it requires consistent, thoughtful details.",
     applyWhen: ["delight_moments", "advocacy", "onboarding"],
     stageRelevance: ["customer"],
-    citationExample:
-      "Dan Gingiss's Experience Maker philosophy: the shareable moment here isn't expensive — it's a small, thoughtful detail that customers talk about.",
+    insight:
+      "The Experience Maker philosophy: the shareable moment here isn't expensive — it's a small, thoughtful detail that customers remember and talk about.",
   },
   {
     id: "swinscoe_punk_cx",
-    expert: "Adrian Swinscoe",
     framework: "Punk CX / Simplification",
     principle:
       "Cut the noise, focus on human-to-human basics. More process doesn't mean better CX — sometimes less is dramatically more.",
     applyWhen: ["simplification", "onboarding", "service_culture"],
     stageRelevance: ["both"],
-    citationExample:
-      'Adrian Swinscoe\'s "Punk CX" approach would say: strip this back. You don\'t need a 12-step process — you need 3 things done brilliantly.',
+    insight:
+      '"Punk CX" thinking says: strip this back. You don\'t need a 12-step process — you need 3 things done brilliantly.',
   },
   {
     id: "nir_eyal_hook",
-    expert: "Nir Eyal",
     framework: "Hook Model (Habit Formation)",
     principle:
       "Product stickiness comes from trigger → action → variable reward → investment loops. Build habits, not just features.",
     applyWhen: ["onboarding", "retention", "decision_science", "expansion"],
     stageRelevance: ["customer"],
-    citationExample:
-      "Nir Eyal's Hook Model applies here: the trigger is set, but there's no variable reward. Without it, the habit loop breaks and churn follows.",
+    insight:
+      "The Hook Model applies here: the trigger is set, but there's no variable reward. Without it, the habit loop breaks and churn follows.",
   },
 ];
 
@@ -347,15 +332,15 @@ export function buildInfluencerPromptContext(
   const entries = frameworks
     .map(
       (f) =>
-        `- **${f.expert} — ${f.framework}:** ${f.principle}\n  → Citation: "${f.citationExample}"`
+        `- **${f.framework}:** ${f.principle}\n  → Apply: "${f.insight}"`
     )
     .join("\n\n");
 
-  return `## CX Expert Frameworks (Cite by Name)
+  return `## CX Frameworks (Apply Where Relevant)
 
-You have access to these proven CX frameworks from recognised industry experts. When your analysis matches a framework, CITE the expert by name. This makes your insights more credible and actionable.
+You have access to these proven CX frameworks and principles. When your analysis matches a framework, apply its insight directly. Do not name or attribute frameworks to individuals — present them as established methodology.
 
 ${entries}
 
-**How to cite:** Weave expert names naturally into your insights and recommendations. Example: "Following Annette Franz's approach, the root cause here isn't the process — it's that no one asked WHY customers drop off at this stage." Don't force citations — only cite when genuinely relevant.`;
+**How to apply:** Weave framework insights naturally into your analysis. Example: "The map is not the insight — the WHY is. At this stage, the real question is why customers drop off, not just that they do." Apply only when genuinely relevant.`;
 }
