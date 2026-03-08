@@ -1,8 +1,8 @@
 // Onboarding entry point — three modes, all preserved:
 //
-//   /onboarding             → OnboardingChat (conversational, current default)
-//   /onboarding?mode=wizard2  → OnboardingChatWizard (new chat-skinned wizard)
+//   /onboarding             → OnboardingChatWizard (chat-skinned wizard, current default)
 //   /onboarding?mode=classic  → OnboardingWizard (original step-based wizard)
+//   /onboarding?mode=chat     → OnboardingChat (old conversational chat — kept for reference)
 
 import { OnboardingChat } from "@/components/onboarding/onboarding-chat";
 import { OnboardingChatWizard } from "@/components/onboarding/onboarding-chat-wizard";
@@ -24,20 +24,20 @@ export default async function OnboardingPage({
     );
   }
 
-  if (mode === "wizard2") {
+  if (mode === "chat") {
     return (
-      <div className="flex flex-col items-center px-8 pt-4 h-[100dvh] overflow-hidden w-full">
-        <div className="w-full max-w-4xl flex-1 min-h-0">
-          <OnboardingChatWizard />
-        </div>
+      <div className="flex flex-col items-center px-8 pt-4 h-[100dvh] overflow-hidden">
+        <OnboardingChat />
       </div>
     );
   }
 
-  // Default: conversational chat flow
+  // Default: chat-skinned wizard (structured data + chat visual identity)
   return (
-    <div className="flex flex-col items-center px-8 pt-4 h-[100dvh] overflow-hidden">
-      <OnboardingChat />
+    <div className="flex flex-col items-center px-8 pt-4 h-[100dvh] overflow-hidden w-full">
+      <div className="w-full max-w-4xl flex-1 min-h-0">
+        <OnboardingChatWizard />
+      </div>
     </div>
   );
 }
