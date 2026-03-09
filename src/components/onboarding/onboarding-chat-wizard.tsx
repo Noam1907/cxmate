@@ -730,14 +730,7 @@ function ChallengeWidget({
                 // Cancel chip auto-submit if user is actively typing
                 if (autoSubmitTimer.current) clearTimeout(autoSubmitTimer.current);
               }}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && !e.shiftKey && canSubmit) {
-                  e.preventDefault();
-                  if (autoSubmitTimer.current) clearTimeout(autoSubmitTimer.current);
-                  onSubmit();
-                }
-              }}
-              placeholder="Tell me what's keeping you up at night... (Enter to continue)"
+              placeholder="Tell me what's keeping you up at night…"
               rows={3}
               className="w-full text-sm border border-slate-200 rounded-xl px-3 py-2.5 pr-10 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50 transition-all resize-none"
             />
@@ -758,7 +751,7 @@ function ChallengeWidget({
         {/* Pain point chips */}
         <div>
           <label className="text-xs font-medium text-slate-500 mb-2 block">
-            Or select all that apply — clicking auto-continues:
+            Also pick any that hit home:
           </label>
           <div className="flex flex-wrap gap-2">
             {painOptions.map((pain) => {
@@ -780,9 +773,12 @@ function ChallengeWidget({
               );
             })}
           </div>
-          {hasChips && (
+          {canSubmit && (
             <div className="flex items-center justify-between mt-2.5">
-              <p className="text-[11px] text-muted-foreground">Moving on in a moment…</p>
+              {hasChips
+                ? <p className="text-[11px] text-muted-foreground">Moving on in a moment…</p>
+                : <span />
+              }
               <button
                 type="button"
                 onClick={() => {
@@ -791,7 +787,7 @@ function ChallengeWidget({
                 }}
                 className="text-xs font-medium text-primary flex items-center gap-1 hover:gap-1.5 transition-all"
               >
-                Continue now <ArrowRight size={11} weight="bold" />
+                Continue <ArrowRight size={11} weight="bold" />
               </button>
             </div>
           )}
