@@ -28,6 +28,7 @@ function JourneyContent() {
   const [firstName, setFirstName] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState<ViewMode>("visual");
+  const [playbookMoments, setPlaybookMoments] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     if (!loading && journey) {
@@ -38,6 +39,33 @@ function JourneyContent() {
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loading, journey]);
+
+  // Load playbook moments for journey↔playbook cross-linking
+  useEffect(() => {
+    function extractMoments(): boolean {
+      const stored = sessionStorage.getItem("cx-mate-playbook");
+      if (!stored) return false;
+      try {
+        const pb = JSON.parse(stored);
+        const moments = new Set<string>();
+        if (Array.isArray(pb.stagePlaybooks)) {
+          for (const stage of pb.stagePlaybooks) {
+            for (const rec of stage.recommendations ?? []) {
+              if (rec.stageName && rec.momentName) {
+                moments.add(`${rec.stageName}:${rec.momentName}`);
+              }
+            }
+          }
+        }
+        setPlaybookMoments(moments);
+        return moments.size > 0;
+      } catch { return false; }
+    }
+    if (extractMoments()) return;
+    // Playbook may still be generating — poll until it arrives
+    const interval = setInterval(() => { if (extractMoments()) clearInterval(interval); }, 3000);
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     async function load() {
@@ -201,7 +229,7 @@ function JourneyContent() {
 
       {/* Content based on view mode */}
       {viewMode === "cards" ? (
-        <JourneyMap journey={journey} evidenceMap={evidenceMap} />
+        <JourneyMap journey={journey} evidenceMap={evidenceMap} playbookMoments={playbookMoments} />
       ) : (
         <>
           <div data-print-hide-visual>
@@ -209,7 +237,7 @@ function JourneyContent() {
           </div>
           {/* Print fallback: always render card view for PDF export (visual timeline overflows A4) */}
           <div className="hidden" data-print-show-cards>
-            <JourneyMap journey={journey} evidenceMap={evidenceMap} />
+            <JourneyMap journey={journey} evidenceMap={evidenceMap} playbookMoments={playbookMoments} />
           </div>
         </>
       )}

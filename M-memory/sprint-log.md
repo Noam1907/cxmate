@@ -501,3 +501,40 @@ The intelligence stack upgrade (all 7 layers active) turned a "C+" Orca AI outpu
 - "Save My Results" CTA for anonymous users
 - Measurement gap: NPS/CSAT/CES suggestions in recommendations
 - Full regression QA (gatekeeper audit)
+
+---
+
+## Session — 2026-03-08 (P0 fixes + Homepage + Beta GTM)
+
+### Completed this session
+- **P0-A: QBR JSON repair** — Added system prompt + 3-level progressive repair chain to `generate-qbr/route.ts`. Matches `generate-journey.ts` battle-tested pattern.
+- **P0-B: QBR null guards** — All 6 `.map()`/`.length` calls in `qbr/page.tsx` guarded with `?? []`
+- **P0-C: QBR error boundary** — Created `/src/app/qbr/error.tsx` (matches `/journey/error.tsx` pattern)
+- **P1-A: Chat route timeout** — Added `/api/onboarding/chat` to `vercel.json` (maxDuration: 60s) + `export const maxDuration = 60` in route file
+- **Homepage copy rework** — All generic copy replaced: subhead specific, CTAs = "Map My CX Journey", dark section = "When did you last see what customers see?", How It Works = deliverable-focused, Features = 3 real deliverables + Live Intelligence, Bottom CTA = "Your customers already have an experience..."
+- **Branch hygiene** — All work committed to `preview/onboarding-chat` + merged to `main` + pushed. Vercel auto-deploys from `main`.
+- **Beta GTM output** — 3 documents created in `O-output/`:
+  - `beta-icp-target-list.md` — ICP profile, 6 verticals, 20 target company profiles, 5-source research method
+  - `beta-tester-outreach-sequence.md` — Full 3-touch cold sequence (LinkedIn + email), warm intro templates, 4-touch post-signup FU, 30-min feedback call script
+  - `low-radar-campaign.md` — 3-channel stealth campaign: 6 ready-to-post LinkedIn posts (fully written), 4 community post variants, 45-touch DM outreach plan, 3-week calendar
+
+### New skills registered
+- **`prd`** — Modern Product Brief generator. Teresa Torres Opportunity Solution Trees + Shape Up pitches + Amazon PR/FAQ. Invoke: "write a brief for X", "scope this feature", "pitch this idea".
+- **`adhd`** — ADHD Co-Pilot. Registered from canonical source at `T-tools/01-skills/ADHD_Co-pilot/adhd-copilot-SKILL.md`. Operational copy at `.claude/skills/adhd/SKILL.md`. Wired into morning routine (Step 0 — Brain Dump Buffer before status report) and Session Contract close (Step 5).
+
+### Morning routine upgraded
+- **ADHD Co-Pilot integrated** into `T-tools/03-workflows/morning-routine-workflow.md`: Step 0 (Brain Dump Buffer before COO status report) + Session Contract after Morning Brief (Step 5). COO Session Start Checklist updated in `A-agents/coo-agent.md`: Step 0 + Step 9 reference `/adhd`.
+- **Anti-patterns added**: "Don't skip the brain dump" + "Don't skip the session contract".
+
+### Deferred
+- Sign-up gate (name + email requirement) — Anat deferred, revisit later
+
+### P0-D still open (decision needed)
+- `GATES_DISABLED = true` in `lib/tier-access.ts` — billing gates bypassed in production. Needs Anat's call before demo with paying prospects.
+
+### Next session starts with
+- **ADHD Co-Pilot runs first** — Brain Dump Buffer before anything else. That's the new standard.
+- Anat executes beta GTM outreach (docs ready in O-output/)
+- P0-D decision: enable billing gates for demo or leave open?
+- P2-A: Add CX Review (/qbr) to nav header
+- Homepage: consider moving comparison section higher (currently buried below dark section)

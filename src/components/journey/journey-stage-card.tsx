@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { CaretDown, CaretUp } from "@phosphor-icons/react";
 import type { GeneratedStage, GeneratedMoment } from "@/lib/ai/journey-prompt";
 import { getToolLogoUrl, getToolInitial } from "@/lib/tool-logos";
@@ -15,6 +16,7 @@ interface JourneyStageCardProps {
   index: number;
   isLast: boolean;
   momentAnnotations?: Record<string, MomentAnnotation>;
+  playbookMoments?: Set<string>;
 }
 
 // Unified severity palette: critical = red, high = amber, rest = slate
@@ -66,7 +68,7 @@ function ToolBadge({ name, domain }: { name: string; domain?: string }) {
   );
 }
 
-function MomentCard({ moment, annotation }: { moment: GeneratedMoment; annotation?: MomentAnnotation }) {
+function MomentCard({ moment, annotation, hasPlaybookItem, stageSlug }: { moment: GeneratedMoment; annotation?: MomentAnnotation; hasPlaybookItem?: boolean; stageSlug: string }) {
   const [expanded, setExpanded] = useState(false);
   const style = getSeverityStyle(moment.severity);
   const isAtRisk = moment.severity === "critical" || moment.severity === "high";
@@ -180,6 +182,17 @@ function MomentCard({ moment, annotation }: { moment: GeneratedMoment; annotatio
             </div>
           )}
 
+          {/* Playbook cross-link — shown when a playbook action exists for this moment */}
+          {hasPlaybookItem && (
+            <Link
+              href={`/playbook#${stageSlug}`}
+              onClick={(e) => e.stopPropagation()}
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary bg-primary/8 border border-primary/20 px-2.5 py-1.5 rounded-lg hover:bg-primary/15 transition-colors"
+            >
+              📋 Playbook has a how-to for this →
+            </Link>
+          )}
+
           {/* Measure with */}
           {moment.cxToolRecommendation && (
             <div>
@@ -208,7 +221,9 @@ export function JourneyStageCard({
   index,
   isLast,
   momentAnnotations,
+  playbookMoments,
 }: JourneyStageCardProps) {
+  const stageSlug = stage.name.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
   const hasStageInsights =
     stage.topFailureRisk || stage.successPattern || stage.benchmarkContext;
 
@@ -294,6 +309,8 @@ export function JourneyStageCard({
               key={i}
               moment={moment}
               annotation={momentAnnotations?.[moment.name]}
+              hasPlaybookItem={playbookMoments?.has(`${stage.name}:${moment.name}`) ?? false}
+              stageSlug={stageSlug}
             />
           ))}
         </div>

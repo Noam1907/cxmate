@@ -40,6 +40,22 @@ Before touching any of these systems, you MUST also read the listed files. Gener
 | **Auth / Database** | `src/lib/supabase/` (all files), `src/middleware.ts` | Auth, RLS, and dual-mode architecture are tightly coupled. |
 | **UI design / colors** | `src/app/globals.css`, `M-memory/learning-log.md` (design entries) | Design system decisions are documented. Don't introduce new colors or patterns without reading what exists. |
 
+### Core Principle: Anticipate Value, Don't React
+
+**CX Mate is a CX product — we must practice what we preach.** This principle applies to both the PRODUCT and the AGENT TEAM:
+
+**For the product:**
+- Every output must be specific to the company, not generic. "Gather buyer scenarios" is a failure. "For B2B payment platforms, demo with e-commerce marketplaces, SaaS invoicing, wholesale credit lines" is the standard.
+- Every page must connect to its related pages. Journey moments link to playbook how-tos. Playbook actions link back to journey context. No dead ends, no silos.
+- The intelligence layer sits ON TOP of all output — enriching with real-world, company-specific context. Not a one-time onboarding enrichment, but a living layer.
+
+**For the agent team:**
+- Don't wait to be asked. Come to sessions with insights, not just status reports.
+- Connect dots proactively. If two systems should link but don't, flag it before the user notices.
+- Push for specificity. Generic output from any agent is a failure state.
+- Plan before building. The COO presents a sequenced plan, gets confirmation, THEN drives execution. No reactive building.
+- The agents must model the behavior CX Mate sells to customers: proactive, intelligent, always one step ahead.
+
 ### Core Principle: Never Rebuild Without Understanding
 
 **Build on what exists.** Read what was built, understand why it was built that way, then extend. Months of iteration are baked into existing code. Replacing without understanding destroys compounded value. If you don't know why something has 33 fields, don't ship a version with 10.

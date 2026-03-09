@@ -8,9 +8,10 @@ import type { MomentAnnotation } from "./journey-stage-card";
 interface JourneyMapProps {
   journey: GeneratedJourney;
   evidenceMap?: EvidenceMap | null;
+  playbookMoments?: Set<string>;
 }
 
-export function JourneyMap({ journey, evidenceMap }: JourneyMapProps) {
+export function JourneyMap({ journey, evidenceMap, playbookMoments }: JourneyMapProps) {
   const salesStages = journey.stages.filter((s) => s.stageType === "sales");
   const customerStages = journey.stages.filter(
     (s) => s.stageType === "customer"
@@ -61,6 +62,7 @@ export function JourneyMap({ journey, evidenceMap }: JourneyMapProps) {
                 index={i}
                 isLast={i === salesStages.length - 1 && customerStages.length === 0}
                 momentAnnotations={getStageAnnotations(stage.name, stage.meaningfulMoments)}
+                playbookMoments={playbookMoments}
               />
             ))}
           </div>
@@ -98,6 +100,7 @@ export function JourneyMap({ journey, evidenceMap }: JourneyMapProps) {
                 index={salesStages.length + i}
                 isLast={i === customerStages.length - 1}
                 momentAnnotations={getStageAnnotations(stage.name, stage.meaningfulMoments)}
+                playbookMoments={playbookMoments}
               />
             ))}
           </div>

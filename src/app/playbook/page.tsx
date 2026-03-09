@@ -124,6 +124,16 @@ function RecommendationCard({
 
           {expanded && (
             <div className="mt-3 space-y-2" onClick={() => setExpanded(false)}>
+              {/* Journey cross-link — see the moment context */}
+              {rec.momentName && (
+                <Link
+                  href="/journey"
+                  onClick={(e) => e.stopPropagation()}
+                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-primary bg-slate-50 border border-slate-200 px-2.5 py-1.5 rounded-lg hover:border-primary/30 transition-colors"
+                >
+                  ← See &ldquo;{rec.momentName}&rdquo; in Journey Map
+                </Link>
+              )}
               {rec.template && (
                 <div className="rounded-lg bg-slate-50 border border-slate-200 p-3">
                   <div className="flex items-center justify-between mb-1.5">
@@ -163,8 +173,10 @@ function StageSection({
   const total = stagePlaybook.recommendations.length;
   const pct = total > 0 ? Math.round((doneCount / total) * 100) : 0;
 
+  const stageSlug = stagePlaybook.stageName.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
+
   return (
-    <div className="mb-8">
+    <div className="mb-8" id={stageSlug}>
       {/* Stage header */}
       <div className="flex items-center justify-between mb-1">
         <h3 className="text-base font-semibold text-slate-900">{stagePlaybook.stageName}</h3>

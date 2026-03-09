@@ -9,6 +9,8 @@
 ```
 [Morning Session Opens]
        ↓
+[ADHD Co-Pilot] Brain Dump Buffer — clear mental backlog before the day starts
+       ↓
 [COO] Session Start — read state, git status, status report
        ↓
 [CX Intel] /cx-intel — daily market scan (articles, competitors, social)
@@ -17,10 +19,28 @@
        ↓
 [COO] Sprint Alignment — where are we vs. sprint goals?
        ↓
-[COO] Morning Brief — present consolidated report + recommend the day's work
+[COO + ADHD Co-Pilot] Morning Brief + Session Contract — plan the day, lock it in
        ↓
 [Work Begins]
 ```
+
+---
+
+## Step 0: Brain Dump Buffer (ADHD Co-Pilot)
+
+**Always run this first, before the status report.** The ADHD Co-Pilot clears the mental backlog before the day is set.
+
+Invoke `/adhd` and run Session Open → Step 1 (Brain Dump Buffer):
+
+> "Before we start — what's bouncing around in your head right now? Drop everything, even if it's unrelated. Quick list, no filter."
+
+Capture what Anat says. Then:
+
+> "Good — those are safe here. Now let's figure out what we're actually doing today."
+
+*Why this comes first: unresolved thoughts compete for attention during the status report. Externalizing them takes 60 seconds and makes everything after it land better.*
+
+**Output:** Mental backlog captured. Anat is present and ready to engage.
 
 ---
 
@@ -101,11 +121,11 @@ Check progress against the current sprint goals:
 
 ---
 
-## Step 5: Morning Brief (COO)
+## Step 5: Morning Brief + Session Contract (COO + ADHD Co-Pilot)
 
-Present a consolidated morning brief to Anat. This is the single view that sets the day.
+Present a consolidated morning brief to Anat. Then immediately convert the Recommended Plan into an ADHD Co-Pilot Session Contract — so the day has a clear anchor from the start.
 
-### Format
+### Morning Brief Format
 
 ```markdown
 ## Good Morning — [Date]
@@ -136,6 +156,24 @@ Present a consolidated morning brief to Anat. This is the single view that sets 
 - [Any decisions that need Anat's input before work can proceed]
 ```
 
+### Session Contract (ADHD Co-Pilot — always follow the brief with this)
+
+After presenting the brief and getting alignment, lock in the day with a Session Contract:
+
+```
+📋 SESSION CONTRACT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🎯 Primary Goal:       [The #1 thing we're finishing today]
+🧭 North Star Check:   [One sentence: how does this move the product forward?]
+🔬 Exploration Budget: [Optional: X mins on side threads before we return]
+🚧 No-Go Zone:         [What we're explicitly NOT touching today]
+🛑 Abort Signal:       [What would tell us to stop or pivot?]
+⏱ Time Budget:        [Optional: how long is this session?]
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+```
+
+Ask Anat to confirm or adjust. This contract is the anchor for the whole session — the ADHD Co-Pilot and COO both reference it during Mid-Session Interventions.
+
 ---
 
 ## Weekly Add-Ons (Monday or First Session of the Week)
@@ -163,6 +201,8 @@ On the first session of each week, the morning routine adds:
 
 ## Anti-Patterns
 
+- **Don't skip the brain dump.** It takes 60 seconds and dramatically improves the quality of everything after it. Skipping it means unresolved thoughts compete with the status report.
+- **Don't skip the session contract.** The brief tells Anat what we're doing. The contract is her commitment to it. Without the contract, drift starts immediately.
 - **Don't skip the intel scan.** Market context compounds — one day feels small, a month of daily scans builds strategic awareness.
 - **Don't skip the health check.** A broken production site is invisible until a tester hits it.
 - **Don't present intel without opinion.** The digest must say why each signal matters for CX Mate — otherwise it's just noise.
