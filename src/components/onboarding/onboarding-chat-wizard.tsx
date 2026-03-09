@@ -44,6 +44,9 @@ import {
   MATURITY_OPTIONS,
   TIMEFRAME_OPTIONS,
   GOAL_TIMEFRAME_MAP,
+  REVENUE_RANGE_OPTIONS,
+  DEAL_SIZE_OPTIONS,
+  PRICING_MODEL_OPTIONS,
   type CompanyMaturity,
   type OnboardingData,
 } from "@/types/onboarding";
@@ -56,7 +59,7 @@ import { notifyOwner } from "@/lib/notify";
 // Types
 // ─────────────────────────────────────────────
 
-type WizardStep = "identity" | "maturity" | "challenge" | "context" | "goal" | "generating";
+type WizardStep = "identity" | "maturity" | "challenge" | "business" | "context" | "goal" | "generating";
 
 type ConversationEntry =
   | { type: "ai"; content: string; key: string }
@@ -676,6 +679,107 @@ function MaturityWidget({
   );
 }
 
+function BusinessWidget({
+  data,
+  onChange,
+  onSubmit,
+}: {
+  data: OnboardingData;
+  onChange: (patch: Partial<OnboardingData>) => void;
+  onSubmit: () => void;
+}) {
+  const canSubmit = !!(data.roughRevenue || data.averageDealSize || data.pricingModel);
+
+  return (
+    <div className="ml-14 mb-4 max-w-[85%] animate-in fade-in slide-in-from-bottom-2 duration-300">
+      <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-4">
+
+        {/* ARR */}
+        <div>
+          <label className="text-xs font-medium text-slate-500 mb-2 block">Rough ARR</label>
+          <div className="flex flex-wrap gap-2">
+            {REVENUE_RANGE_OPTIONS.filter((r) => r.value !== "pre_revenue").map((opt) => (
+              <button
+                key={opt.value}
+                type="button"
+                onClick={() => onChange({ roughRevenue: data.roughRevenue === opt.value ? "" : opt.value })}
+                className={`text-xs font-medium px-3 py-1.5 rounded-xl border transition-all duration-150 ${
+                  data.roughRevenue === opt.value
+                    ? "bg-primary text-primary-foreground border-primary shadow-sm"
+                    : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
+                }`}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Deal size */}
+        <div>
+          <label className="text-xs font-medium text-slate-500 mb-2 block">Average deal size</label>
+          <div className="flex flex-wrap gap-2">
+            {DEAL_SIZE_OPTIONS.map((opt) => (
+              <button
+                key={opt.value}
+                type="button"
+                onClick={() => onChange({ averageDealSize: data.averageDealSize === opt.value ? "" : opt.value })}
+                className={`text-xs font-medium px-3 py-1.5 rounded-xl border transition-all duration-150 ${
+                  data.averageDealSize === opt.value
+                    ? "bg-primary text-primary-foreground border-primary shadow-sm"
+                    : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
+                }`}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Pricing model */}
+        <div>
+          <label className="text-xs font-medium text-slate-500 mb-2 block">Pricing model</label>
+          <div className="flex flex-wrap gap-2">
+            {PRICING_MODEL_OPTIONS.map((opt) => (
+              <button
+                key={opt.value}
+                type="button"
+                onClick={() => onChange({ pricingModel: data.pricingModel === opt.value ? "" : opt.value })}
+                className={`text-xs font-medium px-3 py-1.5 rounded-xl border transition-all duration-150 ${
+                  data.pricingModel === opt.value
+                    ? "bg-primary text-primary-foreground border-primary shadow-sm"
+                    : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
+                }`}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="flex items-center justify-between pt-1">
+          <button
+            type="button"
+            onClick={onSubmit}
+            className="text-xs text-slate-400 hover:text-slate-600 transition-colors"
+          >
+            Skip
+          </button>
+          {canSubmit && (
+            <button
+              type="button"
+              onClick={onSubmit}
+              className="text-xs font-medium text-primary flex items-center gap-1 hover:gap-1.5 transition-all"
+            >
+              Continue <ArrowRight size={11} weight="bold" />
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function ChallengeWidget({
   data,
   onChange,
@@ -1206,7 +1310,7 @@ export function OnboardingChatWizard() {
   const { enrichment, isEnriching, enrich } = useCompanyEnrichment();
 
   // Autosave
-  const stepIndex = ["identity", "maturity", "challenge", "context", "goal", "generating"].indexOf(currentStep);
+  const stepIndex = ["identity", "maturity", "challenge", "business", "context", "goal", "generating"].indexOf(currentStep);
   useOnboardingAutosave(data, stepIndex);
 
   // ── Effects ──────────────────────────────────────
@@ -1419,17 +1523,42 @@ export function OnboardingChatWizard() {
 
     setConversation((prev) => [...prev.filter((e) => e.key !== "widget-challenge"), ...entries]);
 
-    const contextPrompt = data.companyMaturity === "scaling" || data.companyMaturity === "growing"
-      ? `Two quick questions — your tools and what's already built. Helps me build on what you have instead of starting from scratch.`
-      : `Almost done — what tools do you use, and what's already in place? Even informal processes count.`;
+    const isGrowingOrScaling = data.companyMaturity === "scaling" || data.companyMaturity === "growing";
 
-    transitionTo("context", [
-      { type: "ai", content: contextPrompt, key: `ai-context-q-${Date.now()}` },
-      { type: "widget", step: "context", key: "widget-context" },
-    ]);
+    if (isGrowingOrScaling) {
+      transitionTo("business", [
+        { type: "ai", content: "Quick numbers check — helps me make the output specific to your business, not just generic benchmarks.", key: `ai-business-q-${Date.now()}` },
+        { type: "widget", step: "business", key: "widget-business" },
+      ]);
+    } else {
+      transitionTo("context", [
+        { type: "ai", content: `Almost done — what tools do you use, and what's already in place? Even informal processes count.`, key: `ai-context-q-${Date.now()}` },
+        { type: "widget", step: "context", key: "widget-context" },
+      ]);
+    }
 
     track("onboarding_step_completed", { step_key: "challenge", step_number: 2, company_name: data.companyName });
   }, [data, enrichment, updateData, transitionTo]);
+
+  const handleBusinessSubmit = useCallback(() => {
+    const revLabel = REVENUE_RANGE_OPTIONS.find((r) => r.value === data.roughRevenue)?.label || data.roughRevenue;
+    const dealLabel = DEAL_SIZE_OPTIONS.find((d) => d.value === data.averageDealSize)?.label || data.averageDealSize;
+    const pricingLabel = PRICING_MODEL_OPTIONS.find((p) => p.value === data.pricingModel)?.label || data.pricingModel;
+    const parts = [revLabel, dealLabel, pricingLabel].filter(Boolean);
+    const summary = parts.length > 0 ? parts.join(" · ") : "Skipped";
+
+    setConversation((prev) => [
+      ...prev.filter((e) => e.key !== "widget-business"),
+      { type: "user-summary", content: summary, key: `user-business-${Date.now()}` },
+    ]);
+
+    transitionTo("context", [
+      { type: "ai", content: "Two quick questions — your tools and what's already built. Helps me build on what you have instead of starting from scratch.", key: `ai-context-q-${Date.now()}` },
+      { type: "widget", step: "context", key: "widget-context" },
+    ]);
+
+    track("onboarding_step_completed", { step_key: "business", step_number: 3, company_name: data.companyName });
+  }, [data, transitionTo]);
 
   const handleContextSubmit = useCallback(() => {
     // Build user summary
@@ -1728,6 +1857,15 @@ export function OnboardingChatWizard() {
                       <MaturityWidget
                         key={entry.key}
                         onSelect={handleMaturitySelect}
+                      />
+                    );
+                  case "business":
+                    return (
+                      <BusinessWidget
+                        key={entry.key}
+                        data={data}
+                        onChange={updateData}
+                        onSubmit={handleBusinessSubmit}
                       />
                     );
                   case "challenge":
