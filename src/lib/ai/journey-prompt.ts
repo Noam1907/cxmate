@@ -146,33 +146,14 @@ function detectCompanyStage(companySize: string): "early" | "growing" | "establi
 
 function buildFailurePatternContext(companyStage: "early" | "growing" | "established"): string {
   const patterns = getFailurePatternsByStage(companyStage);
-  const formatted = patterns.map(
-    (p) =>
-      `- **${p.name}** (${p.phase}, ${p.severity}): ${p.description} ` +
-      `Impact: ${p.impactEstimate}. ` +
-      `Immediate fix: ${p.fix.immediate} ` +
-      `Prevention tool: ${p.preventionTool}`
-  ).join("\n");
-
-  return `## Common CX Failure Patterns for ${companyStage}-stage companies
-These are the mistakes companies at this stage typically make:
-
-${formatted}`;
+  return `## Failure Risks (${companyStage})
+${patterns.map(p => `- ${p.name} (${p.severity}): ${p.description}. Fix: ${p.fix.immediate}`).join("\n")}`;
 }
 
 function buildSuccessPatternContext(companyStage: "early" | "growing" | "established"): string {
   const patterns = getSuccessPatternsByStage(companyStage);
-  const formatted = patterns.map(
-    (p) =>
-      `- **${p.name}** (${p.phase}, effort: ${p.effort}, impact: ${p.impact}): ${p.description} ` +
-      `Why it works: ${p.whyItWorks} ` +
-      `Measure with: ${p.measureWith}`
-  ).join("\n");
-
-  return `## Proven CX Success Patterns for ${companyStage}-stage companies
-Evidence-based interventions to recommend:
-
-${formatted}`;
+  return `## Success Patterns (${companyStage})
+${patterns.map(p => `- ${p.name} (${p.impact}): ${p.description}. Measure: ${p.measureWith}`).join("\n")}`;
 }
 
 function buildBenchmarkContext(vertical: string, companySize: string): string {
@@ -208,29 +189,13 @@ function buildBenchmarkContext(vertical: string, companySize: string): string {
 function buildFoundationsContext(maturityStage: MaturityStage): string {
   const foundations = getFoundationsForStage(maturityStage);
   const guidance = getStageGuidance(maturityStage);
-
-  let context = `## Best Practice Foundations (for ${maturityStage} companies)\n`;
-
+  let context = `## Foundations (${maturityStage})\n`;
   if (guidance) {
-    context += `\nStage: ${guidance.name} (${guidance.customerRange})
-Focus: ${guidance.keyFocus}
-
-Top mistakes at this stage:
-${guidance.topMistakes.map((m) => `- "${m.mistake}" — ${m.consequence} → Do instead: ${m.whatToDoInstead}`).join("\n")}
-
-Immediate actions to recommend:
-${guidance.immediateActions.map((a) => `- ${a}`).join("\n")}
-
-CX tools to deploy now:
-${guidance.cxToolsToDeploy.map((t) => `- ${t}`).join("\n")}
-
-Don't do yet:
-${guidance.dontDoYet.map((d) => `- ${d}`).join("\n")}`;
+    context += `Focus: ${guidance.keyFocus}
+Avoid: ${guidance.topMistakes.map(m => m.mistake).join("; ")}
+Do now: ${guidance.immediateActions.join("; ")}`;
   }
-
-  context += `\n\nFoundation elements to build:
-${foundations.map((f) => `- **${f.name}** (priority ${f.priority}): ${f.description} Start with: ${f.minimalViableVersion}`).join("\n")}`;
-
+  context += `\n${foundations.map(f => `- ${f.name} (P${f.priority}): ${f.minimalViableVersion}`).join("\n")}`;
   return context;
 }
 
@@ -293,13 +258,8 @@ function buildCxMaturityContext(input: OnboardingInput): string {
   };
   sections.push(dataLabels[input.dataVsGut] || "CX decision style unknown");
 
-  return `## CX Maturity Assessment
-${sections.join("\n")}
-
-Use this to calibrate your recommendations:
-- If they're gut-driven, don't recommend complex analytics — start with basic measurement
-- If they already measure well, focus on acting on data rather than collecting more
-- Match CX tool recommendations to their actual measurement maturity`;
+  return `## CX Maturity
+${sections.join("\n")}`;
 }
 
 // ============================================
@@ -328,23 +288,7 @@ function buildBusinessDataContext(input: OnboardingInput): string {
 - Est. annual revenue: $${p.annualRevenue?.toLocaleString()} (${calculations.annualRevenue.source})
 ${input.pricingModel ? `- Pricing model: ${input.pricingModel}` : ""}`;
 
-  if (dataSource === "user_provided") {
-    context += `
-
-IMPORTANT: Since the user provided real business data, you MUST:
-1. Show your math in impact projections — e.g., "50 customers × $12K ACV × 25% churn reduction = $150K saved"
-2. Set dataSource to "user_provided" on all impactProjections
-3. Use their actual numbers, not benchmarks
-4. Include the calculation formula in the "calculation" field`;
-  } else {
-    context += `
-
-IMPORTANT: These are benchmark estimates (user didn't provide real numbers). You MUST:
-1. Label all projections clearly — "Based on industry benchmarks for [vertical] companies at your stage"
-2. Set dataSource to "benchmark_estimated" on all impactProjections
-3. Use percentage-based language when possible ("typically reduces churn by 20-30%")
-4. Include the benchmark source in the "calculation" field`;
-  }
+  context += `\nData source: ${dataSource}. Use "${dataSource}" for all impactProjection.dataSource fields.${dataSource === "user_provided" ? " Show math with their actual numbers." : " Use percentage-based projections."}`;
 
   return context;
 }
@@ -354,27 +298,9 @@ IMPORTANT: These are benchmark estimates (user didn't provide real numbers). You
 // ============================================
 
 function buildAnalysisModeContext(input: OnboardingInput): string {
-  if (input.hasExistingCustomers) {
-    return `## Analysis Mode: COMPARISON
-This company has existing customers. Your job is to:
-1. VALIDATE what they're doing right — acknowledge their progress
-2. COMPARE their current state against best practices for ${input.vertical} companies at their stage
-3. Identify GAPS between where they are and where they should be
-4. Show the REVENUE IMPACT of closing each gap (with transparent math)
-5. Frame insights as "Companies like yours typically..." not "You're doing this wrong"
-
-Tone: You're a knowledgeable peer who's seen this movie before. You're validating their experience while showing them what the best companies at their stage do differently.`;
-  }
-
-  return `## Analysis Mode: PRESCRIPTIVE
-This company is pre-customer or very early. Your job is to:
-1. PRESCRIBE the optimal journey from day one — they have a blank canvas
-2. Show them what "great" looks like at their stage (not aspirational enterprise practices)
-3. Highlight the TOP 3 things to get right from the start (not 20 things)
-4. Use PERCENTAGE-based projections since we don't have real revenue data
-5. Frame insights as "The companies that nail this early..." and "Here's what you want to avoid..."
-
-Tone: You're a mentor who's helped dozens of companies launch. You're excited about their potential while being practical about priorities.`;
+  return input.hasExistingCustomers
+    ? `Mode: COMPARISON — validate progress, compare vs ${input.vertical} best practices, show revenue gaps with math. Peer tone: "Companies like yours..."`
+    : `Mode: PRESCRIPTIVE — prescribe optimal journey from day one, top 3 priorities only, percentage-based projections. Mentor tone.`;
 }
 
 // ============================================
@@ -425,9 +351,9 @@ Key moments for this vertical: ${vertical.keyMoments.join(", ") || "varies"}`
 
   return `You are CX Mate — a knowledgeable, assertive CX advisor for B2B startups. Peer advisor voice: direct, opinionated, touch of humor, never condescending. Use "Companies like yours..." framing.
 
-## Who We're Talking To
-${input.userName ? `- Person: ${input.userName}${input.userRole ? ` (${input.userRole})` : ""}` : ""}${input.userRole && !input.userName ? `- Role: ${input.userRole}` : ""}
-${input.userName || input.userRole ? `Use their name and role to personalize advice. A CEO needs strategic framing; a Head of CS needs tactical playbooks; a VP Product needs cross-functional recommendations.` : ""}
+## User
+${input.userName ? `${input.userName}${input.userRole ? ` (${input.userRole})` : ""}` : ""}${input.userRole && !input.userName ? `${input.userRole}` : ""}
+${input.userName || input.userRole ? `Personalize to their role.` : ""}
 
 ## Company Context
 - Company: ${input.companyName}
@@ -443,8 +369,7 @@ ${verticalContext}
 - Main acquisition channel: ${input.mainChannel}
 ${input.preLiveProcess ? `- Pre-live / implementation process: ${input.preLiveProcess}` : ""}
 ${input.currentTools ? `- Current CX tools/stack: ${input.currentTools}` : ""}
-${input.currentTools ? `
-EXISTING TOOL MAPPING: For each stage, identify which of the user's current tools (${input.currentTools}) are relevant and output them in the stage's "existingTools" array as {"name": "ToolName", "domain": "tool-domain.com"}. Only include tools genuinely relevant to that stage. Common domains: Salesforce=salesforce.com, HubSpot=hubspot.com, Zendesk=zendesk.com, Intercom=intercom.com, Jira=atlassian.com, Slack=slack.com, Gainsight=gainsight.com, ChurnZero=churnzero.com, Mixpanel=mixpanel.com, Amplitude=amplitude.com, Segment=segment.com, Freshdesk=freshdesk.com, Monday=monday.com, Notion=notion.so, Asana=asana.com, Pipedrive=pipedrive.com, Gong=gong.io, Outreach=outreach.io, Stripe=stripe.com, Pendo=pendo.io, Fullstory=fullstory.com, Hotjar=hotjar.com, Typeform=typeform.com, Zoho=zoho.com, Drift=drift.com.` : ""}
+${input.currentTools ? `\nMap their tools to stage existingTools as {"name":"ToolName","domain":"tool-domain.com"}.` : ""}
 
 ## Existing CX Processes
 ${input.hasExistingJourney === "yes" || input.hasExistingJourney === "partial" ? `- Has existing journey processes: ${input.hasExistingJourney === "yes" ? "Yes (formal)" : "Partially"}` : "- No existing CX processes in place — building from scratch"}
@@ -481,141 +406,20 @@ ${preCustomerNote}
 ---
 
 ${analysisModeContext}
-
----
-
 ${cxMaturityContext}
-
----
-
 ${businessDataContext}
-
----
-
-# CX INTELLIGENCE (company-specific context)
-
 ${benchmarkContext}
-
 ${failureContext}
-
 ${successContext}
-
 ${foundationsContext}
 
----
+## Task
+Generate JSON journey map. ULTRA CONCISE — every field max 12 words. emotionalState max 4 words.
+${!input.hasExistingCustomers ? 'All stageType MUST be "sales". No post-sale stages. ' : ""}Counts: 2 moments/stage, 2-3 confrontation insights, 2 cxToolRoadmap, 2 impactProjections, 2-3 techStack, 2 assumptions.
+Impact projections MUST include calculation (math formula) and dataSource. addressesPainPoints only if direct match. Prefer AI agents over manual tools.
 
-## Your Task
-Generate a customized, theory-backed journey map with the CX Mate companion voice:
+JSON schema:
+{"name":"str","stages":[{"name":"str","stageType":"sales|customer","description":"str","emotionalState":"2-4 words","topFailureRisk":"str","successPattern":"str","benchmarkContext":"str","existingTools":[{"name":"str","domain":"str"}],"meaningfulMoments":[{"name":"str","type":"risk|delight|decision|handoff","description":"str","severity":"low|medium|high|critical","triggers":["str"],"recommendations":["str"],"diagnosis":"str","actionTemplate":"str","cxToolRecommendation":"str","impactIfIgnored":"str","addressesPainPoints":["str"]}]}],"confrontationInsights":[{"pattern":"str","likelihood":"high|medium|low","description":"str","businessImpact":"str","immediateAction":"str","measureWith":"str","companionAdvice":"str","addressesPainPoints":["str"]}],"cxToolRoadmap":[{"tool":"str","whenToDeploy":"str","whyThisTool":"str","expectedOutcome":"str"}],"impactProjections":[{"area":"str","potentialImpact":"str","timeToRealize":"str","effort":"low|medium|high","calculation":"math formula","dataSource":"user_provided|benchmark_estimated"}],"techStackRecommendations":[{"category":"crm|marketing|support|analytics|cs_platform|communication|bi|survey|data_infrastructure","categoryLabel":"str","tools":["str"],"whyNow":"str","connectWith":"str"}],"assumptions":["str"],"maturityAssessment":"str"}
 
-⚠️ SPEED CONSTRAINT: Keep total output under 6000 tokens. Be extremely concise — every string max 12 words, no elaboration.
-
-1. **Stages**: Customize to this company. **emotionalState = 2-4 words only**. One failure risk, one success pattern per stage.${!input.hasExistingCustomers ? ' ALL stages MUST have stageType: "sales". No post-sale stages.' : ""}
-
-2. **Meaningful Moments (2 per stage, max)**: Tailored to their challenges. For each moment:
-   - Provide a theory-backed **diagnosis** (1 sentence: root cause)
-   - Give a specific **actionTemplate** (1 sentence: exactly what to do)
-   - Recommend a specific **cxToolRecommendation** (1 sentence: which tool or AI agent + why). Think agentic-first: prefer autonomous AI agents (AI support agent, AI SDR, AI onboarding agent) over manual tools when they exist. Specify what the agent does autonomously.
-   - State the **impactIfIgnored** (1 sentence: business cost)
-   - **addressesPainPoints**: Array of pain point keys from user input (only if direct match, else omit)
-   - Omit **decisionScienceInsight** and **competitorGap** to keep output concise
-
-3. **Confrontation Insights (2-3 max)**: Companion voice. Each field max 10 words:
-   - Pattern name, likelihood, business impact (with math if user data available), immediate action, what to measure
-   - **companionAdvice**: 1 sentence, first person, direct advice
-   - **addressesPainPoints**: pain point keys (use EXACT keys, omit if no match)
-   - Omit **competitorContext** to keep output concise
-
-4. **CX Tool Roadmap (2 tools max)**: Most critical only.
-
-5. **Impact Projections (2 max)**: Each MUST include:
-   - **calculation**: Math formula (e.g., "50 customers × $12K ACV × 25% churn reduction = $150K")
-   - **dataSource**: "user_provided" or "benchmark_estimated"
-   - Include both dollar amount AND percentage (e.g., "$36K–$72K / 20-40% churn reduction")
-
-6. **Maturity Assessment**: 2 sentences max in companion voice.
-
-7. **Tech Stack Recommendations (2-3 max)**: Each: category, 2 tool names, 1-sentence whyNow, 1-sentence connectWith.
-
-8. **Assumptions (2)**: Most important, 1 sentence each.
-
-Prioritize their stated pain points. Plain language. ULTRA CONCISE — every field max 12 words.
-
-## Output Format
-Return a JSON object with this exact structure:
-{
-  "name": "Journey map name",
-  "stages": [
-    {
-      "name": "Stage Name",
-      "stageType": "sales" | "customer",
-      "description": "What happens at this stage for this specific company",
-      "emotionalState": "2-4 words max (e.g. 'Skeptical but engaged', 'Cautiously optimistic', 'Anxious and overwhelmed')",
-      "topFailureRisk": "The most likely CX failure pattern at this stage",
-      "successPattern": "The highest-impact success intervention for this stage",
-      "benchmarkContext": "How similar companies perform at this stage",
-      "existingTools": [{"name": "Salesforce", "domain": "salesforce.com"}],
-      "meaningfulMoments": [
-        {
-          "name": "Moment Name",
-          "type": "risk" | "delight" | "decision" | "handoff",
-          "description": "Why this moment matters for this company",
-          "severity": "low" | "medium" | "high" | "critical",
-          "triggers": ["signal 1", "signal 2"],
-          "recommendations": ["specific action 1", "specific action 2"],
-          "diagnosis": "Root cause in 1 sentence",
-          "actionTemplate": "Specific action in 1 sentence",
-          "cxToolRecommendation": "Tool + why in 1 sentence",
-          "impactIfIgnored": "Business cost in 1 sentence",
-          "addressesPainPoints": ["pain_point_key_1"]
-        }
-      ]
-    }
-  ],
-  "confrontationInsights": [
-    {
-      "pattern": "Pattern Name",
-      "likelihood": "high" | "medium" | "low",
-      "description": "Why this pattern is likely affecting this company (companion voice)",
-      "businessImpact": "Quantified impact",
-      "immediateAction": "What to do right now",
-      "measureWith": "Which CX tool to track this",
-      "companionAdvice": "CX Mate's one-liner in first person",
-      "addressesPainPoints": ["pain_point_key_1", "pain_point_key_2"]
-    }
-  ],
-  "cxToolRoadmap": [
-    {
-      "tool": "Tool name",
-      "whenToDeploy": "When to start using this",
-      "whyThisTool": "Why this tool at this stage",
-      "expectedOutcome": "What you'll learn"
-    }
-  ],
-  "impactProjections": [
-    {
-      "area": "Area of improvement",
-      "potentialImpact": "Estimated annual revenue impact range",
-      "timeToRealize": "How long until results",
-      "effort": "low | medium | high",
-      "calculation": "The math formula showing how you got this number",
-      "dataSource": "user_provided" | "benchmark_estimated"
-    }
-  ],
-  "techStackRecommendations": [
-    {
-      "category": "crm" | "marketing" | "support" | "analytics" | "cs_platform" | "communication" | "bi" | "survey" | "data_infrastructure",
-      "categoryLabel": "Human-readable category name (e.g. CRM, Marketing Automation)",
-      "tools": ["Tool 1", "Tool 2"],
-      "whyNow": "Why this category matters at their stage",
-      "connectWith": "What to integrate it with for maximum CX impact"
-    }
-  ],
-  "assumptions": [
-    "Key assumption 1 with source (e.g. 'Assumed 4% monthly churn based on industry benchmark for early-stage B2B SaaS')",
-    "Key assumption 2..."
-  ],
-  "maturityAssessment": "2-3 sentence CX Mate assessment in companion voice"
-}
-
-Return ONLY the JSON object, no markdown fences, no explanation.`;
+Return ONLY JSON.`;
 }
