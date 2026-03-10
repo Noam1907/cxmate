@@ -472,7 +472,7 @@ export default function PlaybookPage() {
       const journey: GeneratedJourney = data.journey;
       const onboardingData: OnboardingInput = data.onboardingData;
       const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 290_000); // 290s — slightly under Vercel's 300s
+      const timeout = setTimeout(() => controller.abort("Playbook generation timed out"), 290_000); // 290s — slightly under Vercel's 300s
       const response = await fetch("/api/recommendations/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -498,7 +498,13 @@ export default function PlaybookPage() {
         recommendation_count: generatedPlaybook.stagePlaybooks?.flatMap((s) => s.recommendations).length,
       });
     } catch (err) {
-      const errMsg = err instanceof Error ? err.message : "Something went wrong";
+      let errMsg = err instanceof Error ? err.message : "Something went wrong";
+      // Friendly message for abort/timeout errors
+      if (err instanceof DOMException && err.name === "AbortError") {
+        errMsg = "Playbook generation timed out. This can happen with complex journeys. Please try again.";
+      } else if (errMsg.includes("signal is aborted") || errMsg.includes("aborted")) {
+        errMsg = "Playbook generation timed out. This can happen with complex journeys. Please try again.";
+      }
       setError(errMsg);
       track("playbook_generation_failed", { error: errMsg });
     } finally {
