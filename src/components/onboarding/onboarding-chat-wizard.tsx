@@ -855,11 +855,12 @@ function ChallengeWidget({
               <button
                 type="button"
                 onClick={onToggleVoice}
-                className={`absolute right-2 bottom-2 p-1.5 rounded-lg transition-colors ${
-                  isListening ? "bg-red-100 text-red-500" : "text-slate-400 hover:bg-slate-100"
+                className={`absolute right-2 bottom-1.5 z-10 p-2.5 rounded-xl cursor-pointer transition-colors ${
+                  isListening ? "bg-red-100 text-red-500 animate-pulse" : "text-slate-400 hover:bg-slate-100 hover:text-slate-600"
                 }`}
+                aria-label={isListening ? "Stop listening" : "Voice input"}
               >
-                {isListening ? <MicrophoneSlash size={16} /> : <Microphone size={16} />}
+                {isListening ? <MicrophoneSlash size={18} /> : <Microphone size={18} />}
               </button>
             )}
           </div>
@@ -1021,11 +1022,12 @@ function ContextWidget({
               <button
                 type="button"
                 onClick={onToggleVoice}
-                className={`absolute right-2 bottom-2 p-1.5 rounded-lg transition-colors ${
-                  isListening ? "bg-red-100 text-red-500" : "text-slate-400 hover:bg-slate-100"
+                className={`absolute right-2 bottom-1.5 z-10 p-2.5 rounded-xl cursor-pointer transition-colors ${
+                  isListening ? "bg-red-100 text-red-500 animate-pulse" : "text-slate-400 hover:bg-slate-100 hover:text-slate-600"
                 }`}
+                aria-label={isListening ? "Stop listening" : "Voice input"}
               >
-                {isListening ? <MicrophoneSlash size={16} /> : <Microphone size={16} />}
+                {isListening ? <MicrophoneSlash size={18} /> : <Microphone size={18} />}
               </button>
             )}
           </div>
@@ -1399,14 +1401,19 @@ export function OnboardingChatWizard() {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     recognition.onresult = (event: any) => {
       const transcript: string = event.results[0][0].transcript;
-      setData((prev) => ({ ...prev, biggestChallenge: (prev.biggestChallenge ? prev.biggestChallenge + " " : "") + transcript }));
+      // Write to the correct field based on current step
+      const field = currentStep === "context" ? "currentTools" : "biggestChallenge";
+      setData((prev) => ({
+        ...prev,
+        [field]: (prev[field as keyof typeof prev] ? prev[field as keyof typeof prev] + " " : "") + transcript,
+      }));
     };
     recognition.onerror = () => setIsListening(false);
     recognition.onend = () => setIsListening(false);
 
     recognitionRef.current = recognition;
     recognition.start();
-  }, [isListening]);
+  }, [isListening, currentStep]);
 
   // ── Transition helper — adds typing delay ──────────
 

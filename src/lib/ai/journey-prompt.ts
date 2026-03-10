@@ -15,16 +15,9 @@ import {
   getDefaultStages,
   getDefaultMoments,
   getVertical,
-  // Buyer decision cycle
-  DECISION_CYCLE,
-  DECISION_DIAGNOSES,
-  // Customer lifecycle
-  LIFECYCLE_PHASES,
   // Failure & success patterns
   getFailurePatternsByStage,
   getSuccessPatternsByStage,
-  // CX measurement tools
-  MEASUREMENT_TOOLS,
   // Benchmarks & impact
   getVerticalBenchmark,
   getSizeBenchmark,
@@ -32,11 +25,6 @@ import {
   getFoundationsForStage,
   getStageGuidance,
   type MaturityStage,
-  // Layer 1A: CX Influencer Frameworks
-  getRelevantFrameworks,
-  buildInfluencerPromptContext,
-  // Layer 1B: CCXP Professional Framework
-  buildCCXPPromptContext,
 } from "@/lib/cx-knowledge";
 import { buildProfileFromOnboarding } from "@/lib/cx-knowledge/impact-models/impact-calculator";
 import type { OnboardingInput } from "@/lib/validations/onboarding";
@@ -156,45 +144,6 @@ function detectCompanyStage(companySize: string): "early" | "growing" | "establi
 // Knowledge Base Context Builders
 // ============================================
 
-function buildDecisionCycleContext(): string {
-  const stages = DECISION_CYCLE.map(
-    (s) =>
-      `- **${s.name}** (${s.stage}): Buyer mindset: "${s.buyerMindset}". ` +
-      `Dominant currency: ${s.dominantCurrency}. Price relevance: ${s.priceRelevance}. ` +
-      `Trust relevance: ${s.trustRelevance}.`
-  ).join("\n");
-
-  const diagnoses = DECISION_DIAGNOSES.map(
-    (d) =>
-      `- "${d.symptom}" → Stage: ${d.likelyStage}. Root cause: ${d.rootCause}. ` +
-      `Action: ${d.recommendedAction}.`
-  ).join("\n");
-
-  return `## Buyer Decision Cycle Theory
-Understanding where buyers are in their decision cycle determines which CX interventions work:
-
-${stages}
-
-Common sales/CX problems and their decision-stage diagnosis:
-${diagnoses}`;
-}
-
-function buildLifecycleContext(): string {
-  const phases = LIFECYCLE_PHASES.map(
-    (p) =>
-      `- **${p.name}** (${p.typicalTimeframe}): ${p.description}. ` +
-      `Healthy signals: ${p.healthySignals.slice(0, 2).join(", ")}. ` +
-      `Warning signals: ${p.warningSignals.slice(0, 2).join(", ")}. ` +
-      `Recommended CX tool: ${p.recommendedCxTool}. ` +
-      `Science: ${p.scienceBehind}`
-  ).join("\n");
-
-  return `## Customer Lifecycle Science
-Each post-sale phase has known healthy and warning signals:
-
-${phases}`;
-}
-
 function buildFailurePatternContext(companyStage: "early" | "growing" | "established"): string {
   const patterns = getFailurePatternsByStage(companyStage);
   const formatted = patterns.map(
@@ -224,21 +173,6 @@ function buildSuccessPatternContext(companyStage: "early" | "growing" | "establi
 Evidence-based interventions to recommend:
 
 ${formatted}`;
-}
-
-function buildMeasurementToolsContext(): string {
-  const tools = MEASUREMENT_TOOLS.map(
-    (t) =>
-      `- **${t.name}** (${t.id}): ${t.whatItMeasures}. ` +
-      `Question: "${t.question}". ` +
-      `Best for: ${t.bestForStages.join(", ")}. ` +
-      `When NOT to use: ${t.whenNotToUse[0]}.`
-  ).join("\n");
-
-  return `## CX Measurement Tools
-Recommend the right tool at the right moment:
-
-${tools}`;
 }
 
 function buildBenchmarkContext(vertical: string, companySize: string): string {
@@ -476,12 +410,11 @@ Key moments for this vertical: ${vertical.keyMoments.join(", ") || "varies"}`
     ? `\n⚠️ IMPORTANT: This company has NO existing customers yet. Generate ONLY sales-stage content (pre-sale journey). Do NOT generate any post-sale or customer success stages (onboarding, activation, retention, expansion, renewal). Those stages don't apply — there are no customers yet. Focus 100% on the journey from awareness through to winning the first customers.\n`
     : "";
 
-  // Build all context sections
-  const decisionCycleContext = buildDecisionCycleContext();
-  const lifecycleContext = buildLifecycleContext();
+  // Build context sections — benchmarks are company-specific, keep full
+  // Generic CX theory (decision cycle, lifecycle, measurement tools) is omitted
+  // because Claude already has this knowledge — adding it bloats the prompt by ~3000 tokens
   const failureContext = buildFailurePatternContext(companyStage);
   const successContext = buildSuccessPatternContext(companyStage);
-  const toolsContext = buildMeasurementToolsContext();
   const benchmarkContext = buildBenchmarkContext(input.vertical, input.companySize);
   const foundationsContext = buildFoundationsContext(maturityStage);
 
@@ -490,23 +423,7 @@ Key moments for this vertical: ${vertical.keyMoments.join(", ") || "varies"}`
   const businessDataContext = buildBusinessDataContext(input);
   const analysisModeContext = buildAnalysisModeContext(input);
 
-  // v4: Layer 1 — Methodology Intelligence
-  const relevantFrameworks = getRelevantFrameworks(
-    input.painPoints,
-    companyStage,
-    effectiveJourneyType
-  );
-  const influencerContext = buildInfluencerPromptContext(relevantFrameworks);
-  const ccxpContext = buildCCXPPromptContext(companyStage);
-
-  return `You are CX Mate — a knowledgeable CX companion for B2B startups. Think of yourself as a trusted peer advisor who's been in the trenches, seen what works and what doesn't, and is now whispering smart advice in the founder's ear.
-
-## Your Persona
-- **Peer advisor, not judge.** You validate what they're doing right before showing gaps. Frame insights as "Companies like yours typically..." not "Here's the truth about your business..."
-- **Assertive and direct** — you don't hedge or give wishy-washy advice. You have opinions backed by data.
-- **Touch of humor** — professional but not corporate. You're the kind of advisor people actually enjoy talking to.
-- **Never condescending.** Even if they're early stage with no CX in place, you respect where they are and meet them there.
-- **Transparent about data quality.** When using their real numbers, say "Based on your numbers..." When using benchmarks, say "Based on what we see with similar companies..."
+  return `You are CX Mate — a knowledgeable, assertive CX advisor for B2B startups. Peer advisor voice: direct, opinionated, touch of humor, never condescending. Use "Companies like yours..." framing.
 
 ## Who We're Talking To
 ${input.userName ? `- Person: ${input.userName}${input.userRole ? ` (${input.userRole})` : ""}` : ""}${input.userRole && !input.userName ? `- Role: ${input.userRole}` : ""}
@@ -575,36 +492,26 @@ ${businessDataContext}
 
 ---
 
-# CX INTELLIGENCE (Use this knowledge to enrich every recommendation)
+# CX INTELLIGENCE (company-specific context)
 
-${decisionCycleContext}
-
-${lifecycleContext}
+${benchmarkContext}
 
 ${failureContext}
 
 ${successContext}
 
-${toolsContext}
-
-${benchmarkContext}
-
 ${foundationsContext}
-
----
-
-${influencerContext}
-
-${ccxpContext}
 
 ---
 
 ## Your Task
 Generate a customized, theory-backed journey map with the CX Mate companion voice:
 
-1. **Stages**: Use the standard stages as a foundation but customize names, descriptions, and emotional states to match this specific company. **emotionalState must be 2-4 words** (e.g. "Skeptical but engaged", "Anxious and overwhelmed", "Cautiously optimistic") — never a full sentence. For each stage, identify the top failure risk and recommend the highest-impact success pattern.${!input.hasExistingCustomers ? ' IMPORTANT: ALL stages MUST have stageType: "sales". Do not generate any stages with stageType: "customer". There are no customers yet.' : ""}
+⚠️ SPEED CONSTRAINT: Keep total output under 6000 tokens. Be extremely concise — every string max 12 words, no elaboration.
 
-2. **Meaningful Moments (2-3 per stage, max)**: Tailored to their industry and challenges. For each moment:
+1. **Stages**: Customize to this company. **emotionalState = 2-4 words only**. One failure risk, one success pattern per stage.${!input.hasExistingCustomers ? ' ALL stages MUST have stageType: "sales". No post-sale stages.' : ""}
+
+2. **Meaningful Moments (2 per stage, max)**: Tailored to their challenges. For each moment:
    - Provide a theory-backed **diagnosis** (1 sentence: root cause)
    - Give a specific **actionTemplate** (1 sentence: exactly what to do)
    - Recommend a specific **cxToolRecommendation** (1 sentence: which tool or AI agent + why). Think agentic-first: prefer autonomous AI agents (AI support agent, AI SDR, AI onboarding agent) over manual tools when they exist. Specify what the agent does autonomously.
@@ -612,26 +519,26 @@ Generate a customized, theory-backed journey map with the CX Mate companion voic
    - **addressesPainPoints**: Array of pain point keys from user input (only if direct match, else omit)
    - Omit **decisionScienceInsight** and **competitorGap** to keep output concise
 
-3. **Confrontation Insights (3-4 max)**: Companion voice. Each in 1 sentence per field:
+3. **Confrontation Insights (2-3 max)**: Companion voice. Each field max 10 words:
    - Pattern name, likelihood, business impact (with math if user data available), immediate action, what to measure
    - **companionAdvice**: 1 sentence, first person, direct advice
    - **addressesPainPoints**: pain point keys (use EXACT keys, omit if no match)
    - Omit **competitorContext** to keep output concise
 
-4. **CX Tool Roadmap (2-3 tools max)**: Most critical tools only. Don't recommend NPS if under 50 responses — suggest CSAT instead.
+4. **CX Tool Roadmap (2 tools max)**: Most critical only.
 
-5. **Impact Projections (2-3)**: Each MUST include:
+5. **Impact Projections (2 max)**: Each MUST include:
    - **calculation**: Math formula (e.g., "50 customers × $12K ACV × 25% churn reduction = $150K")
    - **dataSource**: "user_provided" or "benchmark_estimated"
    - Include both dollar amount AND percentage (e.g., "$36K–$72K / 20-40% churn reduction")
 
 6. **Maturity Assessment**: 2 sentences max in companion voice.
 
-7. **Tech Stack Recommendations (3-4 max)**: Most critical categories only. Each: category, 2 tool names, 1-sentence whyNow, 1-sentence connectWith.
+7. **Tech Stack Recommendations (2-3 max)**: Each: category, 2 tool names, 1-sentence whyNow, 1-sentence connectWith.
 
-8. **Assumptions (2-3)**: Most important assumptions only, 1 sentence each.
+8. **Assumptions (2)**: Most important, 1 sentence each.
 
-Prioritize moments related to their stated pain points. Use plain language. Be the advisor they'd actually want to talk to. KEEP IT CONCISE — every field is 1 sentence max.
+Prioritize their stated pain points. Plain language. ULTRA CONCISE — every field max 12 words.
 
 ## Output Format
 Return a JSON object with this exact structure:

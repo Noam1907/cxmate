@@ -424,12 +424,12 @@ export default function PlaybookPage() {
         } catch { /* ignore */ }
       }
     }, 2000);
-    // After 30s give up polling — playbook should already be in sessionStorage
+    // After 12s give up polling — playbook should already be in sessionStorage
     // (generation now happens synchronously during onboarding loading screen)
     const giveUp = setTimeout(() => {
       clearInterval(poll);
       setPreparing(false);
-    }, 30 * 1000);
+    }, 12 * 1000);
     return () => { clearInterval(poll); clearTimeout(giveUp); };
   }, [preparing, playbook]);
 
@@ -609,11 +609,18 @@ export default function PlaybookPage() {
             </>
           ) : (
             <div className="text-center space-y-5">
+              <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto">
+                <span className="text-2xl">📋</span>
+              </div>
               <h1 className="text-2xl font-bold text-slate-900">Your CX Playbook</h1>
-              <p className="text-slate-500">AI-built action plan, matched to your stack — with measurement checkpoints and assets you can extend with any AI tool.</p>
+              <p className="text-slate-500">
+                {error
+                  ? "Something went wrong, but you can try again. Each generation is tailored to your journey."
+                  : "AI-built action plan, matched to your stack — with measurement checkpoints and assets you can extend with any AI tool."}
+              </p>
               {error && <p className="text-sm text-red-600 bg-red-50 rounded-lg p-3 border border-red-100">{error}</p>}
               <Button onClick={handleGenerate} disabled={loading} size="lg">
-                Generate My Playbook
+                {error ? "Try Again" : "Generate My Playbook"}
               </Button>
             </div>
           )}

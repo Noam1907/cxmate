@@ -1381,7 +1381,7 @@ export function OnboardingChat() {
                 type="button"
                 onClick={toggleVoice}
                 disabled={isThinking || !!pendingFields}
-                className={`flex-shrink-0 w-9 h-9 rounded-xl flex items-center justify-center transition-all disabled:opacity-30 disabled:cursor-not-allowed ${
+                className={`flex-shrink-0 w-9 h-9 rounded-xl flex items-center justify-center cursor-pointer transition-all disabled:opacity-30 disabled:cursor-not-allowed ${
                   isListening
                     ? "bg-red-100 text-red-500 animate-pulse"
                     : "text-slate-400 hover:text-slate-600 hover:bg-slate-200"
