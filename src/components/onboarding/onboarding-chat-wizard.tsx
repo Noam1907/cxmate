@@ -131,13 +131,7 @@ function buildInsightForStep(
     case "maturity": {
       const vertical = data.vertical || enrichment?.suggestedVertical;
       if (!vertical || vertical === "other") {
-        const stageLabel: Record<string, string> = {
-          pre_launch: "pre-revenue",
-          first_customers: "early-customer",
-          growing: "growth-stage",
-          scaling: "scaling",
-        };
-        return `Your playbook is calibrated for ${stageLabel[data.companyMaturity] || data.companyMaturity} companies. Every recommendation is sequenced for what moves the needle at this stage.`;
+        return `Calibrating for your stage — recommendations will match where you are right now.`;
       }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const bench = getVerticalBenchmark(vertical as any);
@@ -145,14 +139,14 @@ function buildInsightForStep(
       const { monthlyChurnRate, onboardingCompletionRate } = bench.metrics;
       const verticalLabel: Record<string, string> = {
         b2b_saas: "B2B SaaS",
-        professional_services: "professional services",
-        marketplace: "marketplace",
-        fintech: "fintech",
+        professional_services: "Professional services",
+        marketplace: "Marketplace",
+        fintech: "Fintech",
         ecommerce_b2b: "B2B ecommerce",
-        healthtech: "healthtech",
+        healthtech: "Healthtech",
       };
       const label = verticalLabel[vertical] || vertical;
-      return `${label} benchmarks loaded: top performers hold monthly churn under ${monthlyChurnRate.good}% and onboarding completion above ${onboardingCompletionRate.good}%. Your playbook will show exactly where you sit.`;
+      return `${label} benchmark: top performers hold churn under ${monthlyChurnRate.good}%/mo and onboarding above ${onboardingCompletionRate.good}%.`;
     }
     case "challenge": {
       const vertical = data.vertical || enrichment?.suggestedVertical;
@@ -160,51 +154,47 @@ function buildInsightForStep(
       const bench = vertical ? getVerticalBenchmark(vertical as any) : null;
       const churnCost = bench
         ? `${bench.metrics.annualChurnRate.average}% annual churn`
-        : "15-20% of ARR annually";
-      return `Left unsystematized, these challenges drive ${churnCost} in preventable churn. Your playbook will sequence the highest-impact interventions first.`;
+        : "15–20% of ARR lost annually";
+      return `These challenges typically drive ${churnCost}. Your playbook will prioritize highest-impact fixes.`;
     }
     case "business": {
       if (data.roughRevenue && data.roughRevenue !== "skip") {
         const revenueLabels: Record<string, string> = {
-          pre_revenue: "pre-revenue stage",
-          "0-100k": "early revenue",
-          "100k-500k": "$100K–$500K range",
-          "500k-1m": "$500K–$1M range",
-          "1m-5m": "$1M–$5M range",
-          "5m-20m": "$5M–$20M range",
-          "20m+": "$20M+ range",
+          pre_revenue: "Pre-revenue",
+          "0-100k": "$0–$100K",
+          "100k-500k": "$100K–$500K",
+          "500k-1m": "$500K–$1M",
+          "1m-5m": "$1M–$5M",
+          "5m-20m": "$5M–$20M",
+          "20m+": "$20M+",
         };
         const label = revenueLabels[data.roughRevenue] || data.roughRevenue;
-        return `At ${label}, every lost customer has an outsized impact. Your playbook will prioritize retention moves that protect existing revenue while you grow.`;
+        return `${label} — every lost customer hits hard at this scale. Playbook will focus on protecting revenue.`;
       }
-      return `Business context helps calibrate recommendations — even rough numbers let us benchmark against companies at your scale.`;
+      return `Even rough numbers help us benchmark against companies at your scale.`;
     }
     case "context": {
       const components = data.existingJourneyComponents || [];
-      const toolsText = data.currentTools?.trim();
       if (components.length >= 5) {
-        return `You already have ${components.length} journey pieces in place — that's more than most companies at your stage. Your playbook will build on what's working, not start from zero.`;
+        return `${components.length} journey pieces in place — more than most at your stage. We'll build on what's working.`;
       }
       if (components.length > 0) {
-        return `${components.length} journey component${components.length === 1 ? "" : "s"} in place. Your analysis will identify the gaps between what you have and what top performers run.`;
+        return `${components.length} component${components.length === 1 ? "" : "s"} in place. We'll identify the gaps vs. top performers.`;
       }
-      if (toolsText) {
-        return `We'll map how your current tools connect to the customer journey — most teams have the pieces but not the system.`;
-      }
-      return `Starting fresh means no legacy constraints. Your playbook will give you the right sequence to build a CX system from day one.`;
+      return `Starting fresh — your playbook will lay out the right sequence from day one.`;
     }
     case "goal": {
       const timeframeLabels: Record<string, string> = {
         this_month: "this month",
         this_quarter: "this quarter",
-        next_6_months: "over the next 6 months",
+        next_6_months: "in 6 months",
         this_year: "this year",
       };
       const tf = data.timeframe ? timeframeLabels[data.timeframe] || data.timeframe : "";
       if (tf) {
-        return `Your playbook will sequence actions for results ${tf} — starting with what moves the needle fastest.`;
+        return `Actions sequenced for results ${tf} — starting with what moves the needle fastest.`;
       }
-      return `Your goal shapes everything — the journey map, the priorities, and the playbook actions. We'll make every recommendation point toward this outcome.`;
+      return `Your goal shapes the journey map, priorities, and every playbook action.`;
     }
     default:
       return null;
@@ -484,12 +474,12 @@ function InsightsPanel({
           {insights.map((insight) => (
             <div
               key={insight.key}
-              className="bg-amber-50/80 border border-amber-200/60 rounded-xl p-4 flex gap-3 items-start animate-in fade-in slide-in-from-right-2 duration-500"
+              className="bg-amber-50/80 border border-amber-200/60 rounded-xl p-3 flex gap-2.5 items-start animate-in fade-in slide-in-from-right-2 duration-500"
             >
-              <div className="shrink-0 mt-0.5 w-7 h-7 rounded-full bg-amber-100 flex items-center justify-center">
-                <Sparkle size={14} className="text-amber-500" weight="fill" />
+              <div className="shrink-0 mt-0.5 w-6 h-6 rounded-full bg-amber-100 flex items-center justify-center">
+                <Sparkle size={12} className="text-amber-500" weight="fill" />
               </div>
-              <p className="text-[13px] text-amber-900/90 leading-relaxed">{insight.content}</p>
+              <p className="text-xs text-amber-900/90 leading-relaxed">{insight.content}</p>
             </div>
           ))}
         </div>
@@ -497,10 +487,10 @@ function InsightsPanel({
 
       {/* Empty state — shown before any insights appear */}
       {insights.length === 0 && data.companyName && (
-        <div className="rounded-xl border border-dashed border-slate-200 p-5 text-center">
-          <Sparkle size={20} className="text-slate-300 mx-auto mb-2" weight="fill" />
-          <p className="text-[13px] text-muted-foreground leading-relaxed">
-            Insights appear as you answer questions
+        <div className="rounded-xl border border-dashed border-slate-200 p-4 text-center">
+          <Sparkle size={16} className="text-slate-300 mx-auto mb-1.5" weight="fill" />
+          <p className="text-xs text-muted-foreground leading-relaxed">
+            Insights appear as you answer
           </p>
         </div>
       )}
@@ -1505,7 +1495,7 @@ export function OnboardingChatWizard() {
     const insightContent = buildInsightForStep("maturity", { ...data, companyMaturity: maturity, ...derived }, enrichment);
     if (insightContent && !insightsShown.current.has("maturity")) {
       insightsShown.current.add("maturity");
-      setSidebarInsights((prev) => [...prev, { key: `insight-maturity-${Date.now()}`, content: insightContent }]);
+      setSidebarInsights([{ key: `insight-maturity-${Date.now()}`, content: insightContent }]);
     }
 
     // Remove maturity widget, add entries
@@ -1541,7 +1531,7 @@ export function OnboardingChatWizard() {
     const insightContent = buildInsightForStep("challenge", data, enrichment);
     if (insightContent && !insightsShown.current.has("challenge")) {
       insightsShown.current.add("challenge");
-      setSidebarInsights((prev) => [...prev, { key: `insight-challenge-${Date.now()}`, content: insightContent }]);
+      setSidebarInsights([{ key: `insight-challenge-${Date.now()}`, content: insightContent }]);
     }
 
     setConversation((prev) => [...prev.filter((e) => e.key !== "widget-challenge"), ...entries]);
@@ -1579,7 +1569,7 @@ export function OnboardingChatWizard() {
     const insightContent = buildInsightForStep("business", data, enrichment);
     if (insightContent && !insightsShown.current.has("business")) {
       insightsShown.current.add("business");
-      setSidebarInsights((prev) => [...prev, { key: `insight-business-${Date.now()}`, content: insightContent }]);
+      setSidebarInsights([{ key: `insight-business-${Date.now()}`, content: insightContent }]);
     }
 
     transitionTo("context", [
@@ -1614,7 +1604,7 @@ export function OnboardingChatWizard() {
     const insightContent = buildInsightForStep("context", data, enrichment);
     if (insightContent && !insightsShown.current.has("context")) {
       insightsShown.current.add("context");
-      setSidebarInsights((prev) => [...prev, { key: `insight-context-${Date.now()}`, content: insightContent }]);
+      setSidebarInsights([{ key: `insight-context-${Date.now()}`, content: insightContent }]);
     }
 
     transitionTo("goal", [
@@ -1641,7 +1631,7 @@ export function OnboardingChatWizard() {
     const goalInsight = buildInsightForStep("goal", data, enrichment);
     if (goalInsight && !insightsShown.current.has("goal")) {
       insightsShown.current.add("goal");
-      setSidebarInsights((prev) => [...prev, { key: `insight-goal-${Date.now()}`, content: goalInsight }]);
+      setSidebarInsights([{ key: `insight-goal-${Date.now()}`, content: goalInsight }]);
     }
 
     // Set missing required fields with defaults from enrichment or sensible defaults
@@ -1817,7 +1807,7 @@ export function OnboardingChatWizard() {
   // ─────────────────────────────────────────────
 
   return (
-    <div className="w-full h-full grid grid-cols-1 lg:grid-cols-[1fr_240px] gap-4 min-h-0 overflow-hidden">
+    <div className="w-full h-full grid grid-cols-1 lg:grid-cols-[1fr_220px] gap-4 min-h-0 overflow-hidden">
       {/* Left: Chat column */}
       <div className="flex flex-col h-full min-h-0 min-w-0">
         {/* Header */}
@@ -1847,7 +1837,7 @@ export function OnboardingChatWizard() {
         {/* Scrollable conversation */}
         <div
           ref={scrollContainerRef}
-          className="flex-1 overflow-y-auto px-1 pb-4 min-h-0"
+          className="flex-1 overflow-y-auto px-1 pb-12 min-h-0"
         >
           {conversation.map((entry) => {
             switch (entry.type) {
@@ -1980,9 +1970,9 @@ export function OnboardingChatWizard() {
         </div>
       </div>
 
-      {/* Right: Insights panel (hidden on mobile) */}
-      <div className="hidden lg:block">
-        <div className="sticky top-4 space-y-3">
+      {/* Right: Insights panel (hidden on mobile, no scroll) */}
+      <div className="hidden lg:block overflow-hidden min-h-0">
+        <div className="space-y-3">
           <InsightsPanel data={data} enrichment={enrichment} insights={sidebarInsights} />
         </div>
       </div>

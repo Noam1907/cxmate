@@ -35,7 +35,7 @@ export default async function OnboardingPage({
   // Default: chat-skinned wizard (structured data + chat visual identity)
   return (
     <div className="flex flex-col items-center px-8 pt-4 h-[100dvh] overflow-hidden w-full">
-      <div className="w-full max-w-4xl flex-1 min-h-0">
+      <div className="w-full max-w-5xl flex-1 min-h-0">
         <OnboardingChatWizard />
       </div>
     </div>
