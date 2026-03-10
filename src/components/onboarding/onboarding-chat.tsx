@@ -962,11 +962,11 @@ export function OnboardingChat() {
   }, [isListening]);
 
   // Auto-scroll to bottom of message container
+  // Use rAF to ensure scroll happens after layout reflow (prevents scroll-up on enrichment panel changes)
   useEffect(() => {
-    const container = scrollContainerRef.current;
-    if (container) {
-      container.scrollTo({ top: container.scrollHeight, behavior: "smooth" });
-    }
+    requestAnimationFrame(() => {
+      bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+    });
   }, [messages, isThinking]);
 
   // Clear chip selection when AI replies (chips for a new question appear fresh)
@@ -1022,7 +1022,7 @@ export function OnboardingChat() {
         .signInWithOtp({
           email: userEmail,
           options: {
-            emailRedirectTo: `${window.location.origin}/auth/callback?redirect=/dashboard`,
+            emailRedirectTo: `${window.location.origin}/auth/callback?redirect=/analysis`,
             shouldCreateUser: true,
             data: { company_name: companyName, name: userName },
           },
@@ -1087,7 +1087,7 @@ export function OnboardingChat() {
         });
 
         sessionStorage.setItem("cx-mate-journey", JSON.stringify(result));
-        router.push(`/journey?id=${result.templateId}`);
+        router.push(`/analysis?id=${result.templateId}`);
       } catch (error) {
         if (error instanceof DOMException && error.name === "AbortError") {
           const isTimeout = abortRef.current?.signal?.reason === "Request timed out";

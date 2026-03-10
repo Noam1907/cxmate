@@ -799,23 +799,12 @@ function ChallengeWidget({
   const hasText = data.biggestChallenge.trim().length >= 5;
   const hasChips = data.painPoints.length >= 1;
   const canSubmit = hasText || hasChips;
-  const autoSubmitTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  useEffect(() => {
-    return () => { if (autoSubmitTimer.current) clearTimeout(autoSubmitTimer.current); };
-  }, []);
-
   const togglePain = (value: string) => {
     const current = data.painPoints;
     const updated = current.includes(value)
       ? current.filter((p) => p !== value)
       : [...current, value];
     onChange({ painPoints: updated });
-    // Auto-advance 2s after last chip click (only if no free-text is being typed)
-    if (autoSubmitTimer.current) clearTimeout(autoSubmitTimer.current);
-    if (updated.length > 0) {
-      autoSubmitTimer.current = setTimeout(onSubmit, 2000);
-    }
   };
 
   return (
@@ -831,8 +820,6 @@ function ChallengeWidget({
               value={data.biggestChallenge}
               onChange={(e) => {
                 onChange({ biggestChallenge: e.target.value });
-                // Cancel chip auto-submit if user is actively typing
-                if (autoSubmitTimer.current) clearTimeout(autoSubmitTimer.current);
               }}
               placeholder="Tell me what's keeping you up at night…"
               rows={3}
@@ -878,17 +865,10 @@ function ChallengeWidget({
             })}
           </div>
           {canSubmit && (
-            <div className="flex items-center justify-between mt-2.5">
-              {hasChips
-                ? <p className="text-[11px] text-muted-foreground">Moving on in a moment…</p>
-                : <span />
-              }
+            <div className="flex items-center justify-end mt-2.5">
               <button
                 type="button"
-                onClick={() => {
-                  if (autoSubmitTimer.current) clearTimeout(autoSubmitTimer.current);
-                  onSubmit();
-                }}
+                onClick={onSubmit}
                 className="text-xs font-medium text-primary flex items-center gap-1 hover:gap-1.5 transition-all"
               >
                 Continue <ArrowRight size={11} weight="bold" />
@@ -1735,7 +1715,7 @@ export function OnboardingChatWizard() {
       profileContext.setJourney(result.journey);
       profileContext.setTemplateId(result.templateId);
       clearOnboardingDraft();
-      router.push(`/journey?id=${result.templateId}`);
+      router.push(`/analysis?id=${result.templateId}`);
     } catch (error) {
       if (error instanceof DOMException && error.name === "AbortError") {
         const isTimeout = abortRef.current?.signal?.reason === "Request timed out";

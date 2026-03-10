@@ -16,13 +16,13 @@ function HeroSection() {
       <div className="max-w-3xl mx-auto px-6 pt-24 pb-20 text-center">
         {/* Headline — plain language, no jargon */}
         <h1 className="text-5xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-slate-900 leading-[1.04] mb-6">
-          Your customers hit friction you never see —{" "}
+          Your customers hit friction you never see{" "}
           <span style={{ color: "#0D9488" }}>until they leave.</span>
         </h1>
 
         {/* Subheadline — one sentence */}
         <p className="text-lg sm:text-xl text-slate-600 leading-relaxed mb-10 max-w-xl mx-auto">
-          One conversation maps your full customer journey and tells you exactly what to fix — before they decide to leave.
+          One conversation maps your full customer journey and tells you exactly what to fix, before they decide to leave.
         </p>
 
         {/* CTA */}
@@ -146,7 +146,7 @@ function HowItWorksSection() {
     {
       number: 1,
       label: "Tell us about your business",
-      description: "Your product, customers, team, and where things break — in a quick conversation, not a form.",
+      description: "Your product, customers, team, and where things break. In a quick conversation, not a form.",
       detail: "~10 min · No setup",
       accent: "#F0C040",
       accentDark: "#92400E",
@@ -154,7 +154,7 @@ function HowItWorksSection() {
     {
       number: 2,
       label: "Get your journey mapped",
-      description: "50+ touchpoints across your customer lifecycle — with every friction point and handoff gap identified.",
+      description: "50+ touchpoints across your customer lifecycle, with every friction point and handoff gap identified.",
       detail: "~3 min · Benchmarked to your vertical",
       accent: "#0D9488",
       accentDark: "#134E4A",

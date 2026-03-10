@@ -42,10 +42,12 @@ export function useCompanyEnrichment(): UseCompanyEnrichmentReturn {
       // Skip if company name too short
       if (!companyName || companyName.trim().length < 2) return null;
 
-      // Skip if we already enriched this exact company
+      // Skip if we already enriched this exact company+website combo
       const key = `${companyName.trim().toLowerCase()}|${companyWebsite || ""}`;
       if (key === lastEnrichedRef.current && enrichment) return enrichment;
 
+      // Clear stale enrichment so UI doesn't show old company data during re-fetch
+      setEnrichment(null);
       setIsEnriching(true);
       setError(null);
 
