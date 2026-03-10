@@ -1328,22 +1328,23 @@ export function OnboardingChatWizard() {
     setSupportsVoice(!!(w.SpeechRecognition || w.webkitSpeechRecognition));
   }, []);
 
-  // Auto-scroll — multiple attempts to catch widgets that render after paint
+  // Auto-scroll — only if user is near the bottom (not reading earlier content)
   useEffect(() => {
     const container = scrollContainerRef.current;
     if (!container) return;
-    const doScroll = () => container.scrollTo({ top: container.scrollHeight, behavior: "smooth" });
-    // Immediate
+    const doScroll = () => {
+      // Only scroll if user is within 300px of the bottom (not scrolled up to read)
+      const distanceFromBottom = container.scrollHeight - container.scrollTop - container.clientHeight;
+      if (distanceFromBottom < 300) {
+        container.scrollTo({ top: container.scrollHeight, behavior: "smooth" });
+      }
+    };
+    // Staggered attempts to catch widgets that render after paint
     requestAnimationFrame(doScroll);
-    // After first paint (catches most elements)
     const t1 = setTimeout(doScroll, 100);
-    // After animations start (catches large widget cards)
     const t2 = setTimeout(doScroll, 350);
-    // Final catch-all (widgets with entrance animations)
     const t3 = setTimeout(doScroll, 700);
-    // Extra catch for large widget cards that animate in slowly
-    const t4 = setTimeout(doScroll, 1200);
-    return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); clearTimeout(t4); };
+    return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); };
   }, [conversation, isTyping, currentStep]);
 
   // Push data to sidebar context
