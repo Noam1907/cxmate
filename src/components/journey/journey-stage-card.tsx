@@ -120,6 +120,17 @@ function MomentCard({ moment, annotation, hasPlaybookItem, stageSlug }: { moment
               ))}
             </div>
           )}
+
+          {/* Playbook cross-link — always visible (collapsed + expanded) */}
+          {hasPlaybookItem && !expanded && (
+            <Link
+              href={`/playbook#${stageSlug}`}
+              onClick={(e) => e.stopPropagation()}
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary bg-primary/8 border border-primary/20 px-2.5 py-1 rounded-lg hover:bg-primary/15 transition-colors mt-2"
+            >
+              📋 Playbook has a how-to for this →
+            </Link>
+          )}
         </div>
       </div>
 
@@ -309,7 +320,7 @@ export function JourneyStageCard({
               key={i}
               moment={moment}
               annotation={momentAnnotations?.[moment.name]}
-              hasPlaybookItem={playbookMoments?.has(`${stage.name}:${moment.name}`) ?? false}
+              hasPlaybookItem={playbookMoments?.has(`${stage.name.trim().toLowerCase()}:${moment.name.trim().toLowerCase()}`) ?? false}
               stageSlug={stageSlug}
             />
           ))}

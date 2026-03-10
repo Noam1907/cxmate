@@ -52,7 +52,7 @@ function JourneyContent() {
           for (const stage of pb.stagePlaybooks) {
             for (const rec of stage.recommendations ?? []) {
               if (rec.stageName && rec.momentName) {
-                moments.add(`${rec.stageName}:${rec.momentName}`);
+                moments.add(`${rec.stageName.trim().toLowerCase()}:${rec.momentName.trim().toLowerCase()}`);
               }
             }
           }

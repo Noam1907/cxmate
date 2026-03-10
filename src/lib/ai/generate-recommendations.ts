@@ -123,8 +123,8 @@ export async function generateRecommendations(
   const prompt = buildRecommendationPrompt(journey, input);
 
   const requestBody = JSON.stringify({
-    model: "claude-sonnet-4-20250514",
-    max_tokens: 16384,
+    model: "claude-haiku-4-5-20251001",
+    max_tokens: 8000,
     // Tool use: Claude MUST call generate_playbook — API validates the JSON schema.
     // No freeform text, no parsing, no repair. This is the permanent fix.
     tools: [PLAYBOOK_TOOL],

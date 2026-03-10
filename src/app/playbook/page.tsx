@@ -120,6 +120,16 @@ function RecommendationCard({
                 🔧 {tool}
               </span>
             ))}
+            {/* Journey cross-link — always visible in collapsed state */}
+            {rec.momentName && !expanded && (
+              <Link
+                href="/journey"
+                onClick={(e) => e.stopPropagation()}
+                className="text-[10px] font-semibold text-slate-400 hover:text-primary bg-slate-50 border border-slate-200 px-1.5 py-0.5 rounded-full hover:border-primary/30 transition-colors"
+              >
+                ← {rec.momentName}
+              </Link>
+            )}
           </div>
 
           {expanded && (
