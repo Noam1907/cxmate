@@ -163,6 +163,49 @@ function buildInsightForStep(
         : "15-20% of ARR annually";
       return `Left unsystematized, these challenges drive ${churnCost} in preventable churn. Your playbook will sequence the highest-impact interventions first.`;
     }
+    case "business": {
+      if (data.roughRevenue && data.roughRevenue !== "skip") {
+        const revenueLabels: Record<string, string> = {
+          pre_revenue: "pre-revenue stage",
+          "0-100k": "early revenue",
+          "100k-500k": "$100K–$500K range",
+          "500k-1m": "$500K–$1M range",
+          "1m-5m": "$1M–$5M range",
+          "5m-20m": "$5M–$20M range",
+          "20m+": "$20M+ range",
+        };
+        const label = revenueLabels[data.roughRevenue] || data.roughRevenue;
+        return `At ${label}, every lost customer has an outsized impact. Your playbook will prioritize retention moves that protect existing revenue while you grow.`;
+      }
+      return `Business context helps calibrate recommendations — even rough numbers let us benchmark against companies at your scale.`;
+    }
+    case "context": {
+      const components = data.existingJourneyComponents || [];
+      const toolsText = data.currentTools?.trim();
+      if (components.length >= 5) {
+        return `You already have ${components.length} journey pieces in place — that's more than most companies at your stage. Your playbook will build on what's working, not start from zero.`;
+      }
+      if (components.length > 0) {
+        return `${components.length} journey component${components.length === 1 ? "" : "s"} in place. Your analysis will identify the gaps between what you have and what top performers run.`;
+      }
+      if (toolsText) {
+        return `We'll map how your current tools connect to the customer journey — most teams have the pieces but not the system.`;
+      }
+      return `Starting fresh means no legacy constraints. Your playbook will give you the right sequence to build a CX system from day one.`;
+    }
+    case "goal": {
+      const timeframeLabels: Record<string, string> = {
+        this_month: "this month",
+        this_quarter: "this quarter",
+        next_6_months: "over the next 6 months",
+        this_year: "this year",
+      };
+      const tf = data.timeframe ? timeframeLabels[data.timeframe] || data.timeframe : "";
+      if (tf) {
+        return `Your playbook will sequence actions for results ${tf} — starting with what moves the needle fastest.`;
+      }
+      return `Your goal shapes everything — the journey map, the priorities, and the playbook actions. We'll make every recommendation point toward this outcome.`;
+    }
     default:
       return null;
   }
@@ -417,16 +460,16 @@ function InsightsPanel({
 
   return (
     <div className="space-y-3">
-      {/* Compact company card */}
+      {/* Company card */}
       {data.companyName && (
-        <div className="bg-white rounded-2xl border border-slate-200 p-3">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg border border-slate-100 bg-slate-50 flex items-center justify-center shrink-0 overflow-hidden">
+        <div className="bg-white rounded-2xl border border-slate-200 p-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl border border-slate-100 bg-slate-50 flex items-center justify-center shrink-0 overflow-hidden">
               <CompanyLogo domain={domain} companyName={data.companyName} />
             </div>
             <div className="min-w-0">
-              <p className="font-semibold text-foreground text-xs leading-tight truncate">{data.companyName}</p>
-              {domain && <p className="text-[10px] text-muted-foreground truncate">{domain}</p>}
+              <p className="font-semibold text-foreground text-sm leading-tight truncate">{data.companyName}</p>
+              {domain && <p className="text-xs text-muted-foreground truncate">{domain}</p>}
             </div>
           </div>
         </div>
@@ -434,19 +477,19 @@ function InsightsPanel({
 
       {/* Insights — appear as user answers questions */}
       {insights.length > 0 && (
-        <div className="space-y-2">
-          <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide px-0.5">
+        <div className="space-y-2.5">
+          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide px-0.5">
             Insights for you
           </p>
           {insights.map((insight) => (
             <div
               key={insight.key}
-              className="bg-amber-50/80 border border-amber-200/60 rounded-xl p-3 flex gap-2 items-start animate-in fade-in slide-in-from-right-2 duration-500"
+              className="bg-amber-50/80 border border-amber-200/60 rounded-xl p-4 flex gap-3 items-start animate-in fade-in slide-in-from-right-2 duration-500"
             >
-              <div className="shrink-0 mt-0.5 w-5 h-5 rounded-full bg-amber-100 flex items-center justify-center">
-                <Sparkle size={11} className="text-amber-500" weight="fill" />
+              <div className="shrink-0 mt-0.5 w-7 h-7 rounded-full bg-amber-100 flex items-center justify-center">
+                <Sparkle size={14} className="text-amber-500" weight="fill" />
               </div>
-              <p className="text-[11px] text-amber-900/90 leading-relaxed">{insight.content}</p>
+              <p className="text-[13px] text-amber-900/90 leading-relaxed">{insight.content}</p>
             </div>
           ))}
         </div>
@@ -454,9 +497,9 @@ function InsightsPanel({
 
       {/* Empty state — shown before any insights appear */}
       {insights.length === 0 && data.companyName && (
-        <div className="rounded-xl border border-dashed border-slate-200 p-4 text-center">
-          <Sparkle size={16} className="text-slate-300 mx-auto mb-1.5" weight="fill" />
-          <p className="text-[11px] text-muted-foreground leading-relaxed">
+        <div className="rounded-xl border border-dashed border-slate-200 p-5 text-center">
+          <Sparkle size={20} className="text-slate-300 mx-auto mb-2" weight="fill" />
+          <p className="text-[13px] text-muted-foreground leading-relaxed">
             Insights appear as you answer questions
           </p>
         </div>
@@ -1532,13 +1575,20 @@ export function OnboardingChatWizard() {
       { type: "user-summary", content: summary, key: `user-business-${Date.now()}` },
     ]);
 
+    // Push insight to sidebar
+    const insightContent = buildInsightForStep("business", data, enrichment);
+    if (insightContent && !insightsShown.current.has("business")) {
+      insightsShown.current.add("business");
+      setSidebarInsights((prev) => [...prev, { key: `insight-business-${Date.now()}`, content: insightContent }]);
+    }
+
     transitionTo("context", [
       { type: "ai", content: "Two quick questions — your tools and what's already built. Helps me build on what you have instead of starting from scratch.", key: `ai-context-q-${Date.now()}` },
       { type: "widget", step: "context", key: "widget-context" },
     ]);
 
     track("onboarding_step_completed", { step_key: "business", step_number: 3, company_name: data.companyName });
-  }, [data, transitionTo]);
+  }, [data, enrichment, transitionTo]);
 
   const handleContextSubmit = useCallback(() => {
     // Build user summary
@@ -1560,13 +1610,20 @@ export function OnboardingChatWizard() {
     ];
     setConversation((prev) => [...prev.filter((e) => e.key !== "widget-context"), ...entries]);
 
+    // Push insight to sidebar
+    const insightContent = buildInsightForStep("context", data, enrichment);
+    if (insightContent && !insightsShown.current.has("context")) {
+      insightsShown.current.add("context");
+      setSidebarInsights((prev) => [...prev, { key: `insight-context-${Date.now()}`, content: insightContent }]);
+    }
+
     transitionTo("goal", [
       { type: "ai", content: "Almost there — what do you want to fix first, and when do you need results?", key: `ai-goal-q-${Date.now()}` },
       { type: "widget", step: "goal", key: "widget-goal" },
     ]);
 
     track("onboarding_step_completed", { step_key: "context", step_number: 3, company_name: data.companyName });
-  }, [data, updateData, transitionTo]);
+  }, [data, enrichment, updateData, transitionTo]);
 
   const handleGoalSubmit = useCallback(() => {
     const goalLabel = getGoalsForPainAndMaturity(data.companyMaturity, data.painPoints)
@@ -1579,6 +1636,13 @@ export function OnboardingChatWizard() {
     ];
 
     setConversation((prev) => [...prev.filter((e) => e.key !== "widget-goal"), ...entries]);
+
+    // Push insight to sidebar
+    const goalInsight = buildInsightForStep("goal", data, enrichment);
+    if (goalInsight && !insightsShown.current.has("goal")) {
+      insightsShown.current.add("goal");
+      setSidebarInsights((prev) => [...prev, { key: `insight-goal-${Date.now()}`, content: goalInsight }]);
+    }
 
     // Set missing required fields with defaults from enrichment or sensible defaults
     const finalPatch: Partial<OnboardingData> = {};
