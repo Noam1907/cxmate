@@ -4,6 +4,34 @@ Track sprint progress and status.
 
 ---
 
+## Session: 2026-03-09 (Morning — Keren Shaked demo prep)
+
+### Shipped This Session
+
+**Foundational — Anticipate Value principle**
+- Updated CLAUDE.md, product-architecture.md (principles #13 + #14), orchestrator-agent.md (new "Anticipate Value Principle" section), coo-agent.md ("Plan First" + "Anticipate Value" rules + anti-patterns)
+- Updated M-memory/decisions.md with 3 decisions: Anticipate Value, journey↔playbook cross-linking, COO must plan first
+- Root cause: CX Mate preaches proactive CX but agent team was reactive. Intelligence layer must be "always on top" — output must be company-specific, never generic. Every page must link to its related context.
+
+**Journey↔Playbook Cross-Link (feat)**
+- `journey/page.tsx`: loads playbook from sessionStorage, builds `Set<string>` of `stageName:momentName` keys, polls every 3s until playbook arrives (pre-generation may still be in flight)
+- `journey-map.tsx`: passes `playbookMoments` prop down to `JourneyStageCard`
+- `journey-stage-card.tsx`: `MomentCard` shows "📋 Playbook has a how-to for this →" badge (inside expanded state, after action template) when `playbookMoments` has a matching key. Links to `/playbook#${stageSlug}`
+- `playbook/page.tsx`: `StageSection` gets anchor `id={stageSlug}` for direct linking. `RecommendationCard` shows "← See [momentName] in Journey Map" link inside expanded state.
+- Build passes. TypeScript clean. Pushed to main → Vercel deploy in progress.
+
+**Demo prep — Orca AI for Keren Shaked**
+- Created `O-output/06-presale/demo-account-orca-ai.md` with full Orca AI onboarding inputs, narrative mapped to Keren's CX philosophy, 4 wow moments to find, pre-demo checklist, and handling for things that might go wrong.
+
+### Next Session Should Start With
+1. **Verify Vercel deployment** — confirm cross-link badges appear live at cxmate.app
+2. **Run Orca AI onboarding** (use exact inputs in demo-account-orca-ai.md) — BEFORE demo today
+3. **Note the 4 wow moments** from the generated output (crew trust moment, multi-stakeholder handoff, revenue number, cross-link badge in action)
+4. **Sprint 5 planning** — after demo, debrief what Keren said. Her feedback is product gold.
+5. **Specific intelligence layer** — the next real P0: when journey shows a generic action template, the system should auto-enrich it with vertical-specific examples from the web. This is the "intelligence always on top" principle in product form.
+
+---
+
 ## Current Sprint: Sprint 3 - Dashboard + Persistence + Polish (Weeks 5-6)
 
 **Goal:** Dashboard, navigation, UX polish, auth + DB persistence, journey editing

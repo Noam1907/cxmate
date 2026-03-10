@@ -2,21 +2,21 @@
 
 ## Onboarding Inputs — Enter Exactly As Written
 
-| Field | Value |
-|-------|-------|
-| Your name | Anat |
-| Role | Head of Customer Success |
-| Company | Orca AI |
-| Website | orca-ai.io |
-| Maturity | Growing (11–50 customers) |
+| Field                 | Value                                                                                         |
+| --------------------- | --------------------------------------------------------------------------------------------- |
+| Your name             | Anat                                                                                          |
+| Role                  | Head of Customer Success                                                                      |
+| Company               | Orca AI                                                                                       |
+| Website               | orca-ai.io                                                                                    |
+| Maturity              | Growing (11–50 customers)                                                                     |
 | Challenge (free text) | Crew adoption is the real decision-maker, but we only talk to fleet owners in the sales cycle |
-| Pain chips | Multi-stakeholder complexity, High churn risk |
-| ARR | $1M – $5M |
-| Average deal | $100K – $500K / year |
-| Pricing model | Package tiers |
-| Tools | Salesforce, Intercom, Notion |
-| Primary goal | Reduce churn / increase retention |
-| Timeframe | Within 3 months |
+| Pain chips            | Multi-stakeholder complexity, High churn risk                                                 |
+| ARR                   | $1M – $5M                                                                                     |
+| Average deal          | $100K – $500K / year                                                                          |
+| Pricing model         | Package tiers                                                                                 |
+| Tools                 | Salesforce, Intercom, Notion                                                                  |
+| Primary goal          | Reduce churn / increase retention                                                             |
+| Timeframe             | Within 3 months                                                                               |
 
 ---
 

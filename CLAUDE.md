@@ -1,31 +1,75 @@
 # CX Mate - AI Agent Team Project Instructions
 
+## The Operating Model: ABC-TOM
+
+This project runs on the **ABC-TOM framework**. Every agent, every session, no exceptions.
+
+```
+ABC-TOM
+├── ABC = The Foundation (set up once, evolve through promotions)
+│   ├── A-agents/    → Your AI team definitions
+│   ├── B-brain/     → Knowledge, research, references
+│   └── C-core/      → Brand DNA, identity, ICP, product architecture
+│
+└── TOM = The Execution (run daily)
+    ├── T-tools/     → Skills, workflows, prompts
+    ├── O-output/    → Everything the team creates
+    └── M-memory/    → What the system learns
+```
+
+**The Mantra:** "Set up ABC once. Run TOM daily."
+**The Distinction:** "ABC is who you are. TOM is what you do."
+**Brain vs Memory:** "Brain is what you bring. Memory is what you learn together."
+
+> Canonical framework reference: `/Users/anat/Documents/Anat-workspace/the-system/@ALL-GUIDES-HERE/04-tom-agent-knowledge/system-guide.md`
+
+**The Loop (how the system compounds):**
+```
+You give direction → Agent reads ABC → Agent uses T-tools → O-output created → You review → M-memory updated
+        ↑                                                                                          |
+        └── Strong patterns from M-memory get promoted into B-brain and C-core ←───────────────────┘
+```
+
+Every cycle makes the foundation stronger. Week 10 is better than week 1 because the loop ran 50 times.
+
+---
+
 ## Session Start Protocol (MANDATORY)
 
 When starting ANY new conversation from this folder, ALWAYS:
 
-1. **Read the core files first** — Every agent must understand the current state before doing anything
+1. **Read ABC** — the foundation. Every agent must load the full context before doing anything.
 2. **Activate the COO agent** — Read `A-agents/coo-agent.md` and run the session start checklist
-3. The COO reads all memory files, checks git/deployment status, and presents a status report
+3. The COO reads all M-memory files, checks git/deployment status, and presents a status report
 4. The COO recommends what to work on and starts driving execution
 
 ### Agent Onboarding — Required Reading (Every Session, Every Agent)
 
-**Tier 1 — Context (read FIRST):**
-- `C-core/project-brief.md` (What CX Mate is, who it's for)
-- `C-core/product-architecture.md` (6-layer intelligence model, onboarding flow, output pages)
-- `C-core/tech-stack.md` (Stack, project structure, key patterns, data model)
+**ABC = The Foundation — read ALL of this first:**
 
-**Tier 2 — Execution context:**
-- `M-memory/sprint-log.md` (What's done, in progress, what's next)
-- `M-memory/decisions.md` (Why we built things the way we did)
-- `M-memory/learning-log.md` (Patterns, gotchas, things we learned)
-
-**Tier 3 — Team structure:**
+**A — Agents (your team):**
 - `A-agents/orchestrator-agent.md` (How agents collaborate, onboarding protocol)
 - Your agent-specific `.md` in `A-agents/` (your role, tools, responsibilities)
 
-**Why this matters:** The product evolves daily. An agent that skips reading will make wrong assumptions (wrong step count, wrong color scheme, wrong architecture). Read first, build second.
+**B — Brain (domain knowledge):**
+- `B-brain/00-architecture/intelligence-stack.md` (7-layer intelligence architecture)
+- `B-brain/01-cx-methodology/` (Journey stages, moments taxonomy, CX influencers)
+- `B-brain/02-market-research/competitive-landscape.md` (Competitive positioning)
+
+**C — Core (identity + architecture):**
+- `C-core/project-brief.md` (What CX Mate is, who it's for)
+- `C-core/product-architecture.md` (6-layer intelligence model, onboarding flow, output pages)
+- `C-core/tech-stack.md` (Stack, project structure, key patterns, data model)
+- `C-core/voice-dna.md` (How CX Mate sounds)
+- `C-core/icp-profile.md` (Who we build for)
+
+**M — Memory (execution context — read to know where we are):**
+- `M-memory/sprint-log.md` (What's done, in progress, what's next)
+- `M-memory/decisions.md` (Why we built things the way we did)
+- `M-memory/learning-log.md` (Patterns, gotchas, things we learned)
+- `M-memory/intel/` (Latest CX intelligence digests)
+
+**Why this matters:** The product evolves daily. An agent that skips reading ABC will make wrong assumptions (wrong step count, wrong color scheme, wrong architecture). ABC first, TOM second. Always.
 
 ### Task-Specific Must-Reads (MANDATORY)
 
@@ -115,20 +159,26 @@ This is a multi-agent development project for CX Mate, an AI-powered CX orchestr
 
 ---
 
-## The Loop (After Significant Work)
+## The ABC-TOM Loop (After Significant Work)
 
-The COO is responsible for running this loop. It happens automatically, not on request.
+The COO is responsible for running this loop. It happens automatically, not on request. **This is how the system compounds.**
 
+### Step 1: Update TOM (execution layer)
 1. **Technical decision made?** Update `M-memory/decisions.md`
 2. **Sprint task completed?** Update `M-memory/sprint-log.md`
 3. **Pattern discovered?** Update `M-memory/learning-log.md`
-4. **Architecture changed?** Update `C-core/tech-stack.md`
-5. **Product scope changed?** Update `C-core/project-brief.md` and `C-core/product-architecture.md`
-6. **Agent role evolved?** Update the relevant `A-agents/*.md`
-7. **Session ending?** Leave a "next session starts with..." note in sprint-log
-8. **Pattern strong enough to become a product principle?** Promote it from M-memory directly into the relevant C-core file — that's how the system compounds
-9. **New research or reference material?** Move it from `B-brain/INBOX/` into the right B-brain subfolder
-10. **Significant output created?** Save it to `O-output/`
+4. **Significant output created?** Save it to `O-output/`
+5. **Session ending?** Leave a "next session starts with..." note in sprint-log
+
+### Step 2: Promote to ABC (foundation layer) — this is what makes the system smarter
+6. **Architecture changed?** Promote to `C-core/tech-stack.md`
+7. **Product scope changed?** Promote to `C-core/project-brief.md` and `C-core/product-architecture.md`
+8. **Agent role evolved?** Promote to the relevant `A-agents/*.md`
+9. **Pattern strong enough to become a product principle?** Promote from M-memory into the relevant C-core file
+10. **New research or reference material?** Promote from `B-brain/INBOX/` into the right B-brain subfolder
+11. **CX methodology insight validated?** Promote to `B-brain/01-cx-methodology/`
+
+**The key distinction:** TOM updates capture what happened. ABC promotions make the foundation stronger for next time. Both must happen. Skipping Step 2 means the system never compounds.
 
 ---
 
