@@ -32,6 +32,7 @@ const RECOMMENDATION_FIELD = {
     expectedOutcome: { type: "string" },
     effort:          { type: "string", enum: ["15_min","1_hour","half_day","multi_day"] },
     measureWith:     { type: "string" },
+    addressesRisk:   { type: "string" },
   },
   required: ["momentName","stageName","action","type","priority","owner","timing","expectedOutcome","effort","measureWith"],
 } as const;
@@ -123,8 +124,8 @@ export async function generateRecommendations(
   const prompt = buildRecommendationPrompt(journey, input);
 
   const requestBody = JSON.stringify({
-    model: "claude-haiku-4-5-20251001",
-    max_tokens: 8000,
+    model: "claude-sonnet-4-20250514",
+    max_tokens: 16384,
     // Tool use: Claude MUST call generate_playbook — API validates the JSON schema.
     // No freeform text, no parsing, no repair. This is the permanent fix.
     tools: [PLAYBOOK_TOOL],

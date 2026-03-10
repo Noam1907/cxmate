@@ -105,6 +105,11 @@ export async function loadJourney(
   orgId: string;
   vertical: string;
 } | null> {
+  // Guard against "null"/"undefined" strings from URL params
+  if (!templateId || templateId === "null" || templateId === "undefined" || templateId === "preview") {
+    return null;
+  }
+
   // Load template
   const { data: template, error } = await supabase
     .from("journey_templates")
