@@ -159,16 +159,9 @@ function buildInsightForStep(
     }
     case "business": {
       if (data.roughRevenue && data.roughRevenue !== "skip") {
-        const revenueLabels: Record<string, string> = {
-          pre_revenue: "Pre-revenue",
-          "0-100k": "$0–$100K",
-          "100k-500k": "$100K–$500K",
-          "500k-1m": "$500K–$1M",
-          "1m-5m": "$1M–$5M",
-          "5m-20m": "$5M–$20M",
-          "20m+": "$20M+",
-        };
-        const label = revenueLabels[data.roughRevenue] || data.roughRevenue;
+        // Use the canonical REVENUE_RANGE_OPTIONS label
+        const opt = REVENUE_RANGE_OPTIONS.find((r) => r.value === data.roughRevenue);
+        const label = opt?.label || data.roughRevenue;
         return `${label} — every lost customer hits hard at this scale. Playbook will focus on protecting revenue.`;
       }
       return `Even rough numbers help us benchmark against companies at your scale.`;
