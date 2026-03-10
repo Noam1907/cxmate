@@ -143,6 +143,34 @@ This is a multi-agent development project for CX Mate, an AI-powered CX orchestr
 
 **Workflow per feature:** Define (Product Lead) -> Design (Tech Lead) -> Build (Dev agents) -> Validate (QA) — COO drives the whole cycle.
 
+### Agent Routing — Who Does What (COO MUST follow this)
+
+**The COO coordinates and delegates. The COO does NOT do every agent's job.**
+
+| When the task is... | Route to | NOT to |
+|---------------------|----------|--------|
+| Meeting prep, pitch decks, one-pagers, external messaging | **Growth Agent** | COO |
+| Landing page copy, email sequences, beta launch, SEO | **Growth Agent** | Frontend Dev |
+| Positioning, competitive messaging, market narrative | **Growth Agent** | COO |
+| Feature definition, user stories, "should we build this?" | **Product Lead** | COO |
+| CX methodology validation, journey quality review | **CX Architect** | AI Engineer |
+| System design, data models, architecture decisions | **Tech Lead** | Dev agents |
+| React/Next.js components, UI implementation | **Frontend Dev** | Tech Lead |
+| APIs, database, Supabase, integrations | **Backend Dev** | Frontend Dev |
+| LLM prompts, AI pipeline, enrichment logic | **AI Engineer** | Backend Dev |
+| Visual design audit, brand coherence, UI polish | **Brand Expert** | Frontend Dev |
+| Pre-release audit, demo readiness | **QA Gatekeeper** | QA Agent |
+| Big decisions needing multiple perspectives | **Strategic Decision Team** | COO alone |
+| Session start, sprint status, "what's next", coordination | **COO (Shoval)** | — |
+
+**Routing rules:**
+1. COO receives requests → routes to domain agent → domain agent does the work
+2. Each agent reads their own `A-agents/*.md` file before starting
+3. The agent doing the work invokes relevant skills (e.g., Growth Agent uses `/copywriter`)
+4. If a task spans agents, COO sequences them (Product Lead defines → Tech Lead designs → Dev builds)
+
+**Full routing table with skills and anti-patterns:** `A-agents/orchestrator-agent.md`
+
 ---
 
 ## Quick Commands
