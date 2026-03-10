@@ -1,73 +1,89 @@
-# CX Mate
-
-**For:** Keren Shaked | **March 11, 2026**
+# Meeting Prep: Keren Shaked — March 11, 2026
 
 ---
 
-## The Gap
+## Who She Is
+- Israeli CX practitioner, active on LinkedIn
+- Referenced in our CX Intelligence Stack as a framework source
+- She knows CX methodology deeply — don't over-explain, speak peer-to-peer
 
-65% of enterprises are stuck in the first two CX maturity stages. They have teams, budgets, and tools — and still can't get it right.
-
-Now look below them: every B2B company from seed to Series B. No CX hire. No methodology. No budget for Gainsight or a consultant. Their customer journey isn't bad — it's *accidental.* Built on founder memory and Slack DMs.
-
-There's nothing between "wing it" and "$50K/year enterprise platforms." **That's the gap.**
-
-**The market agrees:** SMBs represent 56.8% of the journey mapping market. 89% of buyers switch after a poor experience — even when the product is great. SMBs lose 1–9% of total revenue to the operational fragmentation that lives in this gap.
+## Your Goal for This Meeting
+> **[FILL IN: What do you want from Keren? Advisory role? Feedback on methodology? Beta tester? LinkedIn endorsement? Partnership? Intro to her network?]**
 
 ---
 
-## What CX Mate Does
+## The Elevator Pitch (30 seconds)
 
-One conversation → a complete CX architecture. No CRM, no setup, no CX expertise required.
-
-**The output:**
-- **Journey map** — stages, meaningful moments, risk levels, evidence annotations — tied to *their* specific company, maturity, vertical, and pain points
-- **CX Intelligence Report** — confrontation-style hard truths with transparent revenue impact projections (formulas visible, assumptions disclosed)
-- **Prioritized playbook** — what to do Monday, with effort estimates, AI tool recommendations, and email templates
-
-What takes a consultant 3 months and $150K, CX Mate delivers in minutes.
+"Every B2B company from seed to Series B is running their customer journey on gut feel. There's nothing between winging it and a $50K Gainsight implementation. CX Mate fills that gap — one conversation, and you get a full journey map, a CX intelligence report, and a prioritized playbook. Real CX methodology baked in, not ChatGPT fluff."
 
 ---
 
-## Why It's Not "Just ChatGPT"
+## The 3 Points to Land
 
-This is where the methodology matters — and where your expertise is relevant.
+**1. The gap is real and nobody's filling it**
+- 65% of enterprises can't get past the first two CX maturity stages — even with teams and budget
+- Below them? Zero tools, zero methodology. Gut feel + spreadsheets.
+- SMBs = 56.8% of the journey mapping market. $76.2B by 2035.
+- Gainsight = 24 weeks + $50K/yr. ChurnZero = 6-8 weeks. CX Mate = one conversation.
 
-| | ChatGPT / Gemini | CX Mate |
-|---|---|---|
-| **Input** | Company name + a prompt | 33 structured intelligence fields via adaptive onboarding + live website enrichment |
-| **Methodology** | Whatever the model knows | CCXP body of knowledge, 15 named expert frameworks, maturity-adaptive analysis modes (Prescriptive / Comparison / Optimization) |
-| **Output** | Plausible text | Structured stages → moments → insights → recommendations chain, with evidence annotations linking every recommendation to specific pain points |
-| **Over time** | A one-time answer | CX Score tracking, before/after delta, outcome correlation |
+**2. The methodology is real — not an AI wrapper**
+- 33 structured input fields via adaptive onboarding (not "enter your company name")
+- CCXP body of knowledge, 15 named expert frameworks wired into prompts
+- Maturity-adaptive analysis: Prescriptive (early) → Comparison (growing) → Optimization (scaling)
+- Evidence chain: pain points → journey moments → recommendations — everything links back
+- This is what separates us from "just ask ChatGPT"
 
-**The moat is in the inputs and the structure, not the model.** A founder who knows enough to write a perfect CX prompt already has a CX director. The entire market is everyone who doesn't.
-
----
-
-## The Intelligence Architecture
-
-```
-L6  Outcome Intelligence     What actually worked — the learning loop
-L5  External Signals         Funding rounds, hiring patterns, regulatory shifts
-L4  User Intelligence        Behavior + CRM data + aggregate "companies like yours" patterns
-L3  Technology Intelligence  What tools + AI can do right now (refreshed weekly)
-L2  Market Intelligence      Competitor CX gaps, vertical benchmarks, hiring signals
-L1  Methodology Intelligence CCXP frameworks, 15 expert models, lifecycle science
-L0  Input Foundation         33 structured fields + live website enrichment
-```
-
-L0–L1 are live today. L2–L3 static with automation planned. L4–L6 are the compounding moat — they get stronger with every user, every month, every outcome tracked.
+**3. The architecture compounds over time**
+- 7-layer intelligence stack (L0 input → L6 outcome learning loop)
+- L0–L1 live today. L2–L3 static with automation planned. L4–L6 = the future moat
+- CX Score tracking, before/after delta, outcome correlation
+- More users = better "companies like yours" patterns — the Gainsight model, accessible
 
 ---
 
-## Where We Are
+## Stats Ready to Drop
 
-**Built and working:** Conversational onboarding, auto-enrichment, journey generation, CX Intelligence Report, Evidence Wall, Playbook, Dashboard, auth + persistence.
-
-**Now:** Beta launch prep — payments, analytics, invite system.
-
-**Business model:** Free full run (trust-building) → $79/mo Starter → $199/mo Pro → $1,200/yr Premium.
+| Stat | When to use it |
+|------|---------------|
+| 89% switch after one bad experience — even with great product | "The product isn't the problem. The journey is." |
+| SMBs lose 1–9% of revenue to operational fragmentation | Dollar hook — makes the gap concrete |
+| Journey management → 18x faster sales cycles, 3.5x referrals | When she asks "does journey design actually move numbers?" |
+| Only 17% of companies can prove CX ROI | "We show the math — transparent formulas, assumptions disclosed" |
+| 72% switch after one bad experience | Urgency — "one moment breaks everything" |
 
 ---
 
-*Your customers have a journey whether you designed it or not.*
+## Questions She'll Probably Ask
+
+**"How is this different from asking ChatGPT?"**
+→ "A founder who knows enough to write a perfect CX prompt already has a CX director. CX Mate knows which questions to ask, asks them in sequence, and turns answers into a structured system — not a one-time text response. 33 fields in, structured journey out. The gap is in the inputs, not the model."
+
+**"Which CX frameworks do you use?"**
+→ CCXP body of knowledge, lifecycle science, decision science, failure patterns. 15 named expert frameworks including Annette Franz, Ian Golding — and yours. We built a `cx-influencer-frameworks.ts` module that selects relevant frameworks based on company context.
+
+**"Who's actually using this?"**
+→ Pre-beta. Working product — onboarding through dashboard all functional. Sprint 4 is beta launch prep (payments, analytics, invites). Looking for expert feedback before we go live.
+
+**"What maturity stages do you target?"**
+→ Pre-launch through Scaling. The onboarding adapts — different questions, different pain points, different analysis depth per stage. A pre-launch founder gets prescriptive best practices. A scaling company gets optimization recommendations against benchmarks.
+
+**"How do you handle the quality problem — AI generating bad CX advice?"**
+→ The methodology layer constrains the output. It's not "generate a journey" — it's "generate a journey using these specific CX frameworks, for this maturity stage, with these pain points as constraints, and cite which framework drives each recommendation." The prompt is 400+ lines of engineered CX context.
+
+---
+
+## What's Built and Working
+
+Conversational onboarding → auto-enrichment from website → journey generation (~2.8 min) → CX Intelligence Report with Evidence Wall → Playbook with AI tool recs → Dashboard. Auth + DB persistence. Dual-mode (preview before signup, save after).
+
+**Stack:** Next.js, Supabase, Claude API, Tailwind, shadcn/ui
+
+---
+
+## Business Model (if it comes up)
+
+Free full run (trust) → $79/mo Starter → $199/mo Pro → $1,200/yr Premium
+
+---
+
+*Close the meeting with your ask. Don't leave without it.*
