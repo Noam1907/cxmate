@@ -62,8 +62,8 @@ export async function generateJourney(
 
   const requestBody = JSON.stringify({
     model: "claude-sonnet-4-20250514",
-    max_tokens: 4096,
-    system: "CX expert API. Return ONLY valid JSON — first char { last char }. No markdown. Every string max 12 words. Under 3500 tokens total. Speed over detail.",
+    max_tokens: 8192,
+    system: "CX expert API. Return ONLY valid JSON — first char { last char }. No markdown. Every string max 12 words. Speed over detail.",
     messages: [{ role: "user", content: prompt }],
   });
 
