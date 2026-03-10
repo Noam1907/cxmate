@@ -4,7 +4,7 @@ import { Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { track } from "@/lib/analytics";
 
-type ExportPage = "journey" | "cx_report" | "playbook" | "dashboard" | "qbr";
+type ExportPage = "journey" | "cx_report" | "playbook" | "dashboard" | "analysis" | "qbr";
 
 interface ExportPdfButtonProps {
   page: ExportPage;

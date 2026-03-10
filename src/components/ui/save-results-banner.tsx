@@ -47,7 +47,7 @@ export function SaveResultsBanner({ isPreview, companyName }: SaveResultsBannerP
               : "Your results are only saved in this browser."}
           </p>
           <p className="text-xs text-amber-700 mt-0.5">
-            Create a free account to access your journey map, CX report, and playbook from any device — and keep them forever.
+            Sign up to access your journey map, CX report, and playbook from any device. Your results stay with you as your CX evolves.
           </p>
         </div>
       </div>
