@@ -345,11 +345,17 @@ export async function POST(request: Request) {
       { role: "assistant" as const, content: "{" },
     ];
 
+    const apiKey = process.env.CX_MATE_ANTHROPIC_API_KEY;
+    if (!apiKey) {
+      return NextResponse.json({ error: "AI service not configured" }, { status: 500 });
+    }
+
     const response = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
+      signal: AbortSignal.timeout(50_000), // 50s — under Vercel's 60s limit
       headers: {
         "Content-Type": "application/json",
-        "x-api-key": process.env.CX_MATE_ANTHROPIC_API_KEY!,
+        "x-api-key": apiKey,
         "anthropic-version": "2023-06-01",
       },
       body: JSON.stringify({

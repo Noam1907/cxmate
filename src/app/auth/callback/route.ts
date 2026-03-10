@@ -2,16 +2,24 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 
+/** Prevent open-redirect: only allow relative paths, reject protocol-relative URLs */
+function sanitizeRedirect(path: string | null, fallback: string): string {
+  if (!path || !path.startsWith("/") || path.startsWith("//")) return fallback;
+  // Also reject backslash-based tricks and encoded schemes
+  if (path.includes("\\") || path.includes("%2f%2f")) return fallback;
+  return path;
+}
+
 /**
  * Auth callback handler.
  * Exchanges the auth code for a session, then:
  * - If new user (no org_id): creates org, sets app_metadata, redirects to /onboarding
- * - If existing user: redirects to /dashboard (or redirect param)
+ * - If existing user: redirects to /analysis (or redirect param)
  */
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
-  const redirectTo = searchParams.get("redirect") || "/dashboard";
+  const redirectTo = sanitizeRedirect(searchParams.get("redirect"), "/analysis");
 
   if (code) {
     const supabase = await createClient();
@@ -62,7 +70,7 @@ export async function GET(request: Request) {
 
         // New user — use redirect param if provided (e.g. magic link from onboarding),
         // otherwise default to /onboarding for standard email+password signups
-        const newUserRedirect = searchParams.get("redirect") || "/onboarding";
+        const newUserRedirect = sanitizeRedirect(searchParams.get("redirect"), "/onboarding");
         return NextResponse.redirect(`${origin}${newUserRedirect}`);
       }
 

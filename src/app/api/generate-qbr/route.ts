@@ -73,6 +73,7 @@ export async function POST(request: Request) {
 
     const response = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
+      signal: AbortSignal.timeout(110_000), // 110s — under Vercel's 120s limit
       headers: {
         "x-api-key": apiKey,
         "anthropic-version": "2023-06-01",

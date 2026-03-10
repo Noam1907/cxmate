@@ -21,7 +21,7 @@ export async function POST(request: Request) {
   // Security: require secret header to prevent abuse
   const secret = request.headers.get("x-cron-secret");
   const expected = process.env.CRON_SECRET;
-  if (expected && secret !== expected) {
+  if (!expected || secret !== expected) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 

@@ -30,6 +30,17 @@ const enrichSchema = z.object({
  * Strips scripts, styles, nav, footer, and HTML tags.
  * Returns cleaned text capped at ~3000 chars.
  */
+/** Block SSRF: reject private/internal IPs and localhost */
+function isBlockedHost(hostname: string): boolean {
+  const lower = hostname.toLowerCase();
+  if (["localhost", "127.0.0.1", "0.0.0.0", "[::1]"].includes(lower)) return true;
+  // Block private IP ranges: 10.x, 172.16-31.x, 192.168.x, 169.254.x (link-local/metadata)
+  if (/^(10\.|172\.(1[6-9]|2\d|3[01])\.|192\.168\.|169\.254\.)/.test(lower)) return true;
+  // Block cloud metadata endpoints
+  if (lower === "metadata.google.internal") return true;
+  return false;
+}
+
 async function fetchWebsiteContent(url: string): Promise<string | null> {
   try {
     // Normalize URL
@@ -37,6 +48,15 @@ async function fetchWebsiteContent(url: string): Promise<string | null> {
     if (!fullUrl.startsWith("http://") && !fullUrl.startsWith("https://")) {
       fullUrl = `https://${fullUrl}`;
     }
+
+    // SSRF protection: reject internal/private hosts
+    const parsed = new URL(fullUrl);
+    if (isBlockedHost(parsed.hostname)) {
+      console.warn(`[enrich-company] Blocked SSRF attempt: ${parsed.hostname}`);
+      return null;
+    }
+    // Only allow http/https
+    if (!["http:", "https:"].includes(parsed.protocol)) return null;
 
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 8000); // 8s timeout for fetch
