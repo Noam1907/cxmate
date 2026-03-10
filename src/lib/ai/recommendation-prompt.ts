@@ -40,6 +40,7 @@ export interface PlaybookRecommendation {
   effort: "15_min" | "1_hour" | "half_day" | "multi_day";
   measureWith: string; // How to know it worked
   toolsUsed?: string[]; // Specific tools from the user's stack referenced in this recommendation (e.g., ["HubSpot", "Intercom"])
+  addressesRisk?: string; // Which confrontation insight pattern this recommendation addresses (e.g., "Stakeholder misalignment kills 40% of expansion deals")
 }
 
 export interface StagePlaybook {
@@ -132,6 +133,30 @@ ${moments}`;
 }
 
 // ============================================
+// Confrontation Insights Summary
+// ============================================
+
+function buildConfrontationInsightsSummary(journey: GeneratedJourney): string {
+  const insights = journey.confrontationInsights;
+  if (!insights || insights.length === 0) return "";
+
+  const lines = insights.map((insight, i) =>
+    `${i + 1}. **"${insight.pattern}"** (${insight.likelihood} likelihood, ${insight.businessImpact} at risk)\n` +
+    `   ${insight.description}\n` +
+    (insight.immediateAction ? `   Immediate action suggested: ${insight.immediateAction}\n` : "") +
+    (insight.competitorContext ? `   Competitor context: ${insight.competitorContext}\n` : "")
+  );
+
+  return `## Risks Identified in the Journey Analysis (MUST ADDRESS)
+
+The journey analysis identified these specific patterns that threaten this company's growth. Your playbook MUST include recommendations that directly address each one. Tag each relevant recommendation with the risk pattern it addresses using the \`addressesRisk\` field.
+
+${lines.join("\n")}
+
+⚠️ CRITICAL: Every one of these risks must have at least one "must_do" recommendation that directly addresses it. The user will see these risks on the Analysis page and expect the Playbook to tell them exactly what to do about each one. This is the story arc — risk identified → action recommended.`;
+}
+
+// ============================================
 // Maturity Detection
 // ============================================
 
@@ -179,6 +204,7 @@ export function buildRecommendationPrompt(
   const toolsContext = buildToolsContext();
   const stageGuidance = buildStageGuidanceContext(maturityStage);
   const journeySummary = buildJourneySummary(journey);
+  const confrontationContext = buildConfrontationInsightsSummary(journey);
 
   // Layer 1: Methodology Intelligence
   const relevantFrameworks = getRelevantFrameworks(
@@ -244,11 +270,23 @@ ${influencerContext}
 
 ${ccxpContext}
 
+${confrontationContext}
+
 ---
 
 ## Your Task
 
-Generate a complete playbook with 3-5 specific recommendations per journey stage. Each recommendation should be something the team can actually DO — not vague advice.
+Generate a complete playbook with 2-4 specific recommendations per journey stage. Each recommendation should be something the team can actually DO — not vague advice.
+
+⚠️ TOKEN BUDGET: Keep total output under 14000 tokens. Be concise:
+- "action" field: 1-2 sentences max
+- "template" field: 3-5 sentences max (a micro-template, not a full email). Use [brackets] for personalization.
+- "expectedOutcome": 1 sentence
+- "measureWith": 1 sentence
+- "topPriority": 1 sentence
+- "weekOneChecklist": 5 items max, each under 15 words
+- "quickWins": 3 items max
+- Prefer fewer, higher-quality recommendations over quantity
 
 Rules:
 1. **Be specific.** "Send a check-in email" is bad. "Send this exact email at Day 7" with the actual email text is good.
@@ -318,7 +356,8 @@ Return a JSON object with this exact structure:
           "expectedOutcome": "What happens when they do this right",
           "effort": "15_min" | "1_hour" | "half_day" | "multi_day",
           "measureWith": "How to know it worked (specific metric or signal)",
-          "toolsUsed": ["ToolName"] // ONLY if this recommendation specifically uses a tool from their stack. Omit or use [] if no specific tool from their stack applies.
+          "toolsUsed": ["ToolName"], // ONLY if this recommendation specifically uses a tool from their stack. Omit or use [] if no specific tool from their stack applies.
+          "addressesRisk": "Pattern name from Risks Identified section" // Include ONLY if this recommendation directly addresses one of the identified risks. Use the exact pattern text.
         }
       ]
     }
