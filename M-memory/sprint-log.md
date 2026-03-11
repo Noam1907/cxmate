@@ -4,6 +4,51 @@ Track sprint progress and status.
 
 ---
 
+## Session: 2026-03-10 (Morning — Pre-demo prep + Loop Audit)
+
+### Shipped This Session
+
+**ABC-TOM Framework Embedding (governance)**
+- Updated all 3 governance files to embed ABC-TOM framework: `CLAUDE.md` (Brain vs Memory distinction + canonical reference), `A-agents/coo-agent.md` (full rewrite: Core Mandate, Required Reading, Session Start Checklist all restructured around ABC-TOM sections), `T-tools/03-workflows/session-start-workflow.md` (added system guide reference)
+- Canonical reference: `the-system/@ALL-GUIDES-HERE/04-tom-agent-knowledge/system-guide.md` (by Tom Even)
+- The Loop is now explicit in all files: "Strong M-memory patterns promote to B-brain/C-core"
+
+**Gigi Levy-Weiss Strategic Analysis (captured from last night's session)**
+- Confirmed strategic insights already saved in `O-output/07-research/gigi-levy-weiss-ai-saas-future-2026-03-09.md`
+- Key decisions NOW in decisions.md: replacement > assistance positioning, Persona A vs B, compounding intelligence moat
+
+**UX Diagnosis (captured from last night's session)**
+- Option C decision NOW in decisions.md: quick Journey fix + unified `/analysis` page
+- "4 tabs vs 1 story" insight NOW in learning-log.md
+
+**O-output Reorganization**
+- Flat dump → numbered folders: `01-product/`, `02-architecture/`, `03-strategy/`, `04-beta-gtm/`, `05-reference-outputs/`, `06-presale/`, `07-research/`
+- New skills created: `/adhd` (ADHD co-pilot), `/ux-journey` (UX journey expert for CX Mate's own product)
+
+**Git Pushes**
+- `961c1fc` — feat: cross-linking, homepage simplification, AI generation tweaks (6 files)
+- `0868aa8` — chore: ABC-TOM framework embedding, O-output reorg, new skills + research (46 files)
+
+**Concurrency Assessment**
+- Platform safe for 1-3 concurrent users (demo is fine)
+- HIGH risk at 5+: sequential DB inserts in `persistJourney()` (30+ queries per journey)
+- Recommendation: batch inserts before beta invites go wide
+
+**10-Day Loop Audit (M-memory)**
+- Audited all 70+ commits from March 1-10 against M-memory files
+- Found 12+ decisions never logged in decisions.md — NOW added
+- Found 8+ learnings never logged in learning-log.md — NOW added
+- Root cause: conversations produce decisions but M-memory doesn't get updated until explicit audit
+
+### Next Session Should Start With
+1. **Domain + email** — Anat needs to purchase cxmate.io, set up Google Workspace, configure DNS for Vercel + email
+2. **Homepage messaging** — align with Gigi/Persona B positioning (invoke `/copywriter` skill)
+3. **Journey page quick fix** — Option C part 1: collapse stages by default, add summary header, progressive disclosure
+4. **Batch insert fix** — replace sequential `persistJourney()` with batched inserts before beta
+5. **Keren Shaked demo debrief** — capture feedback, update sprint priorities
+
+---
+
 ## Session: 2026-03-09 (Morning — Keren Shaked demo prep)
 
 ### Shipped This Session

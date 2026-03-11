@@ -69,11 +69,12 @@ function CopyButton({ text }: { text: string }) {
 // ─── Recommendation Card ──────────────────────────────────────────────────────
 
 function RecommendationCard({
-  rec, status, onStatusChange,
+  rec, status, onStatusChange, annotations,
 }: {
   rec: PlaybookRecommendation;
   status: RecStatus;
   onStatusChange: () => void;
+  annotations?: { painPoints: string[]; competitorGaps: string[] };
 }) {
   const [expanded, setExpanded] = useState(false);
 
@@ -120,6 +121,12 @@ function RecommendationCard({
                 🔧 {tool}
               </span>
             ))}
+            {/* Pain point badges */}
+            {annotations && annotations.painPoints.length > 0 && annotations.painPoints.map((pp, i) => (
+              <span key={`pp-${i}`} className="text-[10px] font-semibold text-primary bg-primary/10 px-1.5 py-0.5 rounded-full">
+                ✓ {pp}
+              </span>
+            ))}
             {/* Journey cross-link — always visible in collapsed state */}
             {rec.momentName && !expanded && (
               <Link
@@ -147,19 +154,19 @@ function RecommendationCard({
               {rec.template && (
                 <div className="rounded-lg bg-slate-50 border border-slate-200 p-3">
                   <div className="flex items-center justify-between mb-1.5">
-                    <span className="text-xs font-semibold text-slate-400 uppercase tracking-wide">Template</span>
+                    <span className="text-xs font-bold text-slate-500 uppercase tracking-wide">Template</span>
                     <CopyButton text={rec.template} />
                   </div>
-                  <p className="text-xs text-slate-600 whitespace-pre-line leading-relaxed">{rec.template}</p>
+                  <p className="text-sm text-slate-600 whitespace-pre-line leading-relaxed">{rec.template}</p>
                 </div>
               )}
               <div className="rounded-lg bg-slate-50 border border-slate-200 p-3">
-                <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-1">Expected outcome</p>
-                <p className="text-xs text-slate-600">{rec.expectedOutcome}</p>
+                <p className="text-xs font-bold text-slate-500 uppercase tracking-wide mb-1">Expected outcome</p>
+                <p className="text-sm text-slate-600">{rec.expectedOutcome}</p>
               </div>
               <div className="rounded-lg bg-slate-50 border border-slate-200 p-3">
-                <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-1">Measure with</p>
-                <p className="text-xs text-slate-600">{rec.measureWith}</p>
+                <p className="text-xs font-bold text-slate-500 uppercase tracking-wide mb-1">Measure with</p>
+                <p className="text-sm text-slate-600">{rec.measureWith}</p>
               </div>
             </div>
           )}
@@ -189,7 +196,7 @@ function StageSection({
     <div className="mb-8" id={stageSlug}>
       {/* Stage header */}
       <div className="flex items-center justify-between mb-1">
-        <h3 className="text-base font-semibold text-slate-900">{stagePlaybook.stageName}</h3>
+        <h3 className="text-base font-bold text-slate-900">{stagePlaybook.stageName}</h3>
         <span className="text-xs text-slate-400">{doneCount}/{total} done</span>
       </div>
       {/* Measurement plan chip */}
@@ -211,13 +218,13 @@ function StageSection({
           const key = makeKey(rec);
           const status = statuses[key] || "not_started";
           const ann = evidenceMap ? getMomentAnnotations(rec.stageName, rec.momentName, evidenceMap) : undefined;
-          void ann; // annotations available but we keep UI clean
           return (
             <RecommendationCard
               key={i}
               rec={rec}
               status={status}
               onStatusChange={() => onStatusChange(key)}
+              annotations={ann}
             />
           );
         })}

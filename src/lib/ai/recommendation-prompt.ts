@@ -21,6 +21,7 @@ import {
   buildCCXPPromptContext,
 } from "@/lib/cx-knowledge";
 import type { OnboardingInput } from "@/lib/validations/onboarding";
+import { getPainPointsForMaturity, type CompanyMaturity } from "@/types/onboarding";
 import type { GeneratedJourney, GeneratedStage, GeneratedMoment } from "./journey-prompt";
 
 // ============================================
@@ -206,6 +207,13 @@ export function buildRecommendationPrompt(
   const journeySummary = buildJourneySummary(journey);
   const confrontationContext = buildConfrontationInsightsSummary(journey);
 
+  // Resolve pain point values to human-readable labels
+  const painPointOptions = getPainPointsForMaturity(input.companyMaturity as CompanyMaturity) || [];
+  const painPointLabels = input.painPoints.map((value) => {
+    const option = painPointOptions.find((o) => o.value === value);
+    return option ? option.label : value;
+  });
+
   // Layer 1: Methodology Intelligence
   const relevantFrameworks = getRelevantFrameworks(
     input.painPoints,
@@ -244,7 +252,7 @@ ${input.existingJourneyComponents && input.existingJourneyComponents.length > 0 
 ${input.existingJourneyDescription ? `- Description: "${input.existingJourneyDescription}"` : ""}
 IMPORTANT: Acknowledge and build on their existing work. Recommendations for stages they already cover should be IMPROVEMENTS, not from-scratch rebuilds.` : ""}
 - Biggest challenge: ${input.biggestChallenge}
-- Pain points: ${input.painPoints.join(", ")}${input.customPainPoint ? `, ${input.customPainPoint}` : ""}
+- Pain points: ${painPointLabels.join("; ")}${input.customPainPoint ? `; ${input.customPainPoint}` : ""}
 - Primary goal: ${input.primaryGoal}${input.customGoal ? ` (${input.customGoal})` : ""}
 ${input.secondaryGoals?.length ? `- Additional goals: ${input.secondaryGoals.join(", ")}` : ""}- Timeframe: ${input.timeframe}
 ${input.additionalContext ? `- Additional context: ${input.additionalContext}` : ""}
@@ -363,7 +371,9 @@ Return a JSON object with this exact structure:
     }
   ],
   "quickWins": [
-    // Top 3-5 recommendations with lowest effort and highest impact (reference the same objects from stagePlaybooks)
+    // IMPORTANT: Pick the 3 best recommendations from your stagePlaybooks that have BOTH low effort (15_min or 1_hour) AND high priority (must_do or should_do).
+    // Copy them here as COMPLETE PlaybookRecommendation objects — same full structure as above, not references or pointers.
+    // These are the "start here" items — things the team can do TODAY for immediate impact.
   ],
   "weekOneChecklist": [
     "Action 1 to do this week",

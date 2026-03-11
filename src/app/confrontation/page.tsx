@@ -10,7 +10,7 @@ import type {
   ImpactProjection,
 } from "@/lib/ai/journey-prompt";
 import type { OnboardingData } from "@/types/onboarding";
-import { buildEvidenceMap, type EvidenceMap } from "@/lib/evidence-matching";
+import { buildEvidenceMap, getInsightAnnotations, type EvidenceMap } from "@/lib/evidence-matching";
 import { EvidenceWall } from "@/components/evidence/evidence-wall";
 import { track } from "@/lib/analytics";
 import { ExportPdfButton } from "@/components/ui/export-pdf-button";
@@ -76,15 +76,22 @@ const MODE_CONFIG: Record<
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
 function parseDollarValue(impact: string): number | null {
-  const match = impact.match(/\$[\d,.]+\s*[KkMmBb]?/);
+  // Try explicit $-prefixed values first: "$50K", "$120,000", "$1.2M"
+  let match = impact.match(/\$[\d,.]+\s*[KkMmBb]?/);
+  // Fallback: bare numbers with K/M/B suffix: "50K", "1.2M", "120,000"
+  if (!match) match = impact.match(/[\d,.]+\s*[KkMmBb]/);
+  // Fallback: plain large numbers: "150000", "50,000"
+  if (!match) match = impact.match(/[\d,]+(?:\.\d+)?/);
   if (!match) return null;
-  let raw = match[0].replace(/[$,]/g, "");
+  let raw = match[0].replace(/[$,\s]/g, "");
   let multiplier = 1;
   if (/[Kk]$/.test(raw)) { multiplier = 1000; raw = raw.replace(/[Kk]$/, ""); }
   else if (/[Mm]$/.test(raw)) { multiplier = 1_000_000; raw = raw.replace(/[Mm]$/, ""); }
   else if (/[Bb]$/.test(raw)) { multiplier = 1_000_000_000; raw = raw.replace(/[Bb]$/, ""); }
   const num = parseFloat(raw);
-  return isNaN(num) ? null : num * multiplier;
+  // Reject tiny numbers (likely percentages parsed as values)
+  if (isNaN(num) || num < 100) return null;
+  return num * multiplier;
 }
 
 function formatDollarCompact(value: number): string {
@@ -121,17 +128,38 @@ function HeroImpactCard({ projections, delay }: { projections: ImpactProjection[
     .map((p) => parseDollarValue(p.potentialImpact))
     .filter((v): v is number => v !== null);
   const total = values.reduce((s, v) => s + v, 0);
-  if (values.length === 0) return null;
 
-  const lo = formatDollarCompact(Math.round(total * 0.7));
-  const hi = formatDollarCompact(Math.round(total * 1.3));
+  // If we can parse dollar values, show the quantified range
+  if (values.length > 0) {
+    const lo = formatDollarCompact(Math.round(total * 0.7));
+    const hi = formatDollarCompact(Math.round(total * 1.3));
 
+    return (
+      <div className={`rounded-2xl bg-gradient-to-br from-slate-800 to-teal-900 text-white p-8 transition-all duration-700 ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
+        <p className="text-xs font-semibold text-slate-300 uppercase tracking-widest mb-3">Potential revenue at risk annually</p>
+        <div className="text-6xl font-bold tracking-tight">{lo} – {hi}</div>
+        <p className="text-sm text-slate-300 mt-3 leading-relaxed max-w-md">
+          Based on your deal size, customer count, and industry benchmarks. Fix the issues below to recapture it.
+        </p>
+      </div>
+    );
+  }
+
+  // Fallback: projections exist but dollar values couldn't be parsed — show qualitative view
   return (
     <div className={`rounded-2xl bg-gradient-to-br from-slate-800 to-teal-900 text-white p-8 transition-all duration-700 ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
-      <p className="text-xs font-semibold text-slate-300 uppercase tracking-widest mb-3">Potential revenue at risk annually</p>
-      <div className="text-6xl font-bold tracking-tight">{lo} – {hi}</div>
-      <p className="text-sm text-slate-300 mt-3 leading-relaxed max-w-md">
-        Based on your deal size, customer count, and industry benchmarks. Fix the issues below to recapture it.
+      <p className="text-xs font-semibold text-slate-300 uppercase tracking-widest mb-3">Impact areas identified</p>
+      <div className="text-4xl font-bold tracking-tight">{projections.length} risk {projections.length === 1 ? "area" : "areas"}</div>
+      <div className="mt-4 space-y-2">
+        {projections.slice(0, 3).map((p, i) => (
+          <div key={i} className="flex items-center gap-2">
+            <div className="w-1.5 h-1.5 rounded-full bg-amber-400 shrink-0" />
+            <span className="text-sm text-slate-300">{p.area}: {p.potentialImpact}</span>
+          </div>
+        ))}
+      </div>
+      <p className="text-sm text-slate-400 mt-3 leading-relaxed">
+        Fix the issues below to protect and grow your revenue.
       </p>
     </div>
   );
@@ -203,7 +231,12 @@ function ImpactBreakdown({ projections, delay }: { projections: ImpactProjection
 
 // ─── Insight Card ─────────────────────────────────────────────────────────────
 
-function InsightCard({ insight, index, locked = false }: { insight: ConfrontationInsight; index: number; locked?: boolean }) {
+function InsightCard({ insight, index, locked = false, annotations }: {
+  insight: ConfrontationInsight;
+  index: number;
+  locked?: boolean;
+  annotations?: { painPoints: string[]; competitorContext: string | null };
+}) {
   const [expanded, setExpanded] = useState(false);
 
   const isHigh = insight.likelihood === "high";
@@ -220,6 +253,9 @@ function InsightCard({ insight, index, locked = false }: { insight: Confrontatio
     : isMedium
     ? <span className="text-xs font-bold uppercase tracking-widest text-amber-700 bg-amber-100 px-2 py-0.5 rounded-full shrink-0">Important</span>
     : <span className="text-xs font-medium uppercase tracking-widest text-slate-400 shrink-0">On radar</span>;
+
+  const hasPainBadges = annotations && annotations.painPoints.length > 0;
+  const hasCompBadge = annotations && annotations.competitorContext;
 
   return (
     <FadeIn delay={1900 + index * 200}>
@@ -241,6 +277,22 @@ function InsightCard({ insight, index, locked = false }: { insight: Confrontatio
             <p className={`text-sm font-semibold leading-snug ${isHigh ? "text-slate-900" : isMedium ? "text-slate-800" : "text-slate-700"}`}>
               {insight.pattern}
             </p>
+            {/* Pain point & competitor badges — shows what user-stated pains this addresses */}
+            {(hasPainBadges || hasCompBadge) && (
+              <div className="flex flex-wrap gap-1.5 mt-2">
+                {annotations!.painPoints.map((pp, i) => (
+                  <span key={i} className="inline-flex items-center gap-1 text-[10px] font-semibold text-primary bg-primary/10 px-2 py-0.5 rounded-full">
+                    <svg className="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
+                    {pp}
+                  </span>
+                ))}
+                {hasCompBadge && (
+                  <span className="inline-flex items-center text-[10px] font-semibold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full">
+                    {annotations!.competitorContext}
+                  </span>
+                )}
+              </div>
+            )}
           </div>
           <span className={`text-sm shrink-0 mt-0.5 ${isHigh ? "text-rose-300" : isMedium ? "text-amber-300" : "text-slate-300"}`}>
             {expanded ? "−" : "+"}
@@ -268,14 +320,14 @@ function InsightCard({ insight, index, locked = false }: { insight: Confrontatio
             {/* Business impact */}
             {insight.businessImpact && (
               <div>
-                <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-1">Business impact</p>
+                <p className="text-xs font-bold text-slate-500 uppercase tracking-wide mb-1">Business impact</p>
                 <p className="text-sm text-slate-700">{insight.businessImpact}</p>
               </div>
             )}
 
             {/* Measure */}
             {insight.measureWith && (
-              <p className="text-xs text-slate-400">
+              <p className="text-sm text-slate-400">
                 <span className="font-medium text-slate-500">Measure with: </span>
                 {insight.measureWith}
               </p>
@@ -339,14 +391,14 @@ function AssumptionsSection({ assumptions, projections, delay }: { assumptions: 
             {projections.filter((p) => p.calculation).map((p, i) => (
               <div key={i}>
                 <p className="text-sm font-medium text-slate-700 mb-0.5">{p.area}</p>
-                <p className="text-xs text-slate-500 font-mono">{p.calculation}</p>
+                <p className="text-sm text-slate-500 font-mono">{p.calculation}</p>
               </div>
             ))}
             {assumptions.length > 0 && (
               <div className="pt-2 border-t border-slate-200">
                 <p className="text-xs font-medium text-slate-600 mb-2">Key assumptions</p>
                 {assumptions.map((a, i) => (
-                  <p key={i} className="text-xs text-slate-500 flex gap-2 mb-1">
+                  <p key={i} className="text-sm text-slate-500 flex gap-2 mb-1">
                     <span className="shrink-0">·</span>
                     <span>{a}</span>
                   </p>
@@ -542,7 +594,7 @@ function ConfrontationContent() {
         {journey.maturityAssessment && (
           <FadeIn delay={1700} className="mb-12">
             <div className="rounded-xl border bg-white p-6">
-              <h3 className="text-sm font-semibold text-slate-900 mb-2">{config.maturityHeading(hasExistingCustomers)}</h3>
+              <h3 className="text-sm font-bold text-slate-900 mb-2">{config.maturityHeading(hasExistingCustomers)}</h3>
               <p className="text-sm text-slate-500 leading-relaxed">{journey.maturityAssessment}</p>
             </div>
           </FadeIn>
@@ -568,7 +620,13 @@ function ConfrontationContent() {
                 </div>
                 <div className="space-y-2">
                   {insights.filter((i) => i.likelihood === "high").map((insight, i) => (
-                    <InsightCard key={i} insight={insight} index={i} locked={!canSeeDetails} />
+                    <InsightCard
+                      key={i}
+                      insight={insight}
+                      index={i}
+                      locked={!canSeeDetails}
+                      annotations={evidenceMap ? getInsightAnnotations(insight.pattern, evidenceMap) : undefined}
+                    />
                   ))}
                 </div>
               </FadeIn>
@@ -584,7 +642,12 @@ function ConfrontationContent() {
                 </div>
                 <div className="space-y-2">
                   {insights.filter((i) => i.likelihood === "medium").map((insight, i) => (
-                    <InsightCard key={i} insight={insight} index={i + insights.filter((x) => x.likelihood === "high").length} />
+                    <InsightCard
+                      key={i}
+                      insight={insight}
+                      index={i + insights.filter((x) => x.likelihood === "high").length}
+                      annotations={evidenceMap ? getInsightAnnotations(insight.pattern, evidenceMap) : undefined}
+                    />
                   ))}
                 </div>
               </FadeIn>
@@ -600,7 +663,12 @@ function ConfrontationContent() {
                 </div>
                 <div className="space-y-2">
                   {insights.filter((i) => i.likelihood === "low").map((insight, i) => (
-                    <InsightCard key={i} insight={insight} index={i + insights.filter((x) => x.likelihood !== "low").length} />
+                    <InsightCard
+                      key={i}
+                      insight={insight}
+                      index={i + insights.filter((x) => x.likelihood !== "low").length}
+                      annotations={evidenceMap ? getInsightAnnotations(insight.pattern, evidenceMap) : undefined}
+                    />
                   ))}
                 </div>
               </FadeIn>
@@ -627,7 +695,7 @@ function ConfrontationContent() {
                         <span key={j} className="text-xs font-medium bg-primary/8 text-primary px-2 py-0.5 rounded-md">{tool}</span>
                       ))}
                     </div>
-                    <p className="text-xs text-slate-500 leading-relaxed">{rec.whyNow}</p>
+                    <p className="text-sm text-slate-500 leading-relaxed">{rec.whyNow}</p>
                   </div>
                 ))}
               </div>

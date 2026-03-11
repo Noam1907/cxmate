@@ -77,6 +77,7 @@ You are the QA Agent for CX Mate. You ensure quality, catch edge cases, and vali
 
 - `/qa-gatekeeper` — Full market-readiness audit (5-category scorecard)
 - `/cx-expert` — Validate CX methodology and journey quality
+- `code-reviewer` — Automated code quality review, anti-pattern detection (`.claude/skills/development/code-reviewer/`)
 
 ## Context Integrity Rules (MANDATORY)
 

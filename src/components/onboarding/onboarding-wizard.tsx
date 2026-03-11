@@ -578,7 +578,7 @@ export function OnboardingWizard() {
         supabase.auth.signInWithOtp({
           email: data.userEmail,
           options: {
-            emailRedirectTo: `${window.location.origin}/auth/callback?redirect=/dashboard`,
+            emailRedirectTo: `${window.location.origin}/auth/callback?redirect=/analysis`,
             shouldCreateUser: true,
             data: {
               company_name: data.companyName,
@@ -663,7 +663,7 @@ export function OnboardingWizard() {
       profileContext.setTemplateId(result.templateId);
       // Clear draft — successfully submitted, no need to restore
       clearOnboardingDraft();
-      router.push(`/journey?id=${result.templateId}`);
+      router.push(`/analysis?id=${result.templateId}`);
     } catch (error) {
       // Ignore abort errors from unmount/navigation
       if (error instanceof DOMException && error.name === "AbortError") {

@@ -249,6 +249,26 @@ Key validated stats for use in impact projections, prompts, and messaging (sourc
 
 ---
 
+### 2026-03-09 — "Deliverable, Not Dashboard" + Persona B Wake-Up Call
+
+- **"4 tabs vs 1 story" is the core UX insight.** Right now the architecture is tool-shaped (Dashboard, Report, Map, Playbook — four views of one analysis). But Gigi's thesis says the future is deliverable-shaped: the user pays for an outcome, and that outcome should feel like ONE thing. EvenUp doesn't give lawyers 4 tabs — it gives them one demand letter. CX Mate should give one CX analysis document, not 4 separate pages with a nav bar.
+- **Persona B ("think they can do it alone") needs confrontation, not cost comparison.** Persona A (know they need CX, can't afford a consultant) converts on price: "$149 vs $10K consultant." Persona B doesn't know what they're missing — they need to SEE their journey mapped, SEE the confrontation data, THEN realize they can't do this alone. A wall of data doesn't wake anyone up. A story does. The unified `/analysis` page is the Persona B conversion tool.
+- **The analysis IS the atomic unit of value, not "access to pages."** "$149 for a comprehensive CX analysis that would cost $10K from a consultant" is cleaner than "$149 for access to a dashboard and some tabs." This reframes pricing psychology entirely. Source: `O-output/01-product/ux-review-post-onboarding-flow-2026-03-09.md`
+- **First-time vs returning users need different landing pages.** First-time: high overwhelm risk, needs narrative ("My Analysis"). Returning: low overwhelm, needs action center (Dashboard or Playbook). The current flow treats both the same — that's wrong.
+- **Compounding intelligence is the real moat, not AI generation.** Any competitor can call Claude. The moat is: (1) market intelligence that improves with scale, (2) cross-company pattern recognition ("companies like yours that fixed churn did X"), (3) structured CX knowledge base that compounds. Source: Gigi Levy-Weiss analysis.
+
+---
+
+### 2026-03-10 — The Loop Failure Pattern + ABC-TOM Governance
+
+- **The loop keeps failing because conversations don't auto-write to M-memory.** Decisions get made in sessions, acknowledged by the user, and then never written to decisions.md or learning-log.md. Next session, the agent asks the same question from scratch because M-memory doesn't contain the answer. Example: domain = cxmate.io was decided and referenced in sprint-log (Freemius webhook URL) but never formalized in decisions.md. Agent asked "which domain do you have?" — wasting time and eroding trust.
+- **The fix is structural, not behavioral.** Embedding ABC-TOM framework into governance files (CLAUDE.md, COO agent, session-start-workflow) makes the loop protocol part of the system, not dependent on individual sessions remembering to run it. The COO agent now has explicit "CLOSE THE ABC-TOM LOOP" as step 14-15 of every session checklist.
+- **"Brain is what you bring. Memory is what you learn together."** This distinction from Tom Even's system guide was missing from CX Mate governance files. B-brain = user's knowledge, research, examples (static, grows with input). M-memory = patterns discovered through collaboration (dynamic, grows with usage). The Loop: strong M-memory patterns promote to B-brain/C-core — that's how the system compounds.
+- **Sequential DB inserts are the concurrency bottleneck.** `persistJourney()` does 30+ individual Supabase calls per journey (INSERT template, then INSERT each stage, then INSERT each moment, then INSERT each recommendation — all sequential awaits). At 3 concurrent users, ~90 queries is fine. At 5+, connection pool exhausts. Fix before beta: batch inserts. This is a known architecture debt from Sprint 3's "ship fast" approach.
+- **Continuation sessions ≠ context sessions.** Even when resuming from a previous conversation, agents must still read M-memory files. The summary captures what happened but not what was decided across ALL previous sessions. Memory files are the cross-session source of truth, not conversation summaries.
+
+---
+
 ## Version History
 
 | Date | Update | By |

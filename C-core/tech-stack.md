@@ -10,9 +10,10 @@
 | Backend | Next.js API Routes | Monolith-first, extract later |
 | Database | PostgreSQL via Supabase | Auth, RLS, JSONB + normalized tables |
 | AI/LLM | Claude API (Anthropic) | Direct fetch (not SDK), `claude-sonnet-4-20250514`, 8192 max tokens |
-| Hosting | Vercel (frontend) + Supabase (backend/DB) | Production deployed |
-| Analytics | PostHog | Planned for Sprint 4 |
-| Payments | Stripe | Planned for Sprint 4 |
+| Hosting | Vercel (frontend) + Supabase (backend/DB) | Production deployed at cxmate.app (custom domain cxmate.io pending) |
+| Analytics | PostHog | Integrated |
+| Payments | Freemius (Merchant of Record) | Full Analysis=42170, Pro=42172. JS overlay checkout, HMAC webhook. Config: `src/lib/freemius.ts` |
+| Email | Resend (daily digest) | Custom SMTP pending domain setup |
 
 ## Architecture Principles
 
@@ -22,6 +23,15 @@
 4. **AI as service layer:** LLM calls abstracted behind `src/lib/ai/`
 5. **Dual-mode:** Anonymous preview (sessionStorage) + authenticated persistence (Supabase)
 6. **CX knowledge base as the moat:** 8-module structured knowledge, not just prompts
+
+## Known Constraints
+
+| Constraint | Impact | Fix Needed | Status |
+|-----------|--------|-----------|--------|
+| **Sequential DB inserts in `persistJourney()`** | 30+ individual Supabase calls per journey. Safe for 1-3 concurrent users. Connection pool exhausts at 5+. | Batch inserts: `INSERT INTO ... VALUES (row1), (row2), ...` | P0 before beta invites go wide |
+| **No request deduplication** | Double-clicking "Generate" fires two Claude calls | Debounce or disable button after first click | P1 |
+| **vercel.json maxDuration** | 300s on onboarding + recommendations routes, 30s on enrich-company | Monitor for timeout errors in production | Monitoring |
+| **Claude JSON output** | Journey generation still uses raw JSON (not tool use). Tool use pattern applied to recommendations only. | Migrate `generate-journey.ts` to tool use pattern | P2 (repair logic works, tool use is cleaner) |
 
 ## Project Structure
 

@@ -207,5 +207,44 @@ async function _extractToolResult(
     );
   }
 
+  // ─── Quick Wins fallback ───────────────────────────────────────────────────
+  // If Claude returned empty quickWins (common when token-constrained or confused
+  // by "reference" instruction), auto-extract from stagePlaybooks.
+  if (!playbook.quickWins || playbook.quickWins.length === 0) {
+    console.warn("[generate-recommendations] quickWins is empty — auto-extracting from stagePlaybooks.");
+    const allRecs = (playbook.stagePlaybooks || []).flatMap(
+      (sp) => Array.isArray(sp?.recommendations) ? sp.recommendations : []
+    );
+    // Pick low-effort + high-priority recs as quick wins
+    const quickWinCandidates = allRecs
+      .filter((r) =>
+        (r.effort === "15_min" || r.effort === "1_hour") &&
+        (r.priority === "must_do" || r.priority === "should_do")
+      )
+      // Prefer must_do over should_do, then 15_min over 1_hour
+      .sort((a, b) => {
+        const priorityOrder = { must_do: 0, should_do: 1, nice_to_have: 2 };
+        const effortOrder = { "15_min": 0, "1_hour": 1, "half_day": 2, "multi_day": 3 };
+        const pDiff = (priorityOrder[a.priority] ?? 2) - (priorityOrder[b.priority] ?? 2);
+        if (pDiff !== 0) return pDiff;
+        return (effortOrder[a.effort] ?? 3) - (effortOrder[b.effort] ?? 3);
+      })
+      .slice(0, 3);
+
+    // If no low-effort recs found, just grab the top 3 must_do items
+    if (quickWinCandidates.length === 0) {
+      const mustDos = allRecs
+        .filter((r) => r.priority === "must_do")
+        .slice(0, 3);
+      playbook.quickWins = mustDos;
+    } else {
+      playbook.quickWins = quickWinCandidates;
+    }
+
+    if (playbook.quickWins.length > 0) {
+      console.log(`[generate-recommendations] Auto-extracted ${playbook.quickWins.length} quick wins.`);
+    }
+  }
+
   return playbook;
 }

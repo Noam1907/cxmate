@@ -106,10 +106,34 @@ function textContainsKeywords(text: string, keywords: string[]): boolean {
 function getMomentPainPoints(
   moment: GeneratedMoment,
   painPointKeys: string[],
+  painLabelToKey?: Map<string, string>,
 ): string[] {
   // 1. AI-tagged matches (preferred)
   if (moment.addressesPainPoints && moment.addressesPainPoints.length > 0) {
-    return moment.addressesPainPoints.filter((pp) => painPointKeys.includes(pp));
+    const matched: string[] = [];
+    for (const pp of moment.addressesPainPoints) {
+      // Check direct key match (backward compat)
+      if (painPointKeys.includes(pp)) {
+        matched.push(pp);
+      }
+      // Check label → key resolution (new prompt format)
+      else if (painLabelToKey) {
+        const resolvedKey = painLabelToKey.get(pp.toLowerCase());
+        if (resolvedKey && painPointKeys.includes(resolvedKey)) {
+          matched.push(resolvedKey);
+        } else {
+          // Fuzzy: check if AI tag contains any label substring
+          for (const [label, key] of painLabelToKey.entries()) {
+            if (pp.toLowerCase().includes(label) || label.includes(pp.toLowerCase())) {
+              if (painPointKeys.includes(key) && !matched.includes(key)) {
+                matched.push(key);
+              }
+            }
+          }
+        }
+      }
+    }
+    if (matched.length > 0) return matched;
   }
 
   // 2. Fuzzy keyword fallback
@@ -130,10 +154,30 @@ function getMomentPainPoints(
 function getInsightPainPoints(
   insight: ConfrontationInsight,
   painPointKeys: string[],
+  painLabelToKey?: Map<string, string>,
 ): string[] {
   // 1. AI-tagged matches
   if (insight.addressesPainPoints && insight.addressesPainPoints.length > 0) {
-    return insight.addressesPainPoints.filter((pp) => painPointKeys.includes(pp));
+    const matched: string[] = [];
+    for (const pp of insight.addressesPainPoints) {
+      if (painPointKeys.includes(pp)) {
+        matched.push(pp);
+      } else if (painLabelToKey) {
+        const resolvedKey = painLabelToKey.get(pp.toLowerCase());
+        if (resolvedKey && painPointKeys.includes(resolvedKey)) {
+          matched.push(resolvedKey);
+        } else {
+          for (const [label, key] of painLabelToKey.entries()) {
+            if (pp.toLowerCase().includes(label) || label.includes(pp.toLowerCase())) {
+              if (painPointKeys.includes(key) && !matched.includes(key)) {
+                matched.push(key);
+              }
+            }
+          }
+        }
+      }
+    }
+    if (matched.length > 0) return matched;
   }
 
   // 2. Fuzzy fallback
@@ -216,7 +260,7 @@ export function buildEvidenceMap(
   onboardingData: Partial<OnboardingData>,
   journey: GeneratedJourney,
 ): EvidenceMap {
-  const painPointKeys = onboardingData.painPoints || [];
+  let painPointKeys = onboardingData.painPoints || [];
   const maturity = onboardingData.companyMaturity || "growing";
   const allPainOptions = getPainPointsForMaturity(maturity);
   const competitors = (onboardingData.competitors || "")
@@ -227,6 +271,11 @@ export function buildEvidenceMap(
   // Build pain point label/category lookup
   const painPointInfo = new Map(
     allPainOptions.map((pp) => [pp.value, { label: pp.label, category: pp.category }])
+  );
+
+  // Build label → key reverse lookup (for matching AI-generated label tags back to keys)
+  const painLabelToKey = new Map<string, string>(
+    allPainOptions.map((pp) => [pp.label.toLowerCase(), pp.value])
   );
 
   // Initialize pain point mappings
@@ -243,6 +292,29 @@ export function buildEvidenceMap(
     });
   }
 
+  // Add custom pain point as its own entry (user-typed free text)
+  const customPain = onboardingData.customPainPoint?.trim();
+  const CUSTOM_PAIN_KEY = "_custom";
+  if (customPain) {
+    painMap.set(CUSTOM_PAIN_KEY, {
+      painPointKey: CUSTOM_PAIN_KEY,
+      painPointLabel: customPain,
+      category: "custom",
+      matchedInsights: [],
+      matchedMoments: [],
+      matchedImpact: [],
+    });
+    // Also add custom pain text to the label→key reverse lookup so AI tags can match
+    painLabelToKey.set(customPain.toLowerCase(), CUSTOM_PAIN_KEY);
+    // Add the custom key to painPointKeys so matching functions include it
+    painPointKeys = [...painPointKeys, CUSTOM_PAIN_KEY];
+    // Build custom keywords from the user's text (words > 3 chars)
+    const customKeywords = customPain.toLowerCase().split(/\s+/).filter((w) => w.length > 3);
+    if (customKeywords.length > 0) {
+      PAIN_POINT_KEYWORDS[CUSTOM_PAIN_KEY] = customKeywords;
+    }
+  }
+
   // Initialize competitor mappings
   const compMap = new Map<string, CompetitorMapping>();
   for (const comp of competitors) {
@@ -255,7 +327,7 @@ export function buildEvidenceMap(
 
   // Match insights
   for (const insight of journey.confrontationInsights || []) {
-    const matchedPains = getInsightPainPoints(insight, painPointKeys);
+    const matchedPains = getInsightPainPoints(insight, painPointKeys, painLabelToKey);
     for (const painKey of matchedPains) {
       painMap.get(painKey)?.matchedInsights.push(insight.pattern);
     }
@@ -274,7 +346,7 @@ export function buildEvidenceMap(
   // Match moments across stages
   for (const stage of journey.stages || []) {
     for (const moment of stage.meaningfulMoments || []) {
-      const matchedPains = getMomentPainPoints(moment, painPointKeys);
+      const matchedPains = getMomentPainPoints(moment, painPointKeys, painLabelToKey);
       for (const painKey of matchedPains) {
         painMap.get(painKey)?.matchedMoments.push({
           stage: stage.name,
@@ -332,6 +404,11 @@ export function buildEvidenceMap(
         }
       }
     }
+  }
+
+  // Clean up temporary custom pain keyword entry from global map
+  if (customPain && PAIN_POINT_KEYWORDS[CUSTOM_PAIN_KEY]) {
+    delete PAIN_POINT_KEYWORDS[CUSTOM_PAIN_KEY];
   }
 
   // Compute coverage

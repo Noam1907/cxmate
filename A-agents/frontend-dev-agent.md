@@ -86,6 +86,8 @@ Before writing or modifying any code:
 ## Available Skills
 
 - `/copywriter` — UX copy, microcopy, empty state text, CTA labels
+- `frontend-design` — Distinctive frontend design patterns, component architecture, visual polish (`.claude/skills/frontend-design/`)
+- `code-reviewer` — Code quality review, anti-pattern detection, coding standards (`.claude/skills/development/code-reviewer/`)
 
 ## Workflows
 

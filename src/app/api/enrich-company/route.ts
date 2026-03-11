@@ -41,6 +41,98 @@ function isBlockedHost(hostname: string): boolean {
   return false;
 }
 
+/**
+ * Detect if scraped content is JavaScript/code garbage rather than readable text.
+ * JS-rendered sites (WP Rocket, SPAs) return code that fools the scraper.
+ */
+function isGarbageContent(text: string): boolean {
+  if (!text || text.length < 100) return true;
+
+  // Count code-like signals
+  const codeSignals = [
+    /\bfunction\b/g,
+    /\bvar\b/g,
+    /\bconst\b/g,
+    /\blet\b/g,
+    /=>/g,
+    /\{\s*\}/g,
+    /\(\)/g,
+    /\bthis\./g,
+    /\bdocument\./g,
+    /\bwindow\./g,
+    /\bnavigator\./g,
+    /addEventListener/g,
+    /className/g,
+    /querySelector/g,
+  ];
+
+  let codeHits = 0;
+  for (const pattern of codeSignals) {
+    const matches = text.match(pattern);
+    if (matches) codeHits += matches.length;
+  }
+
+  // If more than 15 code hits in the text, it's garbage
+  if (codeHits > 15) return true;
+
+  // Check ratio of special characters (code has lots of {}()[];=)
+  const specialChars = (text.match(/[{}()[\];=<>]/g) || []).length;
+  const ratio = specialChars / text.length;
+  if (ratio > 0.05) return true; // More than 5% special chars = likely code
+
+  // Check for very few spaces (compressed code has long runs without spaces)
+  const words = text.split(/\s+/).filter(Boolean);
+  const avgWordLength = text.length / Math.max(words.length, 1);
+  if (avgWordLength > 30) return true; // Human text averages ~5 chars/word
+
+  return false;
+}
+
+/**
+ * Extract meta tags (title, description, og:*) from raw HTML.
+ * These are always in the initial HTML even on JS-rendered sites,
+ * because they're required for SEO and social media previews.
+ */
+function extractMetaTags(html: string): string | null {
+  const tags: string[] = [];
+
+  // Extract <title>
+  const titleMatch = html.match(/<title[^>]*>([\s\S]*?)<\/title>/i);
+  if (titleMatch?.[1]) {
+    const title = titleMatch[1].replace(/\s+/g, " ").trim();
+    if (title) tags.push(`Title: ${title}`);
+  }
+
+  // Extract meta description
+  const descMatch = html.match(/<meta[^>]*name=["']description["'][^>]*content=["']([\s\S]*?)["'][^>]*>/i)
+    || html.match(/<meta[^>]*content=["']([\s\S]*?)["'][^>]*name=["']description["'][^>]*>/i);
+  if (descMatch?.[1]) {
+    const desc = descMatch[1].replace(/\s+/g, " ").trim();
+    if (desc) tags.push(`Description: ${desc}`);
+  }
+
+  // Extract og:description
+  const ogDescMatch = html.match(/<meta[^>]*property=["']og:description["'][^>]*content=["']([\s\S]*?)["'][^>]*>/i)
+    || html.match(/<meta[^>]*content=["']([\s\S]*?)["'][^>]*property=["']og:description["'][^>]*>/i);
+  if (ogDescMatch?.[1]) {
+    const ogDesc = ogDescMatch[1].replace(/\s+/g, " ").trim();
+    if (ogDesc && !tags.some((t) => t.includes(ogDesc))) {
+      tags.push(`OG Description: ${ogDesc}`);
+    }
+  }
+
+  // Extract og:site_name
+  const siteNameMatch = html.match(/<meta[^>]*property=["']og:site_name["'][^>]*content=["']([\s\S]*?)["'][^>]*>/i)
+    || html.match(/<meta[^>]*content=["']([\s\S]*?)["'][^>]*property=["']og:site_name["'][^>]*>/i);
+  if (siteNameMatch?.[1]) {
+    const siteName = siteNameMatch[1].replace(/\s+/g, " ").trim();
+    if (siteName) tags.push(`Site Name: ${siteName}`);
+  }
+
+  if (tags.length === 0) return null;
+  return tags.join("\n");
+}
+
 async function fetchWebsiteContent(url: string): Promise<string | null> {
   try {
     // Normalize URL
@@ -99,7 +191,23 @@ async function fetchWebsiteContent(url: string): Promise<string | null> {
       .trim();
 
     // Cap at ~3000 chars to keep prompt small
-    return cleaned.slice(0, 3000);
+    const capped = cleaned.slice(0, 3000);
+
+    // Quality check: if body text is mostly JS/code garbage,
+    // fall back to meta tags (title, description, og:*) which are
+    // always in the initial HTML even on JS-rendered sites
+    if (isGarbageContent(capped)) {
+      console.log(`[enrich-company] Body is garbage, extracting meta tags from ${url}`);
+      const metaContent = extractMetaTags(html);
+      if (metaContent) {
+        console.log(`[enrich-company] Got meta tags from ${url}`);
+        return `[Meta tags extracted — site uses client-side rendering]\n${metaContent}`;
+      }
+      console.log(`[enrich-company] No useful content from ${url}`);
+      return null;
+    }
+
+    return capped;
   } catch {
     return null;
   }
@@ -186,7 +294,7 @@ function buildEnrichmentPrompt(
     ? discoveredUrl
       ? `\n## Website Content (auto-discovered from ${discoveredUrl})\nNote: This URL was inferred from the company name, not provided by the user. Use it as a strong signal but set confidence to "medium" unless other signals confirm it.\n\n${websiteContent}`
       : `\n## Website Content (from their official site)\n${websiteContent}`
-    : "\nNo website content available. Do NOT guess or hallucinate facts. Set confidence to \"low\" and only extract what is clearly observable from the company name itself.";
+    : "\nNo website content available (site may use client-side rendering). If you RECOGNIZE this company from your training data, use that knowledge — set confidence to \"medium\". If you do NOT recognize them, set confidence to \"low\", return an empty suggestedCompetitors array [], and only extract what is clearly observable from the company name itself. Do NOT guess competitors you're unsure about.";
 
   return `You are a business research assistant for CX Mate, an AI-powered CX platform. Your job is to analyze a company and return structured data about them.
 
@@ -219,7 +327,7 @@ Analyze this company and return a JSON object with these fields. Use the website
 
 - **description**: One sentence describing what the company does and who they serve. Be specific.
 
-- **suggestedCompetitors**: Array of 3-5 competitor company names. These should be real companies that compete in the same space. If you know the market well, name specific competitors. If not, name the type of competition (e.g., "spreadsheets and manual processes").
+- **suggestedCompetitors**: Array of 3-5 DIRECT competitor company names — companies that a buyer would evaluate alongside this one. These must be real companies that solve the SAME problem for the SAME buyer persona. Do NOT list tangentially related companies, general category leaders, or companies in adjacent spaces. For example, if the company is a B2B spend management platform, list other B2B spend management platforms — not payment processors, banks, or accounting software. If you're not confident you know the right competitors, return an EMPTY array [] rather than guessing wrong.
 
 - **suggestedCustomerSize**: One of: ${JSON.stringify(customerSizeOptions)}
   What size companies does this company typically sell to?

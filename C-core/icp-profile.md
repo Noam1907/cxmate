@@ -150,13 +150,34 @@ What makes an ICP customer buy *right now* vs "maybe later":
 
 ---
 
+## Conversion Personas (Gigi Levy-Weiss Framework)
+
+Two distinct conversion paths — the messaging, positioning, and first-time experience differ fundamentally:
+
+| | Persona A: "Know They Need It" | Persona B: "Think They Can Do It Alone" |
+|---|---|---|
+| **Who** | Companies that know they need CX help but can't afford a consultant | Companies that think their CX is fine, or that CX is something they can handle internally |
+| **Likely size** | Smaller group | **Bigger group** |
+| **Conversion lever** | Cost comparison: "$149 vs $10K consultant" | Confrontation: show them what they're missing |
+| **What convinces them** | Price, speed, credibility (CCXP, methodology) | Seeing their own journey mapped, then seeing the gaps they didn't know existed |
+| **First-time experience** | Unified Analysis page → "wow, this would have cost me $10K" | Unified Analysis page → "I didn't know we had this problem" |
+| **Messaging** | "Like having a CX expert on your team — at a fraction of the cost" | "Stop building your customer journey by accident" |
+
+**Key insight:** Persona B doesn't know what they're missing. A wall of data doesn't wake them up. A narrative does. The unified `/analysis` page (Principle #15) is specifically designed as the Persona B conversion tool.
+
+Source: `O-output/07-research/gigi-levy-weiss-ai-saas-future-2026-03-09.md`
+
+---
+
 ## Pricing Fit by ICP
 
 | Stage | Likely Tier | Why |
 |-------|-------------|-----|
-| Pre-launch / First customers | Free → Starter ($79/mo or $149 one-time) | Value is the foundation; one-time option lowers commitment barrier |
-| Growing | Starter → Pro $199/mo | Monthly Pulse + CRM integration + Competitive Intelligence matters at this stage |
-| Scaling | Pro $199/mo → Premium $1,200/yr | Board Deck generator + Multi-seat + QBR reports = retention weapon |
+| Pre-launch / First customers | Free → Analysis ($149 one-time) | First diagnosis proves value; one-time removes subscription objection |
+| Growing | Analysis → Annual Retainer ($499/yr, 4 quarterly reports) | Quarterly refresh shows CX trajectory; comparison to baseline justifies retainer |
+| Scaling | Annual Retainer → Connected (monthly, TBD) | Data integrations (Intercom, HubSpot, NPS) + real-time alerts. Continuous value = monthly pricing. Switching costs = retention. |
+
+**Pricing philosophy:** Deliverable-shaped, not SaaS-shaped. Each tier matches its value delivery pattern — one-time for a one-time diagnosis, annual for quarterly refreshes, monthly only when integrations deliver daily value.
 
 ---
 

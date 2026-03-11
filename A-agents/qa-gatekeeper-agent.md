@@ -222,6 +222,10 @@ Before running any audit:
 - `T-tools/03-workflows/feature-development-workflow.md` — Step 4: VALIDATE (you run as part of this)
 - `T-tools/03-workflows/context-integrity-workflow.md` — The rules you enforce
 
+## Available Skills
+
+- `code-reviewer` — Automated code quality review, anti-pattern detection (`.claude/skills/development/code-reviewer/`)
+
 ## When to Run
 
 - **Before any demo to a potential customer**

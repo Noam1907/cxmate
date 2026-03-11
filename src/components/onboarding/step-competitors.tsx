@@ -50,7 +50,7 @@ export function StepCompetitors({ data, onChange, enrichment }: StepCompetitorsP
   };
 
   const bubbleText = hasEnrichment
-    ? `I found some competitors in your space. Remove any that don't fit and add your own.`
+    ? `I found some competitors in your space. These are editable — click the ✕ to remove any that don't fit, and add your own below.`
     : maturity === "pre_launch" || maturity === "first_customers"
       ? "Who else is trying to solve this problem for your customers? Knowing your competitive landscape helps me position your CX as a differentiator."
       : "Who are your main competitors? Understanding how your customers compare you helps me find CX moments where you can stand out.";
@@ -82,13 +82,13 @@ export function StepCompetitors({ data, onChange, enrichment }: StepCompetitorsP
               {competitorList.map((competitor) => (
                 <span
                   key={competitor}
-                  className="inline-flex items-center gap-1.5 text-sm font-medium bg-primary/8 text-primary border border-primary/20 rounded-full px-3 py-1.5"
+                  className="group inline-flex items-center gap-1.5 text-sm font-medium bg-primary/8 text-primary border border-primary/20 rounded-full px-3 py-1.5 hover:border-primary/40 transition-colors"
                 >
                   {competitor}
                   <button
                     type="button"
                     onClick={() => removeCompetitor(competitor)}
-                    className="hover:bg-primary/20 rounded-full p-0.5 transition-colors"
+                    className="bg-primary/10 hover:bg-primary/25 rounded-full p-0.5 transition-colors"
                     aria-label={`Remove ${competitor}`}
                   >
                     <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
@@ -120,7 +120,9 @@ export function StepCompetitors({ data, onChange, enrichment }: StepCompetitorsP
           </div>
 
           <p className="text-xs text-muted-foreground">
-            Optional, but it helps me find moments where you can stand out
+            {competitorList.length > 0
+              ? "Click ✕ to remove any that don't fit. Add more with the field above."
+              : "Optional, but it helps me find moments where you can stand out"}
           </p>
         </div>
       </div>

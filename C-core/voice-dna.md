@@ -204,3 +204,104 @@ When reviewing copy, flag anything that:
 - Puts the solution before the pain
 - Claims a specific minute count for time-to-value (the comparison is weeks/months, not minutes)
 - Names the process instead of the outcome in CTAs ("Map Your Journey" → "Get Your Action Playbook")
+
+---
+
+## CX Professional Vocabulary
+
+The language CX Mate uses signals whether we're credible or corporate. This vocabulary guide ensures every agent, prompt, and UI string sounds like a real CX professional — not a SaaS marketing deck.
+
+### Terms We Use (organized by domain)
+
+**Core CX Concepts**
+- Customer Journey — the full end-to-end experience, not just a funnel
+- Touchpoints — every interaction point between customer and company
+- Voice of the Customer (VoC) — structured listening, not just surveys
+- Customer-Centric — designing around the customer's world, not ours
+- Customer Effort Score (CES) — how hard was it?
+- Net Promoter Score (NPS) — would they recommend?
+
+**Customer Insight & Feedback**
+- Closed-Loop Feedback — hear it, act on it, tell them what changed
+- Sentiment Analysis — reading the emotion behind the data
+- Customer Segmentation — treating different customers differently (on purpose)
+- Behavioral Signals — what they do matters more than what they say
+- Proactive Outreach — reaching out before they reach out to you
+
+**Measurement & Metrics**
+- First Contact Resolution (FCR) — solved in one interaction
+- Time to Value (TTV) — how fast they get the aha moment
+- Customer Lifetime Value (CLV/LTV) — the full revenue picture
+- Churn Rate — who's leaving and how fast
+- Net Revenue Retention (NRR) — the growth-within-growth metric
+
+**Retention & Growth**
+- Customer Advocacy — when customers sell for you
+- Expansion Revenue — growing within existing accounts
+- Renewal Rate — the ultimate trust metric
+- Customer Health Score — composite signal for risk/opportunity
+- Cohort Analysis — comparing groups over time
+
+**CX Operations**
+- Journey Orchestration — coordinating actions across touchpoints
+- Service Recovery — turning failures into loyalty
+- Escalation Path — clear routing when things go wrong
+- Handoff — the moment between teams where customers feel the cracks
+- Playbook — specific, repeatable actions (not a "strategy deck")
+
+**CX Strategy**
+- Experience Design — intentional, not accidental
+- Customer Intelligence — data that drives decisions, not dashboards
+- Outcome-Based Thinking — measuring what changed, not what was delivered
+- Revenue Impact — CX in the language the board speaks
+
+### Overused Buzzwords to Avoid
+
+These terms signal to experienced CX leaders that you're parroting marketing copy, not speaking from practice. **Never use these in CX Mate output, UI, or prompts.**
+
+**Vague amplifiers (say nothing)**
+- Synergy / Synergize
+- Leverage (as a verb — say "use" or "build on")
+- Best-in-Class / World-Class
+- Cutting-edge / Next-generation
+- Paradigm Shift
+
+**Empty promises**
+- Seamless (nothing is seamless — say "smooth" or "low-friction" if you must)
+- Frictionless (same — be honest about effort)
+- 360-Degree View (nobody has this; say "complete picture" or "full context")
+- Omnichannel (say "across channels" or name the specific channels)
+- Holistic (say "complete" or "end-to-end")
+
+**Corporate jargon that distances**
+- Ecosystem (unless you mean an actual platform ecosystem)
+- Scalable (say what scales and how)
+- Disruptive / Game-Changer
+- Empower (show the power, don't claim it)
+- Unlock (the most overused SaaS verb — say "reveal", "surface", or "find")
+
+**Meaningless modifiers**
+- Robust / Enterprise-Grade
+- Innovative / Transformative
+- Actionable Insights (everything should be actionable — just say "insights" or better, say what the insight IS)
+- Deep Dive (say "detailed analysis" or just go deep)
+- Low-Hanging Fruit (say "quick wins" or "easy first steps")
+
+### Next-Generation CX Language
+
+These are the terms that signal CX Mate is ahead of the market. Use these in prompts, UI, and all output:
+
+| Old/Generic Term | CX Mate Term | Why It's Better |
+|-----------------|-------------|-----------------|
+| "Customer feedback" | **Signal detection** | We find signals, not just surveys |
+| "Journey mapping" | **Journey intelligence** | Maps are static; intelligence is alive |
+| "Revenue impact" | **Revenue at risk** | Urgency, not opportunity |
+| "Customer growth" | **Experience-led growth** | Growth through CX, not just sales |
+| "CX analytics" | **Customer friction analytics** | Specific about what we measure |
+| "Customer insights" | **Behavioral intelligence** | Actions > opinions |
+| "Best practices" | **Evidence-based patterns** | Proven, not assumed |
+| "Customer scoring" | **Health signal modeling** | Dynamic, not static |
+| "Support metrics" | **Resolution intelligence** | Outcomes, not throughput |
+| "Retention strategy" | **Churn prevention architecture** | Systematic, not reactive |
+
+**Rule:** When writing any CX Mate output — prompts, UI, reports, playbooks — prefer the right column. The left column is what every CX tool says. The right column is what a real CX expert says.

@@ -83,7 +83,7 @@ function MomentCard({ moment, annotation, hasPlaybookItem, stageSlug }: { moment
         <div className={`w-2 h-2 rounded-full mt-1.5 shrink-0 ${style.dot}`} />
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-2">
-            <div className="font-medium text-sm text-slate-800">{moment.name}</div>
+            <div className="font-semibold text-sm text-slate-800">{moment.name}</div>
             <div className="flex items-center gap-1.5 shrink-0">
               <span className="text-xs text-slate-400 font-medium">{getMomentTypeLabel(moment.type)}</span>
               {isAtRisk && (
@@ -97,7 +97,7 @@ function MomentCard({ moment, annotation, hasPlaybookItem, stageSlug }: { moment
               }
             </div>
           </div>
-          <div className="text-xs text-slate-500 mt-0.5 leading-relaxed">{moment.description}</div>
+          <div className="text-sm text-slate-500 mt-0.5 leading-relaxed">{moment.description}</div>
 
           {/* Evidence annotations — pain point link + competitor gap */}
           {annotation && (annotation.painPoints.length > 0 || annotation.competitorGaps.length > 0) && (
@@ -140,26 +140,26 @@ function MomentCard({ moment, annotation, hasPlaybookItem, stageSlug }: { moment
           {/* What they're thinking */}
           {moment.decisionScienceInsight && (
             <div>
-              <div className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">What they&apos;re thinking</div>
-              <p className="text-xs text-slate-600 leading-relaxed italic">&ldquo;{moment.decisionScienceInsight}&rdquo;</p>
+              <div className="text-xs font-bold text-slate-600 uppercase tracking-wide mb-1">What they&apos;re thinking</div>
+              <p className="text-sm text-slate-600 leading-relaxed italic">&ldquo;{moment.decisionScienceInsight}&rdquo;</p>
             </div>
           )}
 
           {/* Diagnosis */}
           {moment.diagnosis && (
             <div>
-              <div className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">What&apos;s likely going wrong</div>
-              <p className="text-xs text-slate-600 leading-relaxed">{moment.diagnosis}</p>
+              <div className="text-xs font-bold text-slate-600 uppercase tracking-wide mb-1">What&apos;s likely going wrong</div>
+              <p className="text-sm text-slate-600 leading-relaxed">{moment.diagnosis}</p>
             </div>
           )}
 
           {/* Triggers */}
           {moment.triggers.length > 0 && (
             <div>
-              <div className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Triggers</div>
+              <div className="text-xs font-bold text-slate-600 uppercase tracking-wide mb-1">Triggers</div>
               <ul className="space-y-0.5">
                 {moment.triggers.map((trigger, i) => (
-                  <li key={i} className="text-xs text-slate-600 flex items-start gap-1.5">
+                  <li key={i} className="text-sm text-slate-600 flex items-start gap-1.5">
                     <span className="text-slate-300 mt-0.5">–</span>
                     {trigger}
                   </li>
@@ -171,10 +171,10 @@ function MomentCard({ moment, annotation, hasPlaybookItem, stageSlug }: { moment
           {/* What to do */}
           {moment.recommendations.length > 0 && (
             <div>
-              <div className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">What to do</div>
+              <div className="text-xs font-bold text-slate-600 uppercase tracking-wide mb-1">What to do</div>
               <ul className="space-y-1">
                 {moment.recommendations.map((rec, i) => (
-                  <li key={i} className="text-xs text-slate-700 flex items-start gap-1.5">
+                  <li key={i} className="text-sm text-slate-700 flex items-start gap-1.5">
                     <span className="text-slate-400 font-semibold shrink-0">{i + 1}.</span>
                     {rec}
                   </li>
@@ -186,8 +186,8 @@ function MomentCard({ moment, annotation, hasPlaybookItem, stageSlug }: { moment
           {/* Action template */}
           {moment.actionTemplate && (
             <div>
-              <div className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Action template</div>
-              <p className="text-xs text-slate-600 leading-relaxed whitespace-pre-line bg-slate-50 rounded-lg px-3 py-2 border border-slate-100">
+              <div className="text-xs font-bold text-slate-600 uppercase tracking-wide mb-1">Action template</div>
+              <p className="text-sm text-slate-600 leading-relaxed whitespace-pre-line bg-slate-50 rounded-lg px-3 py-2 border border-slate-100">
                 {moment.actionTemplate}
               </p>
             </div>
@@ -207,16 +207,16 @@ function MomentCard({ moment, annotation, hasPlaybookItem, stageSlug }: { moment
           {/* Measure with */}
           {moment.cxToolRecommendation && (
             <div>
-              <div className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Measure with</div>
-              <p className="text-xs text-slate-600">{moment.cxToolRecommendation}</p>
+              <div className="text-xs font-bold text-slate-600 uppercase tracking-wide mb-1">Measure with</div>
+              <p className="text-sm text-slate-600">{moment.cxToolRecommendation}</p>
             </div>
           )}
 
           {/* If you ignore this */}
           {moment.impactIfIgnored && (
             <div>
-              <div className="text-xs font-semibold text-rose-600 uppercase tracking-wide mb-1">If ignored</div>
-              <p className="text-xs text-rose-700 leading-relaxed">{moment.impactIfIgnored}</p>
+              <div className="text-xs font-bold text-rose-600 uppercase tracking-wide mb-1">If ignored</div>
+              <p className="text-sm text-rose-700 leading-relaxed">{moment.impactIfIgnored}</p>
             </div>
           )}
 
@@ -259,7 +259,7 @@ export function JourneyStageCard({
             </div>
 
             <div className="flex-1 min-w-0">
-              <h3 className="text-base font-semibold text-slate-900">{stage.name}</h3>
+              <h3 className="text-base font-bold text-slate-900">{stage.name}</h3>
               <p className="text-sm text-slate-500 mt-0.5 leading-snug">{stage.description}</p>
 
               {/* Metadata pills — emotional state + at-risk count */}
@@ -290,19 +290,19 @@ export function JourneyStageCard({
         {hasStageInsights && (
           <div className="mx-5 mb-4 space-y-2">
             {stage.topFailureRisk && (
-              <div className="flex items-start gap-2.5 text-xs border-l-2 border-amber-400 pl-3 py-1">
+              <div className="flex items-start gap-2.5 text-sm border-l-2 border-amber-400 pl-3 py-1">
                 <span className="font-semibold text-slate-600 shrink-0">Top risk:</span>
                 <span className="text-slate-600">{stage.topFailureRisk}</span>
               </div>
             )}
             {stage.successPattern && (
-              <div className="flex items-start gap-2.5 text-xs border-l-2 border-slate-300 pl-3 py-1">
+              <div className="flex items-start gap-2.5 text-sm border-l-2 border-slate-300 pl-3 py-1">
                 <span className="font-semibold text-slate-600 shrink-0">Best move:</span>
                 <span className="text-slate-600">{stage.successPattern}</span>
               </div>
             )}
             {stage.benchmarkContext && (
-              <div className="flex items-start gap-2.5 text-xs border-l-2 border-slate-200 pl-3 py-1">
+              <div className="flex items-start gap-2.5 text-sm border-l-2 border-slate-200 pl-3 py-1">
                 <span className="font-semibold text-slate-500 shrink-0">Benchmark:</span>
                 <span className="text-slate-500">{stage.benchmarkContext}</span>
               </div>

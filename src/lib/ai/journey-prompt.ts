@@ -28,6 +28,7 @@ import {
 } from "@/lib/cx-knowledge";
 import { buildProfileFromOnboarding } from "@/lib/cx-knowledge/impact-models/impact-calculator";
 import type { OnboardingInput } from "@/lib/validations/onboarding";
+import { getPainPointsForMaturity, type CompanyMaturity } from "@/types/onboarding";
 
 // ============================================
 // Output Interfaces (v3 — enriched)
@@ -349,6 +350,13 @@ Key moments for this vertical: ${vertical.keyMoments.join(", ") || "varies"}`
   const businessDataContext = buildBusinessDataContext(input);
   const analysisModeContext = buildAnalysisModeContext(input);
 
+  // Resolve pain point values to human-readable labels
+  const painPointOptions = getPainPointsForMaturity(input.companyMaturity as CompanyMaturity) || [];
+  const painPointLabels = input.painPoints.map((value) => {
+    const option = painPointOptions.find((o) => o.value === value);
+    return option ? option.label : value; // fallback to raw value if not found
+  });
+
   return `You are CX Mate — a knowledgeable, assertive CX advisor for B2B startups. Peer advisor voice: direct, opinionated, touch of humor, never condescending. Use "Companies like yours..." framing.
 
 ## User
@@ -390,9 +398,11 @@ ${input.enrichmentData ? `
 ${input.enrichmentData.reasoning ? `- Analysis notes: ${input.enrichmentData.reasoning}` : ""}
 Use this enrichment data to make your analysis more specific and personalized. If the enrichment data conflicts with user-provided data, prefer the user-provided data.` : ""}
 
-## Their Challenges
+## Their Challenges (CRITICAL — EVERY pain point must appear in the output)
 - Biggest challenge: ${input.biggestChallenge}
-- Pain points: ${input.painPoints.join(", ")}${input.customPainPoint ? `, ${input.customPainPoint}` : ""}
+- Pain points: ${painPointLabels.join("; ")}${input.customPainPoint ? `; ${input.customPainPoint}` : ""}
+
+⚠️ MANDATORY: Every pain point listed above MUST be reflected in at least one meaningful moment's addressesPainPoints OR one confrontation insight's addressesPainPoints. The user explicitly told us these are their problems — if the output doesn't address them, it feels generic and useless. Use the exact pain point text when tagging addressesPainPoints so we can trace it.
 
 ## Their Goals
 - Primary goal: ${input.primaryGoal}${input.customGoal ? ` — "${input.customGoal}"` : ""}
@@ -416,7 +426,7 @@ ${foundationsContext}
 ## Task
 Generate JSON journey map. ULTRA CONCISE — every field max 12 words. emotionalState max 4 words.
 ${!input.hasExistingCustomers ? 'All stageType MUST be "sales". No post-sale stages. ' : ""}Counts: 2 moments/stage, 2-3 confrontation insights, 2 cxToolRoadmap, 2 impactProjections, 2-3 techStack, 2 assumptions.
-Impact projections MUST include calculation (math formula) and dataSource. addressesPainPoints only if direct match. Prefer AI agents over manual tools.
+Impact projections MUST include calculation (math formula) and dataSource. potentialImpact MUST be a dollar value (e.g. "$50K", "$120K", "$1.2M") — never percentages or vague text. addressesPainPoints: tag generously — if a moment or insight relates to a stated pain point, include it. Use the exact pain point text from above. Prefer AI agents over manual tools.
 
 JSON schema:
 {"name":"str","stages":[{"name":"str","stageType":"sales|customer","description":"str","emotionalState":"2-4 words","topFailureRisk":"str","successPattern":"str","benchmarkContext":"str","existingTools":[{"name":"str","domain":"str"}],"meaningfulMoments":[{"name":"str","type":"risk|delight|decision|handoff","description":"str","severity":"low|medium|high|critical","triggers":["str"],"recommendations":["str"],"diagnosis":"str","actionTemplate":"str","cxToolRecommendation":"str","impactIfIgnored":"str","addressesPainPoints":["str"]}]}],"confrontationInsights":[{"pattern":"str","likelihood":"high|medium|low","description":"str","businessImpact":"str","immediateAction":"str","measureWith":"str","companionAdvice":"str","addressesPainPoints":["str"]}],"cxToolRoadmap":[{"tool":"str","whenToDeploy":"str","whyThisTool":"str","expectedOutcome":"str"}],"impactProjections":[{"area":"str","potentialImpact":"str","timeToRealize":"str","effort":"low|medium|high","calculation":"math formula","dataSource":"user_provided|benchmark_estimated"}],"techStackRecommendations":[{"category":"crm|marketing|support|analytics|cs_platform|communication|bi|survey|data_infrastructure","categoryLabel":"str","tools":["str"],"whyNow":"str","connectWith":"str"}],"assumptions":["str"],"maturityAssessment":"str"}

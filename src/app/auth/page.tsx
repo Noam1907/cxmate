@@ -53,7 +53,7 @@ async function validateInviteCode(code: string): Promise<{ valid: boolean; error
 function AuthContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const redirectTo = searchParams.get("redirect") || "/dashboard";
+  const redirectTo = searchParams.get("redirect") || "/analysis";
   const urlError = searchParams.get("error");
 
   const [mode, setMode] = useState<"login" | "signup">("login");

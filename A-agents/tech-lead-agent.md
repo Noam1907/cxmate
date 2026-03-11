@@ -64,6 +64,7 @@ Before approving or making any architectural change:
 ## Available Skills
 
 - `/qa-gatekeeper` — Market-readiness audit (code review complement)
+- `code-reviewer` — Automated code quality review, anti-pattern detection, coding standards (`.claude/skills/development/code-reviewer/`)
 
 ## Workflows
 

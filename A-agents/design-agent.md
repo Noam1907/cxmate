@@ -261,6 +261,7 @@ The rule: **the illustrated style lives in the emotional moments, not the data m
 ## Available Skills
 
 - `/copywriter` — UX copy review, microcopy, empty state text, CTA labels
+- `frontend-design` — Distinctive frontend design patterns, component architecture, visual polish (`.claude/skills/frontend-design/`)
 
 ## Context Integrity Rules (MANDATORY)
 

@@ -155,7 +155,7 @@ function BillingSuccessContent() {
         {/* CTAs */}
         <div className="flex flex-col items-center gap-3">
           <Link
-            href="/dashboard"
+            href="/analysis"
             className="w-full max-w-xs bg-primary hover:bg-primary/90 text-white text-sm font-semibold py-3 px-6 rounded-xl transition-colors text-center"
           >
             Go to Dashboard →

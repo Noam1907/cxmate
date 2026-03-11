@@ -36,7 +36,7 @@ export function NavHeader() {
   const isAuth = pathname.startsWith("/auth");
 
   const navItems = [
-    { href: "/dashboard", label: "Dashboard" },
+    { href: `/analysis?id=${templateId}`, label: "Analysis" },
     { href: `/confrontation?id=${templateId}`, label: "CX Report" },
     { href: `/journey?id=${templateId}`, label: "Journey" },
     { href: "/playbook", label: "Playbook" },
@@ -45,7 +45,7 @@ export function NavHeader() {
   return (
     <header className="border-b border-slate-200/70 bg-background sticky top-0 z-50">
       <div className="max-w-full px-6 flex items-center justify-between h-14">
-        <Link href={isOnboarding || isAuth ? "/" : "/dashboard"} className="flex items-center gap-2">
+        <Link href={isOnboarding || isAuth ? "/" : "/analysis"} className="flex items-center gap-2">
           <LogoMark size="sm" />
           <span className="text-sm font-semibold tracking-tight text-slate-800">CX Mate</span>
         </Link>

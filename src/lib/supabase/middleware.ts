@@ -5,7 +5,7 @@ import { NextResponse, type NextRequest } from "next/server";
 const PUBLIC_ROUTES = ["/", "/onboarding", "/auth", "/auth/callback", "/reset"];
 
 // Routes that require auth OR preview data
-const APP_ROUTES = ["/dashboard", "/confrontation", "/journey", "/playbook"];
+const APP_ROUTES = ["/analysis", "/dashboard", "/confrontation", "/journey", "/playbook"];
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
@@ -66,7 +66,7 @@ export async function updateSession(request: NextRequest) {
 
     // For dashboard and playbook (no ?id param), allow through
     // — the pages themselves handle the empty state
-    if (pathname === "/dashboard" || pathname === "/playbook") {
+    if (pathname === "/analysis" || pathname === "/dashboard" || pathname === "/playbook") {
       return supabaseResponse;
     }
 

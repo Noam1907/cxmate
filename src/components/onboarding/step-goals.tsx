@@ -201,17 +201,20 @@ export function StepGoals({ data, onChange }: StepGoalsProps) {
         </div>
       )}
 
-      {/* Additional Context */}
-      <div className="space-y-2">
-        <Label htmlFor="additionalContext" className="text-sm font-semibold text-foreground">
-          Anything else I should know? (optional)
+      {/* Additional Context — prominent open text field */}
+      <div className="rounded-2xl border border-border/60 bg-white p-6 space-y-3 shadow-sm">
+        <Label htmlFor="additionalContext" className="text-sm font-bold text-foreground">
+          Anything else you want me to know?
         </Label>
+        <p className="text-xs text-muted-foreground">
+          Context, recent changes, upcoming launches, team dynamics — anything that helps me make your analysis more specific.
+        </p>
         <Textarea
           id="additionalContext"
-          placeholder="e.g. We just hired a Head of CS and want to give them a clear starting point..."
+          placeholder="e.g. We just hired a Head of CS and want to give them a clear starting point... We're launching a new pricing tier next quarter... Our support team is overwhelmed..."
           value={data.additionalContext || ""}
           onChange={(e) => onChange({ additionalContext: e.target.value })}
-          rows={3}
+          rows={4}
           className="rounded-xl border-border/60"
         />
       </div>

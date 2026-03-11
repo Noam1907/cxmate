@@ -51,7 +51,7 @@ import {
   type OnboardingData,
 } from "@/types/onboarding";
 import type { EnrichedCompanyData } from "@/types/enrichment";
-import { getVerticalBenchmark, getSizeBenchmark } from "@/lib/cx-knowledge";
+// Vertical benchmarks removed — sidebar insights panel was removed
 import { track, identify } from "@/lib/analytics";
 import { notifyOwner } from "@/lib/notify";
 
@@ -122,77 +122,7 @@ const MATURITY_ICONS: Record<string, React.ElementType> = {
 // Insight builders — triggered after specific steps
 // ─────────────────────────────────────────────
 
-function buildInsightForStep(
-  step: WizardStep,
-  data: OnboardingData,
-  enrichment: EnrichedCompanyData | null
-): string | null {
-  switch (step) {
-    case "maturity": {
-      const vertical = data.vertical || enrichment?.suggestedVertical;
-      if (!vertical || vertical === "other") {
-        return `Calibrating for your stage — recommendations will match where you are right now.`;
-      }
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const bench = getVerticalBenchmark(vertical as any);
-      if (!bench) return null;
-      const { monthlyChurnRate, onboardingCompletionRate } = bench.metrics;
-      const verticalLabel: Record<string, string> = {
-        b2b_saas: "B2B SaaS",
-        professional_services: "Professional services",
-        marketplace: "Marketplace",
-        fintech: "Fintech",
-        ecommerce_b2b: "B2B ecommerce",
-        healthtech: "Healthtech",
-      };
-      const label = verticalLabel[vertical] || vertical;
-      return `${label} benchmark: top performers hold churn under ${monthlyChurnRate.good}%/mo and onboarding above ${onboardingCompletionRate.good}%.`;
-    }
-    case "challenge": {
-      const vertical = data.vertical || enrichment?.suggestedVertical;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const bench = vertical ? getVerticalBenchmark(vertical as any) : null;
-      const churnCost = bench
-        ? `${bench.metrics.annualChurnRate.average}% annual churn`
-        : "15–20% of ARR lost annually";
-      return `These challenges typically drive ${churnCost}. Your playbook will prioritize highest-impact fixes.`;
-    }
-    case "business": {
-      if (data.roughRevenue && data.roughRevenue !== "skip") {
-        // Use the canonical REVENUE_RANGE_OPTIONS label
-        const opt = REVENUE_RANGE_OPTIONS.find((r) => r.value === data.roughRevenue);
-        const label = opt?.label || data.roughRevenue;
-        return `${label} — every lost customer hits hard at this scale. Playbook will focus on protecting revenue.`;
-      }
-      return `Even rough numbers help us benchmark against companies at your scale.`;
-    }
-    case "context": {
-      const components = data.existingJourneyComponents || [];
-      if (components.length >= 5) {
-        return `${components.length} journey pieces in place — more than most at your stage. We'll build on what's working.`;
-      }
-      if (components.length > 0) {
-        return `${components.length} component${components.length === 1 ? "" : "s"} in place. We'll identify the gaps vs. top performers.`;
-      }
-      return `Starting fresh — your playbook will lay out the right sequence from day one.`;
-    }
-    case "goal": {
-      const timeframeLabels: Record<string, string> = {
-        this_month: "this month",
-        this_quarter: "this quarter",
-        next_6_months: "in 6 months",
-        this_year: "this year",
-      };
-      const tf = data.timeframe ? timeframeLabels[data.timeframe] || data.timeframe : "";
-      if (tf) {
-        return `Actions sequenced for results ${tf} — starting with what moves the needle fastest.`;
-      }
-      return `Your goal shapes the journey map, priorities, and every playbook action.`;
-    }
-    default:
-      return null;
-  }
-}
+// buildInsightForStep removed — sidebar insights panel was removed
 
 // ─────────────────────────────────────────────
 // Visual sub-components
@@ -419,75 +349,6 @@ function CompanyLogo({ domain, companyName }: { domain: string | null; companyNa
       className="w-11 h-11 object-contain"
       onError={() => setSourceIndex((i) => i + 1)}
     />
-  );
-}
-
-// ─────────────────────────────────────────────
-// Insights panel (right sidebar) — grows as user progresses
-// ─────────────────────────────────────────────
-
-function InsightsPanel({
-  insights,
-  data,
-  enrichment,
-}: {
-  insights: Array<{ key: string; content: string }>;
-  data: OnboardingData;
-  enrichment: EnrichedCompanyData | null;
-}) {
-  const domain = data.companyWebsite
-    ? data.companyWebsite.replace(/^https?:\/\//, "").replace(/^www\./, "").split("/")[0]
-    : enrichment?.discoveredWebsite
-      ? enrichment.discoveredWebsite.replace(/^https?:\/\//, "").replace(/^www\./, "").split("/")[0]
-      : null;
-
-  return (
-    <div className="space-y-3">
-      {/* Company card */}
-      {data.companyName && (
-        <div className="bg-white rounded-2xl border border-slate-200 p-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl border border-slate-100 bg-slate-50 flex items-center justify-center shrink-0 overflow-hidden">
-              <CompanyLogo domain={domain} companyName={data.companyName} />
-            </div>
-            <div className="min-w-0">
-              <p className="font-semibold text-foreground text-sm leading-tight truncate">{data.companyName}</p>
-              {domain && <p className="text-xs text-muted-foreground truncate">{domain}</p>}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Insights — appear as user answers questions */}
-      {insights.length > 0 && (
-        <div className="space-y-2.5">
-          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide px-0.5">
-            Insights for you
-          </p>
-          {insights.map((insight) => (
-            <div
-              key={insight.key}
-              className="bg-amber-50/80 border border-amber-200/60 rounded-xl p-3 flex gap-2.5 items-start animate-in fade-in slide-in-from-right-2 duration-500"
-            >
-              <div className="shrink-0 mt-0.5 w-6 h-6 rounded-full bg-amber-100 flex items-center justify-center">
-                <Sparkle size={12} className="text-amber-500" weight="fill" />
-              </div>
-              <p className="text-xs text-amber-900/90 leading-relaxed">{insight.content}</p>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* Empty state — shown before any insights appear */}
-      {insights.length === 0 && data.companyName && (
-        <div className="rounded-xl border border-dashed border-slate-200 p-4 text-center">
-          <Sparkle size={16} className="text-slate-300 mx-auto mb-1.5" weight="fill" />
-          <p className="text-xs text-muted-foreground leading-relaxed">
-            Insights appear as you answer
-          </p>
-        </div>
-      )}
-    </div>
   );
 }
 
@@ -1300,7 +1161,6 @@ export function OnboardingChatWizard() {
   const [showEnrichmentEditor, setShowEnrichmentEditor] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
-  const [sidebarInsights, setSidebarInsights] = useState<Array<{ key: string; content: string }>>([]);
 
   // Voice input
   const [isListening, setIsListening] = useState(false);
@@ -1312,7 +1172,6 @@ export function OnboardingChatWizard() {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const abortRef = useRef<AbortController | null>(null);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const insightsShown = useRef<Set<string>>(new Set());
 
   // Enrichment
   const { enrichment, isEnriching, enrich } = useCompanyEnrichment();
@@ -1492,13 +1351,6 @@ export function OnboardingChatWizard() {
       { type: "user-summary", content: maturityLabel, key: `user-maturity-${Date.now()}` },
     ];
 
-    // Push insight to sidebar (not inline chat)
-    const insightContent = buildInsightForStep("maturity", { ...data, companyMaturity: maturity, ...derived }, enrichment);
-    if (insightContent && !insightsShown.current.has("maturity")) {
-      insightsShown.current.add("maturity");
-      setSidebarInsights([{ key: `insight-maturity-${Date.now()}`, content: insightContent }]);
-    }
-
     // Remove maturity widget, add entries
     setConversation((prev) => [...prev.filter((e) => e.key !== "widget-maturity"), ...entries]);
 
@@ -1527,13 +1379,6 @@ export function OnboardingChatWizard() {
     const entries: ConversationEntry[] = [
       { type: "user-summary", content: summary, key: `user-challenge-${Date.now()}` },
     ];
-
-    // Push insight to sidebar (not inline chat)
-    const insightContent = buildInsightForStep("challenge", data, enrichment);
-    if (insightContent && !insightsShown.current.has("challenge")) {
-      insightsShown.current.add("challenge");
-      setSidebarInsights([{ key: `insight-challenge-${Date.now()}`, content: insightContent }]);
-    }
 
     setConversation((prev) => [...prev.filter((e) => e.key !== "widget-challenge"), ...entries]);
 
@@ -1566,13 +1411,6 @@ export function OnboardingChatWizard() {
       { type: "user-summary", content: summary, key: `user-business-${Date.now()}` },
     ]);
 
-    // Push insight to sidebar
-    const insightContent = buildInsightForStep("business", data, enrichment);
-    if (insightContent && !insightsShown.current.has("business")) {
-      insightsShown.current.add("business");
-      setSidebarInsights([{ key: `insight-business-${Date.now()}`, content: insightContent }]);
-    }
-
     transitionTo("context", [
       { type: "ai", content: "Two quick questions — your tools and what's already built. Helps me build on what you have instead of starting from scratch.", key: `ai-context-q-${Date.now()}` },
       { type: "widget", step: "context", key: "widget-context" },
@@ -1601,13 +1439,6 @@ export function OnboardingChatWizard() {
     ];
     setConversation((prev) => [...prev.filter((e) => e.key !== "widget-context"), ...entries]);
 
-    // Push insight to sidebar
-    const insightContent = buildInsightForStep("context", data, enrichment);
-    if (insightContent && !insightsShown.current.has("context")) {
-      insightsShown.current.add("context");
-      setSidebarInsights([{ key: `insight-context-${Date.now()}`, content: insightContent }]);
-    }
-
     transitionTo("goal", [
       { type: "ai", content: "Almost there — what do you want to fix first, and when do you need results?", key: `ai-goal-q-${Date.now()}` },
       { type: "widget", step: "goal", key: "widget-goal" },
@@ -1627,13 +1458,6 @@ export function OnboardingChatWizard() {
     ];
 
     setConversation((prev) => [...prev.filter((e) => e.key !== "widget-goal"), ...entries]);
-
-    // Push insight to sidebar
-    const goalInsight = buildInsightForStep("goal", data, enrichment);
-    if (goalInsight && !insightsShown.current.has("goal")) {
-      insightsShown.current.add("goal");
-      setSidebarInsights([{ key: `insight-goal-${Date.now()}`, content: goalInsight }]);
-    }
 
     // Set missing required fields with defaults from enrichment or sensible defaults
     const finalPatch: Partial<OnboardingData> = {};
@@ -1808,9 +1632,9 @@ export function OnboardingChatWizard() {
   // ─────────────────────────────────────────────
 
   return (
-    <div className="w-full h-full grid grid-cols-1 lg:grid-cols-[1fr_220px] gap-4 min-h-0 overflow-hidden">
-      {/* Left: Chat column */}
-      <div className="flex flex-col h-full min-h-0 min-w-0">
+    <div className="w-full h-full flex justify-center min-h-0 overflow-hidden">
+      {/* Chat column — full width, centered */}
+      <div className="flex flex-col h-full min-h-0 min-w-0 w-full max-w-3xl px-4">
         {/* Header */}
         <div className="mb-4 text-center space-y-1 shrink-0">
           <div className="flex items-center justify-center gap-2.5 mb-2">
@@ -1971,12 +1795,7 @@ export function OnboardingChatWizard() {
         </div>
       </div>
 
-      {/* Right: Insights panel (hidden on mobile, no scroll) */}
-      <div className="hidden lg:block overflow-hidden min-h-0">
-        <div className="space-y-3">
-          <InsightsPanel data={data} enrichment={enrichment} insights={sidebarInsights} />
-        </div>
-      </div>
+      {/* Sidebar removed — testers never noticed it, chat is the full experience */}
     </div>
   );
 }

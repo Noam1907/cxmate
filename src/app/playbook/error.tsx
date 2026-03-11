@@ -30,7 +30,7 @@ export default function PlaybookError({
         </div>
         <div className="flex gap-3 justify-center">
           <Button variant="outline" asChild>
-            <Link href="/dashboard">Go to Dashboard</Link>
+            <Link href="/analysis">Go to Dashboard</Link>
           </Button>
           <Button onClick={reset}>Try again</Button>
         </div>

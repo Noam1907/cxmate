@@ -46,9 +46,9 @@ export function SidebarCompleteView({
       sublabel: journey ? `${journey.stages.length} stages mapped` : "Your customer journey",
     },
     {
-      label: "Dashboard",
-      href: "/dashboard",
-      match: "/dashboard",
+      label: "Analysis",
+      href: "/analysis",
+      match: "/analysis",
       sublabel: "Overview & metrics",
     },
     {
