@@ -583,14 +583,14 @@ function BusinessWidget({
 
         {/* ARR */}
         <div>
-          <label className="text-xs font-medium text-slate-500 mb-2 block">Rough ARR</label>
+          <label className="text-sm font-medium text-slate-500 mb-2 block">Rough ARR</label>
           <div className="flex flex-wrap gap-2">
             {REVENUE_RANGE_OPTIONS.filter((r) => r.value !== "pre_revenue").map((opt) => (
               <button
                 key={opt.value}
                 type="button"
                 onClick={() => onChange({ roughRevenue: data.roughRevenue === opt.value ? "" : opt.value })}
-                className={`text-xs font-medium px-3 py-1.5 rounded-xl border transition-all duration-150 ${
+                className={`text-sm font-medium px-3.5 py-2 rounded-xl border transition-all duration-150 ${
                   data.roughRevenue === opt.value
                     ? "bg-primary text-primary-foreground border-primary shadow-sm"
                     : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
@@ -604,14 +604,14 @@ function BusinessWidget({
 
         {/* Deal size */}
         <div>
-          <label className="text-xs font-medium text-slate-500 mb-2 block">Average deal size</label>
+          <label className="text-sm font-medium text-slate-500 mb-2 block">Average deal size</label>
           <div className="flex flex-wrap gap-2">
             {DEAL_SIZE_OPTIONS.map((opt) => (
               <button
                 key={opt.value}
                 type="button"
                 onClick={() => onChange({ averageDealSize: data.averageDealSize === opt.value ? "" : opt.value })}
-                className={`text-xs font-medium px-3 py-1.5 rounded-xl border transition-all duration-150 ${
+                className={`text-sm font-medium px-3.5 py-2 rounded-xl border transition-all duration-150 ${
                   data.averageDealSize === opt.value
                     ? "bg-primary text-primary-foreground border-primary shadow-sm"
                     : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
@@ -625,14 +625,14 @@ function BusinessWidget({
 
         {/* Pricing model */}
         <div>
-          <label className="text-xs font-medium text-slate-500 mb-2 block">Pricing model</label>
+          <label className="text-sm font-medium text-slate-500 mb-2 block">Pricing model</label>
           <div className="flex flex-wrap gap-2">
             {PRICING_MODEL_OPTIONS.map((opt) => (
               <button
                 key={opt.value}
                 type="button"
                 onClick={() => onChange({ pricingModel: data.pricingModel === opt.value ? "" : opt.value })}
-                className={`text-xs font-medium px-3 py-1.5 rounded-xl border transition-all duration-150 ${
+                className={`text-sm font-medium px-3.5 py-2 rounded-xl border transition-all duration-150 ${
                   data.pricingModel === opt.value
                     ? "bg-primary text-primary-foreground border-primary shadow-sm"
                     : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
@@ -699,7 +699,7 @@ function ChallengeWidget({
       <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-4">
         {/* Challenge textarea */}
         <div>
-          <label className="text-xs font-medium text-slate-500 mb-1 block">
+          <label className="text-sm font-medium text-slate-500 mb-1 block">
             What&apos;s your biggest challenge with customers right now?
           </label>
           <div className="relative">
@@ -729,7 +729,7 @@ function ChallengeWidget({
 
         {/* Pain point chips */}
         <div>
-          <label className="text-xs font-medium text-slate-500 mb-2 block">
+          <label className="text-sm font-medium text-slate-500 mb-2 block">
             Also pick any that hit home:
           </label>
           <div className="flex flex-wrap gap-2">
@@ -740,7 +740,7 @@ function ChallengeWidget({
                   key={pain.value}
                   type="button"
                   onClick={() => togglePain(pain.value)}
-                  className={`text-xs font-medium px-3 py-1.5 rounded-xl border transition-all duration-150 ${
+                  className={`text-sm font-medium px-3.5 py-2 rounded-xl border transition-all duration-150 ${
                     isSelected
                       ? "bg-primary text-primary-foreground border-primary shadow-sm"
                       : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:border-slate-300"
@@ -870,7 +870,7 @@ function ContextWidget({
       <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-5">
         {/* Tech stack */}
         <div>
-          <p className="text-xs font-medium text-slate-500 mb-2">{toolsCopy.label}</p>
+          <p className="text-sm font-medium text-slate-500 mb-2">{toolsCopy.label}</p>
           <div className="relative">
             <textarea
               value={data.currentTools || ""}
@@ -899,7 +899,7 @@ function ContextWidget({
 
         {/* Journey checklist */}
         <div>
-          <p className="text-xs font-medium text-slate-500 mb-1">
+          <p className="text-sm font-medium text-slate-500 mb-1">
             What do you already have in your customer journey?
           </p>
           <p className="text-[11px] text-muted-foreground mb-3">
@@ -1000,7 +1000,7 @@ function GoalWidget({
       <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-4">
         {/* Goal chips */}
         <div>
-          <label className="text-xs font-medium text-slate-500 mb-2 block">
+          <label className="text-sm font-medium text-slate-500 mb-2 block">
             What do you want to fix first?
           </label>
           <div className="flex flex-wrap gap-2">
@@ -1011,7 +1011,7 @@ function GoalWidget({
                   key={goal.value}
                   type="button"
                   onClick={() => handleGoalSelect(goal.value)}
-                  className={`text-xs font-medium px-3 py-1.5 rounded-xl border transition-all duration-150 ${
+                  className={`text-sm font-medium px-3.5 py-2 rounded-xl border transition-all duration-150 ${
                     isSelected
                       ? "bg-primary text-primary-foreground border-primary shadow-sm"
                       : goal.relatedToPain
@@ -1030,7 +1030,7 @@ function GoalWidget({
 
         {/* Timeframe */}
         <div>
-          <label className="text-xs font-medium text-slate-500 mb-2 block">
+          <label className="text-sm font-medium text-slate-500 mb-2 block">
             When do you need results?
           </label>
           <div className="flex flex-wrap gap-2">
@@ -1041,7 +1041,7 @@ function GoalWidget({
                   key={tf.value}
                   type="button"
                   onClick={() => onChange({ timeframe: tf.value })}
-                  className={`text-xs font-medium px-3 py-1.5 rounded-xl border transition-all duration-150 ${
+                  className={`text-sm font-medium px-3.5 py-2 rounded-xl border transition-all duration-150 ${
                     isSelected
                       ? "bg-primary text-primary-foreground border-primary shadow-sm"
                       : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:border-slate-300"
@@ -1053,10 +1053,44 @@ function GoalWidget({
             })}
           </div>
           {data.primaryGoal && GOAL_TIMEFRAME_MAP[data.primaryGoal] && (
-            <p className="text-[11px] text-muted-foreground mt-1.5 leading-relaxed">
+            <p className="text-xs text-muted-foreground mt-1.5 leading-relaxed">
               {GOAL_TIMEFRAME_MAP[data.primaryGoal].explanation}
             </p>
           )}
+          {/* Warning when user picks a shorter timeframe than suggested */}
+          {(() => {
+            if (!data.primaryGoal || !data.timeframe) return null;
+            const suggested = GOAL_TIMEFRAME_MAP[data.primaryGoal]?.timeframe;
+            if (!suggested) return null;
+            const order: Record<string, number> = { "1_month": 1, "3_months": 2, "6_months": 3, "exploring": 0 };
+            const userRank = order[data.timeframe] ?? 0;
+            const suggestedRank = order[suggested] ?? 0;
+            if (userRank >= suggestedRank || userRank === 0) return null;
+            const suggestedLabel = TIMEFRAME_OPTIONS.find((t) => t.value === suggested)?.label?.toLowerCase() || suggested;
+            return (
+              <div className="mt-2 flex gap-2 items-start bg-amber-50 border border-amber-200/60 rounded-xl px-3 py-2.5">
+                <span className="text-amber-500 text-base leading-none mt-0.5">⚠️</span>
+                <p className="text-xs text-amber-800 leading-relaxed">
+                  Heads up — this goal typically needs <strong>{suggestedLabel}</strong> to show real results. A shorter timeline is doable, but we&apos;ll focus your playbook on quick wins only.
+                </p>
+              </div>
+            );
+          })()}
+        </div>
+
+        {/* Free text — anything else */}
+        <div>
+          <label className="text-sm font-medium text-slate-500 mb-1 block">
+            Anything else I should know?
+          </label>
+          <textarea
+            value={data.additionalContext || ""}
+            onChange={(e) => onChange({ additionalContext: e.target.value })}
+            placeholder="Context that might help — unique challenges, recent changes, specific goals..."
+            rows={2}
+            className="w-full text-sm border border-slate-200 rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50 transition-all resize-none"
+          />
+          <p className="text-xs text-muted-foreground mt-1">Optional — but the more context, the sharper your playbook</p>
         </div>
 
         <Button
