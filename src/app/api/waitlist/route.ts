@@ -57,7 +57,7 @@ export async function POST(request: Request) {
         await resend.emails.send({
           from: "CX Mate <noreply@cxmate.io>",
           to: notifyEmail,
-          subject: `🎉 New waitlist signup: ${name} from ${company || "unknown company"}`,
+          subject: `New waitlist signup: ${name} from ${company || "unknown company"}`,
           html: `
             <p><strong>Name:</strong> ${name}</p>
             <p><strong>Email:</strong> ${email}</p>
@@ -68,9 +68,9 @@ export async function POST(request: Request) {
           `,
         });
       }
-    } catch {
+    } catch (emailErr) {
       // Non-fatal — don't fail the request if notification fails
-      console.warn("Failed to send waitlist notification email");
+      console.warn("Failed to send waitlist notification email:", emailErr);
     }
 
     return NextResponse.json({ success: true });
