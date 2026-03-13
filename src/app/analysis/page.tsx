@@ -44,13 +44,23 @@ function formatDollarCompact(value: number): string {
 
 function getTopRisks(insights: ConfrontationInsight[], limit: number = 3): RiskItem[] {
   return insights
-    .map((insight) => ({
-      title: insight.pattern || "Unknown risk",
-      description: insight.description || "",
-      impact: insight.businessImpact || "$0",
-      likelihood: insight.likelihood as "High" | "Medium" | "Low",
-      businessImpact: parseDollarValue(insight.businessImpact || "$0"),
-    }))
+    .map((insight) => {
+      // Try businessImpact first, fall back to extracting from pattern title
+      let dollarValue = parseDollarValue(insight.businessImpact || "");
+      if (dollarValue === 0 && insight.pattern) {
+        dollarValue = parseDollarValue(insight.pattern);
+      }
+      const displayImpact = dollarValue > 0
+        ? formatDollarCompact(dollarValue)
+        : (insight.businessImpact || "$0");
+      return {
+        title: insight.pattern || "Unknown risk",
+        description: insight.description || "",
+        impact: displayImpact,
+        likelihood: insight.likelihood as "High" | "Medium" | "Low",
+        businessImpact: dollarValue,
+      };
+    })
     .sort((a, b) => {
       const lw = (r: RiskItem) => r.likelihood === "High" ? 1 : r.likelihood === "Medium" ? 0.6 : 0.3;
       return (b.businessImpact * lw(b)) - (a.businessImpact * lw(a));
@@ -59,20 +69,24 @@ function getTopRisks(insights: ConfrontationInsight[], limit: number = 3): RiskI
 }
 
 function getTotalRevenueAtRisk(insights: ConfrontationInsight[]): number {
-  return insights.reduce((sum, i) => sum + parseDollarValue(i.businessImpact || "$0"), 0);
+  return insights.reduce((sum, i) => {
+    let val = parseDollarValue(i.businessImpact || "");
+    if (val === 0 && i.pattern) val = parseDollarValue(i.pattern);
+    return sum + val;
+  }, 0);
 }
 
 // ─── Mini Journey Preview ───────────────────────────────────────────────────
 
 function MiniJourneyPreview({ stages }: { stages: GeneratedJourney["stages"] }) {
   return (
-    <div className="flex items-center gap-0 overflow-x-auto pb-2">
+    <div className="flex items-start gap-0 overflow-x-auto pb-2">
       {stages.map((stage, idx) => (
-        <div key={idx} className="flex items-center shrink-0">
+        <div key={idx} className="flex items-start shrink-0">
           {/* Stage node */}
-          <div className="flex flex-col items-center gap-1.5">
+          <div className="flex flex-col items-center gap-1.5 w-[90px]">
             <div
-              className={`w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold text-white shadow-sm ${
+              className={`w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold text-white shadow-sm shrink-0 ${
                 stage.stageType === "sales"
                   ? "bg-sky-500"
                   : "bg-teal-500"
@@ -80,13 +94,13 @@ function MiniJourneyPreview({ stages }: { stages: GeneratedJourney["stages"] }) 
             >
               {idx + 1}
             </div>
-            <p className="text-[10px] text-slate-600 text-center leading-tight max-w-[80px]">
+            <p className="text-[10px] text-slate-600 text-center leading-tight w-full">
               {stage.name}
             </p>
           </div>
           {/* Connector */}
           {idx < stages.length - 1 && (
-            <div className="w-6 h-px bg-slate-300 shrink-0 mb-5" />
+            <div className="w-6 h-px bg-slate-300 shrink-0 mt-[18px] -ml-[5px] -mr-[5px]" />
           )}
         </div>
       ))}
