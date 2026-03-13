@@ -136,8 +136,7 @@ export function SidebarBuildingView({ data }: SidebarBuildingViewProps) {
         </p>
         <div className="space-y-1.5">
           {[
-            { label: "Dashboard" },
-            { label: "CX Report" },
+            { label: "CX Brief" },
             { label: "Journey Map" },
             { label: "Playbook" },
           ].map((item) => (

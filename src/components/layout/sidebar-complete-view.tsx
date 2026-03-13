@@ -46,15 +46,9 @@ export function SidebarCompleteView({
       sublabel: journey ? `${journey.stages.length} stages mapped` : "Your customer journey",
     },
     {
-      label: "Analysis",
-      href: "/analysis",
+      label: "CX Brief",
+      href: `/analysis?id=${id}`,
       match: "/analysis",
-      sublabel: "Overview & metrics",
-    },
-    {
-      label: "CX Report",
-      href: `/confrontation?id=${id}`,
-      match: "/confrontation",
       sublabel: "Intelligence & risks",
     },
     {
