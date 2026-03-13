@@ -14,12 +14,15 @@ export async function middleware(request: NextRequest) {
   if (isPasswordProtected()) {
     const pathname = request.nextUrl.pathname;
 
-    // Always allow: the gate page, its APIs, waitlist signup, and webhook endpoints
+    // Always allow: gate page, internal APIs (notify, digest, health), waitlist, webhooks
     if (
       pathname === "/gate" ||
       pathname === "/api/gate" ||
       pathname === "/api/waitlist" ||
-      pathname.startsWith("/api/billing/webhook")
+      pathname === "/api/health" ||
+      pathname.startsWith("/api/billing/webhook") ||
+      pathname.startsWith("/api/notify") ||
+      pathname.startsWith("/api/digest")
     ) {
       return await updateSession(request);
     }

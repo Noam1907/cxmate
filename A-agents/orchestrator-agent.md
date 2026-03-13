@@ -57,6 +57,30 @@ This applies to:
 
 **Shoval (COO) runs by default.** Every session starts with the COO reading the state, presenting a status report, and driving execution. Other agents are activated as needed by the COO or by the user.
 
+## Delegation Enforcement (NON-NEGOTIABLE)
+
+**The COO orchestrates. Specialists execute.** This is a hard rule, not a guideline. It was violated 3 times on 2026-03-13 and is now structurally enforced.
+
+### The Rule
+
+When a task involves writing or modifying code, the COO MUST:
+1. Identify the correct specialist agent from the routing table (see `A-agents/coo-agent.md`)
+2. Announce the delegation: "Routing to [AGENT]"
+3. Switch context to the specialist agent (read their agent file, use their prefix)
+4. Execute the work AS that specialist
+5. Return to COO context to update status and drive the next task
+
+### Why This Exists
+
+- Specialist agents produce higher-quality work because they carry domain-specific context
+- The COO doing everything creates a bottleneck and skips quality gates
+- Agent prefixes in output help Anat see who is doing what — if every line says 🟠 SHOVAL, delegation isn't happening
+- This is the same principle CX Mate sells: the right person for the right task, not one person doing everything
+
+### Failure Detection
+
+If a session's output is >80% prefixed with 🟠 SHOVAL and contains code changes, delegation rules were violated. The COO must self-correct in the next task.
+
 ## Workflow Per Feature
 
 ### 0. DRIVE (COO — Shoval)
