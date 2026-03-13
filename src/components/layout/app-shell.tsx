@@ -10,7 +10,7 @@ import { SidebarBuildingView } from "./sidebar-building-view";
 import { SidebarCompleteView } from "./sidebar-complete-view";
 
 // Routes where the sidebar should NOT appear
-const SIDEBAR_EXCLUDED_ROUTES = ["/", "/auth", "/reset", "/onboarding"];
+const SIDEBAR_EXCLUDED_ROUTES = ["/", "/auth", "/reset", "/onboarding", "/gate"];
 
 function isExcluded(pathname: string): boolean {
   return SIDEBAR_EXCLUDED_ROUTES.some(

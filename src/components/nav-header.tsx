@@ -27,8 +27,8 @@ export function NavHeader() {
     setTemplateId(getTemplateId());
   }, []);
 
-  // Hide nav on home page only
-  if (pathname === "/") {
+  // Hide nav on home page and gate page
+  if (pathname === "/" || pathname === "/gate") {
     return null;
   }
 
