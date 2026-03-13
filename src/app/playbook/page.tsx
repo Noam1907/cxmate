@@ -570,7 +570,7 @@ export default function PlaybookPage() {
                   <p className="text-xs font-semibold text-slate-500 uppercase tracking-widest">What&apos;s being built</p>
                   {currentTools && (
                     <span className="text-xs text-primary font-medium bg-primary/8 px-2 py-0.5 rounded-full">
-                      Wiring in: {currentTools.split(",")[0].trim()}
+                      Integrating {currentTools.split(",")[0].trim()}
                     </span>
                   )}
                 </div>

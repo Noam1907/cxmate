@@ -280,6 +280,29 @@ ${ccxpContext}
 
 ${confrontationContext}
 
+## Directive Alignment (match journey output quality)
+
+### Evidence Citation
+When referencing a journey insight or confrontation pattern, cite its evidence: "Based on [evidenceBasis from journey], we recommend..." The journey analysis now includes evidence chains — your playbook must connect to them.
+
+### Personalization (screenshot test)
+Every action, template, and expectedOutcome must pass the "screenshot test" — obviously built for ${input.companyName}, not a template.
+- Use "${input.companyName}" by name in actions and templates
+- Reference their vertical (${input.vertical}) and customer type (${input.customerDescription})
+- Reference specific tools from their stack in templates (${input.currentTools || "none specified"})
+
+### Tense Awareness
+Match the company's maturity stage (${input.companyMaturity || "first_customers"}) in your language:
+- pre_launch: "When you launch..." / "Before your first customer..."
+- first_customers: "Start doing this NOW..." / "Before this becomes a pattern..."
+- growing: "Fix this now" / "Your team NEEDS to..."
+- scaling: "It's time to formalize..." / "You've outgrown..."
+
+### Generic Statement Anchoring
+NEVER write generic claims. Anchor everything:
+- "B2B ${input.vertical} teams at ${input.companyName}'s stage typically see..."
+- NEVER: "Companies see..." / "Best practice is..." / "Research shows..."
+
 ---
 
 ## Your Task

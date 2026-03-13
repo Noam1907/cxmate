@@ -78,10 +78,17 @@ function InsightCard({ insight }: { insight: ConfrontationInsight }) {
   );
 }
 
+const LIKELIHOOD_ORDER: Record<string, number> = { high: 0, medium: 1, low: 2 };
+
 export function ConfrontationPanel({ insights }: ConfrontationPanelProps) {
   if (!insights || insights.length === 0) return null;
 
-  const highCount = insights.filter((i) => i.likelihood === "high").length;
+  // Sort by likelihood (high first) as safety net — prompt already orders them
+  const sorted = [...insights].sort(
+    (a, b) => (LIKELIHOOD_ORDER[a.likelihood] ?? 3) - (LIKELIHOOD_ORDER[b.likelihood] ?? 3)
+  );
+
+  const highCount = sorted.filter((i) => i.likelihood === "high").length;
 
   return (
     <Card className="border-red-200 bg-gradient-to-b from-red-50/50 to-transparent">
@@ -103,7 +110,7 @@ export function ConfrontationPanel({ insights }: ConfrontationPanelProps) {
         </div>
       </CardHeader>
       <CardContent className="space-y-3">
-        {insights.map((insight, i) => (
+        {sorted.map((insight, i) => (
           <InsightCard key={i} insight={insight} />
         ))}
       </CardContent>

@@ -41,7 +41,7 @@ export interface GeneratedMoment {
   severity: "low" | "medium" | "high" | "critical";
   triggers: string[];
   recommendations: string[];
-  diagnosis?: string;
+  diagnosis?: string; // v5: evidence format "[source_tag] evidence statement" — REQUIRED in prompt output, optional for DB compat
   actionTemplate?: string;
   cxToolRecommendation?: string;
   decisionScienceInsight?: string;
@@ -72,6 +72,7 @@ export interface ConfrontationInsight {
   companionAdvice?: string; // v3: CX Mate's peer one-liner
   addressesPainPoints?: string[]; // v4: which user pain point keys this insight addresses
   competitorContext?: string; // v4: competitor-specific context for this insight
+  evidenceBasis?: string; // v5: "[source_tag] explanation of evidence chain"
 }
 
 export interface CxToolRecommendation {
@@ -79,6 +80,8 @@ export interface CxToolRecommendation {
   whenToDeploy: string;
   whyThisTool: string;
   expectedOutcome: string;
+  aiCapability?: string; // v5: What AI/agent capability this tool provides
+  automationLevel?: "autonomous" | "agent_assisted" | "human_led"; // v5
 }
 
 export interface ImpactProjection {
@@ -98,6 +101,13 @@ export interface TechStackRecommendation {
   connectWith: string;
 }
 
+export interface MethodologyNote {
+  dataLayersUsed: string[];
+  crossReferences: string[];
+  frameworksApplied: string[];
+  personalizedTo: string;
+}
+
 export interface GeneratedJourney {
   name: string;
   stages: GeneratedStage[];
@@ -107,6 +117,7 @@ export interface GeneratedJourney {
   techStackRecommendations?: TechStackRecommendation[];
   maturityAssessment?: string;
   assumptions?: string[];
+  methodologyNote?: MethodologyNote; // v5: how CX Mate built this analysis
 }
 
 // ============================================
@@ -140,6 +151,36 @@ function detectCompanyStage(companySize: string): "early" | "growing" | "establi
       return "early";
   }
 }
+
+// ============================================
+// v5: Tense Matrix (maturity-aware language)
+// ============================================
+
+const TENSE_MATRIX: Record<CompanyMaturity, string> = {
+  pre_launch: `FUTURE TENSE — This company has no customers. Use "will," "would," "can expect."
+- Moments: "Prospects WILL encounter..." not "Prospects encounter..."
+- Risks: "If [Company] doesn't address this, first customers WILL..." not "Customers are experiencing..."
+- Recommendations: "When you launch, SET UP..." not "You should be doing..."
+- Never reference existing customer behavior — it doesn't exist yet.`,
+
+  first_customers: `PRESENT + CONDITIONAL — Early customers, patterns forming not established.
+- Moments: "Your first customers ARE experiencing..." or "Early signs SUGGEST..."
+- Risks: "If this continues, it WILL become..." not "This is costing you..."
+- Recommendations: "Start doing this NOW before it becomes a pattern..."
+- Revenue impact: use ranges and conditionals ("COULD cost," "risks becoming").`,
+
+  growing: `PRESENT TENSE — Real customers, real data, real patterns.
+- Moments: "Your customers ARE experiencing..." / "This IS happening..."
+- Risks: "This IS costing [Company]..." not "This could cost..."
+- Recommendations: "Fix this now" / "Your team NEEDS to..."
+- Revenue impact: use definitive statements with stated confidence level.`,
+
+  scaling: `PRESENT + HISTORICAL — Enough history to reference trends.
+- Moments: "Your customers HAVE BEEN experiencing..." / "This pattern HAS persisted..."
+- Risks: "This HAS cost [Company]..." / "Over the past year, this trend HAS..."
+- Recommendations: "It's time to formalize..." / "You've outgrown the current approach..."
+- Revenue impact: reference trajectory ("growing from X to Y," "accelerating").`,
+};
 
 // ============================================
 // Knowledge Base Context Builders
@@ -299,9 +340,17 @@ ${input.pricingModel ? `- Pricing model: ${input.pricingModel}` : ""}`;
 // ============================================
 
 function buildAnalysisModeContext(input: OnboardingInput): string {
-  return input.hasExistingCustomers
+  const modeLine = input.hasExistingCustomers
     ? `Mode: COMPARISON — validate progress, compare vs ${input.vertical} best practices, show revenue gaps with math. Peer tone: "Companies like yours..."`
     : `Mode: PRESCRIPTIVE — prescribe optimal journey from day one, top 3 priorities only, percentage-based projections. Mentor tone.`;
+
+  const maturity = (input.companyMaturity as CompanyMaturity) || "first_customers";
+  const tenseRule = TENSE_MATRIX[maturity] || TENSE_MATRIX.first_customers;
+
+  return `${modeLine}
+
+Tense rule based on maturity:
+${tenseRule}`;
 }
 
 // ============================================
@@ -379,6 +428,14 @@ ${input.preLiveProcess ? `- Pre-live / implementation process: ${input.preLivePr
 ${input.currentTools ? `- Current CX tools/stack: ${input.currentTools}` : ""}
 ${input.currentTools ? `\nMap their tools to stage existingTools as {"name":"ToolName","domain":"tool-domain.com"}.` : ""}
 
+## Personalization Rules (MANDATORY — screenshot test)
+Every field must pass the "screenshot test": if someone screenshots any single field, it must be obvious this was built for THIS company.
+1. COMPANY NAME: Use "${input.companyName}" by name in journey name, every confrontation pattern/description, maturityAssessment. Never use "your company" when you can use the name.
+2. VERTICAL: Reference ${input.vertical}${input.industry ? ` / ${input.industry}` : ""} in stage descriptions, moment descriptions, confrontation insights.
+3. TOOLS: When user has tools (${input.currentTools || "none specified"}), reference specific tool names in recommendations and immediateAction fields.
+4. PAIN POINTS: Echo the user's exact pain point language in descriptions — not just in addressesPainPoints tags.
+5. CUSTOMERS: Reference ${input.customerDescription} (${input.customerSize}) in stage descriptions and triggers.
+
 ## Existing CX Processes
 ${input.hasExistingJourney === "yes" || input.hasExistingJourney === "partial" ? `- Has existing journey processes: ${input.hasExistingJourney === "yes" ? "Yes (formal)" : "Partially"}` : "- No existing CX processes in place — building from scratch"}
 ${input.existingJourneyComponents && input.existingJourneyComponents.length > 0 ? `- Processes they have in place: ${input.existingJourneyComponents.join(", ")}` : ""}
@@ -400,9 +457,23 @@ Use this enrichment data to make your analysis more specific and personalized. I
 
 ## Their Challenges (CRITICAL — EVERY pain point must appear in the output)
 - Biggest challenge: ${input.biggestChallenge}
-- Pain points: ${painPointLabels.join("; ")}${input.customPainPoint ? `; ${input.customPainPoint}` : ""}
+- Pain points (EACH is an independent problem — do NOT merge or combine them):
+${painPointLabels.map((label, i) => `  ${i + 1}. "${label}"`).join("\n")}${input.customPainPoint ? `\n  ${painPointLabels.length + 1}. "${input.customPainPoint}"` : ""}
 
-⚠️ MANDATORY: Every pain point listed above MUST be reflected in at least one meaningful moment's addressesPainPoints OR one confrontation insight's addressesPainPoints. The user explicitly told us these are their problems — if the output doesn't address them, it feels generic and useless. Use the exact pain point text when tagging addressesPainPoints so we can trace it.
+⚠️ MANDATORY RULES FOR PAIN POINTS:
+1. Every pain point listed above MUST be reflected in at least one meaningful moment's addressesPainPoints OR one confrontation insight's addressesPainPoints.
+2. Each pain point is a SEPARATE, INDEPENDENT problem. NEVER merge two unrelated pain points into one insight. "Founder-led sales" and "billing bottlenecks" are two different problems — address them separately.
+3. Use the EXACT pain point text when tagging addressesPainPoints so we can trace it.
+4. If a pain point doesn't naturally fit into a moment, create a confrontation insight specifically for it.
+The user explicitly told us these are their problems — if the output doesn't address them individually, it feels generic and AI-mashed.
+
+## Evidence Requirement (MANDATORY)
+Every meaningful moment and every confrontation insight MUST include evidence for its claims. Evidence sources (tag it):
+- "user_stated" — the user told us this directly (pain point, challenge, tool, process)
+- "enrichment" — from AI-enriched company intelligence data
+- "benchmark" — from industry/vertical/size benchmarks
+- "inferred" — we connected two data points (e.g., deal size + customer count = revenue exposure)
+Use the diagnosis field on moments and evidenceBasis field on confrontation insights to show WHY. Format: "[source_tag] specific evidence statement"
 
 ## Their Goals
 - Primary goal: ${input.primaryGoal}${input.customGoal ? ` — "${input.customGoal}"` : ""}
@@ -423,13 +494,44 @@ ${failureContext}
 ${successContext}
 ${foundationsContext}
 
+## Generic Statement Anchoring Rule
+When making a broad statement, NEVER leave it generic. Anchor it:
+- "B2B ${input.vertical} companies at ${input.companyName}'s stage typically see..."
+- "Companies similar to ${input.companyName} — ${input.companySize} ${input.vertical} teams — report..."
+NEVER write: "Companies see..." / "Best practice is..." / "Research shows..."
+
+## AI-First Recommendation Rules
+For every moment recommendation and cxToolRoadmap entry, think AI-NATIVE first:
+1. AUTOMATION LEVEL: Start each recommendation with [autonomous], [agent-assisted], or [human-led]
+2. SPECIFICITY: Name the actual AI tool/platform, not just the category
+3. INTEGRATION: When user has tools, recommend AI layers ON TOP of their stack
+4. AI tools: Intercom Fin, Zendesk AI, Gong, Gainsight Staircase AI, ChurnZero AI, Zapier AI agents, SentiSum, 11x.ai
+
+## Methodology Note (REQUIRED)
+Generate a "methodologyNote" object explaining HOW CX Mate structured this analysis:
+- "dataLayersUsed" — which data sources fed this analysis (company profile, enrichment, benchmarks, maturity, pain points, competitors, existing processes, business data)
+- "crossReferences" — specific connections made across layers (e.g., "Connected pain point X to 3 moments")
+- "frameworksApplied" — CX frameworks used (CCXP, vertical benchmarks, stage guidance)
+- "personalizedTo" — "Built specifically for [Company], a [size]-employee [vertical] company at [stage] stage with [customer_count] customers."
+
+## Confrontation Insight Ordering (MANDATORY)
+- Insight #1 MUST directly address the user's biggestChallenge ("${input.biggestChallenge}") or their #1 pain point. It MUST include "${input.companyName}" by name and a specific, quantified consequence.
+- Insight #2 MUST reveal a HIDDEN connection — something the user did NOT explicitly state but that we can infer by crossing two data points (e.g., deal size + churn signal = revenue exposure they haven't calculated).
+- Insight #3 (if present) can be a broader industry pattern or benchmark comparison.
+Goal: #1 proves "we listened," #2 proves "we're smarter than a search engine," #3 proves "we know your industry."
+
+## Website Recommendation Rules (MANDATORY)
+- NEVER recommend "improve website messaging," "add use cases," "add testimonials," or ANY website content change UNLESS the enrichment data explicitly confirms the gap.
+- If no enrichment data is available, do NOT make any website-specific recommendations. Say nothing rather than risk being wrong about something the user can verify in 5 seconds.
+- SAFE alternatives: recommend internal process improvements, team alignment, measurement setup — things we CAN assess from their inputs.
+
 ## Task
-Generate JSON journey map. ULTRA CONCISE — every field max 12 words. emotionalState max 4 words.
+Generate JSON journey map. ULTRA CONCISE — every field max 12 words. emotionalState max 4 words. EXCEPTION: diagnosis, evidenceBasis, and methodologyNote fields are exempt from the 12-word limit — these should be thorough.
 ${!input.hasExistingCustomers ? 'All stageType MUST be "sales". No post-sale stages. ' : ""}Counts: 2 moments/stage, 2-3 confrontation insights, 2 cxToolRoadmap, 2 impactProjections, 2-3 techStack, 2 assumptions.
-Impact projections MUST include calculation (math formula) and dataSource. potentialImpact MUST be a dollar value (e.g. "$50K", "$120K", "$1.2M") — never percentages or vague text. addressesPainPoints: tag generously — if a moment or insight relates to a stated pain point, include it. Use the exact pain point text from above. Prefer AI agents over manual tools.
+Impact projections MUST include calculation (math formula) and dataSource. potentialImpact MUST be a dollar value (e.g. "$50K", "$120K", "$1.2M") — never percentages or vague text. addressesPainPoints: tag generously. Use the exact pain point text from above. diagnosis is REQUIRED on every moment (evidence format). evidenceBasis is REQUIRED on every confrontation insight.
 
 JSON schema:
-{"name":"str","stages":[{"name":"str","stageType":"sales|customer","description":"str","emotionalState":"2-4 words","topFailureRisk":"str","successPattern":"str","benchmarkContext":"str","existingTools":[{"name":"str","domain":"str"}],"meaningfulMoments":[{"name":"str","type":"risk|delight|decision|handoff","description":"str","severity":"low|medium|high|critical","triggers":["str"],"recommendations":["str"],"diagnosis":"str","actionTemplate":"str","cxToolRecommendation":"str","impactIfIgnored":"str","addressesPainPoints":["str"]}]}],"confrontationInsights":[{"pattern":"str","likelihood":"high|medium|low","description":"str","businessImpact":"str","immediateAction":"str","measureWith":"str","companionAdvice":"str","addressesPainPoints":["str"]}],"cxToolRoadmap":[{"tool":"str","whenToDeploy":"str","whyThisTool":"str","expectedOutcome":"str"}],"impactProjections":[{"area":"str","potentialImpact":"str","timeToRealize":"str","effort":"low|medium|high","calculation":"math formula","dataSource":"user_provided|benchmark_estimated"}],"techStackRecommendations":[{"category":"crm|marketing|support|analytics|cs_platform|communication|bi|survey|data_infrastructure","categoryLabel":"str","tools":["str"],"whyNow":"str","connectWith":"str"}],"assumptions":["str"],"maturityAssessment":"str"}
+{"name":"str","stages":[{"name":"str","stageType":"sales|customer","description":"str","emotionalState":"2-4 words","topFailureRisk":"str","successPattern":"str","benchmarkContext":"str","existingTools":[{"name":"str","domain":"str"}],"meaningfulMoments":[{"name":"str","type":"risk|delight|decision|handoff","description":"str","severity":"low|medium|high|critical","triggers":["str"],"recommendations":["str"],"diagnosis":"str","actionTemplate":"str","cxToolRecommendation":"str","impactIfIgnored":"str","addressesPainPoints":["str"]}]}],"confrontationInsights":[{"pattern":"str","likelihood":"high|medium|low","description":"str","businessImpact":"str","immediateAction":"str","measureWith":"str","companionAdvice":"str","addressesPainPoints":["str"],"evidenceBasis":"str"}],"cxToolRoadmap":[{"tool":"str","whenToDeploy":"str","whyThisTool":"str","expectedOutcome":"str","aiCapability":"str","automationLevel":"autonomous|agent_assisted|human_led"}],"impactProjections":[{"area":"str","potentialImpact":"str","timeToRealize":"str","effort":"low|medium|high","calculation":"math formula","dataSource":"user_provided|benchmark_estimated"}],"techStackRecommendations":[{"category":"crm|marketing|support|analytics|cs_platform|communication|bi|survey|data_infrastructure","categoryLabel":"str","tools":["str"],"whyNow":"str","connectWith":"str"}],"assumptions":["str"],"maturityAssessment":"str","methodologyNote":{"dataLayersUsed":["str"],"crossReferences":["str"],"frameworksApplied":["str"],"personalizedTo":"str"}}
 
 Return ONLY JSON.`;
 }
