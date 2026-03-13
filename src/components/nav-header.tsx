@@ -36,8 +36,7 @@ export function NavHeader() {
   const isAuth = pathname.startsWith("/auth");
 
   const navItems = [
-    { href: `/analysis?id=${templateId}`, label: "Analysis" },
-    { href: `/confrontation?id=${templateId}`, label: "CX Report" },
+    { href: `/analysis?id=${templateId}`, label: "CX Brief" },
     { href: `/journey?id=${templateId}`, label: "Journey" },
     { href: "/playbook", label: "Playbook" },
   ];

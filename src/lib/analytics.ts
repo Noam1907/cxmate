@@ -21,6 +21,7 @@ export type AnalyticsEvent =
   | { name: "journey_map_viewed"; template_id?: string; stage_count?: number }
   | { name: "dashboard_viewed"; template_id?: string }
   | { name: "analysis_viewed"; template_id?: string; stage_count?: number }
+  | { name: "cx_brief_viewed"; template_id?: string; company_name?: string; mode?: string; stage_count?: number }
   // Playbook
   | { name: "playbook_generation_started"; template_id?: string }
   | { name: "playbook_generation_succeeded"; recommendation_count?: number }
