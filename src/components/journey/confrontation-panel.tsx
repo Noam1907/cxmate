@@ -60,6 +60,12 @@ function InsightCard({ insight }: { insight: ConfrontationInsight }) {
 
       {expanded && (
         <div className="mt-3 pt-3 border-t border-current/10 space-y-2.5">
+          {insight.evidenceBasis && (
+            <div className="rounded-md bg-amber-50 border border-amber-200 p-2.5">
+              <div className="text-xs font-semibold text-amber-800 mb-1">Why we flagged this:</div>
+              <div className="text-xs text-amber-700">{insight.evidenceBasis.replace(/^\[.*?\]\s*/, "")}</div>
+            </div>
+          )}
           <div className="rounded-md bg-white/60 border border-current/10 p-2.5">
             <div className="text-xs font-semibold mb-1">Business impact:</div>
             <div className="text-xs">{insight.businessImpact}</div>

@@ -290,10 +290,21 @@ function MomentDetail({ moment, onClose }: { moment: GeneratedMoment; onClose: (
             {moment.recommendations.map((rec, i) => (
               <li key={i} className="flex items-start gap-2 text-sm text-slate-700">
                 <span className="text-slate-300 font-bold mt-0.5 shrink-0">→</span>
-                <span>{rec}</span>
+                <span>{rec.replace(/\[(?:autonomous|agent-assisted|human-led|ai-powered|self-serve)\]\s*/gi, "")}</span>
               </li>
             ))}
           </ul>
+        </div>
+      )}
+
+      {/* Next step — specific tool action */}
+      {moment.nextStep && (
+        <div className="flex items-start gap-2 rounded-lg bg-primary/5 border border-primary/15 px-3 py-2">
+          <span className="text-primary text-sm mt-0.5 shrink-0">&#9889;</span>
+          <div>
+            <span className="text-xs font-semibold text-primary">Next step:</span>{" "}
+            <span className="text-xs text-slate-700">{moment.nextStep}</span>
+          </div>
         </div>
       )}
     </div>

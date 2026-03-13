@@ -176,10 +176,21 @@ function MomentCard({ moment, annotation, hasPlaybookItem, stageSlug }: { moment
                 {moment.recommendations.map((rec, i) => (
                   <li key={i} className="text-sm text-slate-700 flex items-start gap-1.5">
                     <span className="text-slate-400 font-semibold shrink-0">{i + 1}.</span>
-                    {rec}
+                    {rec.replace(/\[(?:autonomous|agent-assisted|human-led|ai-powered|self-serve)\]\s*/gi, "")}
                   </li>
                 ))}
               </ul>
+            </div>
+          )}
+
+          {/* Next step — specific tool action */}
+          {moment.nextStep && (
+            <div className="flex items-start gap-2 rounded-lg bg-primary/5 border border-primary/15 px-3 py-2">
+              <span className="text-primary text-sm mt-0.5 shrink-0">&#9889;</span>
+              <div>
+                <span className="text-xs font-semibold text-primary">Next step:</span>{" "}
+                <span className="text-xs text-slate-700">{moment.nextStep}</span>
+              </div>
             </div>
           )}
 

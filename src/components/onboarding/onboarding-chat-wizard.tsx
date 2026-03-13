@@ -977,10 +977,16 @@ function GoalWidget({
   data,
   onChange,
   onSubmit,
+  supportsVoice,
+  isListening,
+  onToggleVoice,
 }: {
   data: OnboardingData;
   onChange: (patch: Partial<OnboardingData>) => void;
   onSubmit: () => void;
+  supportsVoice: boolean;
+  isListening: boolean;
+  onToggleVoice: () => void;
 }) {
   const goalOptions = getGoalsForPainAndMaturity(data.companyMaturity, data.painPoints);
   const canSubmit = data.primaryGoal && data.timeframe;
@@ -995,13 +1001,31 @@ function GoalWidget({
     onChange(patch);
   };
 
+  // Get selected pain labels for recap
+  const selectedPainLabels = getPainPointsForMaturity(data.companyMaturity)
+    .filter((p) => data.painPoints.includes(p.value))
+    .map((p) => p.label);
+
   return (
     <div className="ml-14 mb-4 max-w-[85%] animate-in fade-in slide-in-from-bottom-2 duration-300">
       <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-4">
+        {/* Pain recap */}
+        {selectedPainLabels.length > 0 && (
+          <div className="rounded-lg bg-slate-50 border border-slate-100 p-3">
+            <div className="text-xs font-medium text-slate-400 mb-1.5">You told us you're dealing with:</div>
+            <div className="flex flex-wrap gap-1.5">
+              {selectedPainLabels.map((label, i) => (
+                <span key={i} className="text-xs bg-white border border-slate-200 text-slate-600 px-2 py-0.5 rounded-full">
+                  {label}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
         {/* Goal chips */}
         <div>
           <label className="text-sm font-medium text-slate-500 mb-2 block">
-            What do you want to fix first?
+            Which of these is most urgent?
           </label>
           <div className="flex flex-wrap gap-2">
             {goalOptions.map((goal) => {
@@ -1083,13 +1107,27 @@ function GoalWidget({
           <label className="text-sm font-medium text-slate-500 mb-1 block">
             Anything else I should know?
           </label>
-          <textarea
-            value={data.additionalContext || ""}
-            onChange={(e) => onChange({ additionalContext: e.target.value })}
-            placeholder="Context that might help — unique challenges, recent changes, specific goals..."
-            rows={2}
-            className="w-full text-sm border border-slate-200 rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50 transition-all resize-none"
-          />
+          <div className="relative">
+            <textarea
+              value={data.additionalContext || ""}
+              onChange={(e) => onChange({ additionalContext: e.target.value })}
+              placeholder="Context that might help — unique challenges, recent changes, specific goals..."
+              rows={2}
+              className="w-full text-sm border border-slate-200 rounded-xl px-3 py-2.5 pr-10 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50 transition-all resize-none"
+            />
+            {supportsVoice && (
+              <button
+                type="button"
+                onClick={onToggleVoice}
+                className={`absolute right-2 bottom-1.5 z-10 p-2.5 rounded-xl cursor-pointer transition-colors ${
+                  isListening ? "bg-red-100 text-red-500 animate-pulse" : "text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+                }`}
+                aria-label={isListening ? "Stop listening" : "Voice input"}
+              >
+                {isListening ? <MicrophoneSlash size={18} /> : <Microphone size={18} />}
+              </button>
+            )}
+          </div>
           <p className="text-xs text-muted-foreground mt-1">Optional — but the more context, the sharper your playbook</p>
         </div>
 
@@ -1473,8 +1511,16 @@ export function OnboardingChatWizard() {
     ];
     setConversation((prev) => [...prev.filter((e) => e.key !== "widget-context"), ...entries]);
 
+    // Build pain-aware goal transition message
+    const selectedPainLabels = getPainPointsForMaturity(data.companyMaturity)
+      .filter((p) => data.painPoints.includes(p.value))
+      .map((p) => p.label);
+    const goalMsg = selectedPainLabels.length > 0
+      ? `Based on what you told me — ${selectedPainLabels.slice(0, 2).join(" and ")}${selectedPainLabels.length > 2 ? ` (+${selectedPainLabels.length - 2} more)` : ""} — what do you want to fix first?`
+      : "Almost there — what do you want to fix first, and when do you need results?";
+
     transitionTo("goal", [
-      { type: "ai", content: "Almost there — what do you want to fix first, and when do you need results?", key: `ai-goal-q-${Date.now()}` },
+      { type: "ai", content: goalMsg, key: `ai-goal-q-${Date.now()}` },
       { type: "widget", step: "goal", key: "widget-goal" },
     ]);
 
@@ -1792,6 +1838,9 @@ export function OnboardingChatWizard() {
                         data={data}
                         onChange={updateData}
                         onSubmit={handleGoalSubmit}
+                        supportsVoice={supportsVoice}
+                        isListening={isListening}
+                        onToggleVoice={toggleVoice}
                       />
                     );
                   default:

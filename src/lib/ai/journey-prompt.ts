@@ -48,6 +48,7 @@ export interface GeneratedMoment {
   impactIfIgnored?: string;
   addressesPainPoints?: string[]; // v4: links moment back to user's stated pain point keys
   competitorGap?: string; // v4: competitor-specific insight for this moment
+  nextStep?: string; // v5: actionable next step with specific tool name (e.g. "Set up in HubSpot", "Track with Mixpanel")
 }
 
 export interface GeneratedStage {
@@ -502,10 +503,12 @@ NEVER write: "Companies see..." / "Best practice is..." / "Research shows..."
 
 ## AI-First Recommendation Rules
 For every moment recommendation and cxToolRoadmap entry, think AI-NATIVE first:
-1. AUTOMATION LEVEL: Start each recommendation with [autonomous], [agent-assisted], or [human-led]
+1. AUTOMATION LEVEL: Do NOT put bracket tags like [autonomous] or [agent-assisted] in recommendation text. Instead, use the cxToolRoadmap's automationLevel field for this.
 2. SPECIFICITY: Name the actual AI tool/platform, not just the category
 3. INTEGRATION: When user has tools, recommend AI layers ON TOP of their stack
 4. AI tools: Intercom Fin, Zendesk AI, Gong, Gainsight Staircase AI, ChurnZero AI, Zapier AI agents, SentiSum, 11x.ai
+5. CLEAN TEXT: Recommendation strings must be plain actionable text. No brackets, no tags, no prefixes. Write like you're telling a colleague what to do.
+6. NEXT STEP: Every moment MUST have a "nextStep" field — a short, specific action with a NAMED TOOL. Examples: "Set up onboarding sequence in HubSpot", "Create health score in Gainsight", "Build dashboard in Mixpanel", "Draft playbook in NotebookLM", "Automate alert in Slack". If the user already has the tool, reference THEIR tool. Never say just "use a tool" — name it.
 
 ## Methodology Note (REQUIRED)
 Generate a "methodologyNote" object explaining HOW CX Mate structured this analysis:
@@ -531,7 +534,7 @@ ${!input.hasExistingCustomers ? 'All stageType MUST be "sales". No post-sale sta
 Impact projections MUST include calculation (math formula) and dataSource. potentialImpact MUST be a dollar value (e.g. "$50K", "$120K", "$1.2M") — never percentages or vague text. addressesPainPoints: tag generously. Use the exact pain point text from above. diagnosis is REQUIRED on every moment (evidence format). evidenceBasis is REQUIRED on every confrontation insight.
 
 JSON schema:
-{"name":"str","stages":[{"name":"str","stageType":"sales|customer","description":"str","emotionalState":"2-4 words","topFailureRisk":"str","successPattern":"str","benchmarkContext":"str","existingTools":[{"name":"str","domain":"str"}],"meaningfulMoments":[{"name":"str","type":"risk|delight|decision|handoff","description":"str","severity":"low|medium|high|critical","triggers":["str"],"recommendations":["str"],"diagnosis":"str","actionTemplate":"str","cxToolRecommendation":"str","impactIfIgnored":"str","addressesPainPoints":["str"]}]}],"confrontationInsights":[{"pattern":"str","likelihood":"high|medium|low","description":"str","businessImpact":"str","immediateAction":"str","measureWith":"str","companionAdvice":"str","addressesPainPoints":["str"],"evidenceBasis":"str"}],"cxToolRoadmap":[{"tool":"str","whenToDeploy":"str","whyThisTool":"str","expectedOutcome":"str","aiCapability":"str","automationLevel":"autonomous|agent_assisted|human_led"}],"impactProjections":[{"area":"str","potentialImpact":"str","timeToRealize":"str","effort":"low|medium|high","calculation":"math formula","dataSource":"user_provided|benchmark_estimated"}],"techStackRecommendations":[{"category":"crm|marketing|support|analytics|cs_platform|communication|bi|survey|data_infrastructure","categoryLabel":"str","tools":["str"],"whyNow":"str","connectWith":"str"}],"assumptions":["str"],"maturityAssessment":"str","methodologyNote":{"dataLayersUsed":["str"],"crossReferences":["str"],"frameworksApplied":["str"],"personalizedTo":"str"}}
+{"name":"str","stages":[{"name":"str","stageType":"sales|customer","description":"str","emotionalState":"2-4 words","topFailureRisk":"str","successPattern":"str","benchmarkContext":"str","existingTools":[{"name":"str","domain":"str"}],"meaningfulMoments":[{"name":"str","type":"risk|delight|decision|handoff","description":"str","severity":"low|medium|high|critical","triggers":["str"],"recommendations":["str"],"diagnosis":"str","actionTemplate":"str","cxToolRecommendation":"str","impactIfIgnored":"str","addressesPainPoints":["str"],"nextStep":"str"}]}],"confrontationInsights":[{"pattern":"str","likelihood":"high|medium|low","description":"str","businessImpact":"str","immediateAction":"str","measureWith":"str","companionAdvice":"str","addressesPainPoints":["str"],"evidenceBasis":"str"}],"cxToolRoadmap":[{"tool":"str","whenToDeploy":"str","whyThisTool":"str","expectedOutcome":"str","aiCapability":"str","automationLevel":"autonomous|agent_assisted|human_led"}],"impactProjections":[{"area":"str","potentialImpact":"str","timeToRealize":"str","effort":"low|medium|high","calculation":"math formula","dataSource":"user_provided|benchmark_estimated"}],"techStackRecommendations":[{"category":"crm|marketing|support|analytics|cs_platform|communication|bi|survey|data_infrastructure","categoryLabel":"str","tools":["str"],"whyNow":"str","connectWith":"str"}],"assumptions":["str"],"maturityAssessment":"str","methodologyNote":{"dataLayersUsed":["str"],"crossReferences":["str"],"frameworksApplied":["str"],"personalizedTo":"str"}}
 
 Return ONLY JSON.`;
 }

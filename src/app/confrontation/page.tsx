@@ -305,6 +305,14 @@ function InsightCard({ insight, index, locked = false, annotations }: {
 
             <p className="text-sm text-slate-600 leading-relaxed">{insight.description}</p>
 
+            {/* Evidence basis — why we flagged this */}
+            {insight.evidenceBasis && (
+              <div className="rounded-lg bg-amber-50/60 border border-amber-200/60 p-3">
+                <p className="text-xs font-bold text-amber-700 uppercase tracking-widest mb-1">Why we flagged this</p>
+                <p className="text-sm text-amber-800">{insight.evidenceBasis.replace(/^\[.*?\]\s*/, "")}</p>
+              </div>
+            )}
+
             {/* Immediate action — most prominent element */}
             {insight.immediateAction && (
               <div className={`rounded-lg p-4 ${isHigh ? "bg-rose-50 border border-rose-200" : isMedium ? "bg-amber-50 border border-amber-200" : "bg-slate-50 border border-slate-200"}`}>
@@ -701,6 +709,48 @@ function ConfrontationContent() {
               </div>
             </FadeIn>
           </div>
+        )}
+
+        {/* Methodology note — how we built this analysis */}
+        {journey.methodologyNote && (
+          <FadeIn delay={1900} className="mb-12">
+            <div className="rounded-xl border border-slate-200 bg-slate-50/50 p-5">
+              <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">How we built this analysis</p>
+              <p className="text-sm text-slate-600 mb-3">{journey.methodologyNote.personalizedTo}</p>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                {journey.methodologyNote.dataLayersUsed?.length > 0 && (
+                  <div>
+                    <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide mb-1">Data layers</p>
+                    <div className="flex flex-wrap gap-1">
+                      {journey.methodologyNote.dataLayersUsed.map((d, i) => (
+                        <span key={i} className="text-[11px] bg-white border border-slate-200 text-slate-500 px-1.5 py-0.5 rounded">{d}</span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {journey.methodologyNote.frameworksApplied?.length > 0 && (
+                  <div>
+                    <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide mb-1">Frameworks</p>
+                    <div className="flex flex-wrap gap-1">
+                      {journey.methodologyNote.frameworksApplied.map((f, i) => (
+                        <span key={i} className="text-[11px] bg-white border border-slate-200 text-slate-500 px-1.5 py-0.5 rounded">{f}</span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {journey.methodologyNote.crossReferences?.length > 0 && (
+                  <div>
+                    <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide mb-1">Cross-references</p>
+                    <div className="flex flex-wrap gap-1">
+                      {journey.methodologyNote.crossReferences.map((c, i) => (
+                        <span key={i} className="text-[11px] bg-white border border-slate-200 text-slate-500 px-1.5 py-0.5 rounded">{c}</span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </FadeIn>
         )}
 
         {/* CTA */}
