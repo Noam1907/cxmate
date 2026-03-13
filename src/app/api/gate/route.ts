@@ -35,29 +35,37 @@ export async function POST(request: NextRequest) {
 
   // Check 2: invite codes from Supabase
   const supabase = getAdminClient();
-  if (supabase) {
-    try {
-      const normalizedCode = password.trim().toUpperCase();
-      const { data, error } = await supabase
-        .from("invite_codes")
-        .select("id, code, max_uses, use_count, is_active")
-        .eq("code", normalizedCode)
-        .single();
-
-      if (!error && data && data.is_active && data.use_count < data.max_uses) {
-        // Increment use count
-        await supabase
-          .from("invite_codes")
-          .update({ use_count: data.use_count + 1 })
-          .eq("id", data.id);
-
-        return grantAccess();
-      }
-    } catch (err) {
-      console.error("Invite code check failed:", err);
-      // Fall through to invalid response
-    }
+  if (!supabase) {
+    console.error("Gate: No Supabase admin client — missing URL or SERVICE_ROLE_KEY");
+    return NextResponse.json({ success: false, error: "Invalid code", debug: "no_supabase_client" }, { status: 401 });
   }
 
-  return NextResponse.json({ success: false, error: "Invalid code" }, { status: 401 });
+  try {
+    const normalizedCode = password.trim().toUpperCase();
+    const { data, error } = await supabase
+      .from("invite_codes")
+      .select("id, code, max_uses, use_count, is_active")
+      .eq("code", normalizedCode)
+      .single();
+
+    if (error) {
+      console.error("Gate: Supabase query error:", error.message, error.code);
+      return NextResponse.json({ success: false, error: "Invalid code", debug: error.message }, { status: 401 });
+    }
+
+    if (data && data.is_active && data.use_count < data.max_uses) {
+      // Increment use count
+      await supabase
+        .from("invite_codes")
+        .update({ use_count: data.use_count + 1 })
+        .eq("id", data.id);
+
+      return grantAccess();
+    }
+
+    return NextResponse.json({ success: false, error: "Invalid code", debug: data ? `active=${data.is_active} uses=${data.use_count}/${data.max_uses}` : "code_not_found" }, { status: 401 });
+  } catch (err) {
+    console.error("Invite code check failed:", err);
+    return NextResponse.json({ success: false, error: "Invalid code", debug: "exception" }, { status: 401 });
+  }
 }
