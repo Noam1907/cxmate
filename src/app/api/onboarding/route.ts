@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { onboardingSchema } from "@/lib/validations/onboarding";
 import { generateJourney } from "@/lib/ai/generate-journey";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { persistJourney } from "@/lib/services/journey-persistence";
 
 // Extend Vercel function timeout to 5 minutes — journey generation takes ~2.8 min
@@ -43,6 +44,17 @@ export async function POST(request: Request) {
             vertical: input.vertical,
             journeyType: input.journeyType,
           }, journey);
+
+          // Sync org record with onboarding data (vertical, size, name)
+          const admin = createAdminClient();
+          await admin
+            .from("organizations")
+            .update({
+              vertical: input.vertical,
+              size: input.companySize,
+              name: input.companyName,
+            })
+            .eq("id", orgId);
         } catch (err) {
           console.error("Failed to persist journey:", err);
           // Fall back to preview mode — don't block the user
