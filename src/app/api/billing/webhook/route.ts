@@ -134,14 +134,32 @@ async function findOrgByEmail(
 ): Promise<string | null> {
   if (!email) return null;
 
-  // Look up the Supabase Auth user by email, then get their org_id
-  const { data: authData } = await adminClient.auth.admin.listUsers();
-  const user = authData?.users?.find(
-    (u: { email?: string }) =>
-      u.email?.toLowerCase() === email.toLowerCase()
-  );
+  const normalizedEmail = email.toLowerCase();
+  let page = 1;
+  const perPage = 1000;
 
-  if (!user) return null;
+  // Paginate through all auth users to find the one matching this email.
+  // listUsers() without pagination only returns the first 50 (Supabase default).
+  while (true) {
+    const { data: authData, error } = await adminClient.auth.admin.listUsers({
+      page,
+      perPage,
+    });
 
-  return (user.app_metadata?.org_id as string) ?? null;
+    if (error || !authData?.users?.length) return null;
+
+    const user = authData.users.find(
+      (u: { email?: string }) =>
+        u.email?.toLowerCase() === normalizedEmail
+    );
+
+    if (user) {
+      return (user.app_metadata?.org_id as string) ?? null;
+    }
+
+    // Reached the last page — no more users to check
+    if (authData.users.length < perPage) return null;
+
+    page++;
+  }
 }

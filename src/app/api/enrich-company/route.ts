@@ -11,6 +11,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import type { EnrichedCompanyData } from "@/types/enrichment";
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 
 // ============================================
 // Input Validation
@@ -353,6 +354,16 @@ Analyze this company and return a JSON object with these fields. Use the website
 
 export async function POST(request: Request) {
   try {
+    // Rate limit: 10 enrichment calls per IP per day
+    const ip = getClientIp(request);
+    const { limited } = checkRateLimit(ip, "enrich-company", 10);
+    if (limited) {
+      return NextResponse.json(
+        { error: "Rate limit exceeded. Please try again tomorrow." },
+        { status: 429 }
+      );
+    }
+
     const body = await request.json();
     const parsed = enrichSchema.safeParse(body);
 

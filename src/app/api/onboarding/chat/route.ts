@@ -10,6 +10,7 @@
  */
 
 import { NextResponse } from "next/server";
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 
 export const maxDuration = 60;
 
@@ -326,6 +327,16 @@ OUTPUT FORMAT — respond ONLY with valid JSON, no markdown fences, no preamble:
 
 export async function POST(request: Request) {
   try {
+    // Rate limit: 30 chat messages per IP per day
+    const ip = getClientIp(request);
+    const { limited } = checkRateLimit(ip, "onboarding-chat", 30);
+    if (limited) {
+      return NextResponse.json(
+        { error: "Rate limit exceeded. Please try again tomorrow." },
+        { status: 429 }
+      );
+    }
+
     const body = await request.json();
     const messages: Message[] = body.messages || [];
     const extractedFields: Record<string, unknown> = body.extractedFields || {};

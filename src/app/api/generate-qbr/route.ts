@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import type { GeneratedPlaybook } from "@/lib/ai/recommendation-prompt";
 import type { GeneratedJourney } from "@/lib/ai/journey-prompt";
 import { buildQBRPrompt, type GeneratedQBR } from "@/lib/ai/qbr-prompt";
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 
 // QBR generation is fast (< 60s) — simpler than journey or playbook
 export const maxDuration = 120;
@@ -53,6 +54,16 @@ function repairJson(raw: string): GeneratedQBR {
 
 export async function POST(request: Request) {
   try {
+    // Rate limit: 5 QBR generations per IP per day
+    const ip = getClientIp(request);
+    const { limited } = checkRateLimit(ip, "generate-qbr", 5);
+    if (limited) {
+      return NextResponse.json(
+        { error: "Rate limit exceeded. Please try again tomorrow." },
+        { status: 429 }
+      );
+    }
+
     const body = await request.json();
     const { playbook, journey, onboardingData } = body as {
       playbook: GeneratedPlaybook;

@@ -4,6 +4,7 @@ import { generateRecommendations } from "@/lib/ai/generate-recommendations";
 import { onboardingSchema } from "@/lib/validations/onboarding";
 import type { GeneratedJourney } from "@/lib/ai/journey-prompt";
 import { createClient } from "@/lib/supabase/server";
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 
 // Extend Vercel function timeout to 5 minutes — playbook generation takes 2-3 min
 export const maxDuration = 300;
@@ -24,6 +25,16 @@ const requestSchema = z.object({
 
 export async function POST(request: Request) {
   try {
+    // Rate limit: 5 playbook generations per IP per day
+    const ip = getClientIp(request);
+    const { limited } = checkRateLimit(ip, "recommendations", 5);
+    if (limited) {
+      return NextResponse.json(
+        { error: "Rate limit exceeded. Please try again tomorrow." },
+        { status: 429 }
+      );
+    }
+
     const body = await request.json();
 
     const parsed = requestSchema.safeParse(body);
