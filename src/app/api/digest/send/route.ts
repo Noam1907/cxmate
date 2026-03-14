@@ -5,23 +5,26 @@ import { createAdminClient } from "@/lib/supabase/admin";
 /**
  * Daily Digest — sends a morning summary email to the configured address.
  *
- * Called by Vercel cron daily at 7am IL, or manually via POST.
+ * Called by Vercel cron daily at 7am IL (GET), or manually via POST.
  * Includes:
  *   1. System health check — all external services verified
  *   2. Product stats — signups, journeys in last 24h
  *
- * Protected by CRON_SECRET header.
+ * Protected by CRON_SECRET (Vercel sends Authorization: Bearer <CRON_SECRET>).
  *
  * Required env vars:
  *   RESEND_API_KEY       — from resend.com
  *   DIGEST_EMAIL         — where to send the digest (your inbox)
  *   CRON_SECRET          — any random string, set in Vercel env vars too
  */
-export async function POST(request: Request) {
-  // Security: require secret header to prevent abuse
-  const secret = request.headers.get("x-cron-secret");
+async function handleDigest(request: Request) {
+  // Security: accept Vercel cron header (Authorization: Bearer) or legacy x-cron-secret
   const expected = process.env.CRON_SECRET;
-  if (!expected || secret !== expected) {
+  const authHeader = request.headers.get("authorization");
+  const legacySecret = request.headers.get("x-cron-secret");
+  const bearerToken = authHeader?.startsWith("Bearer ") ? authHeader.slice(7) : null;
+
+  if (!expected || (bearerToken !== expected && legacySecret !== expected)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -66,6 +69,16 @@ export async function POST(request: Request) {
   }
 
   return NextResponse.json({ ok: true, sentTo: toEmail });
+}
+
+// Vercel crons send GET requests
+export async function GET(request: Request) {
+  return handleDigest(request);
+}
+
+// Manual trigger via POST (e.g. curl)
+export async function POST(request: Request) {
+  return handleDigest(request);
 }
 
 // ─── Health check ─────────────────────────────────────────────────────────────
