@@ -49,6 +49,7 @@ export async function GET(
       success: true,
       templateId: id,
       journey: result.journey,
+      onboardingData: result.onboardingData || null,
     });
   } catch (error) {
     console.error("Journey load error:", error);

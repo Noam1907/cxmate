@@ -54,7 +54,7 @@ export async function POST(request: Request) {
             companyName: input.companyName,
             vertical: input.vertical,
             journeyType: input.journeyType,
-          }, journey);
+          }, journey, input as unknown as Record<string, unknown>);
 
           // Sync org record with onboarding data (vertical, size, name)
           const admin = createAdminClient();

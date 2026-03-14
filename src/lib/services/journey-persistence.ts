@@ -7,7 +7,9 @@ import type { GeneratedJourney } from "@/lib/ai/journey-prompt";
  * Inserts: journey_template → journey_stages → meaningful_moments
  *
  * The full journey JSON is also stored in journey_templates.stages
- * as a JSONB backup for easy reconstruction.
+ * as a JSONB backup for easy reconstruction. Onboarding data is
+ * embedded as _onboardingData inside the same JSONB so authenticated
+ * users can recover context (company name, evidence wall) on return.
  *
  * Returns the journey template UUID.
  */
@@ -19,8 +21,17 @@ export async function persistJourney(
     vertical: string;
     journeyType: "sales" | "customer" | "full_lifecycle";
   },
-  journey: GeneratedJourney
+  journey: GeneratedJourney,
+  onboardingData?: Record<string, unknown>
 ): Promise<string> {
+  // Embed onboarding data inside the JSONB alongside journey data
+  // so returning authenticated users get full context (company name,
+  // pain points for evidence wall, etc.)
+  const stagesPayload = {
+    ...journey,
+    _onboardingData: onboardingData || null,
+  };
+
   // 1. Create journey template
   const { data: template, error: templateError } = await supabase
     .from("journey_templates")
@@ -30,7 +41,7 @@ export async function persistJourney(
       vertical: input.vertical,
       journey_type: input.journeyType,
       is_default: true,
-      stages: journey as unknown as Database["public"]["Tables"]["journey_templates"]["Insert"]["stages"],
+      stages: stagesPayload as unknown as Database["public"]["Tables"]["journey_templates"]["Insert"]["stages"],
       source: "ai_generated",
     })
     .select("id")
@@ -104,6 +115,7 @@ export async function loadJourney(
   journey: GeneratedJourney;
   orgId: string;
   vertical: string;
+  onboardingData?: Record<string, unknown>;
 } | null> {
   // Guard against "null"/"undefined" strings from URL params
   if (!templateId || templateId === "null" || templateId === "undefined" || templateId === "preview") {
@@ -122,18 +134,25 @@ export async function loadJourney(
     return null;
   }
 
-  // The stages column contains the full GeneratedJourney as JSONB backup
-  const journey = template.stages as unknown as GeneratedJourney;
+  // The stages column contains the full GeneratedJourney as JSONB backup,
+  // with _onboardingData embedded alongside (added for returning-user context)
+  const raw = template.stages as unknown as GeneratedJourney & {
+    _onboardingData?: Record<string, unknown>;
+  };
 
-  if (!journey || !journey.stages) {
+  if (!raw || !raw.stages) {
     // Fallback: reconstruct from normalized tables
     return await reconstructJourneyFromTables(supabase, templateId, template);
   }
 
+  // Extract onboarding data and return clean journey
+  const { _onboardingData, ...journey } = raw;
+
   return {
-    journey,
+    journey: journey as GeneratedJourney,
     orgId: template.org_id,
     vertical: template.vertical,
+    onboardingData: _onboardingData || undefined,
   };
 }
 
