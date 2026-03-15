@@ -59,6 +59,16 @@ CX Mate's outputs should reference established CX expert frameworks where releva
 
 ## The Practitioners (Execution & Journey Mapping)
 
+### Jeannie Walters
+- **Title:** CCXP, CSP. Founder & CEO of Experience Investigators. Award-winning CX expert, international keynote speaker, LinkedIn Learning instructor (500K+ professionals trained).
+- **Focus:** Shifting organisations from reactive customer service to proactive, company-wide customer experience strategy. CX as a business discipline, not a department. Practical frameworks for cross-functional teams.
+- **Key Work:** *Experience Is Everything: Making Every Moment Count in the Age of Customer Expectations* (April 2026, Simon & Schuster). LinkedIn Learning courses on CX strategy.
+- **Core Framework:** CX Mission Statement, CX Success Blueprint, and the "Four C's of CX Culture." Designs CX programmes that turn customer insight into prioritised initiatives with clear owners and measurable outcomes.
+- **Use when:** CX strategy as business discipline, proactive vs reactive CX, cross-functional CX ownership, CX culture building, AI + human balance in CX.
+- **Key Insight:** "Customer experience is no longer a department — it's a business discipline that every role needs to understand." / "AI should amplify human capability, not replace it."
+- **Clients:** SAP, Verizon, SurveyMonkey, Citrix — but her frameworks apply at any scale.
+- **Recognition:** CX Network Top 40 Future of CX Leaders 2026. LinkedIn most influential CX voice.
+
 ### Ian Golding
 - **Title:** One of the most respected CX practitioners globally. Key figure in the CCXP (Certified Customer Experience Professional) community.
 - **Focus:** Measurable, sustainable CX strategy. Rigorous methodology grounded in global standards.
@@ -106,6 +116,7 @@ CX Mate's outputs should reference established CX expert frameworks where releva
 |--------|--------------------------|
 | Jeanne Bliss | C-suite accountability, CCO model, CX as business strategy |
 | Shep Hyken | Service excellence, Moments of Magic, consistency over wow |
+| Jeannie Walters | CX as business discipline, proactive CX strategy, cross-functional ownership, CX culture |
 | Annette Franz | Journey mapping methodology, VoC, root cause analysis |
 | Ian Golding | CCXP standards, metrics, measurement rigour |
 | Blake Morgan | AI/automation recommendations, future-proofing |
@@ -139,4 +150,4 @@ The AI prompt should reference these frameworks with light authority — not hea
 - *"This is what Shep Hyken calls a 'Moment of Magic' — a touchpoint where you can consistently exceed expectations without heroic effort."*
 - *"Blake Morgan would flag this as a risk: automation that removes the human from a high-emotion moment."*
 
-*Last updated: 2026-03-02*
+*Last updated: 2026-03-12*
