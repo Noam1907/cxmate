@@ -4,6 +4,242 @@ Track sprint progress and status.
 
 ---
 
+## Session: 2026-03-14 (Rate Limiting + Revenue Guardrail + Data Persistence)
+
+### Shipped This Session
+
+**Rate Limiting on All Claude API Routes (deployed — `2d79997`)**
+- New in-memory rate limiter (`src/lib/rate-limit.ts`) with sliding window algorithm
+- Applied to all 5 Claude-calling routes: onboarding (3/day), chat (30/day), enrich-company (10/day), recommendations (5/day), generate-qbr (5/day)
+- Protects against denial-of-wallet attacks on the anonymous "no sign-up" flow
+- Pre-beta security blocker — now resolved ✅
+
+**Billing Webhook Pagination Fix (deployed — `2d79997`)**
+- `findOrgByEmail()` in billing webhook only searched first 50 users (Supabase `listUsers` default)
+- Now paginates through all users — prevents silent billing failures for user #51+
+
+**Revenue Guardrail in Journey Prompt (deployed — `d0e5165`)**
+- Cap impact projections at 40% of ARR with stage-appropriate ceilings
+- Pre-launch: max $50K, first customers: max $200K
+- Prevents inflated projections (e.g., Corneat run showed $825K for a pre-revenue startup)
+
+**Org Vertical Sync from Onboarding (deployed — `d0e5165`)**
+- Onboarding route now syncs org record (vertical, size, name) after journey persists
+- Fixes orgs showing "general" when enrichment detected the actual vertical
+
+**Onboarding Data Persistence for Returning Users (deployed — `e4e7ff1`)**
+- Authenticated users returning to CX Brief were seeing "your company" instead of actual company name
+- Evidence wall was empty because onboardingData wasn't persisted
+- Now embeds `_onboardingData` inside `journey_templates.stages` JSONB
+- Extracts and returns it from `loadJourney()` and both journey API routes
+- Backfilled Corneat's existing record with reconstructed onboarding context
+
+**Digest Cron Fix (deployed — `586f1f8`)**
+- Vercel crons send GET with Bearer auth, but route only exported POST with x-cron-secret header
+- Added GET handler + Bearer token auth — cron was getting 405'd every morning
+
+### Items Resolved from Previous Session's Next Steps
+- ✅ Rate limiting on Claude API routes (was #1 priority)
+- ✅ Fix `listUsers()` in billing webhook (was #2 priority)
+- ✅ Revenue guardrail in prompt (was #4 priority)
+
+### Next Session Should Start With
+1. **QA with actual journey data** — only tested empty state on CX Brief; verify full render with real data
+2. **Gate page + homepage copy** — second pass presented, awaiting Anat's direction
+3. **Keren's remaining criticals** — input→output visual mapping (partially done)
+4. **Uncommitted M-memory files** — decisions.md, learning-log.md, sprint-log.md have unstaged changes
+5. **Supabase migration** — `20260314210157_add_onboarding_data_column.sql` sitting in migrations, needs to be applied
+
+---
+
+## Session: 2026-03-13 (CX Brief Merge — Unified Intelligence Page)
+
+### Shipped This Session
+
+**Unified CX Brief Page (deployed to production — `283f3cc`, `a880794`)**
+- Merged separate Analysis page (540 lines) + CX Report/Confrontation page (787 lines) into a single unified CX Brief (~1100 lines)
+- Architecture changed from 4 pages to 3: **CX Brief | Journey Map | Playbook**
+- Key components in the new page:
+  - `HeroSection` — dark gradient hero with headline dollar range from impactProjections, maturity-adaptive headlines via `detectMode()`/`MODE_CONFIG`
+  - `StatRow` — 3 stat cards (high-risk stages, critical moments, total moments mapped)
+  - `JourneyDangerMap` — mini journey visualization highlighting risky stages with red circles + "!" badges
+  - `InsightCard` — from confrontation, with evidence basis, pain point badges, immediate action steps
+  - `ImpactBreakdown` — bar chart of risk areas (gated behind `report_details`)
+  - `QuickWinsPreview` — top 3 critical moments with nextStep from journey data
+  - `AssumptionsSection` — expandable calculation methodology
+  - `MethodologyNote` — data layers, frameworks, cross-references
+- Full feature gating with `usePlanTier()` + `canAccess()` for free vs paid tiers
+- Evidence matching integrated via `buildEvidenceMap()` + `getInsightAnnotations()`
+
+**Navigation Updates (all deployed)**
+- `nav-header.tsx` — changed from 4 nav items (Analysis | CX Report | Journey | Playbook) to 3 (CX Brief | Journey | Playbook)
+- `sidebar-complete-view.tsx` — merged separate Analysis + CX Report nav entries into single "CX Brief" entry
+- `sidebar-building-view.tsx` — updated "After onboarding" preview list from (Dashboard, CX Report, Journey Map, Playbook) to (CX Brief, Journey Map, Playbook)
+
+**Confrontation Redirect (deployed)**
+- Replaced 787-line confrontation page with simple redirect component
+- `/confrontation?id=X` now redirects to `/analysis?id=X`, preserving old URLs and bookmarks
+
+**Analytics Type Fix**
+- Added `cx_brief_viewed` event type to `src/lib/analytics.ts` AnalyticsEvent union
+
+### Build Fixes During Implementation
+- `win.title` → `win.name` (MeaningfulMoment type uses `name` not `title`)
+- Added `cx_brief_viewed` to typed AnalyticsEvent union (was causing `Expected 1 arguments, but got 2`)
+- Changed `page="cx_brief"` to `page="analysis"` for ExportPdfButton (reuses existing ExportPage type)
+
+### QA Verified
+- ✅ Build passes (TypeScript + Next.js)
+- ✅ Empty state renders correctly with 3-card layout (CX Brief, Journey Map, CX Playbook)
+- ✅ `/confrontation?id=preview` correctly redirects to `/analysis?id=preview`
+- ✅ Nav header shows 3 items (CX Brief | Journey | Playbook)
+- ✅ Sidebar building view shows updated "After onboarding" list
+
+### Security Audit (same session)
+- Full codebase security audit completed
+- **Critical finding:** All 5 Claude API routes are unauthenticated — denial-of-wallet risk (scripts can rack up Anthropic costs)
+- **Decision:** Add IP-based rate limiting to all Claude-calling routes before beta invites go out
+- Other findings: `/api/notify` open endpoint (medium), `listUsers()` in billing webhook only gets first 50 users (medium), PostHog records all non-password inputs (acceptable for beta)
+- Full report delivered to Anat — verdict: safe for gated beta, fix rate limiting + billing query before opening up
+
+### M-Memory Updates (same session)
+- `decisions.md` — Updated decision #113 (CX Brief merge: 4→3 pages)
+- `learning-log.md` — Added 2026-03-13 entry (5 patterns from page merge)
+- `B-brain/01-cx-methodology/holistic-cx-scorecard.md` — Saved Keren Shaked's 3-pillar CX framework
+- Daily scheduled task updated to include user entry counts in morning briefing
+
+### Next Session Should Start With
+1. **🔴 Rate limiting on Claude API routes** — Pre-beta blocker. Add IP-based rate limit (3-5 requests/IP/day) to: `/api/onboarding`, `/api/onboarding/chat`, `/api/enrich-company`, `/api/recommendations/generate`, `/api/generate-qbr`. Protects against denial-of-wallet attacks on the anonymous "no sign-up" flow.
+2. **🔴 Fix `listUsers()` in billing webhook** — Only fetches first 50 users. Replace with targeted query. Will silently break billing for user #51+.
+3. **QA with actual journey data** — only tested empty state so far; need to verify full CX Brief renders with real journey data
+4. **Revenue guardrail in prompt** — cap total risk at 40% of stated ARR
+5. **Gate page + homepage copy** — second pass presented, awaiting Anat's direction
+6. **Keren's remaining criticals** — pain points in output ✅, input→output visual mapping (partially done)
+
+---
+
+## Session: 2026-03-12 (Beta Gate + Lead Capture + Waitlist)
+
+### Shipped This Session
+
+**Beta Password Gate (deployed to production)**
+- Built cookie-based password gateway — middleware redirects all unauthenticated visitors to `/gate`
+- `src/middleware.ts` — gate logic with allowed routes (`/gate`, `/api/gate`, `/api/waitlist`, `/api/billing/webhook`)
+- `src/app/api/gate/route.ts` — validates password against `SITE_PASSWORD` env, sets `beta_access` httpOnly cookie (30 days)
+- `src/app/gate/page.tsx` — two-column lead capture landing page (3 iterations: password-only → single-column → two-column)
+- `src/components/nav-header.tsx` — hides nav on `/gate`
+- `src/components/layout/app-shell.tsx` — added `/gate` to `SIDEBAR_EXCLUDED_ROUTES`
+- Vercel env var `SITE_PASSWORD` set on production
+
+**Gate Page — Lead Capture Landing Page (deployed to production)**
+- Left column: Logo, headline, sub-headline, 3 value bullets (MapTrifold, Warning, Target icons), "Built for B2B" line
+- Right column: Private Beta badge, waitlist form (name, email, company → "Get on the list"), divider, expandable access code input
+- Wires to existing `/api/waitlist` endpoint for signups and `/api/gate` for access codes
+- Success state with confirmation message
+
+**Waitlist Pipeline (end-to-end verified)**
+- Fixed middleware blocking `/api/waitlist` — was redirecting to `/gate`
+- Supabase `waitlist` + `invite_codes` tables created (migration `003_beta_waitlist.sql` applied by Anat manually)
+- Waitlist signup tested end-to-end: form → Supabase insert → email notification via Resend to `DIGEST_EMAIL` ✅
+- 3 initial invite codes seeded: `CXBETA2026` (50 uses), `EARLYBIRD` (20), `CXFIRST` (10)
+
+**CX Influencers**
+- Added Jeannie Walters to `B-brain/01-cx-methodology/cx-influencers-2026.md` — CCXP, Experience Investigators, upcoming book, core frameworks
+
+**Messaging Direction Captured (not yet implemented)**
+- Anat's brief: No consultant bashing. CX Mate fills a gap that was empty — making CX expertise accessible at a stage where it didn't exist before
+- Themes: accessibility, speed, simplicity, time savings, stickiness, no guesswork
+- Key framing: "Consultants serve companies that can afford them. We serve the ones that can't yet."
+- Copy review in progress — first pass rejected, second pass presented awaiting feedback
+
+### Bugs Found
+- Middleware was blocking `/api/waitlist` calls from gate page (fixed: added to allowed routes)
+- Waitlist API returned 500 because migration wasn't applied to production (fixed: Anat ran SQL manually)
+- Gate page showed nav header (fixed: added `/gate` to hidden routes)
+
+### Learnings
+- Middleware route gating: any API endpoint that the gate page itself calls must be explicitly allowed through
+- Supabase JS client cannot run DDL — need psql, Supabase CLI with access token, or dashboard SQL editor
+- Copy direction: never position against consultants. We fill the gap before companies can afford one — respect the profession, democratize the expertise
+
+### Uncommitted Files (need git add + commit)
+- `src/app/gate/page.tsx` (new)
+- `src/app/api/gate/route.ts` (new)
+- `src/middleware.ts` (modified)
+- `src/components/nav-header.tsx` (modified)
+- `src/components/layout/app-shell.tsx` (modified)
+- `B-brain/01-cx-methodology/cx-influencers-2026.md` (modified)
+- `.env.local.example` (modified)
+
+### Next Session Should Start With
+1. **Gate page + homepage copy** — second pass presented, awaiting Anat's direction
+2. **Commit + push today's work** — significant uncommitted changes
+3. **Create testing workflow** — Anat explicitly asked for automated testing for emails/integrations
+4. **Keren's 3 criticals** — still P0: "why" evidence layer, pain points in output, input→output mapping
+5. **Fix demo bugs** — Must-do vs Quick Wins rendering, revenue impact numbers
+
+---
+
+## Session: 2026-03-11 (Post-Demo — Debrief + Bug Fixes + UX Polish)
+
+### Shipped This Session
+
+**Demo Debrief — Jonathan Riftin + Keren Shaked**
+- Created `M-memory/demo-debrief-2026-03-11.md` — full debrief with both demos
+- Created `M-memory/open-questions.md` — 12 strategic/product/technical open questions surfaced from demos
+- Shuval (Orca COO) "aha moment" captured — confrontation challenged his blind spots in real-time
+- Keren validated $20-40K market gap, took 2 actionable ideas from the demo
+- Jonathan flagged "no longevity" concern — validates deliverable-shaped pricing
+
+**Sprint 4 Batch (feat: `d8c83ff`)**
+- Enrichment fix — stale data bug resolved
+- Sidebar removal — cleaned up for cleaner output pages
+- UX polish — em-dashes on homepage, timed auto-advance, scroll fixes
+- Evidence matching improvements
+
+**Onboarding UX Fixes (from demo observations)**
+- `75b80f6` — Timeframe warning, font sizes increased, free text "anything else" field added
+- `cb06fca` — Only auto-scroll when user is near bottom
+- `78aeb94` — Canonical revenue labels in insight text
+- `dd7a00b` — Insights panel: 1 insight per step, shorter copy, wider layout
+- `58ec905` — Larger insight bubbles + content for all steps
+
+**AI/Generation Fixes**
+- `05d2d5f` — Increased journey max_tokens to 8192 (was truncating JSON)
+- `beb0d9d` — Reverted to claude-sonnet-4 (3.5-sonnet deprecated, returning 404)
+- `8c08784` — Attempted Sonnet 3.5 + aggressive prompt compression (rolled back)
+- `9dee46f` — Trimmed prompt ~3000 tokens for faster generation
+- `69765a7` — Reverted journey model to Sonnet (Haiku can't handle complex JSON)
+
+**Playbook Fixes**
+- `832fcc3` — Token budget constraints to prevent max_tokens truncation
+- `d69be14` — Friendly timeout error message instead of cryptic abort signal
+- `cc56fb1` — Playbook token truncation fix + UUID null string guard
+
+**Security**
+- `74f6b86` — Fixed critical secret exposure + 7 high/medium vulnerabilities
+
+**Analysis Page**
+- `edb768e` — Rewrote copy + fixed type errors for analysis page
+
+**Domain**
+- cxmate.io purchased, DNS configuration in progress
+- Cloudflare email verification stuck (anat@cxmate.io — verification email not arriving)
+
+### Learnings (to be promoted)
+- Haiku can't handle complex structured JSON output — Sonnet is the minimum for journey generation
+- claude-sonnet-3.5 deprecated (404) — always use `claude-sonnet-4-20250514`
+- Demo feedback is product gold: Keren's 3 critical items (Why layer, pain point proof, input→output mapping) reshape the priority stack
+
+### Next Session Should Start With
+1. **Keren's 3 criticals** — personalization proof, "why" evidence layer, input→output mapping
+2. **Fix remaining demo bugs** — Must-do vs Quick Wins rendering, revenue impact numbers
+3. **Progressive disclosure** — output is overwhelming
+4. **Cloudflare email** — unstick the verification
+5. **Unified `/analysis` page** — the deliverable vision
+
+---
+
 ## Session: 2026-03-10 (Morning — Pre-demo prep + Loop Audit)
 
 ### Shipped This Session

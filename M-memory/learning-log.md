@@ -269,6 +269,16 @@ Key validated stats for use in impact projections, prompts, and messaging (sourc
 
 ---
 
+### 2026-03-13 — CX Brief Merge: From 4 Pages to 3
+
+- **"Unified page" doesn't mean "add a 5th page" — it means merge.** The original decision (#113) said "4 deep-dive pages stay, add an executive summary landing." In practice, Analysis and CX Report had 80% content overlap. Merging them into one CX Brief eliminated redundancy and reduced cognitive load. The architecture went from 4 pages → 3 pages (CX Brief | Journey Map | Playbook). When pages overlap significantly, the right move is merge, not add.
+- **Redirect pages preserve backward compatibility cheaply.** Instead of deleting `/confrontation` (which had bookmarks, PostHog data, and potential external links), a simple redirect page that preserves query params keeps everything working. 5 lines of code, zero broken links.
+- **Sidebar views must stay in sync — there are TWO.** CX Mate has two sidebar views: `sidebar-building-view.tsx` (shown during onboarding) and `sidebar-complete-view.tsx` (shown after journey generation). When nav structure changes, BOTH must be updated. The building view was missed in the first commit and caught only in QA. Grep for "sidebar" when changing navigation.
+- **Analytics event naming follows the page, not the legacy name.** When Analysis + CX Report merged into CX Brief, the analytics event became `cx_brief_viewed` (not `analysis_viewed` or `report_viewed`). Event names should describe what the user sees, not what the code calls it. This prevents confusion when reviewing PostHog data months later.
+- **When merging pages, check all consumers: nav, sidebar, analytics, redirects, middleware.** The full checklist for a page merge: (1) nav-header.tsx, (2) sidebar-building-view.tsx, (3) sidebar-complete-view.tsx, (4) middleware route protection, (5) analytics events, (6) redirect from old URL, (7) any cross-links from other pages. Missing any one creates an inconsistency.
+
+---
+
 ## Version History
 
 | Date | Update | By |
